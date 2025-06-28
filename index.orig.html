@@ -92,6 +92,7 @@
             --c-btn-secondary-bg: linear-gradient(90deg, rgba(245,169,184,0.15) 0%, rgba(91,206,250,0.10) 100%);
 
             --c-success: #3ec6a8;
+            --c-danger: #f87171;
         }
 
         /* --- Global Styles --- */
@@ -353,11 +354,23 @@
             overflow: hidden;
             border: 1.5px solid var(--c-primary);
             box-shadow: 0 1px 4px rgba(91, 206, 250, 0.04);
-            transition: border-color 0.2s, background 0.3s ease;
+            transition: border-color 0.2s, background 0.3s ease, transform 0.2s ease-in-out;
         }
 
         .flight-code-input-wrapper:focus-within {
             border-color: var(--c-secondary);
+        }
+
+        /* --- NEW: Invalid Code Styling --- */
+        @keyframes shake {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
+        }
+        .flight-code-input-wrapper.input-error {
+            border-color: var(--c-danger);
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
         }
 
         .flight-code-input-wrapper input {
@@ -1283,7 +1296,7 @@
             scrollbar-color: var(--c-primary) transparent;
         }
 
-        /* --- NEW: Toast Notification Styles --- */
+        /* --- Toast Notification Styles --- */
         #toast-container {
             position: fixed;
             top: 80px;
@@ -1300,7 +1313,7 @@
             border-radius: 12px;
             box-shadow: var(--c-panel-shadow);
             border: 2px solid var(--c-primary);
-            width: 320px;
+            width: 350px;
             max-width: 90vw;
             opacity: 0;
             transform: translateX(100%);
@@ -1310,6 +1323,14 @@
             opacity: 1;
             transform: translateX(0);
         }
+        /* --- NEW: Danger Toast Variant --- */
+        .toast.toast-danger {
+            border-color: var(--c-danger);
+        }
+        .toast.toast-danger .toast-header strong {
+            color: var(--c-danger);
+        }
+
         .toast-header {
             display: flex;
             justify-content: space-between;
@@ -1326,6 +1347,7 @@
         }
         .toast-body {
             font-size: 0.95em;
+            line-height: 1.5;
             margin-bottom: 1rem;
         }
         .toast-actions {
@@ -1509,7 +1531,7 @@
     </div>
 </footer>
 
-<!-- Toast container for invitations -->
+<!-- Toast container -->
 <div id="toast-container"></div>
 
 <!-- All Modals are placed here -->
@@ -1756,6 +1778,7 @@
     const createFlightBtn = document.getElementById("createFlightBtn");
     const joinFlightBtn = document.getElementById("joinFlightBtn");
     const flightCodeInput = document.getElementById("flightCodeInput");
+    const flightCodeInputWrapper = flightCodeInput.closest('.flight-code-input-wrapper'); // NEW
 
     const dashboard = document.getElementById("dashboard");
     const dashboardFlightCode = document.getElementById("dashboard-flight-code");
@@ -2024,7 +2047,7 @@
         ws.onopen = () => discoverLocalIpAndRegister(); // Still useful for LAN/WAN detection
         ws.onmessage = async (event) => {
             const msg = JSON.parse(event.data);
-            console.log("Received:", msg);
+            // console.log("Received:", msg);
             switch (msg.type) {
                 case "registered": myId = msg.id; break;
                 case "users-on-network-update":
@@ -2043,12 +2066,46 @@
                     break;
                 case "signal": if (!peerConnection) initializePeerConnection(isFlightCreator); await handleSignal(msg.data); break;
                 case "peer-left": handlePeerLeft(); break;
-                case "error": console.error("Server error:", msg.message); alert(msg.message); resetState(); break;
+                case "error": handleServerError(msg.message); break;
             }
         };
-        ws.onclose = () => { alert("Connection to server lost. Please refresh."); resetState(); };
+        ws.onclose = () => {
+            showToast({
+                type: 'danger',
+                title: 'Connection Lost',
+                body: 'Connection to the server was lost. Please refresh the page to reconnect.',
+                duration: 0 // Persist until dismissed
+            });
+            resetState();
+        };
         ws.onerror = (error) => console.error("WebSocket error:", error);
     }
+
+    // --- NEW: Centralized Error Handling ---
+    function handleServerError(message) {
+        console.error("Server error:", message);
+        // Check for specific, user-facing errors
+        if (message.includes("Flight not found")) {
+            flightCodeInputWrapper.classList.add('input-error');
+            setTimeout(() => flightCodeInputWrapper.classList.remove('input-error'), 1500);
+
+            showToast({
+                type: 'danger',
+                title: 'Flight Not Found',
+                body: "Please double-check the 6-character code and try again. The flight creator must be online. If you're on the same Wi-Fi, they can invite you directly from their dashboard.",
+                duration: 8000
+            });
+        } else {
+            // Generic error for other problems
+            showToast({
+                type: 'danger',
+                title: 'An Error Occurred',
+                body: message,
+                duration: 8000
+            });
+        }
+    }
+
 
     function handlePeerJoined(flightCode) {
         if (!currentFlightCode) { // Receiver joins
@@ -2296,7 +2353,11 @@
         joinFlightBtn.onclick = () => {
             const code = flightCodeInput.value.trim().toUpperCase();
             if (code) { isFlightCreator = false; ws.send(JSON.stringify({ type: "join-flight", flightCode: code })); }
-            else { alert("Please enter a Flight Code to join."); }
+            else {
+                flightCodeInputWrapper.classList.add('input-error');
+                setTimeout(() => flightCodeInputWrapper.classList.remove('input-error'), 1500);
+                showToast({ type: 'danger', title: 'Empty Code', body: 'Please enter a 6-character flight code to join.', duration: 5000 });
+            }
         };
         leaveFlightBtnDashboard.onclick = () => { location.reload(); };
 
@@ -2433,29 +2494,32 @@
         `;
     }
 
-    // --- NEW: Show a toast notification for an invitation ---
-    function showInvitationToast(fromName, flightCode) {
+    // --- NEW: Generic Toast Creation Function ---
+    function showToast({ type = 'info', title, body, duration = 10000, actions = [] }) {
         const toastId = `toast-${Date.now()}`;
         const toast = document.createElement('div');
-        toast.className = 'toast';
+        toast.className = `toast toast-${type}`;
         toast.id = toastId;
+
+        let actionsHTML = '';
+        if (actions.length > 0) {
+            actionsHTML = '<div class="toast-actions">';
+            actions.forEach((action, index) => {
+                actionsHTML += `<button class="btn ${action.class || ''} action-btn-${index}">${action.text}</button>`;
+            });
+            actionsHTML += '</div>';
+        }
+
         toast.innerHTML = `
             <div class="toast-header">
-                <strong>Flight Invitation</strong>
+                <strong>${title}</strong>
                 <button class="toast-close">&times;</button>
             </div>
-            <div class="toast-body">
-                <b>${fromName}</b> has invited you to a flight.
-            </div>
-            <div class="toast-actions">
-                <button class="btn btn-secondary toast-decline">Decline</button>
-                <button class="btn btn-primary toast-join" data-flight-code="${flightCode}">Join</button>
-            </div>
+            <div class="toast-body">${body}</div>
+            ${actionsHTML}
         `;
 
         toastContainer.appendChild(toast);
-
-        // Animate in
         setTimeout(() => toast.classList.add('show'), 100);
 
         const removeToast = () => {
@@ -2463,21 +2527,50 @@
             setTimeout(() => toast.remove(), 500);
         };
 
-        const autoDismiss = setTimeout(removeToast, 10000); // Auto-dismiss after 10s
+        let autoDismiss;
+        if (duration > 0) {
+            autoDismiss = setTimeout(removeToast, duration);
+        }
 
         toast.addEventListener('click', (e) => {
-            if (e.target.matches('.toast-join')) {
-                const code = e.target.dataset.flightCode;
-                isFlightCreator = false; // Important: set flag when joining via invite
-                ws.send(JSON.stringify({ type: "join-flight", flightCode: code }));
-                clearTimeout(autoDismiss);
-                removeToast();
-            } else if (e.target.matches('.toast-decline, .toast-close')) {
+            if (e.target.matches('.toast-close')) {
                 clearTimeout(autoDismiss);
                 removeToast();
             }
+            actions.forEach((action, index) => {
+                if (e.target.matches(`.action-btn-${index}`)) {
+                    action.callback();
+                    clearTimeout(autoDismiss);
+                    removeToast();
+                }
+            });
         });
     }
+
+    function showInvitationToast(fromName, flightCode) {
+        showToast({
+            type: 'info',
+            title: 'Flight Invitation',
+            body: `<b>${fromName}</b> has invited you to a flight.`,
+            duration: 15000,
+            actions: [
+                {
+                    text: 'Decline',
+                    class: 'btn-secondary',
+                    callback: () => console.log('Invitation declined.')
+                },
+                {
+                    text: 'Join',
+                    class: 'btn-primary',
+                    callback: () => {
+                        isFlightCreator = false; // Important: set flag when joining
+                        ws.send(JSON.stringify({ type: "join-flight", flightCode }));
+                    }
+                }
+            ]
+        });
+    }
+
 
     function resetState() {
         if (metricsInterval) clearInterval(metricsInterval);
@@ -2514,7 +2607,7 @@
     discoverLocalIpAndRegister = function() {
         // This function is now mainly for the client to register its name.
         // The local IP discovery part is less critical but can still help the server's LAN/WAN detection heuristic.
-        console.log("Registering user details with server...");
+        // console.log("Registering user details with server...");
         ws.send(JSON.stringify({
             type: "register-details",
             name: myName,
