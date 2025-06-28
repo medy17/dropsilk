@@ -1,8 +1,31 @@
 const WebSocket = require("ws");
 const os = require("os");
+const http = require("http");
 
 const PORT = process.env.PORT || 8080;
-const wss = new WebSocket.Server({ port: PORT });
+
+// Create a simple HTTP server
+const server = http.createServer((req, res) => {
+    // This is our health check endpoint.
+    // It responds to any HTTP request with a success message.
+    if (req.method === 'GET' && req.url === '/') {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('Server is alive and waiting for WebSocket connections.');
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+// Attach the WebSocket server to the HTTP server
+const wss = new WebSocket.Server({ server });
+
+// Start listening
+server.listen(PORT, () => {
+    console.log(`🚀 Upgraded Signalling Server is running on port ${PORT}!`);
+    console.log(`Health check available at http://localhost:${PORT}`);
+});
+
 const flights = {};
 const clients = new Map();
 
@@ -244,6 +267,3 @@ wss.on("connection", (ws, req) => {
 });
 
 const localIpForDisplay = getLocalIpForDisplay();
-console.log(`🚀 Upgraded Signalling Server is running on port ${PORT}!`);
-console.log(`Access from other devices on your network at: ws://${localIpForDisplay}:8080`);
-console.log(`Access on this device at: ws://localhost:8080`);
