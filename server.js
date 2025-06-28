@@ -1,7 +1,8 @@
 const WebSocket = require("ws");
 const os = require("os");
 
-const wss = new WebSocket.Server({ port: 8080 });
+const PORT = process.env.PORT || 8080;
+const wss = new WebSocket.Server({ port: PORT });
 const flights = {};
 const clients = new Map();
 
@@ -243,6 +244,6 @@ wss.on("connection", (ws, req) => {
 });
 
 const localIpForDisplay = getLocalIpForDisplay();
-console.log("🚀 Upgraded Signalling Server is running!");
+console.log(`🚀 Upgraded Signalling Server is running on port ${PORT}!`);
 console.log(`Access from other devices on your network at: ws://${localIpForDisplay}:8080`);
 console.log(`Access on this device at: ws://localhost:8080`);
