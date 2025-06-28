@@ -1,0 +1,26 @@
+{
+  "name": "DropSilk",
+  "short_name": "DropSilk",
+  "description": "Fast, secure, unlimited WebRTC transfers in a beautifully modern UI.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#5bcefa",
+  "theme_color": "#5bcefa",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
