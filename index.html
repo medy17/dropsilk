@@ -1712,7 +1712,8 @@
     themeToggle.addEventListener('click', toggleTheme);
 
     // --- CONFIG ---
-    const WEBSOCKET_URL = `ws://${window.location.hostname}:8080`;
+    // We will replace this URL after deploying the backend in the next step.
+    const WEBSOCKET_URL = "wss://your-backend-app-name.onrender.com";
     const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 
     // --- STATE ---
