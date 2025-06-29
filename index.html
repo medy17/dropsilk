@@ -1460,7 +1460,7 @@
                     </svg>
                     Select Files
                 </label>
-                <button class="btn btn-secondary">
+                <button id="folderSelectBtn" class="btn btn-secondary">
                     <!-- On-brand SVG -->
                     <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
                         <rect x="3" y="7" width="14" height="8" rx="2" fill="#fffaf7" stroke="var(--c-secondary)"/>
@@ -1470,6 +1470,8 @@
                 </button>
             </div>
             <input type="file" id="fileInput_transfer" style="display: none;" multiple />
+            <!-- NEW: Hidden input for folder selection -->
+            <input type="file" id="folderInput_transfer" style="display: none;" webkitdirectory directory multiple />
         </div>
         <!-- MODIFIED: This panel is now dynamic -->
         <div class="panel">
@@ -1796,6 +1798,7 @@
     const dashboardFlightStatus = document.getElementById("dashboard-flight-status");
     const leaveFlightBtnDashboard = document.getElementById("leaveFlightBtnDashboard");
     const fileInputTransfer = document.getElementById("fileInput_transfer");
+    const folderInputTransfer = document.getElementById("folderInput_transfer"); // NEW
     const sendingQueueDiv = document.getElementById("sending-queue");
     const receiverQueueDiv = document.getElementById("receiver-queue");
     const toastContainer = document.getElementById("toast-container");
@@ -2154,10 +2157,6 @@
     function setupDataChannel() {
         dataChannel.onopen = () => {
             console.log("Data channel opened!");
-            // The peer-joined message from the server already handles the UI update.
-            // Re-calling handlePeerJoined here would be redundant.
-
-            // NEW: Start tracking metrics when channel opens
             lastMetricsUpdateTime = Date.now();
             if (metricsInterval) clearInterval(metricsInterval);
             metricsInterval = setInterval(updateMetrics, 1000);
@@ -2165,7 +2164,6 @@
         dataChannel.onclose = () => {
             console.log("Data channel closed.");
             handlePeerLeft();
-            // NEW: Stop tracking metrics when channel closes
             if (metricsInterval) clearInterval(metricsInterval);
             metricsSpeedEl.textContent = '0 KB/s';
         };
@@ -2180,36 +2178,39 @@
 
                 if (receiverQueueDiv.querySelector('.empty-state')) receiverQueueDiv.innerHTML = '';
 
+                const displayName = incomingFileInfo.webkitRelativePath || incomingFileInfo.name;
                 const fileId = `file-recv-${Date.now()}`;
-                const fileIcon = getFileIcon(incomingFileInfo.name);
+                const fileIcon = getFileIcon(displayName);
                 receiverQueueDiv.insertAdjacentHTML('beforeend', `
                     <div class="queue-item" id="${fileId}">
                         <div class="file-icon">${fileIcon}</div>
                         <div class="file-details">
-                            <div class="file-details__name" title="${incomingFileInfo.name}"><span>${incomingFileInfo.name}</span></div>
+                            <div class="file-details__name" title="${displayName}"><span>${displayName}</span></div>
                             <progress class="file-details__progress-bar" value="0" max="1"></progress>
                             <div class="file-details__status"><span class="percent">0%</span></div>
                         </div>
                         <div class="file-action"></div>
                     </div>`);
-                fileIdMap.set(incomingFileInfo.name, fileId);
+                fileIdMap.set(displayName, fileId);
                 return;
             }
             // EOF
             if (event.data === "EOF") {
+                const displayName = incomingFileInfo.webkitRelativePath || incomingFileInfo.name;
                 const received = new Blob(incomingFileData, { type: incomingFileInfo.type });
                 const url = URL.createObjectURL(received);
-                const fileId = fileIdMap.get(incomingFileInfo.name);
+                const fileId = fileIdMap.get(displayName);
                 const fileElement = document.getElementById(fileId);
                 if (fileElement) {
                     fileElement.querySelector('.file-action').innerHTML = `<a href="${url}" download="${incomingFileInfo.name}">Download</a>`;
                     fileElement.querySelector('.percent').textContent = 'Complete!';
                 }
+                // Clean up map for this file
+                fileIdMap.delete(displayName);
                 return;
             }
             // CHUNK
             const chunkSize = event.data.byteLength || event.data.size || 0;
-            // NEW: Update received metrics
             totalBytesReceived += chunkSize;
             receivedInInterval += chunkSize;
             metricsReceivedEl.textContent = formatBytes(totalBytesReceived);
@@ -2217,8 +2218,9 @@
             incomingFileData.push(event.data);
             incomingFileReceived += chunkSize;
             if (incomingFileInfo?.size) {
+                const displayName = incomingFileInfo.webkitRelativePath || incomingFileInfo.name;
                 const progressValue = incomingFileReceived / incomingFileInfo.size;
-                const fileId = fileIdMap.get(incomingFileInfo.name);
+                const fileId = fileIdMap.get(displayName);
                 const fileElement = document.getElementById(fileId);
                 if (fileElement) {
                     fileElement.querySelector('progress').value = progressValue;
@@ -2230,15 +2232,16 @@
 
     function startFileSend(file) {
         currentlySendingFile = file;
+        const displayName = file.webkitRelativePath || file.name;
         const fileId = fileIdMap.get(file);
         const fileElement = document.getElementById(fileId);
         isSending = true;
 
         if(fileElement) {
             fileElement.innerHTML = `
-                <div class="file-icon">${getFileIcon(file.name)}</div>
+                <div class="file-icon">${getFileIcon(displayName)}</div>
                 <div class="file-details">
-                    <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
+                    <div class="file-details__name" title="${displayName}"><span>${displayName}</span></div>
                     <progress class="file-details__progress-bar" value="0" max="1"></progress>
                     <div class="file-details__status">
                         <span class="percent">0%</span>
@@ -2250,7 +2253,15 @@
         if (worker) worker.terminate();
         worker = new Worker("sender.worker.js");
         chunkQueue = []; fileReadingDone = false; sentOffset = 0;
-        dataChannel.send(JSON.stringify({ name: file.name, type: file.type, size: file.size }));
+
+        const metadata = {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            webkitRelativePath: file.webkitRelativePath || ''
+        };
+        dataChannel.send(JSON.stringify(metadata));
+
         worker.onmessage = (e) => {
             const { type, chunk } = e.data;
             if (type === "chunk") {
@@ -2277,7 +2288,6 @@
             const chunk = chunkQueue.shift();
             dataChannel.send(chunk);
 
-            // NEW: Update sent metrics
             const chunkSize = chunk.byteLength;
             totalBytesSent += chunkSize;
             sentInInterval += chunkSize;
@@ -2310,16 +2320,13 @@
         }
     }
 
-    // Define the global file handling function
     function handleFileSelection(files) {
-        if (files.length === 0) return;
+        if (!files || files.length === 0) return;
 
-        // Add success animation for drag and drop
         const dropZone = document.querySelector('.drop-zone');
         if (dropZone) {
             dropZone.style.transform = 'scale(0.98)';
             dropZone.style.transition = 'transform 0.1s ease-out';
-
             setTimeout(() => {
                 dropZone.style.transform = '';
                 dropZone.style.transition = '';
@@ -2333,19 +2340,20 @@
         Array.from(files).forEach(file => {
             fileToSendQueue.push(file);
             const fileId = `send-${Date.now()}-${Math.random()}`;
-            fileIdMap.set(file, fileId);
+            fileIdMap.set(file, fileId); // Use the File object as the key
+
+            const displayName = file.webkitRelativePath || file.name;
 
             sendingQueueDiv.insertAdjacentHTML('beforeend', `
             <div class="queue-item" id="${fileId}" style="opacity: 0; transform: translateY(10px);">
-                <div class="file-icon">${getFileIcon(file.name)}</div>
+                <div class="file-icon">${getFileIcon(displayName)}</div>
                 <div class="file-details">
-                    <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
+                    <div class="file-details__name" title="${displayName}"><span>${displayName}</span></div>
                     <div class="file-details__status"><span class="status-text">Queued</span></div>
                 </div>
             </div>
         `);
 
-            // Animate the new file item in
             const fileElement = document.getElementById(fileId);
             setTimeout(() => {
                 fileElement.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
@@ -2373,13 +2381,26 @@
         leaveFlightBtnDashboard.onclick = () => { location.reload(); };
 
         fileInputTransfer.onchange = () => {
-            if (fileInputTransfer.files.length > 0) {
-                handleFileSelection(fileInputTransfer.files);
-                fileInputTransfer.value = ""; // Clear the input
-            }
+            handleFileSelection(fileInputTransfer.files);
+            fileInputTransfer.value = "";
         };
 
-        // --- MODIFIED: Event delegation for invite buttons on the dynamic panel ---
+        // --- MODIFIED: FOLDER SELECTION LOGIC ---
+        const folderSelectBtn = document.getElementById('folderSelectBtn');
+        // A more robust check: a touch-only device might support 'webkitdirectory' but have no UI for it.
+        // We only enable the button if the feature exists AND the primary input is a fine pointer (like a mouse).
+        const isDesktopLike = window.matchMedia('(pointer: fine)').matches;
+        if ('webkitdirectory' in folderInputTransfer && isDesktopLike) {
+            folderSelectBtn.onclick = () => folderInputTransfer.click();
+        } else {
+            // Hide button if folder selection is not supported or on a touch-primary device.
+            folderSelectBtn.style.display = 'none';
+        }
+        folderInputTransfer.onchange = () => {
+            handleFileSelection(folderInputTransfer.files);
+            folderInputTransfer.value = "";
+        };
+
         connectionPanelList.addEventListener('click', (e) => {
             const inviteBtn = e.target.closest('.invite-user-btn');
             if (inviteBtn && !inviteBtn.disabled) {
@@ -2390,12 +2411,10 @@
                         inviteeId: inviteeId,
                         flightCode: currentFlightCode
                     }));
-                    // Provide feedback
                     inviteBtn.textContent = 'Invited';
                     inviteBtn.disabled = true;
                     setTimeout(() => {
                         inviteBtn.textContent = 'Invite';
-                        // The button will be re-enabled on the next user list update if still applicable
                     }, 3000);
                 }
             }
@@ -2403,7 +2422,6 @@
 
         document.getElementById('shareAppBtn').onclick = () => document.getElementById('inviteBtn').click();
 
-        // Initialize drag and drop and ALL modals
         setupDragAndDrop();
         setupAllModalsAndNav();
     }
@@ -2592,6 +2610,7 @@
         dashboard.style.display = "none";
         flightCodeInput.value = "";
         fileInputTransfer.value = "";
+        folderInputTransfer.value = "";
         sendingQueueDiv.innerHTML = '<div class="empty-state">Select files to send</div>';
         receiverQueueDiv.innerHTML = '<div class="empty-state">Waiting for incoming files</div>';
 

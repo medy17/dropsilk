@@ -2,9 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>DropSilk</title>
+    <meta name="description" content="Instantly share files device-to-device with DropSilk. Fast, private, and secure peer-to-peer transfers with no file size limits and no cloud storage.">
+    <meta property="og:title" content="DropSilk | Fast, Private File Sharing">
+    <meta property="og:description" content="Instantly share files device-to-device with no limits, no cloud storage, and end-to-end encryption.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dropsilk.xyz/">
+    <meta property="og:image" content="https://dropsilk.xyz/social-share-image.jpg"> <!-- Create a nice image for this! -->
+    <meta property="og:image:width" content="1280">
+    <meta property="og:image:height" content="674">
+    <meta property="og:site_name" content="DropSilk">
+
+    <!-- Twitter Card Tags (for Twitter/X) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DropSilk | Fast, Private File Sharing">
+    <meta name="twitter:description" content="Instantly share files device-to-device with no limits, no cloud storage, and end-to-end encryption.">
+    <meta name="twitter:image" content="https://dropsilk.xyz/social-share-image.jpg">
+    <meta property="og:image" content="https://dropsilk.xyz/social-share-image-square.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="1200">
+    <meta property="og:image:alt" content="DropSilk Logo with the tagline: Fast, Private, Peer-to-Peer File Sharing (square)">
+
+    <title>DropSilk | Fast, Private, Peer-to-Peer File Sharing</title>
+
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ffffff">
+
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -16,25 +39,71 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+
     <style>
         :root {
+            /* --- Base Palette --- */
             --brilliant-blue: #5bcefa;
             --brilliant-pink: #f5a9b8;
             --brilliant-white: #ffffff;
-            --primary-color: var(--brilliant-blue);
-            --secondary-color: var(--brilliant-pink);
-            --dark-bg: #18181b;
-            --light-bg: var(--brilliant-white);
-            --text-dark: #18181b;
-            --text-light: #18181b;
-            --button-disabled-bg: #cccccc;
-            --button-disabled-text: #666666;
-            --secondary-text: #888;
-            --panel-bg: var(--brilliant-white);
-            --panel-border: var(--brilliant-pink);
-            --panel-shadow: 0 8px 25px rgba(91, 206, 250, 0.07);
-            --success-color: #50c878;
-            --danger-color: #ef4444;
+            --dark-bg-base: #18181b;
+            --dark-bg-root: #111113;
+
+            /* --- Themed Variables (Light Mode Default) --- */
+            --c-bg: var(--brilliant-white);
+            --c-text-primary: var(--dark-bg-base);
+            --c-text-secondary: #888;
+            --c-primary: var(--brilliant-blue);
+            --c-secondary: var(--brilliant-pink);
+
+            --c-panel-bg: var(--brilliant-white);
+            --c-panel-border: var(--brilliant-pink);
+            --c-panel-shadow: 0 8px 25px rgba(91, 206, 250, 0.07);
+
+            --c-header-bg: var(--c-panel-bg);
+            --c-header-border: transparent;
+            --c-footer-bg: var(--c-panel-bg);
+            --c-footer-border: #f0f0f0;
+
+            --c-dropzone-bg: #fafdff;
+            --c-dropzone-border: var(--c-panel-border);
+            --c-dropzone-hover-bg: linear-gradient(135deg, rgba(91,206,250,0.12), rgba(245,169,184,0.08));
+
+            --c-progress-track: #e0e0e0;
+
+            --c-btn-primary-bg: linear-gradient(90deg, rgba(91,206,250,0.12) 0%, rgba(245,169,184,0.10) 100%);
+            --c-btn-secondary-bg: linear-gradient(90deg, rgba(245,169,184,0.12) 0%, rgba(91,206,250,0.08) 100%);
+
+            --c-success: #50c878;
+            --c-danger: #ef4444;
+        }
+
+        body[data-theme="dark"] {
+            /* --- Themed Variables (Dark Mode Overrides) --- */
+            --c-bg: var(--dark-bg-root);
+            --c-text-primary: #f4f4f5;
+            --c-text-secondary: #a1a1aa;
+
+            --c-panel-bg: var(--dark-bg-base);
+            --c-panel-border: rgba(245, 169, 184, 0.4);
+            --c-panel-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.2);
+
+            --c-header-bg: #111113;
+            --c-header-border: var(--c-primary);
+            --c-footer-bg: #111113;
+            --c-footer-border: rgba(255, 255, 255, 0.1);
+
+            --c-dropzone-bg: rgba(255, 255, 255, 0.02);
+            --c-dropzone-border: rgba(245, 169, 184, 0.25);
+            --c-dropzone-hover-bg: linear-gradient(135deg, rgba(91,206,250,0.1), rgba(245,169,184,0.08));
+
+            --c-progress-track: #37373d;
+
+            --c-btn-primary-bg: linear-gradient(90deg, rgba(91,206,250,0.15) 0%, rgba(245,169,184,0.12) 100%);
+            --c-btn-secondary-bg: linear-gradient(90deg, rgba(245,169,184,0.15) 0%, rgba(91,206,250,0.10) 100%);
+
+            --c-success: #3ec6a8;
+            --c-danger: #f87171;
         }
 
         /* --- Global Styles --- */
@@ -44,19 +113,20 @@
 
         body {
             font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-            background: var(--light-bg);
-            color: var(--text-light);
+            background: var(--c-bg);
+            color: var(--c-text-primary);
             margin: 0;
             padding: 0;
             min-height: 100vh;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .header {
             width: 100%;
-            padding: 1.5em 2em;
+            padding: 1.5em 1.5em;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -64,13 +134,14 @@
             top: 0;
             left: 0;
             z-index: 1000;
-            background: var(--panel-bg);
-            border-bottom: 0px solid var(--primary-color);
+            background: var(--c-header-bg);
+            border-bottom: 0px solid var(--c-header-border);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
         .header .logo {
             font-size: 1.5em;
             font-weight: 800;
-            color: var(--primary-color);
+            color: var(--c-primary);
             display: flex;
             align-items: center;
             gap: 0.5em;
@@ -84,10 +155,13 @@
         .header-nav {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
         @media (min-width: 768px) {
+            .header {
+                padding: 1.5em 2em;
+            }
             .header-nav {
                 gap: 1.5rem;
             }
@@ -99,30 +173,57 @@
             font-family: 'IBM Plex Sans', sans-serif;
             font-weight: 600;
             font-size: 0.95rem;
-            color: var(--secondary-text);
+            color: var(--c-text-secondary);
             cursor: pointer;
             padding: 0.5em;
-            /* MODIFIED: Add background-color and transform to transition */
             transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, transform 0.1s ease-out;
             text-decoration: none;
             display: flex;
             align-items: center;
+            justify-content: center;
             border-radius: 6px; /* Added for pill shape */
+            min-width: 38px;
+            min-height: 38px;
+        }
+        .brand-text {
+            font-size: clamp(1rem, 4vw, 2rem); /* Dynamic resizing */
+            white-space: nowrap;               /* No wrapping by default */
+            transition: font-size 0.2s;
+        }
+
+        @media (max-width: 400px) {
+            .brand-text {
+                white-space: normal;             /* Allow wrapping below 400px */
+            }
+        }
+
+        @media (max-width: 350px) {
+            .brand-text {
+                display: none;                   /* Hide below 350px */
+            }
         }
 
         .header-nav-link:hover,
         .header-nav-link:focus {
-            color: var(--primary-color);
+            color: var(--c-primary);
             outline: none;
-            background-color: rgba(91, 206, 250, 0.08); /* Added for pill shape */
+            background-color: rgba(91, 206, 250, 0.08);
         }
         .header-nav-link svg {
             transition: color 0.2s ease-in-out;
+            width: 22px; height: 22px;
         }
         .header-nav-link:hover svg,
         .header-nav-link:focus svg {
-            color: var(--primary-color);
+            color: var(--c-primary);
         }
+
+        /* --- NEW: Theme Toggle Button --- */
+        #theme-toggle .sun-icon { display: none; }
+        #theme-toggle .moon-icon { display: block; }
+        body[data-theme="dark"] #theme-toggle .sun-icon { display: block; }
+        body[data-theme="dark"] #theme-toggle .moon-icon { display: none; }
+
 
         /* --- Initial Setup Screen --- */
         .main-content {
@@ -134,13 +235,13 @@
             flex-grow: 1;
             padding: 8rem 2em 2em;
             gap: 3em;
-            background: var(--brilliant-white);
+            background: var(--c-bg);
         }
 
         .tagline-section {
             flex-basis: 50%;
             text-align: center;
-            background: var(--brilliant-white);
+            background: var(--c-panel-bg);
             border-radius: 18px;
             box-shadow: 0 2px 16px rgba(91, 206, 250, 0.04);
             padding: 2em 2em 2em 2em;
@@ -149,19 +250,24 @@
             border: 1.5px solid rgba(245, 169, 184, 0.18);
         }
 
+        body[data-theme="dark"] .tagline-section {
+            border: 1.5px solid rgba(245, 169, 184, 0.3);
+        }
+
         .tagline-section h1 {
             font-size: clamp(3em, 8vw, 5.5em);
             font-weight: 800;
             line-height: 1.1;
             margin: 0 0 0.5em 0;
-            color: var(--primary-color);
+            color: var(--c-primary);
             letter-spacing: 0.01em;
             text-shadow: 0 2px 8px rgba(91, 206, 250, 0.08);
         }
+        body[data-theme="dark"] .tagline-section h1 { text-shadow: none; }
 
         .tagline-section p {
             font-size: 1.1em;
-            color: var(--secondary-text);
+            color: var(--c-text-secondary);
             max-width: 450px;
             margin: 0 auto;
         }
@@ -171,30 +277,37 @@
             width: 100%;
             max-width: 380px;
         }
+        body[data-theme="dark"] .flight-ticket-panel-wrapper {
+            filter: drop-shadow(0 0 15px rgba(91, 206, 250, 0.1));
+        }
 
         .flight-ticket {
-            background: var(--brilliant-white);
-            color: var(--text-dark);
+            background: var(--c-panel-bg);
+            color: var(--c-text-primary);
             border-radius: 20px;
             padding: 2rem;
-            box-shadow: 0 4px 32px 0 rgba(91, 206, 250, 0.07), 0 1.5px 0 0 var(--secondary-color);
-            border: 1.5px solid var(--primary-color);
-            transition: box-shadow 0.2s;
+            box-shadow: 0 4px 32px 0 rgba(91, 206, 250, 0.07), 0 1.5px 0 0 var(--c-secondary);
+            border: 1.5px solid var(--c-primary);
+            transition: box-shadow 0.2s, background 0.3s ease, color 0.3s ease;
+        }
+        body[data-theme="dark"] .flight-ticket {
+            box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.2), 0 1.5px 0 0 var(--c-secondary);
         }
 
         .flight-ticket h2 {
             font-family: "IBM Plex Mono", monospace;
             margin: 0;
             font-weight: 700;
-            color: var(--primary-color);
+            color: var(--c-primary);
             letter-spacing: 0.02em;
             text-shadow: 0 1px 0 #fff, 0 0 2px #fff;
         }
+        body[data-theme="dark"] .flight-ticket h2 { text-shadow: none; }
 
         .flight-ticket p {
             opacity: 0.8;
             margin: 0.5rem 0 1.5rem 0;
-            color: var(--text-dark);
+            color: var(--c-text-primary);
         }
 
         .ticket-actions {
@@ -209,20 +322,19 @@
             padding: 1em;
             font-size: 1em;
             border-radius: 12px;
-            border: 1.5px solid var(--primary-color);
+            border: 1.5px solid var(--c-primary);
             font-weight: 600;
             cursor: pointer;
-            /* MODIFIED: Add transform to transition */
             transition: all 0.2s, transform 0.1s ease-out;
-            background: linear-gradient(90deg, rgba(91,206,250,0.12) 0%, rgba(245,169,184,0.10) 100%);
-            color: var(--primary-color);
+            background: var(--c-btn-primary-bg);
+            color: var(--c-primary);
             box-shadow: 0 1px 4px rgba(91, 206, 250, 0.06);
         }
 
         .ticket-actions button:hover, .ticket-actions button:focus {
-            background: var(--primary-color);
+            background: var(--c-primary);
             color: var(--brilliant-white);
-            border-color: var(--secondary-color);
+            border-color: var(--c-secondary);
             outline: none;
         }
 
@@ -231,7 +343,7 @@
             align-items: center;
             text-align: center;
             margin: 1em 0;
-            color: var(--primary-color);
+            color: var(--c-primary);
             opacity: 0.6;
             font-weight: 500;
             font-size: 0.95em;
@@ -240,7 +352,7 @@
         .or-separator::before, .or-separator::after {
             content: '';
             flex: 1;
-            border-bottom: 2px dashed var(--secondary-color);
+            border-bottom: 2px dashed var(--c-secondary);
         }
 
         .or-separator:not(:empty)::before { margin-right: .5em; }
@@ -248,16 +360,28 @@
 
         .flight-code-input-wrapper {
             display: flex;
-            background: var(--brilliant-white);
+            background: var(--c-panel-bg);
             border-radius: 12px;
             overflow: hidden;
-            border: 1.5px solid var(--primary-color);
+            border: 1.5px solid var(--c-primary);
             box-shadow: 0 1px 4px rgba(91, 206, 250, 0.04);
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, background 0.3s ease, transform 0.2s ease-in-out;
         }
 
         .flight-code-input-wrapper:focus-within {
-            border-color: var(--secondary-color);
+            border-color: var(--c-secondary);
+        }
+
+        /* --- NEW: Invalid Code Styling --- */
+        @keyframes shake {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
+        }
+        .flight-code-input-wrapper.input-error {
+            border-color: var(--c-danger);
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
         }
 
         .flight-code-input-wrapper input {
@@ -269,7 +393,7 @@
             width: calc(1ch * 6 + 1.5em);
             background: none;
             border: none;
-            color: var(--text-dark);
+            color: var(--c-text-primary);
             padding: 1em 1em;
             outline: none;
             text-align: center;
@@ -280,18 +404,17 @@
         .flight-code-input-wrapper button {
             width: auto;
             background: none;
-            color: var(--primary-color);
+            color: var(--c-primary);
             padding: 0.5em 0.8em;
             cursor: pointer;
             font-size: 1.8em;
             border-radius: 10px;
             border: none;
-            /* MODIFIED: Add transform to transition */
             transition: color 0.2s, transform 0.1s ease-out;
         }
 
         .flight-code-input-wrapper button:hover, .flight-code-input-wrapper button:focus {
-            color: var(--secondary-color);
+            color: var(--c-secondary);
             background: rgba(91, 206, 250, 0.08);
             outline: none;
         }
@@ -324,12 +447,13 @@
         }
 
         .panel {
-            background-color: var(--panel-bg);
+            background-color: var(--c-panel-bg);
             border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: var(--panel-shadow);
-            border: 2px solid var(--panel-border);
+            box-shadow: var(--c-panel-shadow);
+            border: 2px solid var(--c-panel-border);
             min-width: 0;
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         #dashboard-header {
@@ -338,7 +462,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 1rem;
-            border-bottom: 2px solid var(--primary-color);
+            border-bottom: 2px solid var(--c-primary);
         }
         #dashboard-flight-code {
             display: inline-block;
@@ -347,7 +471,7 @@
                     rgba(91,206,250,0.12) 0%,
                     rgba(245,169,184,0.10) 100%
             );
-            color: var(--primary-color);
+            color: var(--c-primary);
             font-family: "IBM Plex Mono", monospace;
             font-size: 1em;
             font-weight: 700;
@@ -355,7 +479,7 @@
             padding: 0.25em 0.7em;
             letter-spacing: 0.15em;
             margin-left: 0.5em;
-            border: 1.5px solid var(--secondary-color);
+            border: 1.5px solid var(--c-secondary);
             box-shadow: 0 1px 4px rgba(91, 206, 250, 0.06);
             backdrop-filter: blur(6px) saturate(1.2);
             -webkit-backdrop-filter: blur(6px) saturate(1.2);
@@ -371,7 +495,10 @@
             position: relative;
             overflow: hidden;
         }
-        /* MODIFIED: Use scale for :active state for consistency */
+        body[data-theme="dark"] #dashboard-flight-code {
+            outline: none;
+        }
+
         #dashboard-flight-code:active {
             transform: scale(0.97);
         }
@@ -381,8 +508,8 @@
                     rgba(62,198,168,0.18) 0%,
                     rgba(127,234,210,0.18) 100%
             );
-            color: #3ec6a8;
-            border-color: #3ec6a8;
+            color: var(--c-success);
+            border-color: var(--c-success);
             box-shadow: 0 0 0 2px #3ec6a833;
         }
         #dashboard-flight-code .copy-feedback {
@@ -391,7 +518,7 @@
             top: 50%;
             transform: translate(-50%,-50%);
             background: rgba(255,255,255,0.95);
-            color: #3ec6a8;
+            color: var(--c-success);
             font-size: 0.95em;
             font-weight: 700;
             border-radius: 6px;
@@ -400,6 +527,9 @@
             pointer-events: none;
             transition: opacity 0.2s;
             z-index: 2;
+        }
+        body[data-theme="dark"] #dashboard-flight-code .copy-feedback {
+            background: var(--dark-bg-root);
         }
         #dashboard-flight-code.copied .copy-feedback {
             opacity: 1;
@@ -416,16 +546,16 @@
         }
         .flight-info__code span {
             font-weight: 800;
-            color: var(--primary-color);
+            color: var(--c-primary);
         }
         .flight-info__status {
-            background-color: var(--brilliant-white);
-            color: var(--secondary-color);
+            background-color: var(--c-panel-bg);
+            color: var(--c-secondary);
             font-weight: 600;
             padding: 0.5em 1em;
             border-radius: 99px;
             font-size: 0.9em;
-            border: 1.5px solid var(--primary-color);
+            border: 1.5px solid var(--c-primary);
         }
         .flight-actions {
             display: flex;
@@ -455,21 +585,21 @@
         }
 
         .invite-modal {
-            background: var(--panel-bg);
+            background: var(--c-panel-bg);
             border-radius: 20px;
             padding: 2rem;
             box-shadow:
                     0 20px 60px rgba(91, 206, 250, 0.15),
                     0 8px 32px rgba(245, 169, 184, 0.1),
                     0 0 0 1px rgba(91, 206, 250, 0.1);
-            border: 2px solid var(--primary-color);
+            border: 2px solid var(--c-primary);
             max-width: 400px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            transform: scale(0.95) translateY(20px); /* MODIFIED: Starting scale */
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* MODIFIED: Added opacity */
+            transform: scale(0.95) translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
         }
 
         .modal-overlay.show .invite-modal {
@@ -482,12 +612,12 @@
             align-items: center;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
-            border-bottom: 2px solid var(--primary-color);
+            border-bottom: 2px solid var(--c-primary);
         }
 
         .modal-header h3 {
             margin: 0;
-            color: var(--primary-color);
+            color: var(--c-primary);
             font-size: 1.4rem;
             font-weight: 700;
         }
@@ -496,7 +626,7 @@
             background: none;
             border: none;
             font-size: 1.5rem;
-            color: var(--secondary-color);
+            color: var(--c-secondary);
             cursor: pointer;
             padding: 0.5rem;
             border-radius: 50%;
@@ -512,7 +642,7 @@
 
         .modal-close:hover {
             background: linear-gradient(135deg, rgba(245,169,184,0.15), rgba(91,206,250,0.1));
-            color: var(--primary-color);
+            color: var(--c-primary);
             transform: rotate(90deg);
         }
 
@@ -522,7 +652,7 @@
 
         .modal-body {
             padding-top: 0.5rem;
-            color: var(--secondary-text);
+            color: var(--c-text-secondary);
         }
         .modal-body p {
             line-height: 1.6;
@@ -530,11 +660,11 @@
         }
         .modal-body .flight-code-display a.code {
             text-decoration: none;
-            color: var(--primary-color);
+            color: var(--c-primary);
             transition: color 0.2s, transform 0.1s ease-out;
         }
         .modal-body .flight-code-display a.code:hover {
-            color: var(--secondary-color);
+            color: var(--c-secondary);
         }
         .modal-body .flight-code-display a.code:active {
             transform: scale(0.97);
@@ -587,7 +717,7 @@
         }
 
         .qr-description {
-            color: var(--secondary-text);
+            color: var(--c-text-secondary);
             font-size: 0.9rem;
             margin-top: 1rem;
             line-height: 1.4;
@@ -606,9 +736,9 @@
             gap: 0.75rem;
             padding: 1rem 1.5rem;
             border-radius: 12px;
-            border: 1.5px solid var(--primary-color);
-            background: linear-gradient(90deg, rgba(91,206,250,0.12) 0%, rgba(245,169,184,0.10) 100%);
-            color: var(--primary-color);
+            border: 1.5px solid var(--c-primary);
+            background: var(--c-btn-primary-bg);
+            color: var(--c-primary);
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease, transform 0.1s ease-out;
@@ -619,34 +749,33 @@
         }
 
         .share-btn:hover {
-            background: var(--primary-color);
+            background: var(--c-primary);
             color: var(--brilliant-white);
-            border-color: var(--secondary-color);
+            border-color: var(--c-secondary);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(91, 206, 250, 0.25);
         }
 
-        /* MODIFIED: Reset hover transform on active */
         .share-btn:active {
             transform: translateY(0) scale(0.97);
         }
 
         .share-btn.secondary {
-            border-color: var(--secondary-color);
-            color: var(--secondary-color);
-            background: linear-gradient(90deg, rgba(245,169,184,0.12) 0%, rgba(91,206,250,0.08) 100%);
+            border-color: var(--c-secondary);
+            color: var(--c-secondary);
+            background: var(--c-btn-secondary-bg);
         }
 
         .share-btn.secondary:hover {
-            background: var(--secondary-color);
+            background: var(--c-secondary);
             color: var(--brilliant-white);
-            border-color: var(--primary-color);
+            border-color: var(--c-primary);
         }
 
         .share-btn.success {
             background: linear-gradient(90deg, rgba(80,200,120,0.15) 0%, rgba(127,234,210,0.12) 100%);
-            border-color: var(--success-color);
-            color: var(--success-color);
+            border-color: var(--c-success);
+            color: var(--c-success);
         }
 
         .share-btn svg {
@@ -657,7 +786,7 @@
 
         .flight-code-display {
             background: linear-gradient(135deg, rgba(91,206,250,0.15), rgba(245,169,184,0.1));
-            border: 1.5px solid var(--primary-color);
+            border: 1.5px solid var(--c-primary);
             border-radius: 12px;
             padding: 1rem;
             margin: 1rem 0;
@@ -668,13 +797,13 @@
             font-family: "IBM Plex Mono", monospace;
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--primary-color);
+            color: var(--c-primary);
             letter-spacing: 0.2em;
             margin-bottom: 0.5rem;
         }
 
         .flight-code-display .label {
-            color: var(--secondary-text);
+            color: var(--c-text-secondary);
             font-size: 0.85rem;
             font-weight: 500;
         }
@@ -684,17 +813,10 @@
                 padding: 1.5rem;
                 margin: 1rem;
             }
-
-            .share-actions {
-                gap: 0.8rem;
-            }
-
-            .share-btn {
-                padding: 0.9rem 1.2rem;
-                font-size: 0.9rem;
-            }
+            .share-actions { gap: 0.8rem; }
+            .share-btn { padding: 0.9rem 1.2rem; font-size: 0.9rem; }
         }
-        /* MODIFIED: .btn base class with glass effect */
+
         .btn {
             padding: 0.8em 1.5em;
             border-radius: 12px;
@@ -713,29 +835,32 @@
             -webkit-backdrop-filter: blur(6px) saturate(1.2);
             outline: 1px solid rgba(255,255,255,0.18);
         }
-        /* MODIFIED: .btn-primary with glass effect */
+        body[data-theme="dark"] .btn {
+            outline: none;
+        }
+
         .btn-primary {
-            background: linear-gradient(90deg, rgba(91,206,250,0.12) 0%, rgba(245,169,184,0.10) 100%);
-            color: var(--primary-color);
-            border-color: var(--primary-color);
+            background: var(--c-btn-primary-bg);
+            color: var(--c-primary);
+            border-color: var(--c-primary);
         }
         .btn-primary:hover {
-            background: var(--primary-color);
+            background: var(--c-primary);
             color: var(--brilliant-white);
-            border-color: var(--secondary-color);
+            border-color: var(--c-secondary);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(91, 206, 250, 0.25);
         }
-        /* MODIFIED: .btn-secondary with glass effect */
+
         .btn-secondary {
-            background: linear-gradient(90deg, rgba(245,169,184,0.12) 0%, rgba(91,206,250,0.08) 100%);
-            color: var(--secondary-color);
-            border-color: var(--secondary-color);
+            background: var(--c-btn-secondary-bg);
+            color: var(--c-secondary);
+            border-color: var(--c-secondary);
         }
         .btn-secondary:hover {
-            background: var(--secondary-color);
+            background: var(--c-secondary);
             color: var(--brilliant-white);
-            border-color: var(--primary-color);
+            border-color: var(--c-primary);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(245, 169, 184, 0.25);
         }
@@ -746,16 +871,12 @@
             gap: 1.5rem;
         }
         @media (min-width: 992px) {
-            .dashboard-grid {
-                grid-template-columns: 2fr 1fr;
-            }
-            .grid-col-span-2 {
-                grid-column: span 2 / span 2;
-            }
+            .dashboard-grid { grid-template-columns: 2fr 1fr; }
+            .grid-col-span-2 { grid-column: span 2 / span 2; }
         }
 
         .drop-zone {
-            border: 2px dashed var(--panel-border);
+            border: 2px dashed var(--c-dropzone-border);
             text-align: center;
             padding: 3rem 1rem;
             display: flex;
@@ -763,22 +884,26 @@
             align-items: center;
             justify-content: center;
             gap: 1rem;
-            background-color: #fafdff;
-        }
-        .drop-zone {
+            background-color: var(--c-dropzone-bg);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
 
         .drop-zone.drag-over {
-            border-color: var(--primary-color);
-            background: linear-gradient(135deg, rgba(91,206,250,0.12), rgba(245,169,184,0.08));
+            border-color: var(--c-primary);
+            background: var(--c-dropzone-hover-bg);
             transform: scale(1.02);
             box-shadow:
                     0 8px 32px rgba(91, 206, 250, 0.15),
                     0 0 0 2px rgba(91, 206, 250, 0.3),
                     inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        body[data-theme="dark"] .drop-zone.drag-over {
+            box-shadow:
+                    0 8px 32px rgba(0, 0, 0, 0.3),
+                    0 0 0 2px rgba(91, 206, 250, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
         .drop-zone.drag-over::before {
@@ -804,29 +929,29 @@
         }
 
         .drop-zone.drag-over .drop-zone__icon {
-            color: var(--primary-color);
+            color: var(--c-primary);
             transform: scale(1.1);
             filter: drop-shadow(0 4px 8px rgba(91, 206, 250, 0.3));
         }
 
         .drop-zone.drag-over p {
-            color: var(--primary-color);
+            color: var(--c-primary);
             font-weight: 700;
         }
 
         .drop-zone.drag-over .secondary-text {
-            color: var(--secondary-color);
+            color: var(--c-secondary);
             font-weight: 600;
         }
 
         .drop-zone.drag-active {
-            border-color: var(--secondary-color);
+            border-color: var(--c-secondary);
             background: linear-gradient(135deg, rgba(245,169,184,0.15), rgba(91,206,250,0.08));
             transform: scale(1.05);
         }
 
         .drop-zone.drag-active .drop-zone__icon {
-            color: var(--secondary-color);
+            color: var(--c-secondary);
             animation: bounce 0.6s ease-in-out infinite alternate;
         }
 
@@ -842,7 +967,7 @@
         body.dragging .drop-zone {
             pointer-events: all;
         }
-        .drop-zone__icon { color: var(--primary-color); }
+        .drop-zone__icon { color: var(--c-primary); }
         .drop-zone p { margin: 0; font-weight: 600; }
         .drop-zone__buttons { display: flex; gap: 1rem; }
 
@@ -852,13 +977,89 @@
             align-items: center;
             margin-bottom: 1rem;
         }
-        .panel-header h3 { margin: 0; font-size: 1.1rem; color: var(--primary-color);}
-        .panel-header .icon-btn { background: none; border: none; cursor: pointer; color: var(--secondary-text); font-size: 1.5rem; padding: 0.2em; }
+        .panel-header h3 { margin: 0; font-size: 1.1rem; color: var(--c-primary);}
+        .panel-header .icon-btn { background: none; border: none; cursor: pointer; color: var(--c-text-secondary); font-size: 1.5rem; padding: 0.2em; }
         .empty-state {
             text-align: center;
-            color: var(--secondary-text);
+            color: var(--c-text-secondary);
             padding: 1rem 0;
             font-size: 0.9em;
+        }
+
+        /* --- STYLES FOR CONNECTION PANEL --- */
+        #connection-panel-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .network-user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 12px;
+            background: linear-gradient(90deg, rgba(91,206,250,0.05) 0%, rgba(245,169,184,0.04) 100%);
+            transition: background 0.2s ease;
+        }
+        .network-user-item:hover {
+            background: linear-gradient(90deg, rgba(91,206,250,0.1) 0%, rgba(245,169,184,0.08) 100%);
+        }
+        .network-user-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .network-user-name {
+            font-weight: 600;
+        }
+        .network-user-id {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8em;
+            color: var(--c-text-secondary);
+            opacity: 0.8;
+        }
+        .invite-user-btn {
+            padding: 0.5em 1em;
+            font-size: 0.85em;
+        }
+        .invite-user-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            background: transparent;
+            border-color: var(--c-text-secondary);
+            color: var(--c-text-secondary);
+        }
+
+        /* --- NEW: Styles for "In Flight" view --- */
+        .inflight-user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 12px;
+            background: linear-gradient(90deg, rgba(91,206,250,0.05) 0%, rgba(245,169,184,0.04) 100%);
+        }
+        .inflight-user-details {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .inflight-user-name {
+            font-weight: 600;
+        }
+        .user-badge {
+            font-size: 0.75em;
+            font-weight: 700;
+            padding: 0.2em 0.6em;
+            border-radius: 99px;
+            background-color: var(--c-primary);
+            color: var(--brilliant-white);
+            text-transform: uppercase;
+        }
+        .inflight-user-id {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8em;
+            color: var(--c-text-secondary);
+            opacity: 0.8;
         }
 
         @keyframes marquee-scroll {
@@ -871,7 +1072,7 @@
             align-items: center;
             gap: 1rem;
             padding: 1rem 0.5rem;
-            border-bottom: 1px solid var(--panel-border);
+            border-bottom: 1px solid var(--c-panel-border);
         }
         .queue-item:last-child { border-bottom: none; }
         .file-icon {
@@ -908,6 +1109,10 @@
             -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
             mask-image: linear-gradient(to right, black 90%, transparent 100%);
         }
+        body[data-theme="dark"] .file-details__name {
+            -webkit-mask-image: linear-gradient(to right, var(--dark-bg-base) 90%, transparent 100%);
+            mask-image: linear-gradient(to right, var(--dark-bg-base) 90%, transparent 100%);
+        }
         .file-details__name span {
             display: inline-block;
             padding-right: 2rem;
@@ -920,26 +1125,25 @@
             height: 8px;
             border-radius: 4px;
             overflow: hidden;
-            background-color: #e0e0e0;
+            background-color: var(--c-progress-track);
             border: none;
-            accent-color: var(--primary-color);
+            accent-color: var(--c-primary);
         }
         .file-details__progress-bar::-webkit-progress-bar {
-            background-color: #e0e0e0;
+            background-color: var(--c-progress-track);
             border-radius: 4px;
         }
         .file-details__progress-bar::-webkit-progress-value {
             background: linear-gradient(90deg, #3ec6a8 0%, #7fead2 100%);
             border-radius: 4px;
         }
-
         .file-details__progress-bar::-moz-progress-bar {
             background: linear-gradient(90deg, #3ec6a8 0%, #7fead2 100%);
             border-radius: 4px;
         }
         .file-details__status {
             font-size: 0.8em;
-            color: var(--secondary-text);
+            color: var(--c-text-secondary);
             display: flex;
             justify-content: space-between;
             margin-top: 0.3em;
@@ -947,7 +1151,6 @@
         .file-action {
             flex-shrink: 0;
         }
-        /* MODIFIED: .file-action a with glass effect */
         .file-action a {
             display: block;
             padding: 0.8em 1.2em;
@@ -957,19 +1160,21 @@
             text-align: center;
             white-space: nowrap;
             transition: all 0.2s ease, transform 0.1s ease-out;
-            background: linear-gradient(90deg, rgba(91,206,250,0.12) 0%, rgba(245,169,184,0.10) 100%);
-            color: var(--primary-color);
-            border: 1.5px solid var(--primary-color);
+            background: var(--c-btn-primary-bg);
+            color: var(--c-primary);
+            border: 1.5px solid var(--c-primary);
             box-shadow: 0 1px 4px rgba(91, 206, 250, 0.06);
             backdrop-filter: blur(6px) saturate(1.2);
             -webkit-backdrop-filter: blur(6px) saturate(1.2);
             outline: 1px solid rgba(255,255,255,0.18);
         }
-
+        body[data-theme="dark"] .file-action a {
+            outline: none;
+        }
         .file-action a:hover {
-            background: var(--primary-color);
+            background: var(--c-primary);
             color: var(--brilliant-white);
-            border-color: var(--secondary-color);
+            border-color: var(--c-secondary);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(91, 206, 250, 0.25);
         }
@@ -990,7 +1195,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary-color);
+            color: var(--c-primary);
             width: 28px;
             height: 28px;
             min-width: 28px;
@@ -1000,8 +1205,8 @@
             margin-right: 0.5em;
             transition: color 0.2s, background 0.2s;
         }
-        .metrics-list li:nth-child(1) .icon { color: var(--primary-color); }
-        .metrics-list li:nth-child(2) .icon { color: var(--secondary-color); }
+        .metrics-list li:nth-child(1) .icon { color: var(--c-primary); }
+        .metrics-list li:nth-child(2) .icon { color: var(--c-secondary); }
         .metrics-list li:nth-child(3) .icon { color: #fbbf24; }
         .metrics-list .icon svg {
             width: 20px;
@@ -1015,12 +1220,13 @@
         .promo-panel .btn { margin-top: 1rem; }
 
         .site-footer {
-            background-color: var(--brilliant-white);
+            background-color: var(--c-footer-bg);
             padding: 1.5rem 2rem;
-            border-top: 1px solid #f0f0f0;
+            border-top: 1px solid var(--c-footer-border);
             font-size: 0.9em;
-            color: var(--secondary-text);
+            color: var(--c-text-secondary);
             margin-top: auto;
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .footer-content {
@@ -1049,17 +1255,17 @@
             font-family: 'IBM Plex Sans', sans-serif;
             font-weight: 500;
             font-size: 1em;
-            color: var(--secondary-text);
+            color: var(--c-text-secondary);
             cursor: pointer;
             padding: 0.5em;
             border-radius: 6px;
-            /* MODIFIED: Add transform to transition */
-            transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, transform 0.1s ease-out;            text-decoration: none;
+            transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, transform 0.1s ease-out;
+            text-decoration: none;
         }
 
         .footer-nav-link:hover,
         .footer-nav-link:focus {
-            color: var(--primary-color);
+            color: var(--c-primary);
             background-color: rgba(91, 206, 250, 0.08);
             outline: none;
         }
@@ -1082,9 +1288,9 @@
         }
 
         .invite-modal::-webkit-scrollbar-thumb {
-            background-color: var(--primary-color);
+            background-color: var(--c-primary);
             border-radius: 20px;
-            border: 2px solid var(--panel-bg);
+            border: 2px solid var(--c-panel-bg);
         }
 
         .invite-modal::-webkit-scrollbar-thumb:hover {
@@ -1098,7 +1304,71 @@
 
         .invite-modal {
             scrollbar-width: thin;
-            scrollbar-color: var(--primary-color) transparent;
+            scrollbar-color: var(--c-primary) transparent;
+        }
+
+        /* --- Toast Notification Styles --- */
+        #toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .toast {
+            background: var(--c-panel-bg);
+            color: var(--c-text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--c-panel-shadow);
+            border: 2px solid var(--c-primary);
+            width: 350px;
+            max-width: 90vw;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.4s cubic-bezier(0.215, 0.610, 0.355, 1);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        /* --- NEW: Danger Toast Variant --- */
+        .toast.toast-danger {
+            border-color: var(--c-danger);
+        }
+        .toast.toast-danger .toast-header strong {
+            color: var(--c-danger);
+        }
+
+        .toast-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .toast-header strong {
+            color: var(--c-primary);
+            font-weight: 700;
+        }
+        .toast-close {
+            background: none; border: none; font-size: 1.2rem; color: var(--c-text-secondary); cursor: pointer;
+            padding: 0.2rem;
+        }
+        .toast-body {
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+        .toast-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+        .toast-actions .btn {
+            font-size: 0.85em;
+            padding: 0.6em 1.2em;
         }
 
         /* --- MODIFIED: Consistent Tactile Button Feedback on :active --- */
@@ -1117,12 +1387,20 @@
 <div class="header">
     <a href="#" class="logo" onclick="location.reload()">
         <img src="/logo.webp" alt="DropSilk Logo" />
-        <span>DropSilk</span>
+        <span class="brand-text">Drop<wbr>Silk</span>
     </a>
-    <!-- NEW: Header Navigation -->
     <nav class="header-nav">
         <button id="aboutBtn" class="header-nav-link">About</button>
         <button id="contactBtn" class="header-nav-link">Contact</button>
+        <!-- NEW: Theme Toggle Button -->
+        <button id="theme-toggle" class="header-nav-link" aria-label="Toggle theme">
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707z"/>
+            </svg>
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+            </svg>
+        </button>
         <a href="https://github.com/medy17" target="_blank" rel="noopener noreferrer" class="header-nav-link" aria-label="GitHub Profile">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
@@ -1133,7 +1411,7 @@
 <div class="main-content">
     <div class="tagline-section">
         <h1>FAST.<br />PRIVATE.<br />NO LIMIT.</h1>
-        <p>Send files directly between devices. Instantly. No cloud. No storage. Just you and the receiver—peer to peer.</p>
+        <p>Instantly share files, device to device. No cloud. No server. Just like a dance: it takes two to tango.</p>
     </div>
     <div class="flight-ticket-panel-wrapper">
         <div class="flight-ticket">
@@ -1177,25 +1455,30 @@
                 <label for="fileInput_transfer" class="btn btn-primary">
                     <!-- On-brand SVG -->
                     <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <rect x="4" y="4" width="12" height="12" rx="2" fill="#e3f7fd" stroke="var(--primary-color)"/>
-                        <path d="M10 8v4M8 10h4" stroke="var(--primary-color)" stroke-width="1.5" stroke-linecap="round"/>
+                        <rect x="4" y="4" width="12" height="12" rx="2" fill="#e3f7fd" stroke="var(--c-primary)"/>
+                        <path d="M10 8v4M8 10h4" stroke="var(--c-primary)" stroke-width="1.5" stroke-linecap="round"/>
                     </svg>
                     Select Files
                 </label>
-                <button class="btn btn-secondary">
+                <button id="folderSelectBtn" class="btn btn-secondary">
                     <!-- On-brand SVG -->
                     <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <rect x="3" y="7" width="14" height="8" rx="2" fill="#fffaf7" stroke="var(--secondary-color)"/>
-                        <path d="M3 7V6a2 2 0 0 1 2-2h3l2 2h5a2 2 0 0 1 2 2v1" stroke="var(--secondary-color)" stroke-width="1.5" fill="none"/>
+                        <rect x="3" y="7" width="14" height="8" rx="2" fill="#fffaf7" stroke="var(--c-secondary)"/>
+                        <path d="M3 7V6a2 2 0 0 1 2-2h3l2 2h5a2 2 0 0 1 2 2v1" stroke="var(--c-secondary)" stroke-width="1.5" fill="none"/>
                     </svg>
                     Select Folder
                 </button>
             </div>
             <input type="file" id="fileInput_transfer" style="display: none;" multiple />
+            <!-- NEW: Hidden input for folder selection -->
+            <input type="file" id="folderInput_transfer" style="display: none;" webkitdirectory directory multiple />
         </div>
+        <!-- MODIFIED: This panel is now dynamic -->
         <div class="panel">
-            <div class="panel-header"><h3>Nearby Users</h3><button class="icon-btn" onclick="broadcastNearbyUsers()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg></button></div>
-            <div id="nearby-users-list"><div class="empty-state">No users on your network</div></div>
+            <div class="panel-header"><h3 id="connection-panel-title">Users on Your Network</h3></div>
+            <div id="connection-panel-list">
+                <div class="empty-state">No other users found.</div>
+            </div>
         </div>
         <div class="panel grid-col-span-2">
             <div class="panel-header"><h3>Sending Queue</h3></div>
@@ -1260,6 +1543,9 @@
         </nav>
     </div>
 </footer>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
 
 <!-- All Modals are placed here -->
 <div class="modal-overlay" id="inviteModal">
@@ -1436,16 +1722,56 @@
 </div>
 
 <script>
+    // --- NEW: THEME TOGGLE LOGIC ---
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    const applyTheme = (theme, persist = true) => {
+        body.setAttribute('data-theme', theme);
+        if (persist) {
+            localStorage.setItem('dropsilk-theme', theme);
+        }
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (theme === 'dark') {
+            themeToggle.setAttribute('aria-label', 'Switch to Shades Up (Light Mode)');
+            if (metaThemeColor) metaThemeColor.setAttribute('content', '#111113');
+        } else {
+            themeToggle.setAttribute('aria-label', 'Switch to Shades Down (Dark Mode)');
+            if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff');
+        }
+    };
+
+    const toggleTheme = () => {
+        const currentTheme = body.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(newTheme);
+    };
+
+    const initializeTheme = () => {
+        const savedTheme = localStorage.getItem('dropsilk-theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            applyTheme('light', false); // Default to light mode, do not save preference yet
+        }
+    };
+
+    initializeTheme(); // Apply theme on initial script load to prevent FOUC
+    themeToggle.addEventListener('click', toggleTheme);
+
     // --- CONFIG ---
-    const WEBSOCKET_URL = `ws://${window.location.hostname}:8080`;
+    // We will replace this URL after deploying the backend in the next step.
+    const WEBSOCKET_URL = "wss://dropsilk-server.onrender.com";
     const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 
     // --- STATE ---
     let ws, peerConnection, dataChannel, worker;
-    let myName = "",
+    let myId = "",
+        myName = "",
         currentFlightCode = null,
         isFlightCreator = false,
-        connectionType = 'wan'; // 'lan' or 'wan', determined by server
+        connectionType = 'wan',
+        peerInfo = null; // NEW: To store connected peer's info
     let fileToSendQueue = [];
     let currentlySendingFile = null;
     const fileIdMap = new Map();
@@ -1465,15 +1791,22 @@
     const createFlightBtn = document.getElementById("createFlightBtn");
     const joinFlightBtn = document.getElementById("joinFlightBtn");
     const flightCodeInput = document.getElementById("flightCodeInput");
+    const flightCodeInputWrapper = flightCodeInput.closest('.flight-code-input-wrapper'); // NEW
 
     const dashboard = document.getElementById("dashboard");
     const dashboardFlightCode = document.getElementById("dashboard-flight-code");
     const dashboardFlightStatus = document.getElementById("dashboard-flight-status");
     const leaveFlightBtnDashboard = document.getElementById("leaveFlightBtnDashboard");
     const fileInputTransfer = document.getElementById("fileInput_transfer");
+    const folderInputTransfer = document.getElementById("folderInput_transfer"); // NEW
     const sendingQueueDiv = document.getElementById("sending-queue");
     const receiverQueueDiv = document.getElementById("receiver-queue");
-    const nearbyUsersList = document.getElementById("nearby-users-list");
+    const toastContainer = document.getElementById("toast-container");
+
+    // --- MODIFIED: Dynamic connection panel elements ---
+    const connectionPanelTitle = document.getElementById("connection-panel-title");
+    const connectionPanelList = document.getElementById("connection-panel-list");
+
 
     // --- NEW: METRICS UI ELEMENTS ---
     const metricsSentEl = document.getElementById('metrics-sent');
@@ -1526,6 +1859,10 @@
             setupContainer.style.display = "none";
             dashboard.style.display = "flex";
             setFlightCode(flightCode);
+            // Re-render the network list to enable invite buttons if not yet connected
+            if (!peerInfo) {
+                renderNetworkUsersView(lastNetworkUsers || []);
+            }
         }
 
         initializeUser();
@@ -1630,22 +1967,27 @@
             });
 
             function generateQRCode() {
-                const url = `https://dropsilk.dev?code=${currentFlightCode}`;
+                const url = `https://dropsilk.xyz?code=${currentFlightCode}`;
                 if (typeof QRCode === 'undefined') {
                     console.error('QRCode library not loaded');
                     if (qrCanvas) qrCanvas.style.display = 'none'; return;
                 }
-                QRCode.toCanvas(qrCanvas, url, { width: 200, margin: 2, color: { dark: '#5bcefa', light: '#ffffff' }, errorCorrectionLevel: 'M' }, (err) => {
+                const isDarkMode = document.body.getAttribute('data-theme') === 'dark';
+                const qrColors = {
+                    dark: isDarkMode ? '#5bcefa' : '#18181b', // QR Code dots
+                    light: '#00000000' // Transparent background
+                };
+                QRCode.toCanvas(qrCanvas, url, { width: 200, margin: 2, color: qrColors, errorCorrectionLevel: 'M' }, (err) => {
                     if (err) console.error('QR Code generation error:', err);
                 });
             }
-            copyLinkBtn.addEventListener('click', () => copyToClipboard(`https://dropsilk.dev?code=${currentFlightCode}`, copyLinkBtn, 'Link Copied!'));
+            copyLinkBtn.addEventListener('click', () => copyToClipboard(`https://dropsilk.xyz?code=${currentFlightCode}`, copyLinkBtn, 'Link Copied!'));
             copyCodeBtn.addEventListener('click', () => copyToClipboard(currentFlightCode, copyCodeBtn, 'Code Copied!'));
             shareNativeBtn.addEventListener('click', async () => {
                 if (navigator.share) {
                     try {
-                        await navigator.share({ title: 'Join my DropSilk flight!', text: `Join my file transfer session with code: ${currentFlightCode}`, url: `https://dropsilk.dev?code=${currentFlightCode}` });
-                    } catch (error) { if (error.name !== 'AbortError') copyToClipboard(`https://dropsilk.dev?code=${currentFlightCode}`, shareNativeBtn, 'Link Copied!'); }
+                        await navigator.share({ title: 'Join my DropSilk flight!', text: `Join my file transfer session with code: ${currentFlightCode}`, url: `https://dropsilk.xyz?code=${currentFlightCode}` });
+                    } catch (error) { if (error.name !== 'AbortError') copyToClipboard(`https://dropsilk.xyz?code=${currentFlightCode}`, shareNativeBtn, 'Link Copied!'); }
                 }
             });
         };
@@ -1716,33 +2058,73 @@
 
     function initializeWebSocket() {
         ws = new WebSocket(WEBSOCKET_URL);
-        ws.onopen = () => discoverLocalIpAndRegister();
+        ws.onopen = () => discoverLocalIpAndRegister(); // Still useful for LAN/WAN detection
         ws.onmessage = async (event) => {
             const msg = JSON.parse(event.data);
-            console.log("Received:", msg);
+            // console.log("Received:", msg);
             switch (msg.type) {
-                case "nearby-users-update": updateNearbyUsersUI(msg.users); break;
+                case "registered": myId = msg.id; break;
+                case "users-on-network-update":
+                    lastNetworkUsers = msg.users;
+                    if (!peerInfo) { // Only render if we're not in an active P2P session
+                        renderNetworkUsersView(msg.users);
+                    }
+                    break;
+                case "flight-invitation": showInvitationToast(msg.fromName, msg.flightCode); break;
                 case "flight-created": enterFlightMode(msg.flightCode); break;
                 case "peer-joined":
-                    connectionType = msg.connectionType || 'wan'; // Set connection type from server
-                    console.log(`Peer joined. Connection type set to: ${connectionType}`);
+                    connectionType = msg.connectionType || 'wan';
+                    peerInfo = msg.peer;
+                    console.log(`Peer ${peerInfo.name} joined. Connection type: ${connectionType}`);
                     handlePeerJoined(msg.flightCode);
                     break;
                 case "signal": if (!peerConnection) initializePeerConnection(isFlightCreator); await handleSignal(msg.data); break;
                 case "peer-left": handlePeerLeft(); break;
-                case "error": console.error("Server error:", msg.message); alert(msg.message); resetState(); break;
+                case "error": handleServerError(msg.message); break;
             }
         };
-        ws.onclose = () => { alert("Connection to server lost. Please refresh."); resetState(); };
+        ws.onclose = () => {
+            showToast({
+                type: 'danger',
+                title: 'Connection Lost',
+                body: 'Connection to the server was lost. Please refresh the page to reconnect.',
+                duration: 0 // Persist until dismissed
+            });
+            resetState();
+        };
         ws.onerror = (error) => console.error("WebSocket error:", error);
     }
+
+    // --- NEW: Centralized Error Handling ---
+    function handleServerError(message) {
+        console.error("Server error:", message);
+        // Check for specific, user-facing errors
+        if (message.includes("Flight not found")) {
+            flightCodeInputWrapper.classList.add('input-error');
+            setTimeout(() => flightCodeInputWrapper.classList.remove('input-error'), 1500);
+
+            showToast({
+                type: 'danger',
+                title: 'Flight Not Found',
+                body: "Please double-check the 6-character code and try again. The flight creator must be online. If you're on the same Wi-Fi, they can invite you directly from their dashboard.",
+                duration: 8000
+            });
+        } else {
+            // Generic error for other problems
+            showToast({
+                type: 'danger',
+                title: 'An Error Occurred',
+                body: message,
+                duration: 8000
+            });
+        }
+    }
+
 
     function handlePeerJoined(flightCode) {
         if (!currentFlightCode) { // Receiver joins
             enterFlightMode(flightCode);
         }
-        // This is called for both creator and joiner.
-        // It's the right place to initialize the connection.
         if (!peerConnection) {
             initializePeerConnection(isFlightCreator);
         }
@@ -1750,16 +2132,21 @@
         dashboardFlightStatus.style.color = '#15803d';
         dashboardFlightStatus.style.backgroundColor = '#f0fdf4';
         dashboardFlightStatus.style.borderColor = '#bbf7d0';
+        renderInFlightView();
         processFileToSendQueue();
     }
 
     function handlePeerLeft() {
         console.log("Peer has left the flight.");
+        peerInfo = null; // Clear peer info
         resetPeerConnectionState();
         dashboardFlightStatus.textContent = 'Peer disconnected. Waiting...';
         dashboardFlightStatus.style.color = '#d97706';
         dashboardFlightStatus.style.backgroundColor = '#fffbe6';
         dashboardFlightStatus.style.borderColor = '#fde68a';
+        // Revert to network view. The server will send a `users-on-network-update` which will
+        // trigger the render, but we can be proactive to make the UI feel instant.
+        renderNetworkUsersView(lastNetworkUsers);
     }
 
     // --- FILE TRANSFER & UI LOGIC (WITH FIXES) ---
@@ -1770,8 +2157,6 @@
     function setupDataChannel() {
         dataChannel.onopen = () => {
             console.log("Data channel opened!");
-            handlePeerJoined(currentFlightCode);
-            // NEW: Start tracking metrics when channel opens
             lastMetricsUpdateTime = Date.now();
             if (metricsInterval) clearInterval(metricsInterval);
             metricsInterval = setInterval(updateMetrics, 1000);
@@ -1779,7 +2164,6 @@
         dataChannel.onclose = () => {
             console.log("Data channel closed.");
             handlePeerLeft();
-            // NEW: Stop tracking metrics when channel closes
             if (metricsInterval) clearInterval(metricsInterval);
             metricsSpeedEl.textContent = '0 KB/s';
         };
@@ -1794,36 +2178,39 @@
 
                 if (receiverQueueDiv.querySelector('.empty-state')) receiverQueueDiv.innerHTML = '';
 
+                const displayName = incomingFileInfo.webkitRelativePath || incomingFileInfo.name;
                 const fileId = `file-recv-${Date.now()}`;
-                const fileIcon = getFileIcon(incomingFileInfo.name);
+                const fileIcon = getFileIcon(displayName);
                 receiverQueueDiv.insertAdjacentHTML('beforeend', `
                     <div class="queue-item" id="${fileId}">
                         <div class="file-icon">${fileIcon}</div>
                         <div class="file-details">
-                            <div class="file-details__name" title="${incomingFileInfo.name}"><span>${incomingFileInfo.name}</span></div>
+                            <div class="file-details__name" title="${displayName}"><span>${displayName}</span></div>
                             <progress class="file-details__progress-bar" value="0" max="1"></progress>
                             <div class="file-details__status"><span class="percent">0%</span></div>
                         </div>
                         <div class="file-action"></div>
                     </div>`);
-                fileIdMap.set(incomingFileInfo.name, fileId);
+                fileIdMap.set(displayName, fileId);
                 return;
             }
             // EOF
             if (event.data === "EOF") {
+                const displayName = incomingFileInfo.webkitRelativePath || incomingFileInfo.name;
                 const received = new Blob(incomingFileData, { type: incomingFileInfo.type });
                 const url = URL.createObjectURL(received);
-                const fileId = fileIdMap.get(incomingFileInfo.name);
+                const fileId = fileIdMap.get(displayName);
                 const fileElement = document.getElementById(fileId);
                 if (fileElement) {
                     fileElement.querySelector('.file-action').innerHTML = `<a href="${url}" download="${incomingFileInfo.name}">Download</a>`;
                     fileElement.querySelector('.percent').textContent = 'Complete!';
                 }
+                // Clean up map for this file
+                fileIdMap.delete(displayName);
                 return;
             }
             // CHUNK
             const chunkSize = event.data.byteLength || event.data.size || 0;
-            // NEW: Update received metrics
             totalBytesReceived += chunkSize;
             receivedInInterval += chunkSize;
             metricsReceivedEl.textContent = formatBytes(totalBytesReceived);
@@ -1831,8 +2218,9 @@
             incomingFileData.push(event.data);
             incomingFileReceived += chunkSize;
             if (incomingFileInfo?.size) {
+                const displayName = incomingFileInfo.webkitRelativePath || incomingFileInfo.name;
                 const progressValue = incomingFileReceived / incomingFileInfo.size;
-                const fileId = fileIdMap.get(incomingFileInfo.name);
+                const fileId = fileIdMap.get(displayName);
                 const fileElement = document.getElementById(fileId);
                 if (fileElement) {
                     fileElement.querySelector('progress').value = progressValue;
@@ -1844,15 +2232,16 @@
 
     function startFileSend(file) {
         currentlySendingFile = file;
+        const displayName = file.webkitRelativePath || file.name;
         const fileId = fileIdMap.get(file);
         const fileElement = document.getElementById(fileId);
         isSending = true;
 
         if(fileElement) {
             fileElement.innerHTML = `
-                <div class="file-icon">${getFileIcon(file.name)}</div>
+                <div class="file-icon">${getFileIcon(displayName)}</div>
                 <div class="file-details">
-                    <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
+                    <div class="file-details__name" title="${displayName}"><span>${displayName}</span></div>
                     <progress class="file-details__progress-bar" value="0" max="1"></progress>
                     <div class="file-details__status">
                         <span class="percent">0%</span>
@@ -1864,7 +2253,15 @@
         if (worker) worker.terminate();
         worker = new Worker("sender.worker.js");
         chunkQueue = []; fileReadingDone = false; sentOffset = 0;
-        dataChannel.send(JSON.stringify({ name: file.name, type: file.type, size: file.size }));
+
+        const metadata = {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            webkitRelativePath: file.webkitRelativePath || ''
+        };
+        dataChannel.send(JSON.stringify(metadata));
+
         worker.onmessage = (e) => {
             const { type, chunk } = e.data;
             if (type === "chunk") {
@@ -1891,7 +2288,6 @@
             const chunk = chunkQueue.shift();
             dataChannel.send(chunk);
 
-            // NEW: Update sent metrics
             const chunkSize = chunk.byteLength;
             totalBytesSent += chunkSize;
             sentInInterval += chunkSize;
@@ -1924,16 +2320,13 @@
         }
     }
 
-    // Define the global file handling function
     function handleFileSelection(files) {
-        if (files.length === 0) return;
+        if (!files || files.length === 0) return;
 
-        // Add success animation for drag and drop
         const dropZone = document.querySelector('.drop-zone');
         if (dropZone) {
             dropZone.style.transform = 'scale(0.98)';
             dropZone.style.transition = 'transform 0.1s ease-out';
-
             setTimeout(() => {
                 dropZone.style.transform = '';
                 dropZone.style.transition = '';
@@ -1947,19 +2340,20 @@
         Array.from(files).forEach(file => {
             fileToSendQueue.push(file);
             const fileId = `send-${Date.now()}-${Math.random()}`;
-            fileIdMap.set(file, fileId);
+            fileIdMap.set(file, fileId); // Use the File object as the key
+
+            const displayName = file.webkitRelativePath || file.name;
 
             sendingQueueDiv.insertAdjacentHTML('beforeend', `
             <div class="queue-item" id="${fileId}" style="opacity: 0; transform: translateY(10px);">
-                <div class="file-icon">${getFileIcon(file.name)}</div>
+                <div class="file-icon">${getFileIcon(displayName)}</div>
                 <div class="file-details">
-                    <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
+                    <div class="file-details__name" title="${displayName}"><span>${displayName}</span></div>
                     <div class="file-details__status"><span class="status-text">Queued</span></div>
                 </div>
             </div>
         `);
 
-            // Animate the new file item in
             const fileElement = document.getElementById(fileId);
             setTimeout(() => {
                 fileElement.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
@@ -1978,20 +2372,56 @@
         joinFlightBtn.onclick = () => {
             const code = flightCodeInput.value.trim().toUpperCase();
             if (code) { isFlightCreator = false; ws.send(JSON.stringify({ type: "join-flight", flightCode: code })); }
-            else { alert("Please enter a Flight Code to join."); }
+            else {
+                flightCodeInputWrapper.classList.add('input-error');
+                setTimeout(() => flightCodeInputWrapper.classList.remove('input-error'), 1500);
+                showToast({ type: 'danger', title: 'Empty Code', body: 'Please enter a 6-character flight code to join.', duration: 5000 });
+            }
         };
         leaveFlightBtnDashboard.onclick = () => { location.reload(); };
 
         fileInputTransfer.onchange = () => {
-            if (fileInputTransfer.files.length > 0) {
-                handleFileSelection(fileInputTransfer.files);
-                fileInputTransfer.value = ""; // Clear the input
-            }
+            handleFileSelection(fileInputTransfer.files);
+            fileInputTransfer.value = "";
         };
+
+        // --- MODIFIED: FOLDER SELECTION LOGIC ---
+        const folderSelectBtn = document.getElementById('folderSelectBtn');
+        // A more robust check: a touch-only device might support 'webkitdirectory' but have no UI for it.
+        // We only enable the button if the feature exists AND the primary input is a fine pointer (like a mouse).
+        const isDesktopLike = window.matchMedia('(pointer: fine)').matches;
+        if ('webkitdirectory' in folderInputTransfer && isDesktopLike) {
+            folderSelectBtn.onclick = () => folderInputTransfer.click();
+        } else {
+            // Hide button if folder selection is not supported or on a touch-primary device.
+            folderSelectBtn.style.display = 'none';
+        }
+        folderInputTransfer.onchange = () => {
+            handleFileSelection(folderInputTransfer.files);
+            folderInputTransfer.value = "";
+        };
+
+        connectionPanelList.addEventListener('click', (e) => {
+            const inviteBtn = e.target.closest('.invite-user-btn');
+            if (inviteBtn && !inviteBtn.disabled) {
+                const inviteeId = inviteBtn.dataset.inviteeId;
+                if (inviteeId && currentFlightCode) {
+                    ws.send(JSON.stringify({
+                        type: 'invite-to-flight',
+                        inviteeId: inviteeId,
+                        flightCode: currentFlightCode
+                    }));
+                    inviteBtn.textContent = 'Invited';
+                    inviteBtn.disabled = true;
+                    setTimeout(() => {
+                        inviteBtn.textContent = 'Invite';
+                    }, 3000);
+                }
+            }
+        });
 
         document.getElementById('shareAppBtn').onclick = () => document.getElementById('inviteBtn').click();
 
-        // Initialize drag and drop and ALL modals
         setupDragAndDrop();
         setupAllModalsAndNav();
     }
@@ -2029,61 +2459,158 @@
         const extension = fileName.split('.').pop().toLowerCase();
 
         // Image
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) return `
-<svg viewBox="0 0 20 20" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5">
-  <rect x="3" y="4" width="14" height="12" rx="2" fill="#e3f7fd" stroke="var(--primary-color)"/>
-  <circle cx="7" cy="8" r="1.5" fill="var(--primary-color)" />
-  <path d="M3 16l4-5 3 4 4-6 3 7" stroke="var(--secondary-color)" stroke-width="1.5" fill="none"/>
-</svg>`;
-
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) return `<svg viewBox="0 0 20 20" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="12" rx="2" fill="#e3f7fd" stroke="var(--c-primary)"/><circle cx="7" cy="8" r="1.5" fill="var(--c-primary)"/><path d="M3 16l4-5 3 4 4-6 3 7" stroke="var(--c-secondary)" stroke-width="1.5" fill="none"/></svg>`;
         // Video
-        if (['mp4', 'mov', 'avi', 'mkv', 'm4v'].includes(extension)) return `
-<svg viewBox="0 0 20 20" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5">
-  <rect x="3" y="4" width="14" height="12" rx="2" fill="#f5eafd" stroke="var(--secondary-color)"/>
-  <polygon points="8,8 14,10 8,12" fill="var(--primary-color)" />
-</svg>`;
-
+        if (['mp4', 'mov', 'avi', 'mkv', 'm4v'].includes(extension)) return `<svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4.2" y="5.6" width="19.6" height="16.8" rx="2.8" ry="2.8" fill="#f5eafd" stroke="var(--c-secondary)"/><polygon points="9.2 10 17.9 14.2 9.2 18.4" fill="var(--c-primary)"/></svg>`;
         // Audio
-        if (['mp3', 'wav', 'ogg', 'm4a'].includes(extension)) return `
-<svg viewBox="0 0 20 20" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5">
-  <rect x="3" y="4" width="14" height="12" rx="2" fill="#eafdff" stroke="var(--primary-color)"/>
-  <path d="M8 8v4m0 0a2 2 0 1 0 4 0V8" stroke="var(--secondary-color)" stroke-width="1.5"/>
-</svg>`;
-
+        if (['mp3', 'wav', 'ogg', 'm4a'].includes(extension)) return `<svg viewBox="0 0 28 28" width="28" height="28" fill="none"><rect x="4.2" y="5.6" width="19.6" height="16.8" rx="2.8" ry="2.8" fill="#eafdff" stroke="var(--c-primary)"/><path d="M11.3,9.6v7.3c-.4-.3-.8-.4-1.4-.4-1.1,0-2.1.8-2.1,1.7s.9,1.7,2.1,1.7,2.1-.8,2.1-1.7v-6.8l6.5-.8v5.5c-.4-.3-.8-.4-1.4-.4-1.1,0-2.1.8-2.1,1.7s.9,1.7,2.1,1.7,2.1-.8,2.1-1.7v-8.5c0-.5-.5-.9-1-.9l-6.1.6c-.5,0-.8.4-.8.9Z" fill="var(--c-secondary)"/></svg>`;
         // PDF/Document
-        if (['pdf'].includes(extension)) return `
-<svg viewBox="0 0 20 20" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5">
-  <rect x="3" y="4" width="14" height="12" rx="2" fill="#fff" stroke="var(--primary-color)"/>
-  <rect x="6" y="8" width="8" height="1.5" fill="var(--secondary-color)" />
-  <rect x="6" y="11" width="5" height="1.5" fill="var(--secondary-color)" />
-</svg>`;
-
+        if (['pdf'].includes(extension)) return `<svg viewBox="0 0 20 20" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="12" rx="2" fill="#fff" stroke="var(--c-primary)"/><rect x="6" y="8" width="8" height="1.5" fill="var(--c-secondary)"/><rect x="6" y="11" width="5" height="1.5" fill="var(--c-secondary)"/></svg>`;
         // Archive/Zip
-        if (['zip', 'rar', '7z'].includes(extension)) return `
-<svg viewBox="0 0 20 20" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5">
-  <rect x="3" y="4" width="14" height="12" rx="2" fill="#fffaf7" stroke="var(--secondary-color)"/>
-  <rect x="9" y="6" width="2" height="8" fill="var(--primary-color)" />
-  <rect x="7" y="10" width="6" height="2" fill="var(--secondary-color)" />
-</svg>`;
-
+        if (['zip', 'rar', '7z'].includes(extension)) return `<svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4.2" y="5.6" width="19.6" height="16.8" rx="2.8" ry="2.8" fill="#fffaf7" stroke="var(--c-secondary)"/><rect x="12.6" y="8.4" width="2.8" height="11.2" fill="var(--c-primary)"/><rect x="9.8" y="14" width="8.4" height="2.8" fill="var(--c-secondary)"/></svg>`;
         // Generic File
-        return `
-<svg viewBox="0 0 20 20" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5">
-  <rect x="3" y="4" width="14" height="12" rx="2" fill="#f4f4f5" stroke="var(--primary-color)"/>
-  <rect x="6" y="8" width="8" height="1.5" fill="var(--secondary-color)" />
-</svg>`;
+        return `<svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4.2" y="5.6" width="19.6" height="16.8" rx="2.8" ry="2.8" fill="#f4f4f5" stroke="var(--c-primary)"/><path d="M12.2,16v-.4c0-.6.1-1.2.3-1.6.2-.4.7-.8,1.4-1.2.6-.3.9-.6,1.1-.8.2-.2.3-.4.3-.7s-.1-.6-.4-.8c-.3-.2-.7-.3-1.1-.3s-.9.1-1.2.3c-.3.2-.5.5-.6.8h-2.5c0-.7.3-1.3.7-1.8s.9-.9,1.5-1.2,1.4-.5,2.2-.5,1.5.1,2.1.4,1.1.7,1.4,1.2c.3.5.5,1.1.5,1.8s-.2,1.1-.5,1.6c-.3.5-.8.9-1.5,1.3-.5.3-.9.6-1,.8-.2.2-.2.5-.2.7v.2h-2.5ZM13.5,16.9c.4,0,.8.2,1.1.5.3.3.5.7.5,1.1s-.2.8-.5,1.1c-.3.3-.7.5-1.1.5s-.8-.2-1.1-.5c-.3-.3-.5-.7-.5-1.1s.2-.8.5-1.1c.3-.3.7-.5,1.1-.5Z" fill="var(--c-secondary)" stroke="var(--c-primary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8"/></svg>`;
     }
 
-    function updateNearbyUsersUI(users) { /* Unchanged */ }
+    // --- NEW: Keep track of the last user list to re-render it ---
+    let lastNetworkUsers = [];
+    function renderNetworkUsersView(users) {
+        connectionPanelTitle.textContent = "Users on Your Network";
+        connectionPanelList.innerHTML = '';
+        if (users.length === 0) {
+            connectionPanelList.innerHTML = '<div class="empty-state">No other users found on your network.</div>';
+            return;
+        }
+
+        const isInFlight = !!currentFlightCode;
+        users.forEach(user => {
+            const userEl = document.createElement('div');
+            userEl.className = 'network-user-item';
+            userEl.innerHTML = `
+                <div class="network-user-details">
+                    <span class="network-user-name">${user.name}</span>
+                    <span class="network-user-id">ID: ${user.id}</span>
+                </div>
+                <button
+                    class="btn btn-primary invite-user-btn"
+                    data-invitee-id="${user.id}"
+                    ${!isInFlight ? 'disabled title="Create or join a flight to invite users"' : ''}>
+                    Invite
+                </button>
+            `;
+            connectionPanelList.appendChild(userEl);
+        });
+    }
+
+    // --- NEW: Renders the "In Flight" view ---
+    function renderInFlightView() {
+        if (!peerInfo) return; // Safety check
+        connectionPanelTitle.textContent = "In Flight With";
+        connectionPanelList.innerHTML = `
+            <div class="inflight-user-item">
+                <div class="inflight-user-details">
+                    <span class="inflight-user-name">${myName}</span>
+                    <span class="user-badge">You</span>
+                </div>
+                <span class="inflight-user-id">ID: ${myId}</span>
+            </div>
+            <div class="inflight-user-item">
+                <div class="inflight-user-details">
+                    <span class="inflight-user-name">${peerInfo.name}</span>
+                </div>
+                <span class="inflight-user-id">ID: ${peerInfo.id}</span>
+            </div>
+        `;
+    }
+
+    // --- NEW: Generic Toast Creation Function ---
+    function showToast({ type = 'info', title, body, duration = 10000, actions = [] }) {
+        const toastId = `toast-${Date.now()}`;
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.id = toastId;
+
+        let actionsHTML = '';
+        if (actions.length > 0) {
+            actionsHTML = '<div class="toast-actions">';
+            actions.forEach((action, index) => {
+                actionsHTML += `<button class="btn ${action.class || ''} action-btn-${index}">${action.text}</button>`;
+            });
+            actionsHTML += '</div>';
+        }
+
+        toast.innerHTML = `
+            <div class="toast-header">
+                <strong>${title}</strong>
+                <button class="toast-close">&times;</button>
+            </div>
+            <div class="toast-body">${body}</div>
+            ${actionsHTML}
+        `;
+
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 100);
+
+        const removeToast = () => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 500);
+        };
+
+        let autoDismiss;
+        if (duration > 0) {
+            autoDismiss = setTimeout(removeToast, duration);
+        }
+
+        toast.addEventListener('click', (e) => {
+            if (e.target.matches('.toast-close')) {
+                clearTimeout(autoDismiss);
+                removeToast();
+            }
+            actions.forEach((action, index) => {
+                if (e.target.matches(`.action-btn-${index}`)) {
+                    action.callback();
+                    clearTimeout(autoDismiss);
+                    removeToast();
+                }
+            });
+        });
+    }
+
+    function showInvitationToast(fromName, flightCode) {
+        showToast({
+            type: 'info',
+            title: 'Flight Invitation',
+            body: `<b>${fromName}</b> has invited you to a flight.`,
+            duration: 15000,
+            actions: [
+                {
+                    text: 'Decline',
+                    class: 'btn-secondary',
+                    callback: () => console.log('Invitation declined.')
+                },
+                {
+                    text: 'Join',
+                    class: 'btn-primary',
+                    callback: () => {
+                        isFlightCreator = false; // Important: set flag when joining
+                        ws.send(JSON.stringify({ type: "join-flight", flightCode }));
+                    }
+                }
+            ]
+        });
+    }
+
 
     function resetState() {
         if (metricsInterval) clearInterval(metricsInterval);
         resetPeerConnectionState();
         currentFlightCode = null; isFlightCreator = false; connectionType = 'wan'; fileToSendQueue = [];
+        peerInfo = null; // Also reset peerInfo
         setupContainer.style.display = "flex";
         dashboard.style.display = "none";
         flightCodeInput.value = "";
         fileInputTransfer.value = "";
+        folderInputTransfer.value = "";
         sendingQueueDiv.innerHTML = '<div class="empty-state">Select files to send</div>';
         receiverQueueDiv.innerHTML = '<div class="empty-state">Waiting for incoming files</div>';
 
@@ -2108,67 +2635,16 @@
 
     // --- WEBRTC & SERVER COMMUNICATION FUNCTIONS ---
     discoverLocalIpAndRegister = function() {
-        console.log("Starting IP discovery for local users...");
-        const tempPc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-        tempPc.createDataChannel("temp");
-        let privateIpFoundAndRegistered = false;
-        let fallbackExecuted = false;
-
-        const attemptRegistration = (prefix, ip = 'unknown') => {
-            if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
-                    type: "register-details",
-                    name: myName,
-                    localIpPrefix: prefix,
-                    localIp: ip // Send the full local IP
-                }));
-                console.log(`Registered details with server: Name=${myName}, Prefix=${prefix}, LocalIP=${ip}`);
-            } else {
-                setTimeout(() => attemptRegistration(prefix, ip), 100);
-            }
-        };
-
-        const executeFallback = () => {
-            if (fallbackExecuted || privateIpFoundAndRegistered) return;
-            fallbackExecuted = true;
-            console.log("No private IP found via WebRTC. Using fallback 'unknown' prefix.");
-            attemptRegistration("unknown", "unknown");
-            if (tempPc.signalingState !== 'closed') {
-                tempPc.onicecandidate = null;
-                tempPc.close();
-            }
-        };
-
-        tempPc.onicecandidate = (e) => {
-            if (privateIpFoundAndRegistered) return;
-            if (!e.candidate?.candidate) {
-                if (!privateIpFoundAndRegistered) executeFallback();
-                return;
-            }
-            const candidateStr = e.candidate.candidate;
-            const ipMatch = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(candidateStr);
-            if (ipMatch) {
-                const ip = ipMatch[1];
-                // Use the new helper function to check for a true private IP and exclude CGNAT
-                if (isPrivateIp(ip)) {
-                    const prefix = ip.split(".").slice(0, 3).join(".");
-                    console.log(`***** PRIVATE IP FOUND: ${ip}. Registering with prefix: ${prefix} *****`);
-                    privateIpFoundAndRegistered = true;
-                    attemptRegistration(prefix, ip); // Pass full IP
-                    if (tempPc.signalingState !== 'closed') {
-                        tempPc.onicecandidate = null;
-                        tempPc.close();
-                    }
-                }
-            }
-        };
-        tempPc.createOffer().then((offer) => tempPc.setLocalDescription(offer)).catch((error) => {
-            console.error("Error creating WebRTC offer for IP discovery:", error);
-            executeFallback();
-        });
-        setTimeout(() => {
-            if (!privateIpFoundAndRegistered) executeFallback();
-        }, 3500);
+        // This function is now mainly for the client to register its name.
+        // The local IP discovery part is less critical but can still help the server's LAN/WAN detection heuristic.
+        // console.log("Registering user details with server...");
+        ws.send(JSON.stringify({
+            type: "register-details",
+            name: myName,
+            // We can still attempt to get local IP for the LAN/WAN detection, but don't rely on it for grouping.
+            localIpPrefix: "unknown",
+            localIp: "unknown"
+        }));
     }
 
     initializePeerConnection = function(isOfferer) {
@@ -2176,21 +2652,20 @@
         let pcConfig;
         if (connectionType === 'lan') {
             console.log("LAN connection mode: Using host candidates only (no STUN).");
-            // For LAN, we don't need STUN servers. This forces local "host" candidates, which is faster.
             pcConfig = { iceServers: [] };
         } else {
             console.log("WAN connection mode: Using STUN servers.");
             pcConfig = { iceServers: ICE_SERVERS };
         }
 
-        peerConnection = new RTCPeerConnection(pcConfig); // Use the dynamic config
+        peerConnection = new RTCPeerConnection(pcConfig);
 
         peerConnection.onicecandidate = (event) => { if (event.candidate) ws.send(JSON.stringify({ type: "signal", data: { candidate: event.candidate }, })); };
         peerConnection.onconnectionstatechange = () => {
             console.log("Peer connection state:", peerConnection.connectionState);
-            if (peerConnection.connectionState === "disconnected" || peerConnection.connectionState === "failed") {
+            if (peerConnection.connectionState === "disconnected" || peerConnection.connectionState === "failed" || peerConnection.connectionState === "closed") {
                 console.log("Peer connection lost or failed. Resetting state.");
-                handlePeerLeft(); // Use handlePeerLeft to reset UI
+                handlePeerLeft();
             }
         };
         if (isOfferer) {
@@ -2214,11 +2689,7 @@
             try { await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)); } catch (error) { console.error("Error adding ICE candidate:", error); }
         }
     }
-    updateNearbyUsersUI = function(users) {
-        nearbyUsersList.innerHTML = '';``
-        if (users.length === 0) { nearbyUsersList.innerHTML = '<div class="empty-state">No users on your network</div>'; return; }
-        users.forEach(user => { const userEl = document.createElement('div'); userEl.textContent = user.name; nearbyUsersList.appendChild(userEl); });
-    }
+
 </script>
 <script src="https://unpkg.com/qrcode@1.4.4/build/qrcode.min.js"></script>
 </body>
