@@ -27,7 +27,11 @@ server.listen(PORT, () => {
 });
 
 const flights = {};
+// --- NEW: STATE MANAGEMENT OVERHAUL ---
+// Maps clientId -> sessionObject
 const clients = new Map();
+// Maps ws -> clientId
+const connections = new Map();
 
 // --- IP HELPER FUNCTIONS ---
 
@@ -69,7 +73,7 @@ function getLocalIpForDisplay() {
 function broadcastUsersOnSameNetwork() {
     const clientsByNetworkGroup = {};
 
-    for (const [ws, meta] of clients.entries()) {
+    for (const [clientId, meta] of clients.entries()) {
         // Only broadcast users who are not currently in a full flight
         if (meta.flightCode && flights[meta.flightCode] && flights[meta.flightCode].length === 2) {
             continue;
@@ -95,10 +99,12 @@ function broadcastUsersOnSameNetwork() {
         });
     }
 
-    for (const [ws, meta] of clients.entries()) {
+    for (const [clientId, meta] of clients.entries()) {
+        if (!meta.ws || meta.ws.readyState !== WebSocket.OPEN) continue;
+
         // Don't send network updates to users in a full flight
         if (meta.flightCode && flights[meta.flightCode] && flights[meta.flightCode].length === 2) {
-            ws.send(JSON.stringify({ type: "users-on-network-update", users: [] }));
+            meta.ws.send(JSON.stringify({ type: "users-on-network-update", users: [] }));
             continue;
         }
 
@@ -113,157 +119,179 @@ function broadcastUsersOnSameNetwork() {
             groupingKey = cleanIp;
         }
 
-        // This logic is simplified; we just need to send the list of users in the same group.
-        // We filter out the current user themselves.
         if (clientsByNetworkGroup[groupingKey]) {
             const usersOnNetwork = clientsByNetworkGroup[groupingKey].filter(
                 (c) => c.id !== meta.id
             );
-            ws.send(
+            meta.ws.send(
                 JSON.stringify({ type: "users-on-network-update", users: usersOnNetwork }),
             );
         } else {
-            ws.send(JSON.stringify({ type: "users-on-network-update", users: [] }));
+            meta.ws.send(JSON.stringify({ type: "users-on-network-update", users: [] }));
         }
     }
 }
 
 wss.on("connection", (ws, req) => {
-    const clientId = Math.random().toString(36).substr(2, 9);
-    const rawIp = req.headers['x-forwarded-for']?.split(',').shift() || req.socket.remoteAddress;
-    const cleanRemoteIp = getCleanIPv4(rawIp);
-
-    const metadata = { id: clientId, name: "Anonymous", flightCode: null, remoteIp: cleanRemoteIp };
-    clients.set(ws, metadata);
-
-    ws.send(JSON.stringify({ type: "registered", id: clientId }));
-    // Send initial user list upon connection
-    broadcastUsersOnSameNetwork();
-
+    // This connection is temporary until a 'register-details' or 'reconnect' message arrives.
+    // The worker architecture simplifies this; every new connection gets a temporary ID.
+    const tempClientId = Math.random().toString(36).substr(2, 9);
+    connections.set(ws, tempClientId);
 
     ws.on("message", (message) => {
         const data = JSON.parse(message);
-        const meta = clients.get(ws);
+        const senderId = connections.get(ws);
+        if (!senderId) return;
 
         switch (data.type) {
             case "register-details":
-                meta.name = data.name;
-                clients.set(ws, meta);
+                // This is a brand new session.
+                const newClientId = Math.random().toString(36).substr(2, 9);
+                const rawIp = req.headers['x-forwarded-for']?.split(',').shift() || req.socket.remoteAddress;
+                const session = {
+                    id: newClientId,
+                    name: data.name,
+                    flightCode: null,
+                    remoteIp: getCleanIPv4(rawIp),
+                    ws: ws,
+                    state: 'ACTIVE', // 'ACTIVE', 'HELD'
+                    holdTimer: null
+                };
+                clients.set(newClientId, session);
+                connections.set(ws, newClientId); // Update mapping from temp to real ID
+
+                ws.send(JSON.stringify({ type: "registered", id: newClientId }));
                 broadcastUsersOnSameNetwork();
                 break;
 
             case "create-flight":
-                const flightCode = Math.random().toString(36).substr(2, 6).toUpperCase();
-                flights[flightCode] = [ws];
-                meta.flightCode = flightCode;
-                ws.send(JSON.stringify({ type: "flight-created", flightCode }));
-                broadcastUsersOnSameNetwork();
-                break;
-
             case "join-flight":
-                const flight = flights[data.flightCode];
-                if (flight && flight.length < 2) {
-                    const creatorWs = flight[0];
-                    const creatorMeta = clients.get(creatorWs);
-                    const joinerMeta = meta;
-
-                    let connectionType = 'wan';
-                    const creatorIp = creatorMeta.remoteIp;
-                    const joinerIp = joinerMeta.remoteIp;
-
-                    if (isPrivateIP(creatorIp) && isPrivateIP(joinerIp)) {
-                        const creatorSubnet = creatorIp.split('.').slice(0, 3).join('.');
-                        const joinerSubnet = joinerIp.split('.').slice(0, 3).join('.');
-                        if (creatorSubnet === joinerSubnet) {
-                            connectionType = 'lan';
-                        }
-                    } else if (creatorIp === joinerIp) {
-                        connectionType = 'lan';
-                    }
-
-                    flight.push(ws);
-                    meta.flightCode = data.flightCode;
-
-                    // --- Send personalized peer-joined messages ---
-                    const creatorPeerData = { id: creatorMeta.id, name: creatorMeta.name };
-                    const joinerPeerData = { id: joinerMeta.id, name: joinerMeta.name };
-
-                    // Send to joiner about creator
-                    ws.send(JSON.stringify({
-                        type: "peer-joined",
-                        flightCode: data.flightCode,
-                        connectionType: connectionType,
-                        peer: creatorPeerData
-                    }));
-
-                    // Send to creator about joiner
-                    creatorWs.send(JSON.stringify({
-                        type: "peer-joined",
-                        flightCode: data.flightCode,
-                        connectionType: connectionType,
-                        peer: joinerPeerData
-                    }));
-
-                    broadcastUsersOnSameNetwork(); // Update lists for all other clients
-                } else {
-                    ws.send(
-                        JSON.stringify({
-                            type: "error",
-                            message: "Flight not found or is full.",
-                        }),
-                    );
-                }
-                break;
-
             case "invite-to-flight":
-                for (const [clientWs, clientMeta] of clients.entries()) {
-                    if (clientMeta.id === data.inviteeId && clientWs.readyState === WebSocket.OPEN) {
-                        clientWs.send(
-                            JSON.stringify({
-                                type: "flight-invitation",
-                                flightCode: data.flightCode,
-                                fromName: meta.name,
-                            }),
-                        );
-                        break;
-                    }
-                }
-                break;
-
             case "signal":
-                const targetFlight = flights[meta.flightCode];
-                if (targetFlight) {
-                    targetFlight.forEach((client) => {
-                        if (client !== ws && client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({ type: "signal", data: data.data }));
-                        }
-                    });
-                }
+                // These actions require a persistent session, which is guaranteed if we get here.
+                const senderSession = clients.get(senderId);
+                if (!senderSession) return;
+                handleFlightActions(senderSession, data);
                 break;
         }
     });
 
     ws.on("close", () => {
-        const meta = clients.get(ws);
-        if (meta && meta.flightCode) {
-            const flight = flights[meta.flightCode];
-            if (flight) {
-                flights[meta.flightCode] = flight.filter((client) => client !== ws);
-                // Notify the remaining peer that their partner has left.
-                flights[meta.flightCode].forEach((client) => {
-                    // *** THE BUG FIX IS HERE: The remaining user STAYS in the flight. ***
-                    // We no longer set their flightCode to null.
-                    client.send(JSON.stringify({ type: "peer-left" }));
-                });
+        const closedClientId = connections.get(ws);
+        if (!closedClientId) return;
 
-                if (flights[meta.flightCode].length === 0) {
-                    delete flights[meta.flightCode];
-                }
-            }
+        const session = clients.get(closedClientId);
+        console.log(`Client ${closedClientId} disconnected.`);
+
+        // The worker logic means we don't need a complex HELD state anymore.
+        // A disconnect is a disconnect. The worker keeps the session alive.
+        // When the worker reconnects, it establishes a new session on the server.
+        // For simplicity and robustness, we treat any disconnect as final.
+        // The *real* session persistence is now entirely inside the client's worker.
+        if (session) {
+            cleanupSession(closedClientId);
         }
-        clients.delete(ws);
-        broadcastUsersOnSameNetwork();
+        connections.delete(ws);
     });
 });
 
-const localIpForDisplay = getLocalIpForDisplay();
+function handleFlightActions(senderSession, data) {
+    const { type, payload } = data;
+    const senderId = senderSession.id;
+    const ws = senderSession.ws;
+
+    switch(type) {
+        case "create-flight":
+            const flightCode = Math.random().toString(36).substr(2, 6).toUpperCase();
+            flights[flightCode] = [senderId];
+            senderSession.flightCode = flightCode;
+            ws.send(JSON.stringify({ type: "flight-created", flightCode }));
+            broadcastUsersOnSameNetwork();
+            break;
+
+        case "join-flight":
+            const flightToJoin = flights[payload.code];
+            if (flightToJoin && flightToJoin.length < 2) {
+                const creatorId = flightToJoin[0];
+                const creatorSession = clients.get(creatorId);
+
+                if (!creatorSession || !creatorSession.ws || creatorSession.ws.readyState !== WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: "error", message: "Flight creator is not available." }));
+                    return;
+                }
+
+                let connectionType = 'wan';
+                if (isPrivateIP(creatorSession.remoteIp) && isPrivateIP(senderSession.remoteIp) && creatorSession.remoteIp.split('.').slice(0, 3).join('.') === senderSession.remoteIp.split('.').slice(0, 3).join('.')) {
+                    connectionType = 'lan';
+                } else if (creatorSession.remoteIp === senderSession.remoteIp) {
+                    connectionType = 'lan';
+                }
+
+                flightToJoin.push(senderId);
+                senderSession.flightCode = payload.code;
+
+                const creatorPeerData = { id: creatorSession.id, name: creatorSession.name };
+                const joinerPeerData = { id: senderSession.id, name: senderSession.name };
+
+                ws.send(JSON.stringify({ type: "peer-joined", flightCode: payload.code, connectionType, peer: creatorPeerData }));
+                creatorSession.ws.send(JSON.stringify({ type: "peer-joined", flightCode: payload.code, connectionType, peer: joinerPeerData }));
+
+                broadcastUsersOnSameNetwork();
+            } else {
+                ws.send(JSON.stringify({ type: "error", message: "Flight not found or is full." }));
+            }
+            break;
+
+        case "invite-to-flight":
+            const inviteeSession = clients.get(payload.inviteeId);
+            if (inviteeSession && inviteeSession.ws && inviteeSession.ws.readyState === WebSocket.OPEN) {
+                inviteeSession.ws.send(JSON.stringify({ type: "flight-invitation", flightCode: senderSession.flightCode, fromName: senderSession.name }));
+            }
+            break;
+
+        case "signal":
+            const targetFlightSignal = flights[senderSession.flightCode];
+            if (targetFlightSignal) {
+                targetFlightSignal.forEach((peerId) => {
+                    if (peerId !== senderId) {
+                        const peerSession = clients.get(peerId);
+                        if (peerSession && peerSession.ws && peerSession.ws.readyState === WebSocket.OPEN) {
+                            peerSession.ws.send(JSON.stringify({ type: "signal", data: payload.data }));
+                        }
+                    }
+                });
+            }
+            break;
+    }
+}
+
+
+function cleanupSession(clientId) {
+    const session = clients.get(clientId);
+    if (!session) return;
+
+    console.log(`Cleaning up session for client ${clientId}`);
+
+    if (session.flightCode) {
+        const flight = flights[session.flightCode];
+        if (flight) {
+            // Notify the other peer
+            flight.forEach((peerId) => {
+                if (peerId !== clientId) {
+                    const peerSession = clients.get(peerId);
+                    if (peerSession && peerSession.ws && peerSession.ws.readyState === WebSocket.OPEN) {
+                        peerSession.flightCode = null; // Mark them as out of the flight too
+                        peerSession.ws.send(JSON.stringify({ type: "peer-left" }));
+                    }
+                }
+            });
+            // The flight is now dissolved
+            delete flights[session.flightCode];
+            console.log(`Flight ${session.flightCode} dissolved.`);
+        }
+    }
+
+    clients.delete(clientId);
+    console.log(`Client session for ${clientId} removed.`);
+    broadcastUsersOnSameNetwork();
+}
