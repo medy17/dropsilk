@@ -136,6 +136,9 @@ wss.on("connection", (ws, req) => {
     const metadata = { id: clientId, name: "Anonymous", flightCode: null, remoteIp: cleanRemoteIp };
     clients.set(ws, metadata);
 
+    // LOG: New client connection
+    console.log(`[CONNECT] Client connected. ID: ${clientId}, IP: ${cleanRemoteIp}`);
+
     ws.send(JSON.stringify({ type: "registered", id: clientId }));
     // Send initial user list upon connection
     broadcastUsersOnSameNetwork();
@@ -144,9 +147,12 @@ wss.on("connection", (ws, req) => {
     ws.on("message", (message) => {
         const data = JSON.parse(message);
         const meta = clients.get(ws);
+        if (!meta) return; // Safety check
 
         switch (data.type) {
             case "register-details":
+                // LOG: Client registers their details
+                console.log(`[REGISTER] Client ${meta.id} registered as "${data.name}" from IP ${meta.remoteIp}`);
                 meta.name = data.name;
                 clients.set(ws, meta);
                 broadcastUsersOnSameNetwork();
@@ -154,6 +160,8 @@ wss.on("connection", (ws, req) => {
 
             case "create-flight":
                 const flightCode = Math.random().toString(36).substr(2, 6).toUpperCase();
+                // LOG: Flight creation
+                console.log(`[FLIGHT CREATE] User "${meta.name}" (${meta.id}) created flight ${flightCode}. IP: ${meta.remoteIp}`);
                 flights[flightCode] = [ws];
                 meta.flightCode = flightCode;
                 ws.send(JSON.stringify({ type: "flight-created", flightCode }));
@@ -166,6 +174,11 @@ wss.on("connection", (ws, req) => {
                     const creatorWs = flight[0];
                     const creatorMeta = clients.get(creatorWs);
                     const joinerMeta = meta;
+
+                    if (!creatorMeta || !joinerMeta) {
+                        console.error(`[ERROR] Metadata missing for flight ${data.flightCode}`);
+                        return;
+                    }
 
                     let connectionType = 'wan';
                     const creatorIp = creatorMeta.remoteIp;
@@ -180,6 +193,10 @@ wss.on("connection", (ws, req) => {
                     } else if (creatorIp === joinerIp) {
                         connectionType = 'lan';
                     }
+
+                    // LOG: Flight joining
+                    console.log(`[FLIGHT JOIN] User "${joinerMeta.name}" (${joinerMeta.id}) joined flight ${data.flightCode} with creator "${creatorMeta.name}" (${creatorMeta.id}).`);
+                    console.log(`  └─ IPs: Joiner=${joinerMeta.remoteIp}, Creator=${creatorMeta.remoteIp}. Type: ${connectionType.toUpperCase()}`);
 
                     flight.push(ws);
                     meta.flightCode = data.flightCode;
@@ -218,6 +235,8 @@ wss.on("connection", (ws, req) => {
             case "invite-to-flight":
                 for (const [clientWs, clientMeta] of clients.entries()) {
                     if (clientMeta.id === data.inviteeId && clientWs.readyState === WebSocket.OPEN) {
+                        // LOG: Flight invitation
+                        console.log(`[INVITE] User "${meta.name}" (${meta.id}) invited "${clientMeta.name}" (${clientMeta.id}) to flight ${data.flightCode}.`);
                         clientWs.send(
                             JSON.stringify({
                                 type: "flight-invitation",
@@ -231,6 +250,9 @@ wss.on("connection", (ws, req) => {
                 break;
 
             case "signal":
+                // NOTE: WebRTC signaling data is passed through but not inspected or logged.
+                // File names, sizes, or contents are NOT visible to the server as they are
+                // sent over the encrypted peer-to-peer data channel.
                 const targetFlight = flights[meta.flightCode];
                 if (targetFlight) {
                     targetFlight.forEach((client) => {
@@ -245,23 +267,34 @@ wss.on("connection", (ws, req) => {
 
     ws.on("close", () => {
         const meta = clients.get(ws);
-        if (meta && meta.flightCode) {
-            const flight = flights[meta.flightCode];
-            if (flight) {
-                flights[meta.flightCode] = flight.filter((client) => client !== ws);
-                // Notify the remaining peer that their partner has left.
-                flights[meta.flightCode].forEach((client) => {
-                    // *** THE BUG FIX IS HERE: The remaining user STAYS in the flight. ***
-                    // We no longer set their flightCode to null.
-                    client.send(JSON.stringify({ type: "peer-left" }));
-                });
+        clients.delete(ws); // Delete immediately to ensure consistency
 
-                if (flights[meta.flightCode].length === 0) {
-                    delete flights[meta.flightCode];
+        if (meta) {
+            // LOG: Client disconnection
+            const flightInfo = meta.flightCode ? ` from flight ${meta.flightCode}` : "";
+            console.log(`[DISCONNECT] Client "${meta.name}" (${meta.id}) disconnected${flightInfo}. IP: ${meta.remoteIp}`);
+
+            if (meta.flightCode) {
+                const flight = flights[meta.flightCode];
+                if (flight) {
+                    flights[meta.flightCode] = flight.filter((client) => client !== ws);
+                    // Notify the remaining peer that their partner has left.
+                    flights[meta.flightCode].forEach((client) => {
+                        // *** THE BUG FIX IS HERE: The remaining user STAYS in the flight. ***
+                        // We no longer set their flightCode to null.
+                        client.send(JSON.stringify({ type: "peer-left" }));
+                    });
+
+                    if (flights[meta.flightCode].length === 0) {
+                        console.log(`[FLIGHT CLOSE] Flight ${meta.flightCode} is now empty and has been closed.`);
+                        delete flights[meta.flightCode];
+                    }
                 }
             }
+        } else {
+            console.log(`[DISCONNECT] An unknown client disconnected.`);
         }
-        clients.delete(ws);
+
         broadcastUsersOnSameNetwork();
     });
 });
