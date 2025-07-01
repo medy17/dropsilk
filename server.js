@@ -21,7 +21,7 @@ const server = http.createServer((req, res) => {
 const wss = new WebSocket.Server({ server });
 
 // Start listening
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Upgraded Signalling Server is running on port ${PORT}!`);
     console.log(`Health check available at http://localhost:${PORT}`);
 });
