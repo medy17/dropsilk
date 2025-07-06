@@ -1360,30 +1360,39 @@ body[data-theme="dark"] .file-action a {
 
 /* --- NEW: VIDEO PLAYER STYLES --- */
 #video-player-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 3000; /* Higher than modals */
+    position: relative; /* Changed from fixed */
+    z-index: 1; /* Sits above the overlay */
     background-color: #000;
     font-family: 'IBM Plex Sans', sans-serif;
-    display: flex;
+    display: flex; /* Helps center the video element */
     align-items: center;
     justify-content: center;
+    border-radius: 16px;
+    overflow: hidden; /* Important for rounded corners on the video */
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+
+    /* Responsive aspect-ratio magic */
+    max-width: 90vw;
+    max-height: 85vh;
+    aspect-ratio: 16 / 9; /* Default aspect ratio, will be overridden by video */
+
+    /* Animation for modal pop-in */
+    transform: scale(0.95) translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-#video-player-container:not(.paused):not(.controls-visible) {
-    cursor: none;
+
+#videoModal.show #video-player-container {
+    transform: scale(1) translateY(0);
 }
-#video-player-container.fullscreen {
-    border-radius: 0;
-    border: none;
-}
+
 #video-element {
+    display: block;
+    /* This makes the video fill the container while respecting its own aspect ratio */
     width: 100%;
     height: 100%;
-    display: block;
+    object-fit: contain;
 }
+
 #close-video-btn {
     position: absolute; top: 1rem; right: 1rem; z-index: 20;
     background: rgba(24, 24, 27, 0.5); backdrop-filter: blur(4px);
@@ -1393,16 +1402,19 @@ body[data-theme="dark"] .file-action a {
     opacity: 0;
     transition: opacity 0.3s ease, background 0.2s ease, transform 0.2s ease;
 }
+
 #video-player-container.paused #close-video-btn,
 #video-player-container.controls-visible #close-video-btn {
     opacity: 1;
 }
+
 #close-video-btn:hover {
     background: linear-gradient(135deg, rgba(245,169,184,0.15), rgba(91,206,250,0.1)), rgba(24, 24, 27, 0.7);
     background-blend-mode: overlay;
     color: var(--c-primary);
     transform: rotate(90deg);
 }
+
 .video-controls-container {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -1413,6 +1425,7 @@ body[data-theme="dark"] .file-action a {
     padding: 0.5rem;
     user-select: none;
 }
+
 #video-player-container.paused .video-controls-container,
 #video-player-container.controls-visible .video-controls-container {
     opacity: 1;
