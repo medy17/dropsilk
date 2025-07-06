@@ -475,12 +475,44 @@ function setupDataChannel() {
         }
         // EOF
         if (event.data === "EOF") {
-            const received = new Blob(incomingFileData, { type: incomingFileInfo.type });
-            const url = URL.createObjectURL(received);
+            const receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
             const fileId = fileIdMap.get(incomingFileInfo.name);
             const fileElement = document.getElementById(fileId);
+
             if (fileElement) {
-                fileElement.querySelector('.file-action').innerHTML = `<a href="${url}" download="${incomingFileInfo.name}">Download</a>`;
+                const actionContainer = fileElement.querySelector('.file-action');
+                actionContainer.innerHTML = ''; // Clear any previous content
+
+                const isVideo = incomingFileInfo.type.startsWith('video/') || incomingFileInfo.name.toLowerCase().endsWith('.mkv');
+
+                if (isVideo && window.videoPlayer) {
+                    const actionGroup = document.createElement('div');
+                    actionGroup.className = 'file-action-group';
+
+                    const previewBtn = document.createElement('button');
+                    previewBtn.className = 'btn btn-secondary';
+                    previewBtn.textContent = 'Preview';
+                    previewBtn.onclick = () => videoPlayer.open(receivedBlob, incomingFileInfo.name);
+
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(receivedBlob);
+                    downloadLink.download = incomingFileInfo.name;
+                    downloadLink.className = 'btn btn-primary';
+                    downloadLink.textContent = 'Save';
+
+                    actionGroup.appendChild(previewBtn);
+                    actionGroup.appendChild(downloadLink);
+                    actionContainer.appendChild(actionGroup);
+                } else {
+                    // Fallback for non-videos or if player fails to load
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(receivedBlob);
+                    downloadLink.download = incomingFileInfo.name;
+                    downloadLink.className = 'btn btn-primary';
+                    downloadLink.textContent = 'Download';
+                    actionContainer.appendChild(downloadLink);
+                }
+
                 fileElement.querySelector('.percent').textContent = 'Complete!';
             }
             return;
@@ -802,7 +834,7 @@ function showToast({ type = 'info', title, body, duration = 10000, actions = [] 
     toast.innerHTML = `
             <div class="toast-header">
                 <strong>${title}</strong>
-                <button class="toast-close">&times;</button>
+                <button class="toast-close">×</button>
             </div>
             <div class="toast-body">${body}</div>
             ${actionsHTML}

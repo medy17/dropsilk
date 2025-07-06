@@ -1338,3 +1338,167 @@ body[data-theme="dark"] .file-action a {
     transform: translateY(0) scale(0.97);
     transition-duration: 0.1s;
 }
+
+/* --- APPEND TO END OF styles.css --- */
+
+/* --- NEW: Action buttons for receiver queue --- */
+.file-action-group {
+    display: flex;
+    gap: 0.5rem;
+}
+.file-action-group .btn {
+    padding: 0.8em 1em;
+    font-size: 0.85em;
+    flex-grow: 1; /* Make buttons take up equal space */
+}
+.file-action a.btn {
+    padding: 0.8em 1em;
+    font-size: 0.9em;
+}
+
+/* --- NEW: VIDEO PLAYER STYLES --- */
+#video-player-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3000; /* Higher than modals */
+    background-color: #000;
+    font-family: 'IBM Plex Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#video-player-container:not(.paused):not(.controls-visible) {
+    cursor: none;
+}
+#video-player-container.fullscreen {
+    border-radius: 0;
+    border: none;
+}
+#video-element {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+#close-video-btn {
+    position: absolute; top: 1rem; right: 1rem; z-index: 20;
+    background: rgba(24, 24, 27, 0.5); backdrop-filter: blur(4px);
+    border: none; font-size: 1.5rem; color: var(--brilliant-white); cursor: pointer;
+    padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: flex;
+    align-items: center; justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease, background 0.2s ease, transform 0.2s ease;
+}
+#video-player-container.paused #close-video-btn,
+#video-player-container.controls-visible #close-video-btn {
+    opacity: 1;
+}
+#close-video-btn:hover {
+    background: linear-gradient(135deg, rgba(245,169,184,0.15), rgba(91,206,250,0.1)), rgba(24, 24, 27, 0.7);
+    background-blend-mode: overlay;
+    color: var(--c-primary);
+    transform: rotate(90deg);
+}
+.video-controls-container {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    color: white; z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+    padding: 0.5rem;
+    user-select: none;
+}
+#video-player-container.paused .video-controls-container,
+#video-player-container.controls-visible .video-controls-container {
+    opacity: 1;
+}
+.controls {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.5rem 0.75rem;
+}
+.controls-left, .controls-right { display: flex; align-items: center; gap: 1rem; }
+.video-controls-container button {
+    background: none; border: none; color: #fff; padding: 0;
+    cursor: pointer; opacity: 0.85; transition: opacity 0.2s, transform 0.2s;
+}
+.video-controls-container button:hover { opacity: 1; transform: scale(1.1); }
+.video-controls-container button svg { width: 22px; height: 22px; display: block; stroke-width: 2.5; }
+.play-pause-btn .pause-icon { display: block; }
+.play-pause-btn .play-icon { display: none; }
+#video-player-container.paused .play-pause-btn .pause-icon { display: none; }
+#video-player-container.paused .play-pause-btn .play-icon { display: block; }
+.play-pause-btn .play-icon, .play-pause-btn .pause-icon { fill: currentColor; }
+.volume-container { display: flex; align-items: center; }
+.volume-slider {
+    width: 0; transform: scaleX(0); transform-origin: left;
+    transition: width 0.2s ease-in-out, transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+.volume-container:hover .volume-slider { width: 80px; transform: scaleX(1); }
+.volume-btn .low-volume-icon, .volume-btn .muted-icon { display: none; }
+.volume-btn .high-volume-icon, .volume-btn .low-volume-icon, .volume-btn .muted-icon {
+    width: 24px; height: 24px;
+}
+.volume-btn svg { stroke-width: 0; fill: currentColor;}
+.time-container { font-size: 0.9rem; font-family: 'IBM Plex Mono', monospace; width: 100px; }
+.timeline-container { padding: 0 0.75rem; cursor: pointer; }
+.timeline {
+    height: 5px; width: 100%; background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px; position: relative;
+}
+.timeline-container:hover .timeline { height: 8px; }
+.timeline .progress-bar {
+    height: 100%; width: 0%; background-color: var(--c-primary);
+    border-radius: 3px; position: relative;
+    transition: width 0.1s linear;
+}
+.timeline .progress-bar::after {
+    content: ''; position: absolute; right: -6px; top: 50%;
+    transform: translateY(-50%) scale(0); width: 12px; height: 12px;
+    border-radius: 50%; background-color: var(--brilliant-white);
+    transition: transform 0.2s;
+}
+.timeline-container:hover .timeline .progress-bar::after { transform: translateY(-50%) scale(1); }
+.timeline .buffered-bar {
+    position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+    background-color: rgba(255, 255, 255, 0.5); border-radius: 3px;
+}
+.timeline .hover-indicator {
+    position: absolute; top: 0; height: 100%; width: 0;
+    background-color: rgba(255, 255, 255, 0.5); border-radius: 3px;
+}
+.settings-menu-container { position: relative; }
+.settings-menu {
+    position: absolute; bottom: calc(100% + 10px); right: 0;
+    background: rgba(24, 24, 27, 0.9); backdrop-filter: blur(8px);
+    border-radius: 8px; padding: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1); display: none; width: 150px;
+}
+.settings-menu button {
+    width: 100%; text-align: left; padding: 0.5rem 0.75rem; border-radius: 4px;
+    font-size: 0.9rem; color: var(--brilliant-white);
+}
+body[data-theme="light"] .settings-menu { background: rgba(255, 255, 255, 0.9); }
+body[data-theme="light"] .settings-menu button { color: var(--c-text-primary); }
+.settings-menu button:hover { background-color: var(--c-primary); color: var(--brilliant-white) !important; transform: none; }
+.settings-menu button.active { background-color: var(--c-secondary); color: var(--brilliant-white) !important; font-weight: 600; }
+input[type=range].volume-slider { -webkit-appearance: none; appearance: none; background: transparent; }
+input[type=range].volume-slider::-webkit-slider-runnable-track { height: 5px; background: rgba(255, 255, 255, 0.3); border-radius: 3px; }
+input[type=range].volume-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; margin-top: -3.5px; background-color: #fff; height: 12px; width: 12px; border-radius: 50%; }
+input[type=range].volume-slider::-moz-range-track { height: 5px; background: rgba(255, 255, 255, 0.3); border-radius: 3px; }
+input[type=range].volume-slider::-moz-range-thumb { background-color: #fff; height: 12px; width: 12px; border-radius: 50%; border: none; }
+.fullscreen-btn .exit-fullscreen-icon { display: none; }
+#video-player-container.fullscreen .fullscreen-btn .exit-fullscreen-icon { display: block; }
+#video-player-container.fullscreen .fullscreen-btn .enter-fullscreen-icon { display: none; }
+.audio-track-btn, .captions-btn {
+    display: flex !important; /* Overcome inline style from demo */
+}
+.audio-track-btn svg, .captions-btn svg { fill: currentColor; stroke-width: 0; }
+@media (max-width: 600px) {
+    .controls-left, .controls-right { gap: 0.5rem; }
+    .time-container { display: none; }
+    .download-btn { display: none; }
+}
