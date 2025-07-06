@@ -1,8 +1,7 @@
 // --- NEW FILE: video.js ---
 // This is a self-contained video player component.
 
-const videoPlayer = (() => {
-    // --- PRIVATE VARIABLES (Scoped to this module) ---
+window.videoPlayer = (() => {    // --- PRIVATE VARIABLES (Scoped to this module) ---
     const playerContainer = document.getElementById('video-player-container');
     const video = document.getElementById('video-element');
     const closeBtn = document.getElementById('close-video-btn');
