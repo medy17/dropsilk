@@ -1370,6 +1370,7 @@ body[data-theme="dark"] .file-action a {
     border-radius: 16px;
     overflow: hidden; /* Important for rounded corners on the video */
     box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    border: 2px solid var(--c-primary);
 
     /* Responsive aspect-ratio magic */
     max-width: 90vw;
