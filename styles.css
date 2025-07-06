@@ -1107,6 +1107,8 @@ body[data-theme="dark"] .file-details__name {
 }
 .file-action {
     flex-shrink: 0;
+    min-width: 170px;
+    text-align: right;
 }
 .file-action a {
     display: block;
