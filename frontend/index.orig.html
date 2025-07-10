@@ -2,15 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Instantly share files device-to-device with DropSilk. Fast, private, and secure peer-to-peer transfers with no file size limits and no cloud storage.">
-    <meta property="og:title" content="DropSilk | Fast, Private File Sharing">
+    <meta name="description" content="Send files online instantly and securely with DropSilk. Private, peer-to-peer file sharing with no sign up, no file size limits, and no cloud storage. Share files directly between devices—fast, free, and easy.">    <meta property="og:title" content="DropSilk | Fast, Private File Sharing">
     <meta property="og:description" content="Instantly share files device-to-device with no limits, no cloud storage, and end-to-end encryption.">
-
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://dropsilk.xyz/">
     <meta property="og:image" content="https://dropsilk.xyz/social-share-image.jpg"> <!-- Create a nice image for this! -->
-    <meta property="og:image:width" content="1280">
-    <meta property="og:image:height" content="674">
     <meta property="og:site_name" content="DropSilk">
 
     <!-- Twitter Card Tags (for Twitter/X) -->
@@ -18,28 +14,20 @@
     <meta name="twitter:title" content="DropSilk | Fast, Private File Sharing">
     <meta name="twitter:description" content="Instantly share files device-to-device with no limits, no cloud storage, and end-to-end encryption.">
     <meta name="twitter:image" content="https://dropsilk.xyz/social-share-image.jpg">
-    <meta property="og:image" content="https://dropsilk.xyz/social-share-image-square.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="1200">
-    <meta property="og:image:alt" content="DropSilk Logo with the tagline: Fast, Private, Peer-to-Peer File Sharing (square)">
-
     <title>DropSilk | Fast, Private, Peer-to-Peer File Sharing</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ffffff">
-
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" type="image/png" sizes="32x32" href="/frontend/favicon-32x32.png32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/frontend/favicon-16x16.png16x16.png">
+    <link rel="icon" type="image/x-icon" href="/frontend/favicon.icovicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/frontend/apple-touch-icon.png-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/frontend/android-chrome-192x192.png2x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/frontend/android-chrome-512x512.png2x512.png">
+    <link rel="manifest" href="/frontend/site.webmanifestbmanifest">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-
     <style>
         :root {
             /* --- Base Palette --- */
@@ -1386,12 +1374,12 @@
 <body>
 <div class="header">
     <a href="#" class="logo" onclick="location.reload()">
-        <img src="/logo.webp" alt="DropSilk Logo" />
+        <img src="/frontend/logo.webplogo.webp" alt="DropSilk Logo" alt="DropSilk logo – private file sharing app, entirely free, super fast"/>
         <span class="brand-text">Drop<wbr>Silk</span>
     </a>
     <nav class="header-nav">
         <button id="aboutBtn" class="header-nav-link">About</button>
-        <button id="contactBtn" class="header-nav-link">Contact</button>
+        <button id="contactBtn" class="header-nav-link" alt="Contact button for DropSilk dev. Free file sharing, unlimited, instant, no sign up">Contact</button>
         <!-- NEW: Theme Toggle Button -->
         <button id="theme-toggle" class="header-nav-link" aria-label="Toggle theme">
             <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
@@ -1401,7 +1389,7 @@
                 <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
             </svg>
         </button>
-        <a href="https://github.com/medy17" target="_blank" rel="noopener noreferrer" class="header-nav-link" aria-label="GitHub Profile">
+        <a href="https://github.com/medy17" target="_blank" rel="noopener noreferrer" class="header-nav-link" aria-label="GitHub Profile" alt="my GitHub profile where I share more free apps and file transfer code">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
             </svg>
@@ -1410,7 +1398,7 @@
 </div>
 <div class="main-content">
     <div class="tagline-section">
-        <h1>FAST.<br />PRIVATE.<br />NO LIMIT.</h1>
+        <h1>FAST.<br />PRIVATE.<br />UNLIMITED.</h1>
         <p>Instantly share files, device to device. No cloud. No server. Just like a dance: it takes two to tango.</p>
     </div>
     <div class="flight-ticket-panel-wrapper">
@@ -1460,7 +1448,7 @@
                     </svg>
                     Select Files
                 </label>
-                <button id="folderSelectBtn" class="btn btn-secondary">
+                <button class="btn btn-secondary">
                     <!-- On-brand SVG -->
                     <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
                         <rect x="3" y="7" width="14" height="8" rx="2" fill="#fffaf7" stroke="var(--c-secondary)"/>
@@ -1470,8 +1458,6 @@
                 </button>
             </div>
             <input type="file" id="fileInput_transfer" style="display: none;" multiple />
-            <!-- NEW: Hidden input for folder selection -->
-            <input type="file" id="folderInput_transfer" style="display: none;" webkitdirectory directory multiple />
         </div>
         <!-- MODIFIED: This panel is now dynamic -->
         <div class="panel">
@@ -1537,9 +1523,9 @@
         </div>
         <nav class="footer-nav">
             <button id="termsBtn" class="footer-nav-link">Terms</button>
-            <button id="privacyBtn" class="footer-nav-link">Privacy</button>
-            <button id="securityBtn" class="footer-nav-link">Security</button>
-            <button id="faqBtn" class="footer-nav-link">FAQ</button>
+            <button id="privacyBtn" class="footer-nav-link" aria-label="Privacy Policy for DropSilk free, unlimited file sharing peer to peer">Privacy</button>
+            <button id="securityBtn" class="footer-nav-link" aria-label="Security for DropSilk free, unlimited file sharing peer to peer">Security</button>
+            <button id="faqBtn" class="footer-nav-link" aria-label="Learn more about private file sharing">FAQ</button>
         </nav>
     </div>
 </footer>
@@ -1582,7 +1568,7 @@
             </button>
         </div>
         <div class="modal-body">
-            <p><strong>SilkDrop</strong> is a project born from the desire to have a simple, private, and fast way to transfer files between devices.</p>
+            <p><strong>DropSilk</strong> is a project born from the desire to have a simple, private, and fast way to transfer files between devices.</p>
 
             <p>I'm a developer passionate about creating useful and beautiful applications. Hence, the implementation of WebRTC that you see before you.</p>
 
@@ -1798,7 +1784,6 @@
     const dashboardFlightStatus = document.getElementById("dashboard-flight-status");
     const leaveFlightBtnDashboard = document.getElementById("leaveFlightBtnDashboard");
     const fileInputTransfer = document.getElementById("fileInput_transfer");
-    const folderInputTransfer = document.getElementById("folderInput_transfer"); // NEW
     const sendingQueueDiv = document.getElementById("sending-queue");
     const receiverQueueDiv = document.getElementById("receiver-queue");
     const toastContainer = document.getElementById("toast-container");
@@ -2157,6 +2142,10 @@
     function setupDataChannel() {
         dataChannel.onopen = () => {
             console.log("Data channel opened!");
+            // The peer-joined message from the server already handles the UI update.
+            // Re-calling handlePeerJoined here would be redundant.
+
+            // NEW: Start tracking metrics when channel opens
             lastMetricsUpdateTime = Date.now();
             if (metricsInterval) clearInterval(metricsInterval);
             metricsInterval = setInterval(updateMetrics, 1000);
@@ -2164,6 +2153,7 @@
         dataChannel.onclose = () => {
             console.log("Data channel closed.");
             handlePeerLeft();
+            // NEW: Stop tracking metrics when channel closes
             if (metricsInterval) clearInterval(metricsInterval);
             metricsSpeedEl.textContent = '0 KB/s';
         };
@@ -2178,39 +2168,36 @@
 
                 if (receiverQueueDiv.querySelector('.empty-state')) receiverQueueDiv.innerHTML = '';
 
-                const displayName = incomingFileInfo.webkitRelativePath || incomingFileInfo.name;
                 const fileId = `file-recv-${Date.now()}`;
-                const fileIcon = getFileIcon(displayName);
+                const fileIcon = getFileIcon(incomingFileInfo.name);
                 receiverQueueDiv.insertAdjacentHTML('beforeend', `
                     <div class="queue-item" id="${fileId}">
                         <div class="file-icon">${fileIcon}</div>
                         <div class="file-details">
-                            <div class="file-details__name" title="${displayName}"><span>${displayName}</span></div>
+                            <div class="file-details__name" title="${incomingFileInfo.name}"><span>${incomingFileInfo.name}</span></div>
                             <progress class="file-details__progress-bar" value="0" max="1"></progress>
                             <div class="file-details__status"><span class="percent">0%</span></div>
                         </div>
                         <div class="file-action"></div>
                     </div>`);
-                fileIdMap.set(displayName, fileId);
+                fileIdMap.set(incomingFileInfo.name, fileId);
                 return;
             }
             // EOF
             if (event.data === "EOF") {
-                const displayName = incomingFileInfo.webkitRelativePath || incomingFileInfo.name;
                 const received = new Blob(incomingFileData, { type: incomingFileInfo.type });
                 const url = URL.createObjectURL(received);
-                const fileId = fileIdMap.get(displayName);
+                const fileId = fileIdMap.get(incomingFileInfo.name);
                 const fileElement = document.getElementById(fileId);
                 if (fileElement) {
                     fileElement.querySelector('.file-action').innerHTML = `<a href="${url}" download="${incomingFileInfo.name}">Download</a>`;
                     fileElement.querySelector('.percent').textContent = 'Complete!';
                 }
-                // Clean up map for this file
-                fileIdMap.delete(displayName);
                 return;
             }
             // CHUNK
             const chunkSize = event.data.byteLength || event.data.size || 0;
+            // NEW: Update received metrics
             totalBytesReceived += chunkSize;
             receivedInInterval += chunkSize;
             metricsReceivedEl.textContent = formatBytes(totalBytesReceived);
@@ -2218,9 +2205,8 @@
             incomingFileData.push(event.data);
             incomingFileReceived += chunkSize;
             if (incomingFileInfo?.size) {
-                const displayName = incomingFileInfo.webkitRelativePath || incomingFileInfo.name;
                 const progressValue = incomingFileReceived / incomingFileInfo.size;
-                const fileId = fileIdMap.get(displayName);
+                const fileId = fileIdMap.get(incomingFileInfo.name);
                 const fileElement = document.getElementById(fileId);
                 if (fileElement) {
                     fileElement.querySelector('progress').value = progressValue;
@@ -2232,16 +2218,15 @@
 
     function startFileSend(file) {
         currentlySendingFile = file;
-        const displayName = file.webkitRelativePath || file.name;
         const fileId = fileIdMap.get(file);
         const fileElement = document.getElementById(fileId);
         isSending = true;
 
         if(fileElement) {
             fileElement.innerHTML = `
-                <div class="file-icon">${getFileIcon(displayName)}</div>
+                <div class="file-icon">${getFileIcon(file.name)}</div>
                 <div class="file-details">
-                    <div class="file-details__name" title="${displayName}"><span>${displayName}</span></div>
+                    <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
                     <progress class="file-details__progress-bar" value="0" max="1"></progress>
                     <div class="file-details__status">
                         <span class="percent">0%</span>
@@ -2253,15 +2238,7 @@
         if (worker) worker.terminate();
         worker = new Worker("sender.worker.js");
         chunkQueue = []; fileReadingDone = false; sentOffset = 0;
-
-        const metadata = {
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            webkitRelativePath: file.webkitRelativePath || ''
-        };
-        dataChannel.send(JSON.stringify(metadata));
-
+        dataChannel.send(JSON.stringify({ name: file.name, type: file.type, size: file.size }));
         worker.onmessage = (e) => {
             const { type, chunk } = e.data;
             if (type === "chunk") {
@@ -2288,6 +2265,7 @@
             const chunk = chunkQueue.shift();
             dataChannel.send(chunk);
 
+            // NEW: Update sent metrics
             const chunkSize = chunk.byteLength;
             totalBytesSent += chunkSize;
             sentInInterval += chunkSize;
@@ -2320,13 +2298,16 @@
         }
     }
 
+    // Define the global file handling function
     function handleFileSelection(files) {
-        if (!files || files.length === 0) return;
+        if (files.length === 0) return;
 
+        // Add success animation for drag and drop
         const dropZone = document.querySelector('.drop-zone');
         if (dropZone) {
             dropZone.style.transform = 'scale(0.98)';
             dropZone.style.transition = 'transform 0.1s ease-out';
+
             setTimeout(() => {
                 dropZone.style.transform = '';
                 dropZone.style.transition = '';
@@ -2340,20 +2321,19 @@
         Array.from(files).forEach(file => {
             fileToSendQueue.push(file);
             const fileId = `send-${Date.now()}-${Math.random()}`;
-            fileIdMap.set(file, fileId); // Use the File object as the key
-
-            const displayName = file.webkitRelativePath || file.name;
+            fileIdMap.set(file, fileId);
 
             sendingQueueDiv.insertAdjacentHTML('beforeend', `
             <div class="queue-item" id="${fileId}" style="opacity: 0; transform: translateY(10px);">
-                <div class="file-icon">${getFileIcon(displayName)}</div>
+                <div class="file-icon">${getFileIcon(file.name)}</div>
                 <div class="file-details">
-                    <div class="file-details__name" title="${displayName}"><span>${displayName}</span></div>
+                    <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
                     <div class="file-details__status"><span class="status-text">Queued</span></div>
                 </div>
             </div>
         `);
 
+            // Animate the new file item in
             const fileElement = document.getElementById(fileId);
             setTimeout(() => {
                 fileElement.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
@@ -2381,26 +2361,13 @@
         leaveFlightBtnDashboard.onclick = () => { location.reload(); };
 
         fileInputTransfer.onchange = () => {
-            handleFileSelection(fileInputTransfer.files);
-            fileInputTransfer.value = "";
+            if (fileInputTransfer.files.length > 0) {
+                handleFileSelection(fileInputTransfer.files);
+                fileInputTransfer.value = ""; // Clear the input
+            }
         };
 
-        // --- MODIFIED: FOLDER SELECTION LOGIC ---
-        const folderSelectBtn = document.getElementById('folderSelectBtn');
-        // A more robust check: a touch-only device might support 'webkitdirectory' but have no UI for it.
-        // We only enable the button if the feature exists AND the primary input is a fine pointer (like a mouse).
-        const isDesktopLike = window.matchMedia('(pointer: fine)').matches;
-        if ('webkitdirectory' in folderInputTransfer && isDesktopLike) {
-            folderSelectBtn.onclick = () => folderInputTransfer.click();
-        } else {
-            // Hide button if folder selection is not supported or on a touch-primary device.
-            folderSelectBtn.style.display = 'none';
-        }
-        folderInputTransfer.onchange = () => {
-            handleFileSelection(folderInputTransfer.files);
-            folderInputTransfer.value = "";
-        };
-
+        // --- MODIFIED: Event delegation for invite buttons on the dynamic panel ---
         connectionPanelList.addEventListener('click', (e) => {
             const inviteBtn = e.target.closest('.invite-user-btn');
             if (inviteBtn && !inviteBtn.disabled) {
@@ -2411,10 +2378,12 @@
                         inviteeId: inviteeId,
                         flightCode: currentFlightCode
                     }));
+                    // Provide feedback
                     inviteBtn.textContent = 'Invited';
                     inviteBtn.disabled = true;
                     setTimeout(() => {
                         inviteBtn.textContent = 'Invite';
+                        // The button will be re-enabled on the next user list update if still applicable
                     }, 3000);
                 }
             }
@@ -2422,6 +2391,7 @@
 
         document.getElementById('shareAppBtn').onclick = () => document.getElementById('inviteBtn').click();
 
+        // Initialize drag and drop and ALL modals
         setupDragAndDrop();
         setupAllModalsAndNav();
     }
@@ -2610,7 +2580,6 @@
         dashboard.style.display = "none";
         flightCodeInput.value = "";
         fileInputTransfer.value = "";
-        folderInputTransfer.value = "";
         sendingQueueDiv.innerHTML = '<div class="empty-state">Select files to send</div>';
         receiverQueueDiv.innerHTML = '<div class="empty-state">Waiting for incoming files</div>';
 
