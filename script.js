@@ -218,10 +218,12 @@ function setupAllModalsAndNav() {
                 const initialState = document.getElementById('email-view-initial-state');
                 const captchaState = document.getElementById('email-view-captcha-state');
                 const revealedState = document.getElementById('email-view-revealed-state');
+                const captchaPretext = document.getElementById('captcha-pretext'); // <-- Get element here too
 
                 if(initialState) initialState.style.display = 'block';
                 if(captchaState) captchaState.style.display = 'none';
                 if(revealedState) revealedState.style.display = 'none';
+                if(captchaPretext) captchaPretext.style.display = 'block'; // <-- ADD THIS LINE
 
                 // Reset the reCAPTCHA widget if it exists and grecaptcha is available
                 if (window.grecaptcha && captchaWidgetId !== null) {
@@ -301,6 +303,7 @@ function setupAllModalsAndNav() {
         const captchaState = document.getElementById('email-view-captcha-state');
         const revealedState = document.getElementById('email-view-revealed-state');
         const recaptchaContainer = document.getElementById('recaptcha-container');
+        const captchaPretext = document.getElementById('captcha-pretext'); // <-- ADD THIS LINE
 
         let captchaReady = false;
 
@@ -341,6 +344,7 @@ function setupAllModalsAndNav() {
             console.log('reCAPTCHA verified. Token:', token);
             captchaState.style.display = 'none';
             revealedState.style.display = 'block';
+            captchaPretext.style.display = 'none';
         };
 
         copyEmailBtn.addEventListener('click', () => copyToClipboard('aratahmed@gmail.com', copyEmailBtn, 'Email Copied!'));
