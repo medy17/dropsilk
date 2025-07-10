@@ -43,22 +43,29 @@ themeToggle.addEventListener('click', toggleTheme);
 
 // --- NEW: Global QR Code Generator ---
 function generateQRCode() {
-    // Check if canvas exists; if not (e.g., modal not open), do nothing.
-    if (!qrCanvas || !currentFlightCode) return;
-
-    const url = `https://dropsilk.xyz?code=${currentFlightCode}`;
-    if (typeof QRCode === 'undefined') {
-        console.error('QRCode library not loaded');
-        qrCanvas.style.display = 'none';
+    // Check if the canvas element exists, a flight code is set, and the QRCode library is loaded.
+    if (!qrCanvas || !currentFlightCode || typeof QRCode === 'undefined') {
+        if (qrCanvas) qrCanvas.style.display = 'none';
+        if (typeof QRCode === 'undefined') console.error('QRCode library not loaded');
         return;
     }
-    const isDarkMode = document.body.getAttribute('data-theme') === 'dark';
+
+    const url = `https://dropsilk.xyz?code=${currentFlightCode}`;
+
+    // Dynamically get the primary theme color from the CSS variables.
+    // This ensures the QR code is always "coloured" according to your theme.
+    const qrDotColor = getComputedStyle(document.documentElement).getPropertyValue('--c-primary').trim();
+
     const qrColors = {
-        dark: isDarkMode ? '#5bcefa' : '#18181b', // QR Code dots
-        light: '#00000000' // Transparent background
+        dark: qrDotColor,  // The color of the QR code's "dots" will now be your theme's primary color.
+        light: '#00000000' // A transparent background for the "light" areas.
     };
+
+    // Render the QR code to the canvas.
     QRCode.toCanvas(qrCanvas, url, { width: 200, margin: 2, color: qrColors, errorCorrectionLevel: 'M' }, (err) => {
-        if (err) console.error('QR Code generation error:', err);
+        if (err) {
+            console.error('QR Code generation error:', err);
+        }
     });
 }
 
