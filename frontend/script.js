@@ -15,6 +15,12 @@ const applyTheme = (theme, persist = true) => {
         themeToggle.setAttribute('aria-label', 'Switch to Shades Down (Dark Mode)');
         if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff');
     }
+    const inviteModal = document.getElementById('inviteModal');
+    if (inviteModal && inviteModal.classList.contains('show')) {
+        // Since generateQRCode is defined later in the file, this call
+        // works perfectly due to JavaScript's function hoisting.
+        generateQRCode();
+    }
 };
 
 const toggleTheme = () => {
