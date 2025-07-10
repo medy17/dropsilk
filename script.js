@@ -51,6 +51,8 @@ let myId = "",
 let fileToSendQueue = [];
 let currentlySendingFile = null;
 const fileIdMap = new Map();
+let captchaWidgetId = null; // NEW: To hold the ID of the rendered CAPTCHA
+
 
 // --- NEW: METRICS STATE ---
 let totalBytesSent = 0,
@@ -192,35 +194,59 @@ function showButtonSuccess(button, text) {
     }, 2000);
 }
 
-// --- NEW: Refactored Modal Setup ---
+// --- MODIFIED: Refactored Modal Setup ---
 function setupAllModalsAndNav() {
     const modals = {
         invite: { overlay: document.getElementById('inviteModal'), trigger: document.getElementById('inviteBtn'), close: document.getElementById('closeInviteModal') },
         about: { overlay: document.getElementById('aboutModal'), trigger: document.getElementById('aboutBtn'), close: document.getElementById('closeAboutModal') },
         contact: { overlay: document.getElementById('contactModal'), trigger: document.getElementById('contactBtn'), close: document.getElementById('closeContactModal') },
-        // --- NEW: Footer Modals ---
         terms: { overlay: document.getElementById('termsModal'), trigger: document.getElementById('termsBtn'), close: document.getElementById('closeTermsModal') },
         privacy: { overlay: document.getElementById('privacyModal'), trigger: document.getElementById('privacyBtn'), close: document.getElementById('closePrivacyModal') },
         security: { overlay: document.getElementById('securityModal'), trigger: document.getElementById('securityBtn'), close: document.getElementById('closeSecurityModal') },
         faq: { overlay: document.getElementById('faqModal'), trigger: document.getElementById('faqBtn'), close: document.getElementById('closeFaqModal') }
     };
 
-    const setupModal = (modalConfig) => {
+    const setupModal = (modalName, modalConfig) => {
         if (!modalConfig.overlay || !modalConfig.trigger || !modalConfig.close) return;
         const showModal = () => { modalConfig.overlay.classList.add('show'); document.body.style.overflow = 'hidden'; };
-        const hideModal = () => { modalConfig.overlay.classList.remove('show'); document.body.style.overflow = ''; };
+        const hideModal = () => {
+            modalConfig.overlay.classList.remove('show');
+            document.body.style.overflow = '';
+
+            // Add specific reset logic for contact modal when it closes
+            if (modalName === 'contact') {
+                const initialState = document.getElementById('email-view-initial-state');
+                const captchaState = document.getElementById('email-view-captcha-state');
+                const revealedState = document.getElementById('email-view-revealed-state');
+
+                if(initialState) initialState.style.display = 'block';
+                if(captchaState) captchaState.style.display = 'none';
+                if(revealedState) revealedState.style.display = 'none';
+
+                // Reset the reCAPTCHA widget if it exists and grecaptcha is available
+                if (window.grecaptcha && captchaWidgetId !== null) {
+                    grecaptcha.reset(captchaWidgetId);
+                }
+            }
+        };
         modalConfig.trigger.addEventListener('click', showModal);
         modalConfig.close.addEventListener('click', hideModal);
         modalConfig.overlay.addEventListener('click', (e) => { if (e.target === modalConfig.overlay) hideModal(); });
     };
 
-    Object.values(modals).forEach(setupModal);
+    Object.entries(modals).forEach(([name, config]) => setupModal(name, config));
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             document.querySelectorAll('.modal-overlay.show').forEach(m => {
-                m.classList.remove('show');
-                document.body.style.overflow = '';
+                // Find the corresponding close button and trigger its click to ensure reset logic runs
+                const modalConfig = Object.values(modals).find(conf => conf.overlay === m);
+                if (modalConfig && modalConfig.close) {
+                    modalConfig.close.click();
+                } else {
+                    m.classList.remove('show'); // Fallback for modals not in the config
+                    document.body.style.overflow = '';
+                }
             });
         }
     });
@@ -267,9 +293,56 @@ function setupAllModalsAndNav() {
         });
     };
 
-    // Contact Modal Specifics
+    // Contact Modal Specifics with CAPTCHA
     const contactModalSpecifics = () => {
+        const viewEmailBtn = document.getElementById('viewEmailBtn');
         const copyEmailBtn = document.getElementById('copyEmailBtn');
+        const initialState = document.getElementById('email-view-initial-state');
+        const captchaState = document.getElementById('email-view-captcha-state');
+        const revealedState = document.getElementById('email-view-revealed-state');
+        const recaptchaContainer = document.getElementById('recaptcha-container');
+
+        let captchaReady = false;
+
+        // This function is called by the Google script's `onload` parameter
+        window.onRecaptchaLoad = function() {
+            captchaReady = true;
+        };
+
+        const renderCaptcha = () => {
+            if (recaptchaContainer.innerHTML.trim() === '') {
+                captchaWidgetId = grecaptcha.render('recaptcha-container', {
+                    'sitekey': '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', // Google's v2 Test Key
+                    'callback': onCaptchaSuccess,
+                    'theme': document.body.getAttribute('data-theme') || 'light'
+                });
+            }
+        };
+
+        viewEmailBtn.addEventListener('click', () => {
+            initialState.style.display = 'none';
+            captchaState.style.display = 'block';
+
+            if (captchaReady) {
+                renderCaptcha();
+            } else {
+                // If the google script hasn't loaded yet, wait for it.
+                const interval = setInterval(() => {
+                    if (captchaReady) {
+                        clearInterval(interval);
+                        renderCaptcha();
+                    }
+                }, 100);
+            }
+        });
+
+        // This must be on the window object to be accessible by the reCAPTCHA script
+        window.onCaptchaSuccess = function(token) {
+            console.log('reCAPTCHA verified. Token:', token);
+            captchaState.style.display = 'none';
+            revealedState.style.display = 'block';
+        };
+
         copyEmailBtn.addEventListener('click', () => copyToClipboard('aratahmed@gmail.com', copyEmailBtn, 'Email Copied!'));
     };
 

@@ -1518,3 +1518,9 @@ input[type=range].volume-slider::-moz-range-thumb { background-color: #fff; heig
     .time-container { display: none; }
     .download-btn { display: none; }
 }
+/* --- NEW: reCAPTCHA container styling --- */
+#recaptcha-container {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0;
+}
