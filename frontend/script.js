@@ -17,8 +17,7 @@ const applyTheme = (theme, persist = true) => {
     }
     const inviteModal = document.getElementById('inviteModal');
     if (inviteModal && inviteModal.classList.contains('show')) {
-        // Since generateQRCode is defined later in the file, this call
-        // works perfectly due to JavaScript's function hoisting.
+        // This call to the global generateQRCode function now works correctly.
         generateQRCode();
     }
 };
@@ -41,6 +40,29 @@ const initializeTheme = () => {
 initializeTheme(); // Apply theme on initial script load to prevent FOUC
 themeToggle.addEventListener('click', toggleTheme);
 
+
+// --- NEW: Global QR Code Generator ---
+function generateQRCode() {
+    // Check if canvas exists; if not (e.g., modal not open), do nothing.
+    if (!qrCanvas || !currentFlightCode) return;
+
+    const url = `https://dropsilk.xyz?code=${currentFlightCode}`;
+    if (typeof QRCode === 'undefined') {
+        console.error('QRCode library not loaded');
+        qrCanvas.style.display = 'none';
+        return;
+    }
+    const isDarkMode = document.body.getAttribute('data-theme') === 'dark';
+    const qrColors = {
+        dark: isDarkMode ? '#5bcefa' : '#18181b', // QR Code dots
+        light: '#00000000' // Transparent background
+    };
+    QRCode.toCanvas(qrCanvas, url, { width: 200, margin: 2, color: qrColors, errorCorrectionLevel: 'M' }, (err) => {
+        if (err) console.error('QR Code generation error:', err);
+    });
+}
+
+
 // --- CONFIG ---
 // We will replace this URL after deploying the backend in the next step.
 const WEBSOCKET_URL = "wss://dropsilk-server.onrender.com";
@@ -53,7 +75,8 @@ let myId = "",
     currentFlightCode = null,
     isFlightCreator = false,
     connectionType = 'wan',
-    peerInfo = null; // NEW: To store connected peer's info
+    peerInfo = null, // NEW: To store connected peer's info
+    lastNetworkUsers = []; // Keep track of last user list
 let fileToSendQueue = [];
 let currentlySendingFile = null;
 const fileIdMap = new Map();
@@ -85,6 +108,7 @@ const fileInputTransfer = document.getElementById("fileInput_transfer");
 const sendingQueueDiv = document.getElementById("sending-queue");
 const receiverQueueDiv = document.getElementById("receiver-queue");
 const toastContainer = document.getElementById("toast-container");
+const qrCanvas = document.getElementById('qrCanvas'); // Moved to global scope
 
 // --- MODIFIED: Dynamic connection panel elements ---
 const connectionPanelTitle = document.getElementById("connection-panel-title");
@@ -262,7 +286,6 @@ function setupAllModalsAndNav() {
     // Invite Modal Specifics
     const inviteModalSpecifics = () => {
         const modalFlightCode = document.getElementById('modalFlightCode');
-        const qrCanvas = document.getElementById('qrCanvas');
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         const shareNativeBtn = document.getElementById('shareNativeBtn');
         const copyCodeBtn = document.getElementById('copyCodeBtn');
@@ -275,21 +298,6 @@ function setupAllModalsAndNav() {
             generateQRCode();
         });
 
-        function generateQRCode() {
-            const url = `https://dropsilk.xyz?code=${currentFlightCode}`;
-            if (typeof QRCode === 'undefined') {
-                console.error('QRCode library not loaded');
-                if (qrCanvas) qrCanvas.style.display = 'none'; return;
-            }
-            const isDarkMode = document.body.getAttribute('data-theme') === 'dark';
-            const qrColors = {
-                dark: isDarkMode ? '#5bcefa' : '#18181b', // QR Code dots
-                light: '#00000000' // Transparent background
-            };
-            QRCode.toCanvas(qrCanvas, url, { width: 200, margin: 2, color: qrColors, errorCorrectionLevel: 'M' }, (err) => {
-                if (err) console.error('QR Code generation error:', err);
-            });
-        }
         copyLinkBtn.addEventListener('click', () => copyToClipboard(`https://dropsilk.xyz?code=${currentFlightCode}`, copyLinkBtn, 'Link Copied!'));
         copyCodeBtn.addEventListener('click', () => copyToClipboard(currentFlightCode, copyCodeBtn, 'Code Copied!'));
         shareNativeBtn.addEventListener('click', async () => {
@@ -847,8 +855,6 @@ function getFileIcon(fileName) {
     return `<svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4.2" y="5.6" width="19.6" height="16.8" rx="2.8" ry="2.8" fill="#f4f4f5" stroke="var(--c-primary)"/><path d="M12.2,16v-.4c0-.6.1-1.2.3-1.6.2-.4.7-.8,1.4-1.2.6-.3.9-.6,1.1-.8.2-.2.3-.4.3-.7s-.1-.6-.4-.8c-.3-.2-.7-.3-1.1-.3s-.9.1-1.2.3c-.3.2-.5.5-.6.8h-2.5c0-.7.3-1.3.7-1.8s.9-.9,1.5-1.2,1.4-.5,2.2-.5,1.5.1,2.1.4,1.1.7,1.4,1.2c.3.5.5,1.1.5,1.8s-.2,1.1-.5,1.6c-.3.5-.8.9-1.5,1.3-.5.3-.9.6-1,.8-.2.2-.2.5-.2.7v.2h-2.5ZM13.5,16.9c.4,0,.8.2,1.1.5.3.3.5.7.5,1.1s-.2.8-.5,1.1c-.3.3-.7.5-1.1.5s-.8-.2-1.1-.5c-.3-.3-.5-.7-.5-1.1s.2-.8.5-1.1c.3-.3.7-.5,1.1-.5Z" fill="var(--c-secondary)" stroke="var(--c-primary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8"/></svg>`;
 }
 
-// --- NEW: Keep track of the last user list to re-render it ---
-let lastNetworkUsers = [];
 function renderNetworkUsersView(users) {
     connectionPanelTitle.textContent = "Users on Your Network";
     connectionPanelList.innerHTML = '';
