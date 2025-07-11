@@ -1,1 +1,1078 @@
-const _0x5e08be=_0x1902;(function(_0x3ce755,_0x4ca272){const _0x50668d=_0x1902,_0x306726=_0x3ce755();while(!![]){try{const _0x450eee=-parseInt(_0x50668d(0x2b1))/0x1+-parseInt(_0x50668d(0x290))/0x2+parseInt(_0x50668d(0x29d))/0x3*(parseInt(_0x50668d(0x22d))/0x4)+-parseInt(_0x50668d(0x1c9))/0x5+parseInt(_0x50668d(0x2d1))/0x6+-parseInt(_0x50668d(0x26d))/0x7+parseInt(_0x50668d(0x2fd))/0x8*(parseInt(_0x50668d(0x325))/0x9);if(_0x450eee===_0x4ca272)break;else _0x306726['push'](_0x306726['shift']());}catch(_0xbb955c){_0x306726['push'](_0x306726['shift']());}}}(_0xbc3c,0x9077a));const themeToggle=document['getElementById'](_0x5e08be(0x2eb)),body=document[_0x5e08be(0x274)],applyTheme=(_0x4436c4,_0x4a5a87=!![])=>{const _0x470d29=_0x5e08be;body[_0x470d29(0x212)](_0x470d29(0x1d9),_0x4436c4);_0x4a5a87&&localStorage[_0x470d29(0x1bd)](_0x470d29(0x268),_0x4436c4);const _0x34d7b7=document[_0x470d29(0x1ab)](_0x470d29(0x296));if(_0x4436c4===_0x470d29(0x1dd)){themeToggle[_0x470d29(0x212)]('aria-label',_0x470d29(0x302));if(_0x34d7b7)_0x34d7b7[_0x470d29(0x212)]('content',_0x470d29(0x306));}else{themeToggle[_0x470d29(0x212)]('aria-label',_0x470d29(0x244));if(_0x34d7b7)_0x34d7b7['setAttribute'](_0x470d29(0x26f),_0x470d29(0x278));}const _0x511432=document[_0x470d29(0x220)](_0x470d29(0x2bf));_0x511432&&_0x511432[_0x470d29(0x282)][_0x470d29(0x2b5)]('show')&&generateQRCode();},toggleTheme=()=>{const _0x43b5fe=_0x5e08be,_0x53f23b=body[_0x43b5fe(0x224)](_0x43b5fe(0x1d9))||_0x43b5fe(0x24c),_0x15177c=_0x53f23b==='dark'?_0x43b5fe(0x24c):_0x43b5fe(0x1dd);applyTheme(_0x15177c);},initializeTheme=()=>{const _0x3eb811=_0x5e08be,_0x544401=localStorage[_0x3eb811(0x2f7)]('dropsilk-theme');_0x544401?applyTheme(_0x544401):applyTheme('light',![]);};initializeTheme(),themeToggle[_0x5e08be(0x1aa)](_0x5e08be(0x1b8),toggleTheme);function generateQRCode(){const _0x47e615=_0x5e08be;if(!qrCanvas||!currentFlightCode||typeof QRCode==='undefined'){if(qrCanvas)qrCanvas['style'][_0x47e615(0x2dc)]=_0x47e615(0x1e4);if(typeof QRCode===_0x47e615(0x1bf))console['error'](_0x47e615(0x231));return;}const _0x17dafb=_0x47e615(0x2b9)+currentFlightCode,_0x195630=getComputedStyle(document[_0x47e615(0x1d0)])[_0x47e615(0x25b)](_0x47e615(0x31b))[_0x47e615(0x213)](),_0x29863b={'dark':_0x195630,'light':_0x47e615(0x1cc)};QRCode[_0x47e615(0x284)](qrCanvas,_0x17dafb,{'width':0xc8,'margin':0x2,'color':_0x29863b,'errorCorrectionLevel':'M'},_0x488f4a=>{const _0x5efd97=_0x47e615;_0x488f4a&&console[_0x5efd97(0x304)](_0x5efd97(0x28f),_0x488f4a);});}const WEBSOCKET_URL=_0x5e08be(0x1c6),ICE_SERVERS=[{'urls':_0x5e08be(0x1b7)}];let ws,peerConnection,dataChannel,worker,myId='',myName='',currentFlightCode=null,isFlightCreator=![],connectionType=_0x5e08be(0x291),peerInfo=null,lastNetworkUsers=[],fileToSendQueue=[],currentlySendingFile=null;const fileIdMap=new Map();let captchaWidgetId=null,totalBytesSent=0x0,totalBytesReceived=0x0,metricsInterval=null,lastMetricsUpdateTime=0x0,sentInInterval=0x0,receivedInInterval=0x0;const setupContainer=document[_0x5e08be(0x1ab)](_0x5e08be(0x288)),userNameDisplay=document[_0x5e08be(0x220)](_0x5e08be(0x27b)),createFlightBtn=document['getElementById'](_0x5e08be(0x2ef)),joinFlightBtn=document['getElementById'](_0x5e08be(0x311)),flightCodeInput=document[_0x5e08be(0x220)](_0x5e08be(0x29b)),flightCodeInputWrapper=flightCodeInput[_0x5e08be(0x2ee)]('.flight-code-input-wrapper'),dashboard=document[_0x5e08be(0x220)](_0x5e08be(0x1d6)),dashboardFlightCode=document['getElementById'](_0x5e08be(0x310)),dashboardFlightStatus=document['getElementById'](_0x5e08be(0x2ae)),leaveFlightBtnDashboard=document['getElementById'](_0x5e08be(0x2bb)),fileInputTransfer=document[_0x5e08be(0x220)](_0x5e08be(0x1ea)),sendingQueueDiv=document[_0x5e08be(0x220)]('sending-queue'),receiverQueueDiv=document[_0x5e08be(0x220)](_0x5e08be(0x215)),toastContainer=document['getElementById'](_0x5e08be(0x30a)),qrCanvas=document[_0x5e08be(0x220)](_0x5e08be(0x273)),connectionPanelTitle=document[_0x5e08be(0x220)](_0x5e08be(0x1cf)),connectionPanelList=document[_0x5e08be(0x220)]('connection-panel-list'),metricsSentEl=document[_0x5e08be(0x220)]('metrics-sent'),metricsReceivedEl=document['getElementById'](_0x5e08be(0x219)),metricsSpeedEl=document[_0x5e08be(0x220)](_0x5e08be(0x1b5));let enterFlightMode;document[_0x5e08be(0x1aa)]('DOMContentLoaded',()=>{const _0x5b6b28=_0x5e08be,_0x27b81d=document['getElementById'](_0x5b6b28(0x310));function _0x2b54e0(_0x56695c){const _0x38af93=_0x5b6b28;_0x27b81d[_0x38af93(0x212)](_0x38af93(0x1e5),_0x56695c),_0x27b81d[_0x38af93(0x2df)]=_0x38af93(0x210)+_0x56695c+_0x38af93(0x2c7);if(!_0x27b81d[_0x38af93(0x1ab)](_0x38af93(0x28c))){const _0x5e757a=document['createElement'](_0x38af93(0x20d));_0x5e757a[_0x38af93(0x1fc)]=_0x38af93(0x23e),_0x5e757a[_0x38af93(0x1e3)]=_0x38af93(0x2a6),_0x27b81d[_0x38af93(0x21f)](_0x5e757a);}}_0x27b81d['addEventListener']('click',async _0x14c9a1=>{const _0x4c86c5=_0x5b6b28;_0x14c9a1[_0x4c86c5(0x251)](),_0x14c9a1[_0x4c86c5(0x2fc)]();const _0x562207=_0x27b81d[_0x4c86c5(0x224)](_0x4c86c5(0x1e5));if(!_0x562207)return;try{if(navigator[_0x4c86c5(0x2c0)]&&window[_0x4c86c5(0x240)])await navigator['clipboard'][_0x4c86c5(0x2e0)](_0x562207);else{const _0x201c0d=document['createElement'](_0x4c86c5(0x2e1));_0x201c0d[_0x4c86c5(0x2cc)]=_0x562207,_0x201c0d['style'][_0x4c86c5(0x2ec)]=_0x4c86c5(0x256),_0x201c0d[_0x4c86c5(0x22f)][_0x4c86c5(0x1df)]='0',document[_0x4c86c5(0x274)][_0x4c86c5(0x21f)](_0x201c0d),_0x201c0d[_0x4c86c5(0x1ec)](),document[_0x4c86c5(0x25f)](_0x4c86c5(0x2b3)),document[_0x4c86c5(0x274)][_0x4c86c5(0x1fe)](_0x201c0d);}_0x27b81d['classList']['add'](_0x4c86c5(0x21d)),setTimeout(()=>_0x27b81d[_0x4c86c5(0x282)][_0x4c86c5(0x29c)](_0x4c86c5(0x21d)),0x4b0);}catch(_0x4f8f7f){console['error'](_0x4c86c5(0x263),_0x4f8f7f);const _0x54b4a9=_0x27b81d['querySelector']('.code-text');if(_0x54b4a9){const _0x288f88=document[_0x4c86c5(0x322)]();_0x288f88[_0x4c86c5(0x1ce)](_0x54b4a9);const _0x9fd417=window[_0x4c86c5(0x329)]();_0x9fd417[_0x4c86c5(0x1a9)](),_0x9fd417[_0x4c86c5(0x22b)](_0x288f88);}}}),enterFlightMode=function(_0x1ce0eb){const _0x290ebb=_0x5b6b28;currentFlightCode=_0x1ce0eb,setupContainer[_0x290ebb(0x22f)][_0x290ebb(0x2dc)]=_0x290ebb(0x1e4),dashboard['style'][_0x290ebb(0x2dc)]='flex',_0x2b54e0(_0x1ce0eb),!peerInfo&&renderNetworkUsersView(lastNetworkUsers||[]);},initializeUser(),initializeWebSocket(),setupEventListeners();});function isPrivateIp(_0x502686){const _0x3d4567=_0x5e08be;if(!_0x502686)return![];const _0x1b9624=_0x502686[_0x3d4567(0x317)](/^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\./);if(_0x1b9624)return![];return _0x502686[_0x3d4567(0x1c8)]('10.')||_0x502686['startsWith']('192.168.')||_0x502686[_0x3d4567(0x317)](/^172\.(1[6-9]|2[0-9]|3[0-1])\./);}async function copyToClipboard(_0x14581d,_0x31fbc0,_0x2c4ba2='Copied!'){const _0x570ba4=_0x5e08be;try{await navigator[_0x570ba4(0x2c0)][_0x570ba4(0x2e0)](_0x14581d),showButtonSuccess(_0x31fbc0,_0x2c4ba2);}catch(_0x22a5b0){console[_0x570ba4(0x304)]('Copy\x20failed:',_0x22a5b0);const _0x524366=document[_0x570ba4(0x2a5)](_0x570ba4(0x2e1));_0x524366[_0x570ba4(0x2cc)]=_0x14581d,_0x524366[_0x570ba4(0x22f)][_0x570ba4(0x2ec)]=_0x570ba4(0x256),_0x524366[_0x570ba4(0x22f)][_0x570ba4(0x1df)]='0',document[_0x570ba4(0x274)][_0x570ba4(0x21f)](_0x524366),_0x524366['select'](),document['execCommand'](_0x570ba4(0x2b3)),document[_0x570ba4(0x274)][_0x570ba4(0x1fe)](_0x524366),showButtonSuccess(_0x31fbc0,_0x2c4ba2);}}function showButtonSuccess(_0x2fc3ab,_0x28ed19){const _0x1c3d49=_0x5e08be;if(!_0x2fc3ab)return;const _0x1e70e3=_0x2fc3ab[_0x1c3d49(0x2df)];_0x2fc3ab[_0x1c3d49(0x2df)]=_0x1c3d49(0x265)+_0x28ed19+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20',_0x2fc3ab[_0x1c3d49(0x282)][_0x1c3d49(0x2f5)]('success'),setTimeout(()=>{const _0x5f2d2b=_0x1c3d49;_0x2fc3ab[_0x5f2d2b(0x2df)]=_0x1e70e3,_0x2fc3ab['classList'][_0x5f2d2b(0x29c)](_0x5f2d2b(0x289));},0x7d0);}function _0xbc3c(){const _0x46405f=['execCommand','log','href','Flight\x20Invitation','Copy\x20failed:','0.00\x20GB','\x0a\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20xmlns=\x22http://www.w3.org/2000/svg\x22\x20width=\x2220\x22\x20height=\x2220\x22\x20fill=\x22currentColor\x22\x20viewBox=\x220\x200\x2016\x2016\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<path\x20d=\x22M10.97\x204.97a.235.235\x200\x200\x200-.02.022L7.477\x209.417\x205.384\x207.323a.75.75\x200\x200\x200-1.06\x201.061L6.97\x2011.03a.75.75\x200\x200\x200\x201.079-.02l3.992-4.99a.75.75\x200\x200\x200-1.071-1.05z\x22/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','ogg','drag-active','dropsilk-theme','onchange','disabled','dragover','endsWith','2796416ThjnVn','failed','content','Sky','register-details','0\x20KB/s','qrCanvas','body','Soaring','</span></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-details__status\x22><span\x20class=\x22status-text\x22>Queued</span></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','email-view-initial-state','#ffffff','Cloudy','transform','userNameDisplay','drag-over','Please\x20enter\x20a\x206-character\x20flight\x20code\x20to\x20join.','trigger','onmessage','target','split','classList','peer-joined','toCanvas','recaptcha-container','Tiger','termsBtn','.main-content','success','disconnected','network-user-item','.copy-feedback','close','<div\x20class=\x22empty-state\x22>No\x20other\x20users\x20found\x20on\x20your\x20network.</div>','QR\x20Code\x20generation\x20error:','513218nnBnQv','wan','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','100%','Connection\x20to\x20the\x20server\x20was\x20lost.\x20Please\x20refresh\x20the\x20page\x20to\x20reconnect.','.empty-state','meta[name=\x22theme-color\x22]','Join','join-flight','peer','Code\x20Copied!','flightCodeInput','remove','7767HElVUw','round','#bbf7d0','#15803d','onclose','Link\x20Copied!','Eagle','closeFaqModal','createElement','Copied!','Bright','faqBtn','btn-secondary','securityModal','overflow','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-icon\x22>','.action-btn-','dashboard-flight-status','entries','floor','1022201mCFYpC','transition','copy','faqModal','contains','Swift','.status-text','find','https://dropsilk.xyz?code=','Release\x20to\x20add\x20to\x20queue','leaveFlightBtnDashboard','.file-action','Invite','block','inviteModal','clipboard','string','modalFlightCode','\x22\x20style=\x22opacity:\x200;\x20transform:\x20translateY(10px);\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-icon\x22>','length','0\x20Bytes','privacyBtn','</span>','email-view-revealed-state','River','progress','from','value','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-details\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-details__name\x22\x20title=\x22','createDataChannel','zip','<b>','3120690xbNHnb','</button>','onbufferedamountlow','users-on-network-update','videoPlayer','toast-','setLocalDescription','set','<svg\x20viewBox=\x220\x200\x2028\x2028\x22\x20width=\x2228\x22\x20height=\x2228\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.5\x22><rect\x20x=\x224.2\x22\x20y=\x225.6\x22\x20width=\x2219.6\x22\x20height=\x2216.8\x22\x20rx=\x222.8\x22\x20ry=\x222.8\x22\x20fill=\x22#f4f4f5\x22\x20stroke=\x22var(--c-primary)\x22/><path\x20d=\x22M12.2,16v-.4c0-.6.1-1.2.3-1.6.2-.4.7-.8,1.4-1.2.6-.3.9-.6,1.1-.8.2-.2.3-.4.3-.7s-.1-.6-.4-.8c-.3-.2-.7-.3-1.1-.3s-.9.1-1.2.3c-.3.2-.5.5-.6.8h-2.5c0-.7.3-1.3.7-1.8s.9-.9,1.5-1.2,1.4-.5,2.2-.5,1.5.1,2.1.4,1.1.7,1.4,1.2c.3.5.5,1.1.5,1.8s-.2,1.1-.5,1.6c-.3.5-.8.9-1.5,1.3-.5.3-.9.6-1,.8-.2.2-.2.5-.2.7v.2h-2.5ZM13.5,16.9c.4,0,.8.2,1.1.5.3.3.5.7.5,1.1s-.2.8-.5,1.1c-.3.3-.7.5-1.1.5s-.8-.2-1.1-.5c-.3-.3-.5-.7-.5-1.1s.2-.8.5-1.1c.3-.3.7-.5,1.1-.5Z\x22\x20fill=\x22var(--c-secondary)\x22\x20stroke=\x22var(--c-primary)\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22\x20stroke-width=\x220.8\x22/></svg>','Complete!','inviteeId','display','Please\x20double-check\x20the\x206-character\x20code\x20and\x20try\x20again.\x20The\x20flight\x20creator\x20must\x20be\x20online.\x20If\x20you\x27re\x20on\x20the\x20same\x20Wi-Fi,\x20they\x20can\x20invite\x20you\x20directly\x20from\x20their\x20dashboard.','.invite-user-btn','innerHTML','writeText','textarea','<div\x20class=\x22toast-actions\x22>','Flight\x20Not\x20Found','shift','Preview','danger','onclick','addIceCandidate','localDescription','slice','theme-toggle','position','dragenter','closest','createFlightBtn','\x22><span>','contactModal','.flight-code-input-wrapper\x20input','unknown','chunk','add','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','getItem','closePrivacyModal','dataTransfer','div','aboutModal','stopPropagation','6227488uLzeUI','LAN\x20connection\x20mode:\x20Using\x20host\x20candidates\x20only\x20(no\x20STUN).','push','name','\x20mode)','Switch\x20to\x20Shades\x20Up\x20(Light\x20Mode)','#fffbe6','error','shareNativeBtn','#111113','<div\x20class=\x22empty-state\x22>Waiting\x20for\x20incoming\x20files</div>','WAN\x20connection\x20mode:\x20Using\x20STUN\x20servers.','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22network-user-id\x22>ID:\x20','toast-container','.drop-zone','Download','info','#d97706','flex','dashboard-flight-code','joinFlightBtn','file-action-group','pow','types','mp4','matches','match','done','onconnectionstatechange','Error\x20setting\x20remote\x20description\x20or\x20creating\x20answer:','--c-primary','Wing','setRemoteDescription','Flight\x20not\x20found','#f0fdf4','gif','Sent!','createRange','pdf','scale(0.98)','27gNWrED','or\x20select\x20manually','get','closed','getSelection','Data\x20channel\x20error:','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-details\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-details__name\x22\x20title=\x22','WebSocket\x20error:','includes','removeAllRanges','addEventListener','querySelector','closeAboutModal','toast\x20toast-','Join\x20my\x20file\x20transfer\x20session\x20with\x20code:\x20','class','key','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22user-badge\x22>You</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22inflight-user-id\x22>ID:\x20','registered','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22inflight-user-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22inflight-user-details\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22inflight-user-name\x22>','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22queue-item\x22\x20id=\x22','metrics-speed','Added\x20','stun:stun.l.google.com:19302','click','beforeend','Peer\x20','sdp','opacity\x200.3s\x20ease-out,\x20transform\x200.3s\x20ease-out','setItem','copyLinkBtn','undefined','>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Invite\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','Drag\x20&\x20Drop\x20files\x20or\x20folders','In\x20Flight\x20With','btn-primary','bufferedAmount','fromName','wss://dropsilk-server.onrender.com','m4v','startsWith','3509460NUnXCp','show','file-recv-','#00000000','Invited','selectNodeContents','connection-panel-title','documentElement','data','mp3','Bold','translateY(0)','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22network-user-details\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22network-user-name\x22>','dashboard','size','An\x20Error\x20Occurred','data-theme','disabled\x20title=\x22Create\x20or\x20join\x20a\x20flight\x20to\x20invite\x20users\x22','color','reload','dark','</span></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<progress\x20class=\x22file-details__progress-bar\x22\x20value=\x220\x22\x20max=\x221\x22></progress>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-details__status\x22><span\x20class=\x22percent\x22>0%</span></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-action\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','opacity','Peer\x20has\x20left\x20the\x20flight.','now','#fde68a','textContent','none','data-code','<svg\x20viewBox=\x220\x200\x2028\x2028\x22\x20width=\x2228\x22\x20height=\x2228\x22\x20fill=\x22none\x22><rect\x20x=\x224.2\x22\x20y=\x225.6\x22\x20width=\x2219.6\x22\x20height=\x2216.8\x22\x20rx=\x222.8\x22\x20ry=\x222.8\x22\x20fill=\x22#eafdff\x22\x20stroke=\x22var(--c-primary)\x22/><path\x20d=\x22M11.3,9.6v7.3c-.4-.3-.8-.4-1.4-.4-1.1,0-2.1.8-2.1,1.7s.9,1.7,2.1,1.7,2.1-.8,2.1-1.7v-6.8l6.5-.8v5.5c-.4-.3-.8-.4-1.4-.4-1.1,0-2.1.8-2.1,1.7s.9,1.7,2.1,1.7,2.1-.8,2.1-1.7v-8.5c0-.5-.5-.9-1-.9l-6.1.6c-.5,0-.8.4-.8.9Z\x22\x20fill=\x22var(--c-secondary)\x22/></svg>','Bytes','onopen','inviteBtn','fileInput_transfer','random','select','signal','createObjectURL','Silent','overlay','Decline','jpeg','Server\x20error:','warn','shareAppBtn','toUpperCase','connectionState','EOF','hidden','files','type','className','parse','removeChild','Files','input-error','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22inflight-user-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22inflight-user-details\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22inflight-user-name\x22>','rar','Users\x20on\x20Your\x20Network','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-icon\x22>','drop','contact','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22toast-header\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>','6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI','dragleave','forEach','share','Escape','span','onerror','</div>','<span\x20class=\x22code-text\x22>','copyCodeBtn','setAttribute','trim','backgroundColor','receiver-queue','onCaptchaSuccess','<svg\x20viewBox=\x220\x200\x2028\x2028\x22\x20width=\x2228\x22\x20height=\x2228\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.5\x22><rect\x20x=\x224.2\x22\x20y=\x225.6\x22\x20width=\x2219.6\x22\x20height=\x2216.8\x22\x20rx=\x222.8\x22\x20ry=\x222.8\x22\x20fill=\x22#f5eafd\x22\x20stroke=\x22var(--c-secondary)\x22/><polygon\x20points=\x229.2\x2010\x2017.9\x2014.2\x209.2\x2018.4\x22\x20fill=\x22var(--c-primary)\x22/></svg>','terminate','metrics-received','Join\x20my\x20DropSilk\x20flight!','sender.worker.js','byteLength','copied','btn\x20btn-primary','appendChild','getElementById','then','onicecandidate','png','getAttribute','.toast-close','open','values','email-view-captcha-state','</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22toast-close\x22>×</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22toast-body\x22>','Windy','addRange','peer-left','180RAGDFx','onRecaptchaLoad','style','channel','QRCode\x20library\x20not\x20loaded','dragging','toLowerCase','<svg\x20viewBox=\x220\x200\x2028\x2028\x22\x20width=\x2228\x22\x20height=\x2228\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.5\x22><rect\x20x=\x224.2\x22\x20y=\x225.6\x22\x20width=\x2219.6\x22\x20height=\x2216.8\x22\x20rx=\x222.8\x22\x20ry=\x222.8\x22\x20fill=\x22#fffaf7\x22\x20stroke=\x22var(--c-secondary)\x22/><rect\x20x=\x2212.6\x22\x20y=\x228.4\x22\x20width=\x222.8\x22\x20height=\x2211.2\x22\x20fill=\x22var(--c-primary)\x22/><rect\x20x=\x229.8\x22\x20y=\x2214\x22\x20width=\x228.4\x22\x20height=\x222.8\x22\x20fill=\x22var(--c-secondary)\x22/></svg>','btn\x20btn-secondary','Email\x20Copied!','.modal-overlay.show','insertAdjacentHTML','Pilot','jpg','<svg\x20viewBox=\x220\x200\x2020\x2020\x22\x20width=\x2228\x22\x20height=\x2228\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.5\x22><rect\x20x=\x223\x22\x20y=\x224\x22\x20width=\x2214\x22\x20height=\x2212\x22\x20rx=\x222\x22\x20fill=\x22#e3f7fd\x22\x20stroke=\x22var(--c-primary)\x22/><circle\x20cx=\x227\x22\x20cy=\x228\x22\x20r=\x221.5\x22\x20fill=\x22var(--c-primary)\x22/><path\x20d=\x22M3\x2016l4-5\x203\x204\x204-6\x203\x207\x22\x20stroke=\x22var(--c-secondary)\x22\x20stroke-width=\x221.5\x22\x20fill=\x22none\x22/></svg>','stringify','borderColor','copy-feedback','Jet','isSecureContext','Drop\x20your\x20files\x20here!','download','.secondary-text','Switch\x20to\x20Shades\x20Down\x20(Dark\x20Mode)','Agile','Empty\x20Code','button','candidate','pop','send','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22btn\x20btn-primary\x20invite-user-btn\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-invitee-id=\x22','light','</span></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<progress\x20class=\x22file-details__progress-bar\x22\x20value=\x220\x22\x20max=\x221\x22></progress>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-details__status\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22percent\x22>0%</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22status-text\x22>Sending...</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','flightCode','Data\x20channel\x20opened!','Eager','preventDefault','Peer\x20connection\x20state:','.percent','m4a','text','fixed','Clever','.mkv','flight-invitation','querySelectorAll','getPropertyValue','callback','<div\x20class=\x22empty-state\x22>Select\x20files\x20to\x20send</div>','Invitation\x20declined.'];_0xbc3c=function(){return _0x46405f;};return _0xbc3c();}function setupAllModalsAndNav(){const _0x13a5ff=_0x5e08be,_0x6cb1={'invite':{'overlay':document[_0x13a5ff(0x220)](_0x13a5ff(0x2bf)),'trigger':document['getElementById'](_0x13a5ff(0x1e9)),'close':document[_0x13a5ff(0x220)]('closeInviteModal')},'about':{'overlay':document[_0x13a5ff(0x220)](_0x13a5ff(0x2fb)),'trigger':document[_0x13a5ff(0x220)]('aboutBtn'),'close':document[_0x13a5ff(0x220)](_0x13a5ff(0x1ac))},'contact':{'overlay':document[_0x13a5ff(0x220)](_0x13a5ff(0x2f1)),'trigger':document[_0x13a5ff(0x220)]('contactBtn'),'close':document[_0x13a5ff(0x220)]('closeContactModal')},'terms':{'overlay':document[_0x13a5ff(0x220)]('termsModal'),'trigger':document[_0x13a5ff(0x220)](_0x13a5ff(0x287)),'close':document[_0x13a5ff(0x220)]('closeTermsModal')},'privacy':{'overlay':document[_0x13a5ff(0x220)]('privacyModal'),'trigger':document[_0x13a5ff(0x220)](_0x13a5ff(0x2c6)),'close':document[_0x13a5ff(0x220)](_0x13a5ff(0x2f8))},'security':{'overlay':document[_0x13a5ff(0x220)](_0x13a5ff(0x2aa)),'trigger':document[_0x13a5ff(0x220)]('securityBtn'),'close':document[_0x13a5ff(0x220)]('closeSecurityModal')},'faq':{'overlay':document[_0x13a5ff(0x220)](_0x13a5ff(0x2b4)),'trigger':document[_0x13a5ff(0x220)](_0x13a5ff(0x2a8)),'close':document['getElementById'](_0x13a5ff(0x2a4))}},_0x3f9aea=(_0x37ba58,_0x174d14)=>{const _0x18b61f=_0x13a5ff;if(!_0x174d14[_0x18b61f(0x1f0)]||!_0x174d14[_0x18b61f(0x27e)]||!_0x174d14['close'])return;const _0x416fab=()=>{const _0x36c521=_0x18b61f;_0x174d14['overlay']['classList'][_0x36c521(0x2f5)](_0x36c521(0x1ca)),document[_0x36c521(0x274)]['style'][_0x36c521(0x2ab)]=_0x36c521(0x1f9);},_0x4453a5=()=>{const _0x312e8b=_0x18b61f;_0x174d14['overlay'][_0x312e8b(0x282)][_0x312e8b(0x29c)](_0x312e8b(0x1ca)),document[_0x312e8b(0x274)][_0x312e8b(0x22f)][_0x312e8b(0x2ab)]='';if(_0x37ba58===_0x312e8b(0x206)){const _0x3d86a2=document[_0x312e8b(0x220)](_0x312e8b(0x277)),_0x4ddd1c=document[_0x312e8b(0x220)](_0x312e8b(0x228)),_0x9a3fd7=document[_0x312e8b(0x220)]('email-view-revealed-state'),_0x8fd434=document[_0x312e8b(0x220)]('captcha-pretext');if(_0x3d86a2)_0x3d86a2[_0x312e8b(0x22f)]['display']=_0x312e8b(0x2be);if(_0x4ddd1c)_0x4ddd1c[_0x312e8b(0x22f)]['display']=_0x312e8b(0x1e4);if(_0x9a3fd7)_0x9a3fd7[_0x312e8b(0x22f)][_0x312e8b(0x2dc)]=_0x312e8b(0x1e4);if(_0x8fd434)_0x8fd434[_0x312e8b(0x22f)][_0x312e8b(0x2dc)]=_0x312e8b(0x2be);window['grecaptcha']&&captchaWidgetId!==null&&grecaptcha['reset'](captchaWidgetId);}};_0x174d14[_0x18b61f(0x27e)][_0x18b61f(0x1aa)]('click',_0x416fab),_0x174d14[_0x18b61f(0x28d)][_0x18b61f(0x1aa)](_0x18b61f(0x1b8),_0x4453a5),_0x174d14[_0x18b61f(0x1f0)][_0x18b61f(0x1aa)](_0x18b61f(0x1b8),_0x42eee4=>{if(_0x42eee4['target']===_0x174d14['overlay'])_0x4453a5();});};Object[_0x13a5ff(0x2af)](_0x6cb1)[_0x13a5ff(0x20a)](([_0x1176b9,_0x236058])=>_0x3f9aea(_0x1176b9,_0x236058)),document['addEventListener']('keydown',_0x1cfe3b=>{const _0x2dd0c9=_0x13a5ff;_0x1cfe3b[_0x2dd0c9(0x1b0)]===_0x2dd0c9(0x20c)&&document[_0x2dd0c9(0x25a)](_0x2dd0c9(0x237))[_0x2dd0c9(0x20a)](_0x565821=>{const _0x109092=_0x2dd0c9,_0x2773b8=Object[_0x109092(0x227)](_0x6cb1)[_0x109092(0x2b8)](_0x4f1662=>_0x4f1662[_0x109092(0x1f0)]===_0x565821);_0x2773b8&&_0x2773b8[_0x109092(0x28d)]?_0x2773b8[_0x109092(0x28d)][_0x109092(0x1b8)]():(_0x565821[_0x109092(0x282)][_0x109092(0x29c)]('show'),document[_0x109092(0x274)]['style'][_0x109092(0x2ab)]='');});});const _0x1825d7=()=>{const _0x34ff7f=_0x13a5ff,_0x5d44d5=document[_0x34ff7f(0x220)](_0x34ff7f(0x2c2)),_0x335c94=document['getElementById'](_0x34ff7f(0x1be)),_0x1ea5bb=document[_0x34ff7f(0x220)](_0x34ff7f(0x305)),_0x2cafa9=document[_0x34ff7f(0x220)](_0x34ff7f(0x211));if(navigator[_0x34ff7f(0x20b)])_0x1ea5bb[_0x34ff7f(0x22f)]['display']=_0x34ff7f(0x30f);_0x6cb1['invite'][_0x34ff7f(0x27e)]['addEventListener'](_0x34ff7f(0x1b8),()=>{const _0x2d3bba=_0x34ff7f;if(!currentFlightCode)return;_0x5d44d5[_0x2d3bba(0x1e3)]=currentFlightCode,generateQRCode();}),_0x335c94[_0x34ff7f(0x1aa)](_0x34ff7f(0x1b8),()=>copyToClipboard(_0x34ff7f(0x2b9)+currentFlightCode,_0x335c94,_0x34ff7f(0x2a2))),_0x2cafa9[_0x34ff7f(0x1aa)](_0x34ff7f(0x1b8),()=>copyToClipboard(currentFlightCode,_0x2cafa9,_0x34ff7f(0x29a))),_0x1ea5bb[_0x34ff7f(0x1aa)](_0x34ff7f(0x1b8),async()=>{const _0x14e9f0=_0x34ff7f;if(navigator[_0x14e9f0(0x20b)])try{await navigator['share']({'title':_0x14e9f0(0x21a),'text':_0x14e9f0(0x1ae)+currentFlightCode,'url':_0x14e9f0(0x2b9)+currentFlightCode});}catch(_0x2a1cf2){if(_0x2a1cf2['name']!=='AbortError')copyToClipboard(_0x14e9f0(0x2b9)+currentFlightCode,_0x1ea5bb,'Link\x20Copied!');}});},_0x10531b=()=>{const _0x243ccf=_0x13a5ff,_0x5d87d8=document['getElementById']('viewEmailBtn'),_0x3bb76c=document[_0x243ccf(0x220)]('copyEmailBtn'),_0x4f1e12=document[_0x243ccf(0x220)](_0x243ccf(0x277)),_0x1bcce2=document[_0x243ccf(0x220)](_0x243ccf(0x228)),_0x28e4bc=document[_0x243ccf(0x220)](_0x243ccf(0x2c8)),_0x36f5c4=document[_0x243ccf(0x220)](_0x243ccf(0x285)),_0x45fc93=document['getElementById']('captcha-pretext');let _0x137ac7=![];window[_0x243ccf(0x22e)]=function(){_0x137ac7=!![];};const _0x228675=()=>{const _0x31e077=_0x243ccf;_0x36f5c4[_0x31e077(0x2df)][_0x31e077(0x213)]()===''&&(captchaWidgetId=grecaptcha['render'](_0x31e077(0x285),{'sitekey':_0x31e077(0x208),'callback':onCaptchaSuccess,'theme':document[_0x31e077(0x274)][_0x31e077(0x224)]('data-theme')||_0x31e077(0x24c)}));};_0x5d87d8[_0x243ccf(0x1aa)](_0x243ccf(0x1b8),()=>{const _0x151a7b=_0x243ccf;_0x4f1e12[_0x151a7b(0x22f)]['display']=_0x151a7b(0x1e4),_0x1bcce2['style'][_0x151a7b(0x2dc)]=_0x151a7b(0x2be);if(_0x137ac7)_0x228675();else{const _0x4015ca=setInterval(()=>{_0x137ac7&&(clearInterval(_0x4015ca),_0x228675());},0x64);}}),window[_0x243ccf(0x216)]=function(_0x471df2){const _0xc0869b=_0x243ccf;console[_0xc0869b(0x260)]('reCAPTCHA\x20verified.\x20Token:',_0x471df2),_0x1bcce2['style'][_0xc0869b(0x2dc)]=_0xc0869b(0x1e4),_0x28e4bc[_0xc0869b(0x22f)][_0xc0869b(0x2dc)]=_0xc0869b(0x2be),_0x45fc93[_0xc0869b(0x22f)][_0xc0869b(0x2dc)]=_0xc0869b(0x1e4);},_0x3bb76c[_0x243ccf(0x1aa)](_0x243ccf(0x1b8),()=>copyToClipboard('aratahmed@gmail.com',_0x3bb76c,_0x243ccf(0x236)));};_0x1825d7(),_0x10531b();}function _0x1902(_0x4e00e6,_0x2483d5){const _0xbc3c8c=_0xbc3c();return _0x1902=function(_0x19027c,_0x59c163){_0x19027c=_0x19027c-0x1a7;let _0x3d61ae=_0xbc3c8c[_0x19027c];return _0x3d61ae;},_0x1902(_0x4e00e6,_0x2483d5);}function setupDragAndDrop(){const _0x4a0bbf=_0x5e08be,_0x1f5fb6=document[_0x4a0bbf(0x1ab)]('.drop-zone');let _0x2eb0e8=0x0;[_0x4a0bbf(0x2ed),'dragover','dragleave',_0x4a0bbf(0x205)][_0x4a0bbf(0x20a)](_0x4d24a5=>document['addEventListener'](_0x4d24a5,_0x723717=>{const _0x436dd7=_0x4a0bbf;_0x723717[_0x436dd7(0x251)](),_0x723717[_0x436dd7(0x2fc)]();})),[_0x4a0bbf(0x2ed),_0x4a0bbf(0x26b)]['forEach'](_0xa9056d=>_0x1f5fb6[_0x4a0bbf(0x1aa)](_0xa9056d,_0x272368,![])),['dragleave',_0x4a0bbf(0x205)]['forEach'](_0x3bfc4e=>_0x1f5fb6[_0x4a0bbf(0x1aa)](_0x3bfc4e,_0x5cfbf7,![])),_0x1f5fb6['addEventListener'](_0x4a0bbf(0x205),_0x2e2364,![]),document['addEventListener'](_0x4a0bbf(0x2ed),_0x386e66=>{const _0x3ad04a=_0x4a0bbf;_0x386e66[_0x3ad04a(0x2f9)][_0x3ad04a(0x314)][_0x3ad04a(0x1a8)](_0x3ad04a(0x1ff))&&(_0x2eb0e8++,document[_0x3ad04a(0x274)][_0x3ad04a(0x282)]['add']('dragging'));}),document[_0x4a0bbf(0x1aa)](_0x4a0bbf(0x209),_0x3757fe=>{const _0x5276c8=_0x4a0bbf;_0x2eb0e8--,_0x2eb0e8<=0x0&&(_0x2eb0e8=0x0,document[_0x5276c8(0x274)]['classList'][_0x5276c8(0x29c)](_0x5276c8(0x232)));}),document[_0x4a0bbf(0x1aa)](_0x4a0bbf(0x205),_0x1a8652=>{const _0x29ef28=_0x4a0bbf;_0x2eb0e8=0x0,document[_0x29ef28(0x274)]['classList'][_0x29ef28(0x29c)]('dragging');});function _0x272368(_0x1c1df7){const _0x51fd02=_0x4a0bbf;_0x1f5fb6[_0x51fd02(0x282)][_0x51fd02(0x2f5)](_0x51fd02(0x27c)),_0x1c1df7[_0x51fd02(0x2f9)]['types'][_0x51fd02(0x1a8)](_0x51fd02(0x1ff))&&(_0x1f5fb6[_0x51fd02(0x282)][_0x51fd02(0x2f5)]('drag-active'),_0x1f5fb6[_0x51fd02(0x1ab)]('p')[_0x51fd02(0x1e3)]===_0x51fd02(0x1c1)&&(_0x1f5fb6['querySelector']('p')[_0x51fd02(0x1e3)]=_0x51fd02(0x241),_0x1f5fb6[_0x51fd02(0x1ab)]('.secondary-text')[_0x51fd02(0x1e3)]=_0x51fd02(0x2ba)));}function _0x5cfbf7(_0x5ce88e){const _0xfde32a=_0x4a0bbf;!_0x1f5fb6[_0xfde32a(0x2b5)](_0x5ce88e['relatedTarget'])&&(_0x1f5fb6[_0xfde32a(0x282)][_0xfde32a(0x29c)](_0xfde32a(0x27c),_0xfde32a(0x267)),_0x1f5fb6[_0xfde32a(0x1ab)]('p')[_0xfde32a(0x1e3)]=_0xfde32a(0x1c1),_0x1f5fb6[_0xfde32a(0x1ab)]('.secondary-text')[_0xfde32a(0x1e3)]=_0xfde32a(0x326));}function _0x2e2364(_0x58893e){const _0x414903=_0x4a0bbf;_0x1f5fb6[_0x414903(0x282)][_0x414903(0x29c)](_0x414903(0x27c),_0x414903(0x267)),_0x1f5fb6[_0x414903(0x1ab)]('p')[_0x414903(0x1e3)]=_0x414903(0x1c1),_0x1f5fb6[_0x414903(0x1ab)](_0x414903(0x243))[_0x414903(0x1e3)]=_0x414903(0x326),handleFileSelection(_0x58893e[_0x414903(0x2f9)]['files']);}}const input=document[_0x5e08be(0x1ab)](_0x5e08be(0x2f2));input[_0x5e08be(0x1aa)]('input',function(){const _0x5b2619=_0x5e08be;this[_0x5b2619(0x2cc)][_0x5b2619(0x2c4)]>0x6&&(this[_0x5b2619(0x2cc)]=this[_0x5b2619(0x2cc)][_0x5b2619(0x2ea)](0x0,0x6));});function initializeUser(){const _0x7600ed=_0x5e08be;myName=generateRandomName(),userNameDisplay[_0x7600ed(0x1e3)]=myName;}function generateRandomName(){const _0x123173=_0x5e08be,_0x3798ea=[_0x123173(0x2b6),_0x123173(0x257),_0x123173(0x1ef),_0x123173(0x245),'Brave',_0x123173(0x2a7),_0x123173(0x250),_0x123173(0x1d3),'Flying',_0x123173(0x275),_0x123173(0x22a),_0x123173(0x279)],_0x42e883=['Fox','Jaguar',_0x123173(0x2a3),'Sparrow','Lion',_0x123173(0x286),_0x123173(0x2c9),_0x123173(0x270),'Aero',_0x123173(0x23f),_0x123173(0x239),_0x123173(0x31c)];return''+_0x3798ea[Math[_0x123173(0x2b0)](Math[_0x123173(0x1eb)]()*_0x3798ea['length'])]+_0x42e883[Math[_0x123173(0x2b0)](Math[_0x123173(0x1eb)]()*_0x42e883['length'])]+(Math[_0x123173(0x2b0)](Math[_0x123173(0x1eb)]()*0x384)+0x64);}function initializeWebSocket(){const _0x36059e=_0x5e08be;ws=new WebSocket(WEBSOCKET_URL),ws[_0x36059e(0x1e8)]=()=>discoverLocalIpAndRegister(),ws[_0x36059e(0x27f)]=async _0x531db9=>{const _0x47b2b3=_0x36059e,_0x5e90c4=JSON[_0x47b2b3(0x1fd)](_0x531db9[_0x47b2b3(0x1d1)]);switch(_0x5e90c4[_0x47b2b3(0x1fb)]){case _0x47b2b3(0x1b2):myId=_0x5e90c4['id'];break;case _0x47b2b3(0x2d4):lastNetworkUsers=_0x5e90c4['users'];!peerInfo&&renderNetworkUsersView(_0x5e90c4['users']);break;case _0x47b2b3(0x259):showInvitationToast(_0x5e90c4[_0x47b2b3(0x1c5)],_0x5e90c4[_0x47b2b3(0x24e)]);break;case'flight-created':enterFlightMode(_0x5e90c4[_0x47b2b3(0x24e)]);break;case _0x47b2b3(0x283):connectionType=_0x5e90c4['connectionType']||'wan',peerInfo=_0x5e90c4[_0x47b2b3(0x299)],console[_0x47b2b3(0x260)](_0x47b2b3(0x1ba)+peerInfo[_0x47b2b3(0x300)]+'\x20joined.\x20Connection\x20type:\x20'+connectionType),handlePeerJoined(_0x5e90c4['flightCode']);break;case _0x47b2b3(0x1ed):if(!peerConnection)initializePeerConnection(isFlightCreator);await handleSignal(_0x5e90c4['data']);break;case _0x47b2b3(0x22c):handlePeerLeft();break;case _0x47b2b3(0x304):handleServerError(_0x5e90c4['message']);break;}},ws[_0x36059e(0x2a1)]=()=>{const _0x45dfcb=_0x36059e;showToast({'type':_0x45dfcb(0x2e6),'title':'Connection\x20Lost','body':_0x45dfcb(0x294),'duration':0x0}),resetState();},ws[_0x36059e(0x20e)]=_0x45665f=>console[_0x36059e(0x304)](_0x36059e(0x1a7),_0x45665f);}function handleServerError(_0x50b960){const _0x57f751=_0x5e08be;console[_0x57f751(0x304)](_0x57f751(0x1f3),_0x50b960),_0x50b960['includes'](_0x57f751(0x31e))?(flightCodeInputWrapper[_0x57f751(0x282)][_0x57f751(0x2f5)](_0x57f751(0x200)),setTimeout(()=>flightCodeInputWrapper['classList'][_0x57f751(0x29c)](_0x57f751(0x200)),0x5dc),showToast({'type':_0x57f751(0x2e6),'title':_0x57f751(0x2e3),'body':_0x57f751(0x2dd),'duration':0x1f40})):showToast({'type':'danger','title':_0x57f751(0x1d8),'body':_0x50b960,'duration':0x1f40});}function handlePeerJoined(_0x79efef){const _0x55878e=_0x5e08be;!currentFlightCode&&enterFlightMode(_0x79efef),!peerConnection&&initializePeerConnection(isFlightCreator),dashboardFlightStatus[_0x55878e(0x1e3)]='Peer\x20Connected!\x20('+connectionType[_0x55878e(0x1f6)]()+_0x55878e(0x301),dashboardFlightStatus[_0x55878e(0x22f)][_0x55878e(0x1db)]=_0x55878e(0x2a0),dashboardFlightStatus[_0x55878e(0x22f)][_0x55878e(0x214)]=_0x55878e(0x31f),dashboardFlightStatus[_0x55878e(0x22f)][_0x55878e(0x23d)]=_0x55878e(0x29f),renderInFlightView(),processFileToSendQueue();}function handlePeerLeft(){const _0x533cfc=_0x5e08be;console[_0x533cfc(0x260)](_0x533cfc(0x1e0)),peerInfo=null,resetPeerConnectionState(),dashboardFlightStatus[_0x533cfc(0x1e3)]='Peer\x20disconnected.\x20Waiting...',dashboardFlightStatus['style'][_0x533cfc(0x1db)]=_0x533cfc(0x30e),dashboardFlightStatus[_0x533cfc(0x22f)][_0x533cfc(0x214)]=_0x533cfc(0x303),dashboardFlightStatus[_0x533cfc(0x22f)][_0x533cfc(0x23d)]=_0x533cfc(0x1e2),renderNetworkUsersView(lastNetworkUsers);}let chunkQueue=[],isSending=![],fileReadingDone=![],sentOffset=0x0;const HIGH_WATER_MARK=0x400*0x400;let incomingFileInfo=null,incomingFileData=[],incomingFileReceived=0x0;function setupDataChannel(){const _0xfb191b=_0x5e08be;dataChannel[_0xfb191b(0x1e8)]=()=>{const _0x19b94e=_0xfb191b;console[_0x19b94e(0x260)](_0x19b94e(0x24f)),lastMetricsUpdateTime=Date['now']();if(metricsInterval)clearInterval(metricsInterval);metricsInterval=setInterval(updateMetrics,0x3e8);},dataChannel[_0xfb191b(0x2a1)]=()=>{const _0x5df14a=_0xfb191b;console[_0x5df14a(0x260)]('Data\x20channel\x20closed.'),handlePeerLeft();if(metricsInterval)clearInterval(metricsInterval);metricsSpeedEl[_0x5df14a(0x1e3)]=_0x5df14a(0x272);},dataChannel[_0xfb191b(0x20e)]=_0xb520f8=>console['error'](_0xfb191b(0x32a),_0xb520f8),dataChannel[_0xfb191b(0x2d3)]=()=>drainQueue(),dataChannel['onmessage']=_0x493f6b=>{const _0x25fb1a=_0xfb191b;if(typeof _0x493f6b[_0x25fb1a(0x1d1)]===_0x25fb1a(0x2c1)&&_0x493f6b[_0x25fb1a(0x1d1)][_0x25fb1a(0x1c8)]('{')){incomingFileInfo=JSON['parse'](_0x493f6b['data']),incomingFileData=[],incomingFileReceived=0x0;if(receiverQueueDiv[_0x25fb1a(0x1ab)](_0x25fb1a(0x295)))receiverQueueDiv[_0x25fb1a(0x2df)]='';const _0x3de1c6=_0x25fb1a(0x1cb)+Date[_0x25fb1a(0x1e1)](),_0x3b31ee=getFileIcon(incomingFileInfo[_0x25fb1a(0x300)]);receiverQueueDiv[_0x25fb1a(0x238)](_0x25fb1a(0x1b9),_0x25fb1a(0x1b4)+_0x3de1c6+_0x25fb1a(0x2ac)+_0x3b31ee+_0x25fb1a(0x2cd)+incomingFileInfo[_0x25fb1a(0x300)]+_0x25fb1a(0x2f0)+incomingFileInfo[_0x25fb1a(0x300)]+_0x25fb1a(0x1de)),fileIdMap[_0x25fb1a(0x2d8)](incomingFileInfo['name'],_0x3de1c6);return;}if(_0x493f6b[_0x25fb1a(0x1d1)]===_0x25fb1a(0x1f8)){const _0xb63da4=new Blob(incomingFileData,{'type':incomingFileInfo[_0x25fb1a(0x1fb)]}),_0x5275e5=fileIdMap[_0x25fb1a(0x327)](incomingFileInfo['name']),_0x30c74b=document[_0x25fb1a(0x220)](_0x5275e5);if(_0x30c74b){const _0x493763=_0x30c74b['querySelector'](_0x25fb1a(0x2bc));_0x493763['innerHTML']='';const _0x5061a2=incomingFileInfo[_0x25fb1a(0x1fb)][_0x25fb1a(0x1c8)]('video/')||incomingFileInfo[_0x25fb1a(0x300)][_0x25fb1a(0x233)]()[_0x25fb1a(0x26c)](_0x25fb1a(0x258));if(_0x5061a2&&window[_0x25fb1a(0x2d5)]){const _0xe6d65b=document[_0x25fb1a(0x2a5)](_0x25fb1a(0x2fa));_0xe6d65b[_0x25fb1a(0x1fc)]=_0x25fb1a(0x312);const _0x367f44=document[_0x25fb1a(0x2a5)](_0x25fb1a(0x247));_0x367f44['className']=_0x25fb1a(0x235),_0x367f44[_0x25fb1a(0x1e3)]=_0x25fb1a(0x2e5),_0x367f44[_0x25fb1a(0x2e7)]=()=>videoPlayer[_0x25fb1a(0x226)](_0xb63da4,incomingFileInfo[_0x25fb1a(0x300)]);const _0x2207c1=document[_0x25fb1a(0x2a5)]('a');_0x2207c1[_0x25fb1a(0x261)]=URL[_0x25fb1a(0x1ee)](_0xb63da4),_0x2207c1[_0x25fb1a(0x242)]=incomingFileInfo[_0x25fb1a(0x300)],_0x2207c1[_0x25fb1a(0x1fc)]=_0x25fb1a(0x21e),_0x2207c1[_0x25fb1a(0x1e3)]='Save',_0xe6d65b[_0x25fb1a(0x21f)](_0x367f44),_0xe6d65b[_0x25fb1a(0x21f)](_0x2207c1),_0x493763['appendChild'](_0xe6d65b);}else{const _0x4755dc=document['createElement']('a');_0x4755dc['href']=URL['createObjectURL'](_0xb63da4),_0x4755dc[_0x25fb1a(0x242)]=incomingFileInfo['name'],_0x4755dc['className']=_0x25fb1a(0x21e),_0x4755dc[_0x25fb1a(0x1e3)]=_0x25fb1a(0x30c),_0x493763['appendChild'](_0x4755dc);}_0x30c74b[_0x25fb1a(0x1ab)]('.percent')['textContent']=_0x25fb1a(0x2da);}return;}const _0x506f82=_0x493f6b[_0x25fb1a(0x1d1)]['byteLength']||_0x493f6b[_0x25fb1a(0x1d1)][_0x25fb1a(0x1d7)]||0x0;totalBytesReceived+=_0x506f82,receivedInInterval+=_0x506f82,metricsReceivedEl['textContent']=formatBytes(totalBytesReceived),incomingFileData[_0x25fb1a(0x2ff)](_0x493f6b['data']),incomingFileReceived+=_0x506f82;if(incomingFileInfo?.[_0x25fb1a(0x1d7)]){const _0x21c6c7=incomingFileReceived/ incomingFileInfo[_0x25fb1a(0x1d7)],_0x294604=fileIdMap[_0x25fb1a(0x327)](incomingFileInfo[_0x25fb1a(0x300)]),_0x361ece=document[_0x25fb1a(0x220)](_0x294604);_0x361ece&&(_0x361ece[_0x25fb1a(0x1ab)](_0x25fb1a(0x2ca))[_0x25fb1a(0x2cc)]=_0x21c6c7,_0x361ece['querySelector'](_0x25fb1a(0x253))[_0x25fb1a(0x1e3)]=Math['round'](_0x21c6c7*0x64)+'%');}};}function startFileSend(_0x22633e){const _0x367d11=_0x5e08be;currentlySendingFile=_0x22633e;const _0x16a823=fileIdMap[_0x367d11(0x327)](_0x22633e),_0x1a0876=document[_0x367d11(0x220)](_0x16a823);isSending=!![];_0x1a0876&&(_0x1a0876[_0x367d11(0x2df)]=_0x367d11(0x204)+getFileIcon(_0x22633e[_0x367d11(0x300)])+_0x367d11(0x32b)+_0x22633e[_0x367d11(0x300)]+_0x367d11(0x2f0)+_0x22633e[_0x367d11(0x300)]+_0x367d11(0x24d));if(worker)worker[_0x367d11(0x218)]();worker=new Worker(_0x367d11(0x21b)),chunkQueue=[],fileReadingDone=![],sentOffset=0x0,dataChannel['send'](JSON[_0x367d11(0x23c)]({'name':_0x22633e[_0x367d11(0x300)],'type':_0x22633e['type'],'size':_0x22633e['size']})),worker['onmessage']=_0x537288=>{const _0x264179=_0x367d11,{type:_0x26fb60,chunk:_0x3745a0}=_0x537288[_0x264179(0x1d1)];if(_0x26fb60===_0x264179(0x2f4))chunkQueue[_0x264179(0x2ff)](_0x3745a0),drainQueue();else _0x26fb60===_0x264179(0x318)&&(fileReadingDone=!![],worker[_0x264179(0x218)](),worker=null,drainQueue());},worker['postMessage'](_0x22633e);}function drainQueue(){const _0x50e49e=_0x5e08be,_0xd780f=currentlySendingFile;if(!_0xd780f)return;const _0x33ead3=fileIdMap[_0x50e49e(0x327)](_0xd780f),_0x36e730=document['getElementById'](_0x33ead3);while(chunkQueue[_0x50e49e(0x2c4)]>0x0){if(dataChannel[_0x50e49e(0x1c4)]>HIGH_WATER_MARK)return;const _0x21bf1f=chunkQueue[_0x50e49e(0x2e4)]();dataChannel['send'](_0x21bf1f);const _0x11e84d=_0x21bf1f[_0x50e49e(0x21c)];totalBytesSent+=_0x11e84d,sentInInterval+=_0x11e84d,metricsSentEl['textContent']=formatBytes(totalBytesSent),sentOffset+=_0x11e84d;if(_0x36e730){const _0x472dc2=sentOffset/_0xd780f['size'];_0x36e730['querySelector'](_0x50e49e(0x2ca))[_0x50e49e(0x2cc)]=_0x472dc2,_0x36e730['querySelector'](_0x50e49e(0x253))['textContent']=Math[_0x50e49e(0x29e)](_0x472dc2*0x64)+'%';}}fileReadingDone&&chunkQueue[_0x50e49e(0x2c4)]===0x0&&(dataChannel[_0x50e49e(0x24a)](_0x50e49e(0x1f8)),_0x36e730&&(_0x36e730[_0x50e49e(0x1ab)](_0x50e49e(0x2b7))[_0x50e49e(0x1e3)]=_0x50e49e(0x321),_0x36e730[_0x50e49e(0x1ab)](_0x50e49e(0x253))[_0x50e49e(0x1e3)]=_0x50e49e(0x293)),isSending=![],currentlySendingFile=null,processFileToSendQueue());}function processFileToSendQueue(){const _0x4b7294=_0x5e08be;if(fileToSendQueue[_0x4b7294(0x2c4)]>0x0&&dataChannel&&dataChannel['readyState']===_0x4b7294(0x226)&&!isSending){const _0xdd6862=fileToSendQueue[_0x4b7294(0x2e4)]();startFileSend(_0xdd6862);}}function handleFileSelection(_0x1bab6e){const _0x333f83=_0x5e08be;if(_0x1bab6e[_0x333f83(0x2c4)]===0x0)return;const _0x550242=document['querySelector'](_0x333f83(0x30b));_0x550242&&(_0x550242[_0x333f83(0x22f)][_0x333f83(0x27a)]=_0x333f83(0x324),_0x550242[_0x333f83(0x22f)][_0x333f83(0x2b2)]='transform\x200.1s\x20ease-out',setTimeout(()=>{const _0x3b9e7d=_0x333f83;_0x550242[_0x3b9e7d(0x22f)][_0x3b9e7d(0x27a)]='',_0x550242[_0x3b9e7d(0x22f)][_0x3b9e7d(0x2b2)]='';},0x64)),sendingQueueDiv['querySelector']('.empty-state')&&(sendingQueueDiv[_0x333f83(0x2df)]=''),Array[_0x333f83(0x2cb)](_0x1bab6e)[_0x333f83(0x20a)](_0x5b6e20=>{const _0x4a7431=_0x333f83;fileToSendQueue[_0x4a7431(0x2ff)](_0x5b6e20);const _0x791ee7='send-'+Date[_0x4a7431(0x1e1)]()+'-'+Math[_0x4a7431(0x1eb)]();fileIdMap[_0x4a7431(0x2d8)](_0x5b6e20,_0x791ee7),sendingQueueDiv[_0x4a7431(0x238)](_0x4a7431(0x1b9),'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22queue-item\x22\x20id=\x22'+_0x791ee7+_0x4a7431(0x2c3)+getFileIcon(_0x5b6e20[_0x4a7431(0x300)])+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-details\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22file-details__name\x22\x20title=\x22'+_0x5b6e20[_0x4a7431(0x300)]+'\x22><span>'+_0x5b6e20[_0x4a7431(0x300)]+_0x4a7431(0x276));const _0x40e1fe=document['getElementById'](_0x791ee7);setTimeout(()=>{const _0x225a99=_0x4a7431;_0x40e1fe[_0x225a99(0x22f)][_0x225a99(0x2b2)]=_0x225a99(0x1bc),_0x40e1fe[_0x225a99(0x22f)][_0x225a99(0x1df)]='1',_0x40e1fe[_0x225a99(0x22f)][_0x225a99(0x27a)]=_0x225a99(0x1d4);},0x32);}),processFileToSendQueue(),console['log'](_0x333f83(0x1b6)+_0x1bab6e[_0x333f83(0x2c4)]+'\x20file(s)\x20to\x20the\x20sending\x20queue');}function setupEventListeners(){const _0xa3a24a=_0x5e08be;createFlightBtn[_0xa3a24a(0x2e7)]=()=>{isFlightCreator=!![],ws['send'](JSON['stringify']({'type':'create-flight'}));},joinFlightBtn['onclick']=()=>{const _0x1bc003=_0xa3a24a,_0x288b18=flightCodeInput[_0x1bc003(0x2cc)][_0x1bc003(0x213)]()[_0x1bc003(0x1f6)]();_0x288b18?(isFlightCreator=![],ws[_0x1bc003(0x24a)](JSON[_0x1bc003(0x23c)]({'type':_0x1bc003(0x298),'flightCode':_0x288b18}))):(flightCodeInputWrapper[_0x1bc003(0x282)]['add'](_0x1bc003(0x200)),setTimeout(()=>flightCodeInputWrapper['classList'][_0x1bc003(0x29c)](_0x1bc003(0x200)),0x5dc),showToast({'type':'danger','title':_0x1bc003(0x246),'body':_0x1bc003(0x27d),'duration':0x1388}));},leaveFlightBtnDashboard[_0xa3a24a(0x2e7)]=()=>{const _0xa1f2c=_0xa3a24a;location[_0xa1f2c(0x1dc)]();},fileInputTransfer[_0xa3a24a(0x269)]=()=>{const _0x2dea27=_0xa3a24a;fileInputTransfer[_0x2dea27(0x1fa)][_0x2dea27(0x2c4)]>0x0&&(handleFileSelection(fileInputTransfer[_0x2dea27(0x1fa)]),fileInputTransfer[_0x2dea27(0x2cc)]='');},connectionPanelList[_0xa3a24a(0x1aa)](_0xa3a24a(0x1b8),_0x10d54c=>{const _0x359c07=_0xa3a24a,_0x3cb32a=_0x10d54c[_0x359c07(0x280)][_0x359c07(0x2ee)](_0x359c07(0x2de));if(_0x3cb32a&&!_0x3cb32a[_0x359c07(0x26a)]){const _0x3789dc=_0x3cb32a['dataset'][_0x359c07(0x2db)];_0x3789dc&&currentFlightCode&&(ws[_0x359c07(0x24a)](JSON[_0x359c07(0x23c)]({'type':'invite-to-flight','inviteeId':_0x3789dc,'flightCode':currentFlightCode})),_0x3cb32a[_0x359c07(0x1e3)]=_0x359c07(0x1cd),_0x3cb32a[_0x359c07(0x26a)]=!![],setTimeout(()=>{const _0x57f84f=_0x359c07;_0x3cb32a[_0x57f84f(0x1e3)]=_0x57f84f(0x2bd);},0xbb8));}}),document[_0xa3a24a(0x220)](_0xa3a24a(0x1f5))['onclick']=()=>document['getElementById'](_0xa3a24a(0x1e9))['click'](),setupDragAndDrop(),setupAllModalsAndNav();}function formatBytes(_0x3e944b,_0xb23919=0x2){const _0x5c16ea=_0x5e08be;if(_0x3e944b===0x0)return _0x5c16ea(0x2c5);const _0x13b7aa=0x400,_0x40a09b=_0xb23919<0x0?0x0:_0xb23919,_0x27e705=[_0x5c16ea(0x1e7),'KB','MB','GB','TB','PB','EB','ZB','YB'],_0x3b4050=Math[_0x5c16ea(0x2b0)](Math[_0x5c16ea(0x260)](_0x3e944b)/Math[_0x5c16ea(0x260)](_0x13b7aa));return parseFloat((_0x3e944b/Math[_0x5c16ea(0x313)](_0x13b7aa,_0x3b4050))['toFixed'](_0x40a09b))+'\x20'+_0x27e705[_0x3b4050];}function updateMetrics(){const _0x2969a4=_0x5e08be,_0x4142d0=Date[_0x2969a4(0x1e1)](),_0x333343=(_0x4142d0-lastMetricsUpdateTime)/0x3e8;if(_0x333343===0x0)return;const _0x426b85=sentInInterval+receivedInInterval,_0x4511c8=_0x426b85/_0x333343;metricsSpeedEl[_0x2969a4(0x1e3)]=formatBytes(_0x4511c8)+'/s',lastMetricsUpdateTime=_0x4142d0,sentInInterval=0x0,receivedInInterval=0x0;}function getFileIcon(_0x1b6cda){const _0x2f45f7=_0x5e08be,_0x2a3963=_0x1b6cda[_0x2f45f7(0x281)]('.')[_0x2f45f7(0x249)]()['toLowerCase']();if([_0x2f45f7(0x23a),_0x2f45f7(0x1f2),_0x2f45f7(0x223),_0x2f45f7(0x320),'webp'][_0x2f45f7(0x1a8)](_0x2a3963))return _0x2f45f7(0x23b);if([_0x2f45f7(0x315),'mov','avi','mkv',_0x2f45f7(0x1c7)][_0x2f45f7(0x1a8)](_0x2a3963))return _0x2f45f7(0x217);if([_0x2f45f7(0x1d2),'wav',_0x2f45f7(0x266),_0x2f45f7(0x254)][_0x2f45f7(0x1a8)](_0x2a3963))return _0x2f45f7(0x1e6);if([_0x2f45f7(0x323)][_0x2f45f7(0x1a8)](_0x2a3963))return'<svg\x20viewBox=\x220\x200\x2020\x2020\x22\x20width=\x2228\x22\x20height=\x2228\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.5\x22><rect\x20x=\x223\x22\x20y=\x224\x22\x20width=\x2214\x22\x20height=\x2212\x22\x20rx=\x222\x22\x20fill=\x22#fff\x22\x20stroke=\x22var(--c-primary)\x22/><rect\x20x=\x226\x22\x20y=\x228\x22\x20width=\x228\x22\x20height=\x221.5\x22\x20fill=\x22var(--c-secondary)\x22/><rect\x20x=\x226\x22\x20y=\x2211\x22\x20width=\x225\x22\x20height=\x221.5\x22\x20fill=\x22var(--c-secondary)\x22/></svg>';if([_0x2f45f7(0x2cf),_0x2f45f7(0x202),'7z'][_0x2f45f7(0x1a8)](_0x2a3963))return _0x2f45f7(0x234);return _0x2f45f7(0x2d9);}function renderNetworkUsersView(_0x109d6e){const _0x2b6620=_0x5e08be;connectionPanelTitle['textContent']=_0x2b6620(0x203),connectionPanelList[_0x2b6620(0x2df)]='';if(_0x109d6e[_0x2b6620(0x2c4)]===0x0){connectionPanelList[_0x2b6620(0x2df)]=_0x2b6620(0x28e);return;}const _0x5ea7de=!!currentFlightCode;_0x109d6e['forEach'](_0x3aa269=>{const _0x35d1ab=_0x2b6620,_0x4574e6=document['createElement'](_0x35d1ab(0x2fa));_0x4574e6[_0x35d1ab(0x1fc)]=_0x35d1ab(0x28b),_0x4574e6[_0x35d1ab(0x2df)]=_0x35d1ab(0x1d5)+_0x3aa269[_0x35d1ab(0x300)]+_0x35d1ab(0x309)+_0x3aa269['id']+_0x35d1ab(0x24b)+_0x3aa269['id']+'\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+(!_0x5ea7de?_0x35d1ab(0x1da):'')+_0x35d1ab(0x1c0),connectionPanelList[_0x35d1ab(0x21f)](_0x4574e6);});}function renderInFlightView(){const _0x2c0fb4=_0x5e08be;if(!peerInfo)return;connectionPanelTitle[_0x2c0fb4(0x1e3)]=_0x2c0fb4(0x1c2),connectionPanelList['innerHTML']=_0x2c0fb4(0x1b3)+myName+_0x2c0fb4(0x1b1)+myId+_0x2c0fb4(0x201)+peerInfo[_0x2c0fb4(0x300)]+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22inflight-user-id\x22>ID:\x20'+peerInfo['id']+_0x2c0fb4(0x292);}function showToast({type:type=_0x5e08be(0x30d),title:_0x49f667,body:_0x4ab23b,duration:duration=0x2710,actions:actions=[]}){const _0x1f65e6=_0x5e08be,_0x43cf61=_0x1f65e6(0x2d6)+Date['now'](),_0x2f0714=document[_0x1f65e6(0x2a5)](_0x1f65e6(0x2fa));_0x2f0714[_0x1f65e6(0x1fc)]=_0x1f65e6(0x1ad)+type,_0x2f0714['id']=_0x43cf61;let _0x2f3d8a='';actions[_0x1f65e6(0x2c4)]>0x0&&(_0x2f3d8a=_0x1f65e6(0x2e2),actions[_0x1f65e6(0x20a)]((_0x3fe996,_0x4d8de1)=>{const _0x33f3a9=_0x1f65e6;_0x2f3d8a+='<button\x20class=\x22btn\x20'+(_0x3fe996[_0x33f3a9(0x1af)]||'')+'\x20action-btn-'+_0x4d8de1+'\x22>'+_0x3fe996[_0x33f3a9(0x255)]+_0x33f3a9(0x2d2);}),_0x2f3d8a+=_0x1f65e6(0x20f));_0x2f0714[_0x1f65e6(0x2df)]=_0x1f65e6(0x207)+_0x49f667+_0x1f65e6(0x229)+_0x4ab23b+_0x1f65e6(0x2f6)+_0x2f3d8a+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20',toastContainer[_0x1f65e6(0x21f)](_0x2f0714),setTimeout(()=>_0x2f0714[_0x1f65e6(0x282)]['add']('show'),0x64);const _0x163588=()=>{const _0x28d885=_0x1f65e6;_0x2f0714[_0x28d885(0x282)][_0x28d885(0x29c)]('show'),setTimeout(()=>_0x2f0714['remove'](),0x1f4);};let _0x599612;duration>0x0&&(_0x599612=setTimeout(_0x163588,duration)),_0x2f0714[_0x1f65e6(0x1aa)](_0x1f65e6(0x1b8),_0x32aa8f=>{const _0x50ca85=_0x1f65e6;_0x32aa8f[_0x50ca85(0x280)][_0x50ca85(0x316)](_0x50ca85(0x225))&&(clearTimeout(_0x599612),_0x163588()),actions['forEach']((_0x3e66a9,_0x292b47)=>{const _0x31f13b=_0x50ca85;_0x32aa8f[_0x31f13b(0x280)][_0x31f13b(0x316)](_0x31f13b(0x2ad)+_0x292b47)&&(_0x3e66a9[_0x31f13b(0x25c)](),clearTimeout(_0x599612),_0x163588());});});}function showInvitationToast(_0x1aecf3,_0x588526){const _0x4db51b=_0x5e08be;showToast({'type':_0x4db51b(0x30d),'title':_0x4db51b(0x262),'body':_0x4db51b(0x2d0)+_0x1aecf3+'</b>\x20has\x20invited\x20you\x20to\x20a\x20flight.','duration':0x3a98,'actions':[{'text':_0x4db51b(0x1f1),'class':_0x4db51b(0x2a9),'callback':()=>console[_0x4db51b(0x260)](_0x4db51b(0x25e))},{'text':_0x4db51b(0x297),'class':_0x4db51b(0x1c3),'callback':()=>{const _0x5441c2=_0x4db51b;isFlightCreator=![],ws[_0x5441c2(0x24a)](JSON[_0x5441c2(0x23c)]({'type':_0x5441c2(0x298),'flightCode':_0x588526}));}}]});}function resetState(){const _0x5d54ba=_0x5e08be;if(metricsInterval)clearInterval(metricsInterval);resetPeerConnectionState(),currentFlightCode=null,isFlightCreator=![],connectionType=_0x5d54ba(0x291),fileToSendQueue=[],peerInfo=null,setupContainer[_0x5d54ba(0x22f)]['display']=_0x5d54ba(0x30f),dashboard[_0x5d54ba(0x22f)][_0x5d54ba(0x2dc)]=_0x5d54ba(0x1e4),flightCodeInput[_0x5d54ba(0x2cc)]='',fileInputTransfer[_0x5d54ba(0x2cc)]='',sendingQueueDiv['innerHTML']=_0x5d54ba(0x25d),receiverQueueDiv[_0x5d54ba(0x2df)]=_0x5d54ba(0x307),totalBytesSent=0x0,totalBytesReceived=0x0,metricsSentEl['textContent']='0.00\x20GB',metricsReceivedEl[_0x5d54ba(0x1e3)]=_0x5d54ba(0x264),metricsSpeedEl[_0x5d54ba(0x1e3)]=_0x5d54ba(0x272),initializeUser();}function resetPeerConnectionState(){const _0x587831=_0x5e08be;peerConnection&&(peerConnection[_0x587831(0x28d)](),peerConnection=null);worker&&(worker[_0x587831(0x218)](),worker=null);if(metricsInterval)clearInterval(metricsInterval);dataChannel=null,chunkQueue=[],isSending=![],fileReadingDone=![],sentOffset=0x0,incomingFileInfo=null,incomingFileData=[],incomingFileReceived=0x0,currentlySendingFile=null,metricsSpeedEl['textContent']='0\x20KB/s';}discoverLocalIpAndRegister=function(){const _0x1ca6d6=_0x5e08be;ws[_0x1ca6d6(0x24a)](JSON[_0x1ca6d6(0x23c)]({'type':_0x1ca6d6(0x271),'name':myName,'localIpPrefix':_0x1ca6d6(0x2f3),'localIp':'unknown'}));},initializePeerConnection=function(_0x16504f){const _0x5c7bbd=_0x5e08be;if(peerConnection)return;let _0x18e809;connectionType==='lan'?(console[_0x5c7bbd(0x260)](_0x5c7bbd(0x2fe)),_0x18e809={'iceServers':[]}):(console[_0x5c7bbd(0x260)](_0x5c7bbd(0x308)),_0x18e809={'iceServers':ICE_SERVERS}),peerConnection=new RTCPeerConnection(_0x18e809),peerConnection[_0x5c7bbd(0x222)]=_0x450a12=>{const _0x212d2e=_0x5c7bbd;if(_0x450a12[_0x212d2e(0x248)])ws[_0x212d2e(0x24a)](JSON[_0x212d2e(0x23c)]({'type':_0x212d2e(0x1ed),'data':{'candidate':_0x450a12[_0x212d2e(0x248)]}}));},peerConnection[_0x5c7bbd(0x319)]=()=>{const _0x2fadec=_0x5c7bbd;console['log'](_0x2fadec(0x252),peerConnection[_0x2fadec(0x1f7)]),(peerConnection[_0x2fadec(0x1f7)]===_0x2fadec(0x28a)||peerConnection[_0x2fadec(0x1f7)]===_0x2fadec(0x26e)||peerConnection[_0x2fadec(0x1f7)]===_0x2fadec(0x328))&&(console[_0x2fadec(0x260)]('Peer\x20connection\x20lost\x20or\x20failed.\x20Resetting\x20state.'),handlePeerLeft());},_0x16504f?(dataChannel=peerConnection[_0x5c7bbd(0x2ce)]('fileTransfer'),setupDataChannel(),peerConnection['createOffer']()[_0x5c7bbd(0x221)](_0x272c49=>peerConnection[_0x5c7bbd(0x2d7)](_0x272c49))[_0x5c7bbd(0x221)](()=>{const _0x2e6d87=_0x5c7bbd;ws['send'](JSON['stringify']({'type':_0x2e6d87(0x1ed),'data':{'sdp':peerConnection[_0x2e6d87(0x2e9)]}}));})):peerConnection['ondatachannel']=_0x3de265=>{const _0x4ccbd9=_0x5c7bbd;dataChannel=_0x3de265[_0x4ccbd9(0x230)],setupDataChannel();};},handleSignal=async function(_0xdf35e){const _0x5a6811=_0x5e08be;!peerConnection&&(console[_0x5a6811(0x1f4)]('Received\x20signal\x20before\x20peerConnection\x20initialized.\x20Initializing\x20now.'),initializePeerConnection(isFlightCreator));if(_0xdf35e['sdp'])try{await peerConnection[_0x5a6811(0x31d)](new RTCSessionDescription(_0xdf35e[_0x5a6811(0x1bb)]));if(_0xdf35e[_0x5a6811(0x1bb)]['type']==='offer'){const _0x5e7db2=await peerConnection['createAnswer']();await peerConnection[_0x5a6811(0x2d7)](_0x5e7db2),ws[_0x5a6811(0x24a)](JSON[_0x5a6811(0x23c)]({'type':_0x5a6811(0x1ed),'data':{'sdp':peerConnection[_0x5a6811(0x2e9)]}}));}}catch(_0x9c1202){console[_0x5a6811(0x304)](_0x5a6811(0x31a),_0x9c1202);}else{if(_0xdf35e[_0x5a6811(0x248)])try{await peerConnection[_0x5a6811(0x2e8)](new RTCIceCandidate(_0xdf35e[_0x5a6811(0x248)]));}catch(_0x547239){console[_0x5a6811(0x304)]('Error\x20adding\x20ICE\x20candidate:',_0x547239);}}};
+// --- NEW: THEME TOGGLE LOGIC ---
+const themeToggle = document.getElementById('theme-toggle');
+const body = document.body;
+
+const applyTheme = (theme, persist = true) => {
+    body.setAttribute('data-theme', theme);
+    if (persist) {
+        localStorage.setItem('dropsilk-theme', theme);
+    }
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (theme === 'dark') {
+        themeToggle.setAttribute('aria-label', 'Switch to Shades Up (Light Mode)');
+        if (metaThemeColor) metaThemeColor.setAttribute('content', '#111113');
+    } else {
+        themeToggle.setAttribute('aria-label', 'Switch to Shades Down (Dark Mode)');
+        if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff');
+    }
+    const inviteModal = document.getElementById('inviteModal');
+    if (inviteModal && inviteModal.classList.contains('show')) {
+        // This call to the global generateQRCode function now works correctly.
+        generateQRCode();
+    }
+};
+
+const toggleTheme = () => {
+    const currentTheme = body.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(newTheme);
+};
+
+const initializeTheme = () => {
+    const savedTheme = localStorage.getItem('dropsilk-theme');
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else {
+        applyTheme('light', false); // Default to light mode, do not save preference yet
+    }
+};
+
+initializeTheme(); // Apply theme on initial script load to prevent FOUC
+themeToggle.addEventListener('click', toggleTheme);
+
+
+// --- NEW: Global QR Code Generator ---
+function generateQRCode() {
+    // Check if the canvas element exists, a flight code is set, and the QRCode library is loaded.
+    if (!qrCanvas || !currentFlightCode || typeof QRCode === 'undefined') {
+        if (qrCanvas) qrCanvas.style.display = 'none';
+        if (typeof QRCode === 'undefined') console.error('QRCode library not loaded');
+        return;
+    }
+
+    const url = `https://dropsilk.xyz?code=${currentFlightCode}`;
+
+    // Dynamically get the primary theme color from the CSS variables.
+    // This ensures the QR code is always "coloured" according to your theme.
+    const qrDotColor = getComputedStyle(document.documentElement).getPropertyValue('--c-primary').trim();
+
+    const qrColors = {
+        dark: qrDotColor,  // The color of the QR code's "dots" will now be your theme's primary color.
+        light: '#00000000' // A transparent background for the "light" areas.
+    };
+
+    // Render the QR code to the canvas.
+    QRCode.toCanvas(qrCanvas, url, { width: 200, margin: 2, color: qrColors, errorCorrectionLevel: 'M' }, (err) => {
+        if (err) {
+            console.error('QR Code generation error:', err);
+        }
+    });
+}
+
+
+// --- CONFIG ---
+// We will replace this URL after deploying the backend in the next step.
+const WEBSOCKET_URL = "wss://dropsilk-server.onrender.com";
+const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
+
+// --- STATE ---
+let ws, peerConnection, dataChannel, worker;
+let myId = "",
+    myName = "",
+    currentFlightCode = null,
+    isFlightCreator = false,
+    connectionType = 'wan',
+    peerInfo = null, // NEW: To store connected peer's info
+    lastNetworkUsers = []; // Keep track of last user list
+let fileToSendQueue = [];
+let currentlySendingFile = null;
+const fileIdMap = new Map();
+let captchaWidgetId = null; // NEW: To hold the ID of the rendered CAPTCHA
+
+
+// --- NEW: METRICS STATE ---
+let totalBytesSent = 0,
+    totalBytesReceived = 0,
+    metricsInterval = null,
+    lastMetricsUpdateTime = 0,
+    sentInInterval = 0,
+    receivedInInterval = 0;
+
+
+// --- UI ELEMENTS ---
+const setupContainer = document.querySelector(".main-content");
+const userNameDisplay = document.getElementById("userNameDisplay");
+const createFlightBtn = document.getElementById("createFlightBtn");
+const joinFlightBtn = document.getElementById("joinFlightBtn");
+const flightCodeInput = document.getElementById("flightCodeInput");
+const flightCodeInputWrapper = flightCodeInput.closest('.flight-code-input-wrapper'); // NEW
+
+const dashboard = document.getElementById("dashboard");
+const dashboardFlightCode = document.getElementById("dashboard-flight-code");
+const dashboardFlightStatus = document.getElementById("dashboard-flight-status");
+const leaveFlightBtnDashboard = document.getElementById("leaveFlightBtnDashboard");
+const fileInputTransfer = document.getElementById("fileInput_transfer");
+const sendingQueueDiv = document.getElementById("sending-queue");
+const receiverQueueDiv = document.getElementById("receiver-queue");
+const toastContainer = document.getElementById("toast-container");
+const qrCanvas = document.getElementById('qrCanvas'); // Moved to global scope
+
+// --- MODIFIED: Dynamic connection panel elements ---
+const connectionPanelTitle = document.getElementById("connection-panel-title");
+const connectionPanelList = document.getElementById("connection-panel-list");
+
+
+// --- NEW: METRICS UI ELEMENTS ---
+const metricsSentEl = document.getElementById('metrics-sent');
+const metricsReceivedEl = document.getElementById('metrics-received');
+const metricsSpeedEl = document.getElementById('metrics-speed');
+
+// This function will be called to switch to the dashboard view
+let enterFlightMode;
+
+// --- INITIALIZATION & CORE LOGIC ---
+document.addEventListener("DOMContentLoaded", () => {
+    const dashboardFlightCodeBtn = document.getElementById('dashboard-flight-code');
+
+    function setFlightCode(code) {
+        dashboardFlightCodeBtn.setAttribute('data-code', code);
+        dashboardFlightCodeBtn.innerHTML = `<span class="code-text">${code}</span>`;
+        if (!dashboardFlightCodeBtn.querySelector('.copy-feedback')) {
+            const feedback = document.createElement('span');
+            feedback.className = 'copy-feedback';
+            feedback.textContent = 'Copied!';
+            dashboardFlightCodeBtn.appendChild(feedback);
+        }
+    }
+
+    dashboardFlightCodeBtn.addEventListener('click', async (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const code = dashboardFlightCodeBtn.getAttribute('data-code');
+        if (!code) return;
+        try {
+            if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(code); }
+            else {
+                const textarea = document.createElement('textarea');
+                textarea.value = code; textarea.style.position = 'fixed'; textarea.style.opacity = '0';
+                document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); document.body.removeChild(textarea);
+            }
+            dashboardFlightCodeBtn.classList.add('copied');
+            setTimeout(() => dashboardFlightCodeBtn.classList.remove('copied'), 1200);
+        } catch (error) {
+            console.error('Copy failed:', error);
+            const codeSpan = dashboardFlightCodeBtn.querySelector('.code-text');
+            if (codeSpan) {
+                const range = document.createRange(); range.selectNodeContents(codeSpan);
+                const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+            }
+        }
+    });
+
+    enterFlightMode = function(flightCode) {
+        currentFlightCode = flightCode;
+        setupContainer.style.display = "none";
+        dashboard.style.display = "flex";
+        setFlightCode(flightCode);
+        // Re-render the network list to enable invite buttons if not yet connected
+        if (!peerInfo) {
+            renderNetworkUsersView(lastNetworkUsers || []);
+        }
+    }
+
+    initializeUser();
+    initializeWebSocket();
+    setupEventListeners();
+});
+
+// --- NEW HELPER: IP ADDRESS CHECKS ---
+function isPrivateIp(ip) {
+    if (!ip) return false;
+    // Exclude CGNAT range 100.64.0.0/10 as it's not a true private network for our purpose
+    const cgnatMatch = ip.match(/^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\./);
+    if (cgnatMatch) {
+        return false;
+    }
+    // Check for private IP ranges (RFC 1918)
+    return ip.startsWith("10.") ||
+        ip.startsWith("192.168.") ||
+        ip.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./);
+}
+
+// --- NEW: GLOBAL MODAL UTILITIES ---
+async function copyToClipboard(text, button, successText = 'Copied!') {
+    try {
+        await navigator.clipboard.writeText(text);
+        showButtonSuccess(button, successText);
+    } catch (error) {
+        console.error('Copy failed:', error);
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed'; textarea.style.opacity = '0';
+        document.body.appendChild(textarea); textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showButtonSuccess(button, successText);
+    }
+}
+
+function showButtonSuccess(button, text) {
+    if (!button) return;
+    const originalText = button.innerHTML;
+    button.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+        </svg>
+        ${text}
+        `;
+    button.classList.add('success');
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.classList.remove('success');
+    }, 2000);
+}
+
+// --- MODIFIED: Refactored Modal Setup ---
+function setupAllModalsAndNav() {
+    const modals = {
+        invite: { overlay: document.getElementById('inviteModal'), trigger: document.getElementById('inviteBtn'), close: document.getElementById('closeInviteModal') },
+        about: { overlay: document.getElementById('aboutModal'), trigger: document.getElementById('aboutBtn'), close: document.getElementById('closeAboutModal') },
+        contact: { overlay: document.getElementById('contactModal'), trigger: document.getElementById('contactBtn'), close: document.getElementById('closeContactModal') },
+        terms: { overlay: document.getElementById('termsModal'), trigger: document.getElementById('termsBtn'), close: document.getElementById('closeTermsModal') },
+        privacy: { overlay: document.getElementById('privacyModal'), trigger: document.getElementById('privacyBtn'), close: document.getElementById('closePrivacyModal') },
+        security: { overlay: document.getElementById('securityModal'), trigger: document.getElementById('securityBtn'), close: document.getElementById('closeSecurityModal') },
+        faq: { overlay: document.getElementById('faqModal'), trigger: document.getElementById('faqBtn'), close: document.getElementById('closeFaqModal') }
+    };
+
+    const setupModal = (modalName, modalConfig) => {
+        if (!modalConfig.overlay || !modalConfig.trigger || !modalConfig.close) return;
+        const showModal = () => { modalConfig.overlay.classList.add('show'); document.body.style.overflow = 'hidden'; };
+        const hideModal = () => {
+            modalConfig.overlay.classList.remove('show');
+            document.body.style.overflow = '';
+
+            // Add specific reset logic for contact modal when it closes
+            if (modalName === 'contact') {
+                const initialState = document.getElementById('email-view-initial-state');
+                const captchaState = document.getElementById('email-view-captcha-state');
+                const revealedState = document.getElementById('email-view-revealed-state');
+                const captchaPretext = document.getElementById('captcha-pretext'); // <-- Get element here too
+
+                if(initialState) initialState.style.display = 'block';
+                if(captchaState) captchaState.style.display = 'none';
+                if(revealedState) revealedState.style.display = 'none';
+                if(captchaPretext) captchaPretext.style.display = 'block'; // <-- ADD THIS LINE
+
+                // Reset the reCAPTCHA widget if it exists and grecaptcha is available
+                if (window.grecaptcha && captchaWidgetId !== null) {
+                    grecaptcha.reset(captchaWidgetId);
+                }
+            }
+        };
+        modalConfig.trigger.addEventListener('click', showModal);
+        modalConfig.close.addEventListener('click', hideModal);
+        modalConfig.overlay.addEventListener('click', (e) => { if (e.target === modalConfig.overlay) hideModal(); });
+    };
+
+    Object.entries(modals).forEach(([name, config]) => setupModal(name, config));
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.show').forEach(m => {
+                // Find the corresponding close button and trigger its click to ensure reset logic runs
+                const modalConfig = Object.values(modals).find(conf => conf.overlay === m);
+                if (modalConfig && modalConfig.close) {
+                    modalConfig.close.click();
+                } else {
+                    m.classList.remove('show'); // Fallback for modals not in the config
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+    });
+
+    // Invite Modal Specifics
+    const inviteModalSpecifics = () => {
+        const modalFlightCode = document.getElementById('modalFlightCode');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const shareNativeBtn = document.getElementById('shareNativeBtn');
+        const copyCodeBtn = document.getElementById('copyCodeBtn');
+
+        if (navigator.share) shareNativeBtn.style.display = 'flex';
+
+        modals.invite.trigger.addEventListener('click', () => {
+            if (!currentFlightCode) return;
+            modalFlightCode.textContent = currentFlightCode;
+            generateQRCode();
+        });
+
+        copyLinkBtn.addEventListener('click', () => copyToClipboard(`https://dropsilk.xyz?code=${currentFlightCode}`, copyLinkBtn, 'Link Copied!'));
+        copyCodeBtn.addEventListener('click', () => copyToClipboard(currentFlightCode, copyCodeBtn, 'Code Copied!'));
+        shareNativeBtn.addEventListener('click', async () => {
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: 'Join my DropSilk flight!', text: `Join my file transfer session with code: ${currentFlightCode}`, url: `https://dropsilk.xyz?code=${currentFlightCode}` });
+                } catch (error) { if (error.name !== 'AbortError') copyToClipboard(`https://dropsilk.xyz?code=${currentFlightCode}`, shareNativeBtn, 'Link Copied!'); }
+            }
+        });
+    };
+
+    // Contact Modal Specifics with CAPTCHA
+    const contactModalSpecifics = () => {
+        const viewEmailBtn = document.getElementById('viewEmailBtn');
+        const copyEmailBtn = document.getElementById('copyEmailBtn');
+        const initialState = document.getElementById('email-view-initial-state');
+        const captchaState = document.getElementById('email-view-captcha-state');
+        const revealedState = document.getElementById('email-view-revealed-state');
+        const recaptchaContainer = document.getElementById('recaptcha-container');
+        const captchaPretext = document.getElementById('captcha-pretext'); // <-- ADD THIS LINE
+
+        let captchaReady = false;
+
+        // This function is called by the Google script's `onload` parameter
+        window.onRecaptchaLoad = function() {
+            captchaReady = true;
+        };
+
+        const renderCaptcha = () => {
+            if (recaptchaContainer.innerHTML.trim() === '') {
+                captchaWidgetId = grecaptcha.render('recaptcha-container', {
+                    'sitekey': '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', // Google's v2 Test Key
+                    'callback': onCaptchaSuccess,
+                    'theme': document.body.getAttribute('data-theme') || 'light'
+                });
+            }
+        };
+
+        viewEmailBtn.addEventListener('click', () => {
+            initialState.style.display = 'none';
+            captchaState.style.display = 'block';
+
+            if (captchaReady) {
+                renderCaptcha();
+            } else {
+                // If the google script hasn't loaded yet, wait for it.
+                const interval = setInterval(() => {
+                    if (captchaReady) {
+                        clearInterval(interval);
+                        renderCaptcha();
+                    }
+                }, 100);
+            }
+        });
+
+        // This must be on the window object to be accessible by the reCAPTCHA script
+        window.onCaptchaSuccess = function(token) {
+            console.log('reCAPTCHA verified. Token:', token);
+            captchaState.style.display = 'none';
+            revealedState.style.display = 'block';
+            captchaPretext.style.display = 'none';
+        };
+
+        copyEmailBtn.addEventListener('click', () => copyToClipboard('aratahmed@gmail.com', copyEmailBtn, 'Email Copied!'));
+    };
+
+    inviteModalSpecifics();
+    contactModalSpecifics();
+}
+
+function setupDragAndDrop() {
+    const dropZone = document.querySelector('.drop-zone');
+    let dragCounter = 0;
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => document.addEventListener(eventName, e => {e.preventDefault(); e.stopPropagation();}));
+    ['dragenter', 'dragover'].forEach(eventName => dropZone.addEventListener(eventName, handleDragEnter, false));
+    ['dragleave', 'drop'].forEach(eventName => dropZone.addEventListener(eventName, handleDragLeave, false));
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    document.addEventListener('dragenter', e => { if (e.dataTransfer.types.includes('Files')) { dragCounter++; document.body.classList.add('dragging'); }});
+    document.addEventListener('dragleave', e => { dragCounter--; if (dragCounter <= 0) { dragCounter = 0; document.body.classList.remove('dragging'); }});
+    document.addEventListener('drop', e => { dragCounter = 0; document.body.classList.remove('dragging'); });
+
+    function handleDragEnter(e) {
+        dropZone.classList.add('drag-over');
+        if (e.dataTransfer.types.includes('Files')) {
+            dropZone.classList.add('drag-active');
+            if (dropZone.querySelector('p').textContent === 'Drag & Drop files or folders') {
+                dropZone.querySelector('p').textContent = 'Drop your files here!';
+                dropZone.querySelector('.secondary-text').textContent = 'Release to add to queue';
+            }
+        }
+    }
+
+    function handleDragLeave(e) {
+        if (!dropZone.contains(e.relatedTarget)) {
+            dropZone.classList.remove('drag-over', 'drag-active');
+            dropZone.querySelector('p').textContent = 'Drag & Drop files or folders';
+            dropZone.querySelector('.secondary-text').textContent = 'or select manually';
+        }
+    }
+    function handleDrop(e) {
+        dropZone.classList.remove('drag-over', 'drag-active');
+        dropZone.querySelector('p').textContent = 'Drag & Drop files or folders';
+        dropZone.querySelector('.secondary-text').textContent = 'or select manually';
+        handleFileSelection(e.dataTransfer.files);
+    }
+}
+
+// --- CODE TRUNCATE ---
+const input = document.querySelector('.flight-code-input-wrapper input');
+input.addEventListener('input', function () {
+    if (this.value.length > 6) {
+        this.value = this.value.slice(0, 6);
+    }
+});
+
+function initializeUser() { myName = generateRandomName(); userNameDisplay.textContent = myName; }
+function generateRandomName() {
+    const adjectives = ["Swift", "Clever", "Silent", "Agile", "Brave", "Bright", "Eager", "Bold", "Flying", "Soaring", "Windy", "Cloudy"];
+    const nouns = ["Fox", "Jaguar", "Eagle", "Sparrow", "Lion", "Tiger", "River", "Sky", "Aero", "Jet", "Pilot", "Wing"];
+    return `${adjectives[Math.floor(Math.random() * adjectives.length)]}${nouns[Math.floor(Math.random() * nouns.length)]}${Math.floor(Math.random() * 900) + 100}`;
+}
+
+function initializeWebSocket() {
+    ws = new WebSocket(WEBSOCKET_URL);
+    ws.onopen = () => discoverLocalIpAndRegister(); // Still useful for LAN/WAN detection
+    ws.onmessage = async (event) => {
+        const msg = JSON.parse(event.data);
+        // console.log("Received:", msg);
+        switch (msg.type) {
+            case "registered": myId = msg.id; break;
+            case "users-on-network-update":
+                lastNetworkUsers = msg.users;
+                if (!peerInfo) { // Only render if we're not in an active P2P session
+                    renderNetworkUsersView(msg.users);
+                }
+                break;
+            case "flight-invitation": showInvitationToast(msg.fromName, msg.flightCode); break;
+            case "flight-created": enterFlightMode(msg.flightCode); break;
+            case "peer-joined":
+                connectionType = msg.connectionType || 'wan';
+                peerInfo = msg.peer;
+                console.log(`Peer ${peerInfo.name} joined. Connection type: ${connectionType}`);
+                handlePeerJoined(msg.flightCode);
+                break;
+            case "signal": if (!peerConnection) initializePeerConnection(isFlightCreator); await handleSignal(msg.data); break;
+            case "peer-left": handlePeerLeft(); break;
+            case "error": handleServerError(msg.message); break;
+        }
+    };
+    ws.onclose = () => {
+        showToast({
+            type: 'danger',
+            title: 'Connection Lost',
+            body: 'Connection to the server was lost. Please refresh the page to reconnect.',
+            duration: 0 // Persist until dismissed
+        });
+        resetState();
+    };
+    ws.onerror = (error) => console.error("WebSocket error:", error);
+}
+
+// --- NEW: Centralized Error Handling ---
+function handleServerError(message) {
+    console.error("Server error:", message);
+    // Check for specific, user-facing errors
+    if (message.includes("Flight not found")) {
+        flightCodeInputWrapper.classList.add('input-error');
+        setTimeout(() => flightCodeInputWrapper.classList.remove('input-error'), 1500);
+
+        showToast({
+            type: 'danger',
+            title: 'Flight Not Found',
+            body: "Please double-check the 6-character code and try again. The flight creator must be online. If you're on the same Wi-Fi, they can invite you directly from their dashboard.",
+            duration: 8000
+        });
+    } else {
+        // Generic error for other problems
+        showToast({
+            type: 'danger',
+            title: 'An Error Occurred',
+            body: message,
+            duration: 8000
+        });
+    }
+}
+
+
+function handlePeerJoined(flightCode) {
+    if (!currentFlightCode) { // Receiver joins
+        enterFlightMode(flightCode);
+    }
+    if (!peerConnection) {
+        initializePeerConnection(isFlightCreator);
+    }
+    dashboardFlightStatus.textContent = `Peer Connected! (${connectionType.toUpperCase()} mode)`;
+    dashboardFlightStatus.style.color = '#15803d';
+    dashboardFlightStatus.style.backgroundColor = '#f0fdf4';
+    dashboardFlightStatus.style.borderColor = '#bbf7d0';
+    renderInFlightView();
+    processFileToSendQueue();
+}
+
+function handlePeerLeft() {
+    console.log("Peer has left the flight.");
+    peerInfo = null; // Clear peer info
+    resetPeerConnectionState();
+    dashboardFlightStatus.textContent = 'Peer disconnected. Waiting...';
+    dashboardFlightStatus.style.color = '#d97706';
+    dashboardFlightStatus.style.backgroundColor = '#fffbe6';
+    dashboardFlightStatus.style.borderColor = '#fde68a';
+    // Revert to network view. The server will send a `users-on-network-update` which will
+    // trigger the render, but we can be proactive to make the UI feel instant.
+    renderNetworkUsersView(lastNetworkUsers);
+}
+
+// --- FILE TRANSFER & UI LOGIC (WITH FIXES) ---
+let chunkQueue = [], isSending = false, fileReadingDone = false, sentOffset = 0;
+const HIGH_WATER_MARK = 1024 * 1024;
+let incomingFileInfo = null, incomingFileData = [], incomingFileReceived = 0;
+
+function setupDataChannel() {
+    dataChannel.onopen = () => {
+        console.log("Data channel opened!");
+        // The peer-joined message from the server already handles the UI update.
+        // Re-calling handlePeerJoined here would be redundant.
+
+        // NEW: Start tracking metrics when channel opens
+        lastMetricsUpdateTime = Date.now();
+        if (metricsInterval) clearInterval(metricsInterval);
+        metricsInterval = setInterval(updateMetrics, 1000);
+    };
+    dataChannel.onclose = () => {
+        console.log("Data channel closed.");
+        handlePeerLeft();
+        // NEW: Stop tracking metrics when channel closes
+        if (metricsInterval) clearInterval(metricsInterval);
+        metricsSpeedEl.textContent = '0 KB/s';
+    };
+    dataChannel.onerror = (error) => console.error("Data channel error:", error);
+    dataChannel.onbufferedamountlow = () => drainQueue();
+    dataChannel.onmessage = (event) => {
+        // METADATA
+        if (typeof event.data === "string" && event.data.startsWith("{")) {
+            incomingFileInfo = JSON.parse(event.data);
+            incomingFileData = [];
+            incomingFileReceived = 0;
+
+            if (receiverQueueDiv.querySelector('.empty-state')) receiverQueueDiv.innerHTML = '';
+
+            const fileId = `file-recv-${Date.now()}`;
+            const fileIcon = getFileIcon(incomingFileInfo.name);
+            receiverQueueDiv.insertAdjacentHTML('beforeend', `
+                    <div class="queue-item" id="${fileId}">
+                        <div class="file-icon">${fileIcon}</div>
+                        <div class="file-details">
+                            <div class="file-details__name" title="${incomingFileInfo.name}"><span>${incomingFileInfo.name}</span></div>
+                            <progress class="file-details__progress-bar" value="0" max="1"></progress>
+                            <div class="file-details__status"><span class="percent">0%</span></div>
+                        </div>
+                        <div class="file-action"></div>
+                    </div>`);
+            fileIdMap.set(incomingFileInfo.name, fileId);
+            return;
+        }
+        // EOF
+        if (event.data === "EOF") {
+            const receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
+            const fileId = fileIdMap.get(incomingFileInfo.name);
+            const fileElement = document.getElementById(fileId);
+
+            if (fileElement) {
+                const actionContainer = fileElement.querySelector('.file-action');
+                actionContainer.innerHTML = ''; // Clear any previous content
+
+                const isVideo = incomingFileInfo.type.startsWith('video/') || incomingFileInfo.name.toLowerCase().endsWith('.mkv');
+
+                if (isVideo && window.videoPlayer) {
+                    const actionGroup = document.createElement('div');
+                    actionGroup.className = 'file-action-group';
+
+                    const previewBtn = document.createElement('button');
+                    previewBtn.className = 'btn btn-secondary';
+                    previewBtn.textContent = 'Preview';
+                    previewBtn.onclick = () => videoPlayer.open(receivedBlob, incomingFileInfo.name);
+
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(receivedBlob);
+                    downloadLink.download = incomingFileInfo.name;
+                    downloadLink.className = 'btn btn-primary';
+                    downloadLink.textContent = 'Save';
+
+                    actionGroup.appendChild(previewBtn);
+                    actionGroup.appendChild(downloadLink);
+                    actionContainer.appendChild(actionGroup);
+                } else {
+                    // Fallback for non-videos or if player fails to load
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(receivedBlob);
+                    downloadLink.download = incomingFileInfo.name;
+                    downloadLink.className = 'btn btn-primary';
+                    downloadLink.textContent = 'Download';
+                    actionContainer.appendChild(downloadLink);
+                }
+
+                fileElement.querySelector('.percent').textContent = 'Complete!';
+            }
+            return;
+        }
+        // CHUNK
+        const chunkSize = event.data.byteLength || event.data.size || 0;
+        // NEW: Update received metrics
+        totalBytesReceived += chunkSize;
+        receivedInInterval += chunkSize;
+        metricsReceivedEl.textContent = formatBytes(totalBytesReceived);
+
+        incomingFileData.push(event.data);
+        incomingFileReceived += chunkSize;
+        if (incomingFileInfo?.size) {
+            const progressValue = incomingFileReceived / incomingFileInfo.size;
+            const fileId = fileIdMap.get(incomingFileInfo.name);
+            const fileElement = document.getElementById(fileId);
+            if (fileElement) {
+                fileElement.querySelector('progress').value = progressValue;
+                fileElement.querySelector('.percent').textContent = `${Math.round(progressValue * 100)}%`;
+            }
+        }
+    };
+}
+
+function startFileSend(file) {
+    currentlySendingFile = file;
+    const fileId = fileIdMap.get(file);
+    const fileElement = document.getElementById(fileId);
+    isSending = true;
+
+    if(fileElement) {
+        fileElement.innerHTML = `
+                <div class="file-icon">${getFileIcon(file.name)}</div>
+                <div class="file-details">
+                    <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
+                    <progress class="file-details__progress-bar" value="0" max="1"></progress>
+                    <div class="file-details__status">
+                        <span class="percent">0%</span>
+                        <span class="status-text">Sending...</span>
+                    </div>
+                </div>`;
+    }
+
+    if (worker) worker.terminate();
+    worker = new Worker("sender.worker.js");
+    chunkQueue = []; fileReadingDone = false; sentOffset = 0;
+    dataChannel.send(JSON.stringify({ name: file.name, type: file.type, size: file.size }));
+    worker.onmessage = (e) => {
+        const { type, chunk } = e.data;
+        if (type === "chunk") {
+            chunkQueue.push(chunk);
+            drainQueue();
+        } else if (type === "done") {
+            fileReadingDone = true;
+            worker.terminate(); worker = null;
+            drainQueue();
+        }
+    };
+    worker.postMessage(file);
+}
+
+function drainQueue() {
+    const file = currentlySendingFile;
+    if (!file) return;
+
+    const fileId = fileIdMap.get(file);
+    const fileElement = document.getElementById(fileId);
+
+    while (chunkQueue.length > 0) {
+        if (dataChannel.bufferedAmount > HIGH_WATER_MARK) return;
+        const chunk = chunkQueue.shift();
+        dataChannel.send(chunk);
+
+        // NEW: Update sent metrics
+        const chunkSize = chunk.byteLength;
+        totalBytesSent += chunkSize;
+        sentInInterval += chunkSize;
+        metricsSentEl.textContent = formatBytes(totalBytesSent);
+
+        sentOffset += chunkSize;
+        if (fileElement) {
+            const progressValue = sentOffset / file.size;
+            fileElement.querySelector('progress').value = progressValue;
+            fileElement.querySelector('.percent').textContent = `${Math.round(progressValue * 100)}%`;
+        }
+    }
+
+    if (fileReadingDone && chunkQueue.length === 0) {
+        dataChannel.send("EOF");
+        if(fileElement) {
+            fileElement.querySelector('.status-text').textContent = 'Sent!';
+            fileElement.querySelector('.percent').textContent = `100%`;
+        }
+        isSending = false;
+        currentlySendingFile = null;
+        processFileToSendQueue();
+    }
+}
+
+function processFileToSendQueue() {
+    if (fileToSendQueue.length > 0 && dataChannel && dataChannel.readyState === 'open' && !isSending) {
+        const nextFile = fileToSendQueue.shift();
+        startFileSend(nextFile);
+    }
+}
+
+// Define the global file handling function
+function handleFileSelection(files) {
+    if (files.length === 0) return;
+
+    // Add success animation for drag and drop
+    const dropZone = document.querySelector('.drop-zone');
+    if (dropZone) {
+        dropZone.style.transform = 'scale(0.98)';
+        dropZone.style.transition = 'transform 0.1s ease-out';
+
+        setTimeout(() => {
+            dropZone.style.transform = '';
+            dropZone.style.transition = '';
+        }, 100);
+    }
+
+    if (sendingQueueDiv.querySelector('.empty-state')) {
+        sendingQueueDiv.innerHTML = '';
+    }
+
+    Array.from(files).forEach(file => {
+        fileToSendQueue.push(file);
+        const fileId = `send-${Date.now()}-${Math.random()}`;
+        fileIdMap.set(file, fileId);
+
+        sendingQueueDiv.insertAdjacentHTML('beforeend', `
+            <div class="queue-item" id="${fileId}" style="opacity: 0; transform: translateY(10px);">
+                <div class="file-icon">${getFileIcon(file.name)}</div>
+                <div class="file-details">
+                    <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
+                    <div class="file-details__status"><span class="status-text">Queued</span></div>
+                </div>
+            </div>
+        `);
+
+        // Animate the new file item in
+        const fileElement = document.getElementById(fileId);
+        setTimeout(() => {
+            fileElement.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+            fileElement.style.opacity = '1';
+            fileElement.style.transform = 'translateY(0)';
+        }, 50);
+    });
+
+    processFileToSendQueue();
+    console.log(`Added ${files.length} file(s) to the sending queue`);
+}
+
+// --- EVENT LISTENERS & UI HELPERS ---
+function setupEventListeners() {
+    createFlightBtn.onclick = () => { isFlightCreator = true; ws.send(JSON.stringify({ type: "create-flight" })); };
+    joinFlightBtn.onclick = () => {
+        const code = flightCodeInput.value.trim().toUpperCase();
+        if (code) { isFlightCreator = false; ws.send(JSON.stringify({ type: "join-flight", flightCode: code })); }
+        else {
+            flightCodeInputWrapper.classList.add('input-error');
+            setTimeout(() => flightCodeInputWrapper.classList.remove('input-error'), 1500);
+            showToast({ type: 'danger', title: 'Empty Code', body: 'Please enter a 6-character flight code to join.', duration: 5000 });
+        }
+    };
+    leaveFlightBtnDashboard.onclick = () => { location.reload(); };
+
+    fileInputTransfer.onchange = () => {
+        if (fileInputTransfer.files.length > 0) {
+            handleFileSelection(fileInputTransfer.files);
+            fileInputTransfer.value = ""; // Clear the input
+        }
+    };
+
+    // --- MODIFIED: Event delegation for invite buttons on the dynamic panel ---
+    connectionPanelList.addEventListener('click', (e) => {
+        const inviteBtn = e.target.closest('.invite-user-btn');
+        if (inviteBtn && !inviteBtn.disabled) {
+            const inviteeId = inviteBtn.dataset.inviteeId;
+            if (inviteeId && currentFlightCode) {
+                ws.send(JSON.stringify({
+                    type: 'invite-to-flight',
+                    inviteeId: inviteeId,
+                    flightCode: currentFlightCode
+                }));
+                // Provide feedback
+                inviteBtn.textContent = 'Invited';
+                inviteBtn.disabled = true;
+                setTimeout(() => {
+                    inviteBtn.textContent = 'Invite';
+                    // The button will be re-enabled on the next user list update if still applicable
+                }, 3000);
+            }
+        }
+    });
+
+    document.getElementById('shareAppBtn').onclick = () => document.getElementById('inviteBtn').click();
+
+    // Initialize drag and drop and ALL modals
+    setupDragAndDrop();
+    setupAllModalsAndNav();
+}
+
+
+
+// --- NEW: METRICS FUNCTIONS ---
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+function updateMetrics() {
+    const now = Date.now();
+    const elapsedSeconds = (now - lastMetricsUpdateTime) / 1000;
+    if (elapsedSeconds === 0) return;
+
+    const totalBytesInInterval = sentInInterval + receivedInInterval;
+    const speed = totalBytesInInterval / elapsedSeconds;
+
+    metricsSpeedEl.textContent = `${formatBytes(speed)}/s`;
+
+    // Reset for the next interval
+    lastMetricsUpdateTime = now;
+    sentInInterval = 0;
+    receivedInInterval = 0;
+}
+
+
+function getFileIcon(fileName) {
+    const extension = fileName.split('.').pop().toLowerCase();
+
+    // Image
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) return `<svg viewBox="0 0 20 20" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="12" rx="2" fill="#e3f7fd" stroke="var(--c-primary)"/><circle cx="7" cy="8" r="1.5" fill="var(--c-primary)"/><path d="M3 16l4-5 3 4 4-6 3 7" stroke="var(--c-secondary)" stroke-width="1.5" fill="none"/></svg>`;
+    // Video
+    if (['mp4', 'mov', 'avi', 'mkv', 'm4v'].includes(extension)) return `<svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4.2" y="5.6" width="19.6" height="16.8" rx="2.8" ry="2.8" fill="#f5eafd" stroke="var(--c-secondary)"/><polygon points="9.2 10 17.9 14.2 9.2 18.4" fill="var(--c-primary)"/></svg>`;
+    // Audio
+    if (['mp3', 'wav', 'ogg', 'm4a'].includes(extension)) return `<svg viewBox="0 0 28 28" width="28" height="28" fill="none"><rect x="4.2" y="5.6" width="19.6" height="16.8" rx="2.8" ry="2.8" fill="#eafdff" stroke="var(--c-primary)"/><path d="M11.3,9.6v7.3c-.4-.3-.8-.4-1.4-.4-1.1,0-2.1.8-2.1,1.7s.9,1.7,2.1,1.7,2.1-.8,2.1-1.7v-6.8l6.5-.8v5.5c-.4-.3-.8-.4-1.4-.4-1.1,0-2.1.8-2.1,1.7s.9,1.7,2.1,1.7,2.1-.8,2.1-1.7v-8.5c0-.5-.5-.9-1-.9l-6.1.6c-.5,0-.8.4-.8.9Z" fill="var(--c-secondary)"/></svg>`;
+    // PDF/Document
+    if (['pdf'].includes(extension)) return `<svg viewBox="0 0 20 20" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="12" rx="2" fill="#fff" stroke="var(--c-primary)"/><rect x="6" y="8" width="8" height="1.5" fill="var(--c-secondary)"/><rect x="6" y="11" width="5" height="1.5" fill="var(--c-secondary)"/></svg>`;
+    // Archive/Zip
+    if (['zip', 'rar', '7z'].includes(extension)) return `<svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4.2" y="5.6" width="19.6" height="16.8" rx="2.8" ry="2.8" fill="#fffaf7" stroke="var(--c-secondary)"/><rect x="12.6" y="8.4" width="2.8" height="11.2" fill="var(--c-primary)"/><rect x="9.8" y="14" width="8.4" height="2.8" fill="var(--c-secondary)"/></svg>`;
+    // Generic File
+    return `<svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4.2" y="5.6" width="19.6" height="16.8" rx="2.8" ry="2.8" fill="#f4f4f5" stroke="var(--c-primary)"/><path d="M12.2,16v-.4c0-.6.1-1.2.3-1.6.2-.4.7-.8,1.4-1.2.6-.3.9-.6,1.1-.8.2-.2.3-.4.3-.7s-.1-.6-.4-.8c-.3-.2-.7-.3-1.1-.3s-.9.1-1.2.3c-.3.2-.5.5-.6.8h-2.5c0-.7.3-1.3.7-1.8s.9-.9,1.5-1.2,1.4-.5,2.2-.5,1.5.1,2.1.4,1.1.7,1.4,1.2c.3.5.5,1.1.5,1.8s-.2,1.1-.5,1.6c-.3.5-.8.9-1.5,1.3-.5.3-.9.6-1,.8-.2.2-.2.5-.2.7v.2h-2.5ZM13.5,16.9c.4,0,.8.2,1.1.5.3.3.5.7.5,1.1s-.2.8-.5,1.1c-.3.3-.7.5-1.1.5s-.8-.2-1.1-.5c-.3-.3-.5-.7-.5-1.1s.2-.8.5-1.1c.3-.3.7-.5,1.1-.5Z" fill="var(--c-secondary)" stroke="var(--c-primary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8"/></svg>`;
+}
+
+function renderNetworkUsersView(users) {
+    connectionPanelTitle.textContent = "Users on Your Network";
+    connectionPanelList.innerHTML = '';
+    if (users.length === 0) {
+        connectionPanelList.innerHTML = '<div class="empty-state">No other users found on your network.</div>';
+        return;
+    }
+
+    const isInFlight = !!currentFlightCode;
+    users.forEach(user => {
+        const userEl = document.createElement('div');
+        userEl.className = 'network-user-item';
+        userEl.innerHTML = `
+                <div class="network-user-details">
+                    <span class="network-user-name">${user.name}</span>
+                    <span class="network-user-id">ID: ${user.id}</span>
+                </div>
+                <button
+                    class="btn btn-primary invite-user-btn"
+                    data-invitee-id="${user.id}"
+                    ${!isInFlight ? 'disabled title="Create or join a flight to invite users"' : ''}>
+                    Invite
+                </button>
+            `;
+        connectionPanelList.appendChild(userEl);
+    });
+}
+
+// --- NEW: Renders the "In Flight" view ---
+function renderInFlightView() {
+    if (!peerInfo) return; // Safety check
+    connectionPanelTitle.textContent = "In Flight With";
+    connectionPanelList.innerHTML = `
+            <div class="inflight-user-item">
+                <div class="inflight-user-details">
+                    <span class="inflight-user-name">${myName}</span>
+                    <span class="user-badge">You</span>
+                </div>
+                <span class="inflight-user-id">ID: ${myId}</span>
+            </div>
+            <div class="inflight-user-item">
+                <div class="inflight-user-details">
+                    <span class="inflight-user-name">${peerInfo.name}</span>
+                </div>
+                <span class="inflight-user-id">ID: ${peerInfo.id}</span>
+            </div>
+        `;
+}
+
+// --- NEW: Generic Toast Creation Function ---
+function showToast({ type = 'info', title, body, duration = 10000, actions = [] }) {
+    const toastId = `toast-${Date.now()}`;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.id = toastId;
+
+    let actionsHTML = '';
+    if (actions.length > 0) {
+        actionsHTML = '<div class="toast-actions">';
+        actions.forEach((action, index) => {
+            actionsHTML += `<button class="btn ${action.class || ''} action-btn-${index}">${action.text}</button>`;
+        });
+        actionsHTML += '</div>';
+    }
+
+    toast.innerHTML = `
+            <div class="toast-header">
+                <strong>${title}</strong>
+                <button class="toast-close">×</button>
+            </div>
+            <div class="toast-body">${body}</div>
+            ${actionsHTML}
+        `;
+
+    toastContainer.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 100);
+
+    const removeToast = () => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 500);
+    };
+
+    let autoDismiss;
+    if (duration > 0) {
+        autoDismiss = setTimeout(removeToast, duration);
+    }
+
+    toast.addEventListener('click', (e) => {
+        if (e.target.matches('.toast-close')) {
+            clearTimeout(autoDismiss);
+            removeToast();
+        }
+        actions.forEach((action, index) => {
+            if (e.target.matches(`.action-btn-${index}`)) {
+                action.callback();
+                clearTimeout(autoDismiss);
+                removeToast();
+            }
+        });
+    });
+}
+
+function showInvitationToast(fromName, flightCode) {
+    showToast({
+        type: 'info',
+        title: 'Flight Invitation',
+        body: `<b>${fromName}</b> has invited you to a flight.`,
+        duration: 15000,
+        actions: [
+            {
+                text: 'Decline',
+                class: 'btn-secondary',
+                callback: () => console.log('Invitation declined.')
+            },
+            {
+                text: 'Join',
+                class: 'btn-primary',
+                callback: () => {
+                    isFlightCreator = false; // Important: set flag when joining
+                    ws.send(JSON.stringify({ type: "join-flight", flightCode }));
+                }
+            }
+        ]
+    });
+}
+
+
+function resetState() {
+    if (metricsInterval) clearInterval(metricsInterval);
+    resetPeerConnectionState();
+    currentFlightCode = null; isFlightCreator = false; connectionType = 'wan'; fileToSendQueue = [];
+    peerInfo = null; // Also reset peerInfo
+    setupContainer.style.display = "flex";
+    dashboard.style.display = "none";
+    flightCodeInput.value = "";
+    fileInputTransfer.value = "";
+    sendingQueueDiv.innerHTML = '<div class="empty-state">Select files to send</div>';
+    receiverQueueDiv.innerHTML = '<div class="empty-state">Waiting for incoming files</div>';
+
+    // NEW: Reset metrics UI and state
+    totalBytesSent = 0;
+    totalBytesReceived = 0;
+    metricsSentEl.textContent = '0.00 GB';
+    metricsReceivedEl.textContent = '0.00 GB';
+    metricsSpeedEl.textContent = '0 KB/s';
+
+    initializeUser();
+}
+function resetPeerConnectionState() {
+    if (peerConnection) { peerConnection.close(); peerConnection = null; }
+    if (worker) { worker.terminate(); worker = null; }
+    if (metricsInterval) clearInterval(metricsInterval);
+    dataChannel = null; chunkQueue = []; isSending = false;
+    fileReadingDone = false; sentOffset = 0; incomingFileInfo = null;
+    incomingFileData = []; incomingFileReceived = 0; currentlySendingFile = null;
+    metricsSpeedEl.textContent = '0 KB/s';
+}
+
+// --- WEBRTC & SERVER COMMUNICATION FUNCTIONS ---
+discoverLocalIpAndRegister = function() {
+    // This function is now mainly for the client to register its name.
+    // The local IP discovery part is less critical but can still help the server's LAN/WAN detection heuristic.
+    // console.log("Registering user details with server...");
+    ws.send(JSON.stringify({
+        type: "register-details",
+        name: myName,
+        // We can still attempt to get local IP for the LAN/WAN detection, but don't rely on it for grouping.
+        localIpPrefix: "unknown",
+        localIp: "unknown"
+    }));
+}
+
+initializePeerConnection = function(isOfferer) {
+    if (peerConnection) return;
+    let pcConfig;
+    if (connectionType === 'lan') {
+        console.log("LAN connection mode: Using host candidates only (no STUN).");
+        pcConfig = { iceServers: [] };
+    } else {
+        console.log("WAN connection mode: Using STUN servers.");
+        pcConfig = { iceServers: ICE_SERVERS };
+    }
+
+    peerConnection = new RTCPeerConnection(pcConfig);
+
+    peerConnection.onicecandidate = (event) => { if (event.candidate) ws.send(JSON.stringify({ type: "signal", data: { candidate: event.candidate }, })); };
+    peerConnection.onconnectionstatechange = () => {
+        console.log("Peer connection state:", peerConnection.connectionState);
+        if (peerConnection.connectionState === "disconnected" || peerConnection.connectionState === "failed" || peerConnection.connectionState === "closed") {
+            console.log("Peer connection lost or failed. Resetting state.");
+            handlePeerLeft();
+        }
+    };
+    if (isOfferer) {
+        dataChannel = peerConnection.createDataChannel("fileTransfer");
+        setupDataChannel();
+        peerConnection.createOffer().then((offer) => peerConnection.setLocalDescription(offer)).then(() => { ws.send(JSON.stringify({ type: "signal", data: { sdp: peerConnection.localDescription }, })); });
+    } else { peerConnection.ondatachannel = (event) => { dataChannel = event.channel; setupDataChannel(); }; }
+}
+handleSignal = async function(data) {
+    if (!peerConnection) { console.warn("Received signal before peerConnection initialized. Initializing now."); initializePeerConnection(isFlightCreator); }
+    if (data.sdp) {
+        try {
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp));
+            if (data.sdp.type === "offer") {
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                ws.send(JSON.stringify({ type: "signal", data: { sdp: peerConnection.localDescription }, }));
+            }
+        } catch (error) { console.error("Error setting remote description or creating answer:", error); }
+    } else if (data.candidate) {
+        try { await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)); } catch (error) { console.error("Error adding ICE candidate:", error); }
+    }
+}
