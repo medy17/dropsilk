@@ -212,6 +212,7 @@ function getFlagEmoji(countryCode) {
 
 // --- **FIX 2: RESPONSIVE LEADERBOARD HTML GENERATION** ---
 function generateLeaderboardHtml() {
+    // Sort IPs by attempts in descending order
     const sortedIps = Object.keys(honeypotData).sort((a, b) => honeypotData[b].attempts - honeypotData[a].attempts);
 
     let tableRows = '';
@@ -221,15 +222,17 @@ function generateLeaderboardHtml() {
         sortedIps.forEach((ip, index) => {
             const data = honeypotData[ip];
             const maskedIp = ip.split('.').slice(0, 2).join('.') + '.***.***';
-            // Added data-label attributes for responsive CSS
+
+            // **FIX**: Wrap the content of each cell in a <span> tag.
+            // This gives us a specific element to target for alignment and word wrapping.
             tableRows += `
                 <tr>
-                    <td data-label="Rank">${index + 1}</td>
-                    <td data-label="IP Address">${maskedIp}</td>
-                    <td data-label="Attempts">${data.attempts}</td>
-                    <td data-label="Top Username">${he.encode(String(data.topUser))}</td>
-                    <td data-label="Top Password" class="pass-cell">${he.encode(String(data.topPass))}</td>
-                    <td data-label="Country">${data.flag} ${he.encode(String(data.country))}</td>
+                    <td data-label="Rank"><span>${index + 1}</span></td>
+                    <td data-label="IP Address"><span>${maskedIp}</span></td>
+                    <td data-label="Attempts"><span>${data.attempts}</span></td>
+                    <td data-label="Top Username"><span>${he.encode(String(data.topUser))}</span></td>
+                    <td data-label="Top Password" class="pass-cell"><span>${he.encode(String(data.topPass))}</span></td>
+                    <td data-label="Country"><span>${data.flag} ${he.encode(String(data.country))}</span></td>
                 </tr>
             `;
         });
@@ -243,7 +246,7 @@ function generateLeaderboardHtml() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Honeypot - Hall of Shame</title>
         <style>
-            /* --- Base & Desktop Styles --- */
+            /* --- Base & Desktop Styles (Unchanged) --- */
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 2em; }
             .container { max-width: 1000px; margin: 0 auto; background-color: #1e1e1e; border-radius: 8px; padding: 2em; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
             h1 { color: #bb86fc; text-align: center; border-bottom: 2px solid #bb86fc; padding-bottom: 0.5em; margin-bottom: 1.5em; }
@@ -254,42 +257,55 @@ function generateLeaderboardHtml() {
             tr:hover { background-color: #4a4a4a; }
             .pass-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
             
-            /* --- Responsive Styles for Mobile (< 768px) --- */
+            /* --- **REVISED** Responsive Styles for Mobile (< 768px) --- */
             @media screen and (max-width: 768px) {
                 body { padding: 1em; }
                 .container { padding: 1.5em 1em; }
                 
                 table thead { display: none; }
                 table, tbody, tr, td { display: block; width: 100%; }
+
                 tr {
                     margin-bottom: 1.5em;
                     border: 1px solid #333;
                     border-radius: 5px;
                     background-color: #242424;
+                    overflow: hidden; /* Prevents content from poking out of rounded corners */
                 }
+                
                 td {
-                    display: flex;
-                    justify-content: space-between;
-                    text-align: right;
-                    padding: 10px 15px;
+                    display: flex; /* Use flexbox for robust alignment */
+                    align-items: center; /* Vertically align label and value */
+                    justify-content: space-between; /* Put space between label and value */
+                    padding: 12px 15px;
                     border-bottom: 1px dotted #444;
+                    text-align: left; /* Reset text alignment */
                 }
+                
                 td:last-child { border-bottom: none; }
+
+                /* Style the label (the ::before pseudo-element) */
                 td::before {
                     content: attr(data-label);
                     font-weight: bold;
                     color: #bb86fc;
-                    text-align: left;
-                    padding-right: 1em;
+                    padding-right: 1em; /* Space between label and value */
+                    flex-shrink: 0; /* Prevents the label from shrinking */
                 }
+                
+                /* Style the value (the new <span> element) */
+                td span {
+                    text-align: right; /* Align the value text to the right */
+                    word-break: break-all; /* THIS IS THE KEY FIX: forces long text to wrap */
+                }
+
+                /* Special handling for password cell to make it more readable */
                 .pass-cell {
-                    max-width: none;
-                    white-space: normal;
-                    word-break: break-all;
-                    justify-content: flex-start;
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 5px;
+                    align-items: flex-start; /* Align to top */
+                }
+                .pass-cell span {
+                    font-family: monospace;
+                    color: #ccc; /* Make password slightly less prominent */
                 }
             }
         </style>
