@@ -256,14 +256,14 @@ function generateLeaderboardHtml() {
             tr:hover { background-color: #4a4a4a; }
             .pass-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
             
-            /* --- **FINAL** Responsive Styles for Mobile (< 768px) --- */
+            /* --- **FIXED** Responsive Styles for Mobile (< 768px) --- */
             @media screen and (max-width: 768px) {
                 body { padding: 1em; }
                 .container { padding: 1.5em 1em; }
                 
                 table thead { display: none; }
                 table, tbody, tr, td { display: block; width: 100%; }
-
+            
                 tr {
                     margin-bottom: 1.5em;
                     border: 1px solid #333;
@@ -277,29 +277,35 @@ function generateLeaderboardHtml() {
                     align-items: center;
                     padding: 12px 15px;
                     border-bottom: 1px dotted #444;
-                    /* REMOVED: justify-content: space-between; This was the source of the problem. */
+                    gap: 1em; /* ADDED: Consistent spacing between label and value */
                 }
                 
                 td:last-child { border-bottom: none; }
-
+            
                 td::before {
                     content: attr(data-label);
                     font-weight: bold;
                     color: #bb86fc;
-                    padding-right: 1em;
                     flex-shrink: 0; /* Prevents the label from shrinking */
+                    min-width: 120px; /* ADDED: Consistent width for labels */
                 }
                 
-                /* THE KEY FIX: The value's container now grows to fill space */
+                /* FIXED: Better value container styling */
                 td span {
-                    flex-grow: 1; /* NEW: Allows the span to take up all available space */
-                    min-width: 0; /* NEW: A crucial flexbox property to allow shrinking and wrapping */
-                    text-align: right; /* Aligns the text *inside* the flexible span */
-                    word-break: break-all; /* Ensures long words still wrap */
+                    flex-grow: 1;
+                    min-width: 0; /* Allows shrinking */
+                    text-align: left; /* CHANGED: From right to left alignment */
+                    word-break: break-word; /* CHANGED: From break-all to break-word for better readability */
+                    padding-right: 8px; /* ADDED: Small right padding to prevent edge touching */
+                    overflow-wrap: break-word; /* ADDED: Better word wrapping */
                 }
-
+            
                 .pass-cell { align-items: flex-start; }
-                .pass-cell span { font-family: monospace; color: #ccc; }
+                .pass-cell span { 
+                    font-family: monospace; 
+                    color: #ccc; 
+                    font-size: 0.9em; /* ADDED: Slightly smaller font for long passwords */
+                }
             }
         </style>
     </head>
