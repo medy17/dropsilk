@@ -2,31 +2,117 @@
 <html lang="en-US">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <!-- *** FIX #1: Added the viewport meta tag. This is essential for mobile browsing. *** -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log In ‹ WordPress</title>
     <meta name='robots' content='noindex, nofollow, noarchive' />
     <style type="text/css">
-        html, body { height: 100%; margin: 0; padding: 0; }
-        body { background: #f0f0f1; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; }
-        #login { width: 320px; padding: 8% 0 0; margin: auto; }
-        #login h1 { text-align: center; }
-        #login h1 a { background-image: url(https://s.w.org/style/images/w-logo-blue.svg?1); background-size: 84px; background-position: center top; background-repeat: no-repeat;
-            width: 84px; height: 84px; display: inline-block; text-indent: -9999px; outline: 0; }
-        .login form { margin-top: 20px; margin-left: 0; padding: 26px 24px 34px; font-weight: 400; overflow: hidden; background: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,.13); }
-        .login label { color: #444; font-size: 14px; }
-        .login input[type=text], .login input[type=password] { font-size: 16px; width: 100%; padding: 8px; margin: 2px 6px 16px 0;
-            border: 1px solid #ddd; box-shadow: inset 0 1px 2px rgba(0,0,0,.07); background: #fbfbfb; color: #32373c;
-            outline: 0; transition: 50ms border-color ease-in-out; box-sizing: border-box; }
-        .login input[type=text]:focus, .login input[type=password]:focus { border-color: #5b9dd9; box-shadow: 0 0 2px rgba(30,140,190,.8); }
-        .login .forgetmenot { font-weight: 400; float: left; margin-bottom: 0; }
-        .login .submit { float: right; }
-        .wp-core-ui .button-primary { background: #2271b1; border-color: #2271b1; color: #fff; text-decoration: none; text-shadow: none; }
-        .wp-core-ui .button { display: inline-block; text-decoration: none; font-size: 13px; line-height: 2.15384615; min-height: 30px;
-            margin: 0; padding: 0 10px; cursor: pointer; border-width: 1px; border-style: solid; -webkit-appearance: none; border-radius: 3px;
-            white-space: nowrap; box-sizing: border-box; }
-        p#backtoblog, p#nav { text-align: center; padding: 0 24px; font-size: 13px; }
-        p#backtoblog a, p#nav a { text-decoration: none; color: #50575e; }
-        p#backtoblog a:hover, p#nav a:hover { color: #0a4b78; }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f0f0f1;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        }
+        #login {
+            /* *** FIX #2: Changed width to be responsive instead of fixed. *** */
+            width: 90%;            /* Use 90% of the screen width on small devices */
+            max-width: 360px;      /* But don't let it get wider than 360px */
+            padding: 8% 0 0;
+            margin: 0 auto;        /* This now properly centers the box */
+        }
+        #login h1 {
+            text-align: center;
+        }
+        #login h1 a {
+            background-image: url(https://s.w.org/style/images/w-logo-blue.svg?1);
+            background-size: 84px;
+            background-position: center top;
+            background-repeat: no-repeat;
+            width: 84px;
+            height: 84px;
+            display: inline-block;
+            text-indent: -9999px;
+            outline: 0;
+        }
+        .login form {
+            margin-top: 20px;
+            margin-left: 0;
+            padding: 26px 24px 34px;
+            font-weight: 400;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,.13);
+            border-radius: 4px; /* Slightly modernizing the look */
+        }
+        .login label {
+            color: #444;
+            font-size: 14px;
+        }
+        .login input[type=text],
+        .login input[type=password] {
+            font-size: 16px;
+            width: 100%;
+            padding: 8px;
+            margin: 2px 0 16px 0; /* Adjusted margin for better spacing */
+            border: 1px solid #ddd;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
+            background: #fbfbfb;
+            color: #32373c;
+            outline: 0;
+            transition: 50ms border-color ease-in-out;
+            box-sizing: border-box;
+        }
+        .login input[type=text]:focus,
+        .login input[type=password]:focus {
+            border-color: #5b9dd9;
+            box-shadow: 0 0 2px rgba(30,140,190,.8);
+        }
+        .login .forgetmenot {
+            font-weight: 400;
+            float: left;
+            margin-bottom: 0;
+        }
+        .login .submit {
+            float: right;
+        }
+        .wp-core-ui .button-primary {
+            background: #2271b1;
+            border-color: #2271b1;
+            color: #fff;
+            text-decoration: none;
+            text-shadow: none;
+        }
+        .wp-core-ui .button {
+            display: inline-block;
+            text-decoration: none;
+            font-size: 13px;
+            line-height: 2.15384615;
+            min-height: 30px;
+            margin: 0;
+            padding: 0 12px;
+            cursor: pointer;
+            border-width: 1px;
+            border-style: solid;
+            -webkit-appearance: none;
+            border-radius: 3px;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+        p#backtoblog, p#nav {
+            text-align: center;
+            padding: 0 24px;
+            font-size: 13px;
+        }
+        p#backtoblog a, p#nav a {
+            text-decoration: none;
+            color: #50575e;
+        }
+        p#backtoblog a:hover, p#nav a:hover {
+            color: #0a4b78;
+        }
     </style>
 </head>
 <body class="login wp-core-ui">

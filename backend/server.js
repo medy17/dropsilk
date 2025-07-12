@@ -4,11 +4,11 @@ const os = require("os");
 const http = require("http");
 const querystring = require('querystring'); // For parsing POST request bodies
 const fs = require('fs'); // For reading HTML files (like wp-login.html)
-const path = require('path'); // <-- ADD THIS LINE
+const path = require('path');
 
 // --- Third-party Modules ---
 const geoip = require('geoip-lite'); // For GeoIP lookup
-const he = require('he'); // <-- ADD THIS LINE
+const he = require('he'); // For HTML entity encoding
 
 // --- Configuration ---
 const PORT = process.env.PORT || 8080;
@@ -38,16 +38,17 @@ function log(level, message, meta = {}) {
 const server = http.createServer((req, res) => {
     try {
         const url = new URL(req.url, `http://${req.headers.host}`);
+        const clientIp = getClientIp(req); // <-- **FIX 1**: Use the correct IP helper function
 
         // --- HONEYPOT: Routing for fake WordPress endpoints ---
         if (req.method === 'GET' && (
             url.pathname === '/wp-admin/setup-config.php' ||
             url.pathname === '/wordpress/wp-admin/setup-config.php' ||
-            url.pathname === '/wp-login.php' // Bots also directly GET this path
+            url.pathname === '/wp-login.php'
         )) {
-            log('warn', 'HONEYPOT: Serving fake WP login page', { ip: getCleanIPv4(req.socket.remoteAddress), path: url.pathname });
-            const filePath = path.join(__dirname, 'wp-login.html'); // <-- Define the correct, absolute path
-            fs.readFile(filePath, 'utf8', (err, data) => {             // <-- Use the correct path here
+            log('warn', 'HONEYPOT: Serving fake WP login page', { ip: clientIp, path: url.pathname });
+            const filePath = path.join(__dirname, 'wp-login.html');
+            fs.readFile(filePath, 'utf8', (err, data) => {
                 if (err) {
                     log('error', 'HONEYPOT: Error reading wp-login.html', { error: err.message, path: filePath });
                     res.writeHead(500);
@@ -57,7 +58,7 @@ const server = http.createServer((req, res) => {
                 res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
                 res.end(data);
             });
-            return; // Stop further processing of this request
+            return;
         }
 
         // --- HONEYPOT: Handling POST requests to the fake login endpoint ---
@@ -68,17 +69,17 @@ const server = http.createServer((req, res) => {
             });
             req.on('end', () => {
                 const formData = querystring.parse(body);
-                const ip = getCleanIPv4(req.socket.remoteAddress);
-                const geo = geoip.lookup(ip); // Get geo information from IP
+                // The 'clientIp' variable is already correctly assigned above
+                const geo = geoip.lookup(clientIp);
                 const username = formData.log || 'N/A';
                 const password = formData.pwd || 'N/A';
                 const countryCode = geo ? geo.country : 'N/A';
 
-                log('error', 'HONEYPOT: Bot caught!', { ip, username, password, country: countryCode });
+                log('error', 'HONEYPOT: Bot caught!', { ip: clientIp, username, password, country: countryCode });
 
-                if (!honeypotData[ip]) {
-                    honeypotData[ip] = {
-                        rank: honeypotRankCounter++, // Simple rank based on order of first seen
+                if (!honeypotData[clientIp]) {
+                    honeypotData[clientIp] = {
+                        rank: honeypotRankCounter++,
                         attempts: 0,
                         topUser: '',
                         topPass: '',
@@ -90,43 +91,39 @@ const server = http.createServer((req, res) => {
                     };
                 }
 
-                honeypotData[ip].attempts++;
-                honeypotData[ip].lastSeen = new Date().toISOString();
-                // Store the longest password attempt, as it's often more interesting
-                if (password.length > honeypotData[ip].topPassLength) {
-                    honeypotData[ip].topUser = username;
-                    honeypotData[ip].topPass = password;
-                    honeypotData[ip].topPassLength = password.length;
+                honeypotData[clientIp].attempts++;
+                honeypotData[clientIp].lastSeen = new Date().toISOString();
+                if (password.length > honeypotData[clientIp].topPassLength) {
+                    honeypotData[clientIp].topUser = username;
+                    honeypotData[clientIp].topPass = password;
+                    honeypotData[clientIp].topPassLength = password.length;
                 }
 
-                // Redirect the bot to the leaderboard
                 res.writeHead(302, { 'Location': '/honeypot-leaderboard' });
                 res.end();
             });
-            return; // Stop further processing
+            return;
         }
 
         // --- HONEYPOT: Serve the leaderboard page ---
         if (req.method === 'GET' && url.pathname === '/honeypot-leaderboard') {
-            log('info', 'HONEYPOT: Serving leaderboard', { ip: getCleanIPv4(req.socket.remoteAddress) });
+            log('info', 'HONEYPOT: Serving leaderboard', { ip: clientIp });
             res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            res.end(generateLeaderboardHtml());
-            return; // Stop further processing
+            res.end(generateLeaderboardHtml()); // This now generates the responsive HTML
+            return;
         }
-        // --- END HONEYPOT: Routing ---
 
 
         // --- Standard Server Routes ---
         if (req.method === 'GET' && req.url === '/') {
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('Server is alive and waiting for WebSocket connections.');
-            log('info', 'Health check accessed', { ip: req.socket.remoteAddress });
+            log('info', 'Health check accessed', { ip: clientIp });
         } else if (req.method === 'GET' && req.url === '/stats') {
-            // Production stats endpoint
             const stats = {
                 activeConnections: clients.size,
                 activeFlights: Object.keys(flights).length,
-                honeypotVictims: Object.keys(honeypotData).length, // Add honeypot stats
+                honeypotVictims: Object.keys(honeypotData).length,
                 uptime: process.uptime(),
                 memory: process.memoryUsage(),
                 timestamp: new Date().toISOString()
@@ -155,28 +152,29 @@ server.on('error', (error) => {
 });
 
 // --- IP Helper Functions ---
+function getClientIp(req) {
+    // **NEW FUNCTION**: Get IP from the X-Forwarded-For header (if behind a proxy)
+    // or fall back to the direct connection IP. This is crucial for deployed apps.
+    const rawIp = req.headers['x-forwarded-for']?.split(',').shift() || req.socket.remoteAddress;
+    return getCleanIPv4(rawIp);
+}
+
 function getCleanIPv4(ip) {
     if (!ip || typeof ip !== 'string') {
         log('warn', 'Invalid IP address received for cleaning', { ip });
         return 'unknown';
     }
-    try {
-        if (ip.startsWith('::ffff:')) {
-            return ip.substring(7); // Remove IPv6 prefix for IPv4-mapped addresses
-        }
-        if (ip === '::1') {
-            return '127.0.0.1'; // Loopback for IPv6
-        }
-        return ip;
-    } catch (error) {
-        log('error', 'Error processing IP address in getCleanIPv4', { ip, error: error.message });
-        return 'unknown';
+    if (ip.startsWith('::ffff:')) {
+        return ip.substring(7); // Remove IPv6 prefix for IPv4-mapped addresses
     }
+    if (ip === '::1') {
+        return '127.0.0.1'; // Loopback for IPv6
+    }
+    return ip;
 }
 
 function isPrivateIP(ip) {
     if (!ip || typeof ip !== 'string') return false;
-    // RFC 1918 private IP ranges
     return ip.startsWith('10.') ||
         ip.startsWith('192.168.') ||
         ip.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./);
@@ -184,7 +182,6 @@ function isPrivateIP(ip) {
 
 function isCgnatIP(ip) {
     if (!ip || typeof ip !== 'string') return false;
-    // CGNAT range (RFC 6598) 100.64.0.0/10
     return ip.startsWith('100.') && ip.match(/^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\./);
 }
 
@@ -208,14 +205,13 @@ function getLocalIpForDisplay() {
 // --- HONEYPOT: Helper functions for leaderboard HTML generation ---
 function getFlagEmoji(countryCode) {
     if (!countryCode || countryCode.length !== 2) return '❓';
-    // Unicode for regional indicator symbol letters
     const codePoints = countryCode.toUpperCase().split('').map(char => 0x1F1E6 + (char.charCodeAt(0) - 'A'.charCodeAt(0)));
     return String.fromCodePoint(...codePoints);
 }
 
 
+// --- **FIX 2: RESPONSIVE LEADERBOARD HTML GENERATION** ---
 function generateLeaderboardHtml() {
-    // Sort IPs by attempts in descending order
     const sortedIps = Object.keys(honeypotData).sort((a, b) => honeypotData[b].attempts - honeypotData[a].attempts);
 
     let tableRows = '';
@@ -224,16 +220,16 @@ function generateLeaderboardHtml() {
     } else {
         sortedIps.forEach((ip, index) => {
             const data = honeypotData[ip];
-            // Mask IP address for privacy, showing only the first two octets
             const maskedIp = ip.split('.').slice(0, 2).join('.') + '.***.***';
+            // Added data-label attributes for responsive CSS
             tableRows += `
                 <tr>
-                    <td>${index + 1}</td>
-                    <td>${maskedIp}</td>
-                    <td>${data.attempts}</td>
-                    <td>${he.encode(String(data.topUser))}</td>
-                    <td class="pass-cell">${he.encode(String(data.topPass))}</td>
-                    <td>${data.flag} ${he.encode(String(data.country))}</td>
+                    <td data-label="Rank">${index + 1}</td>
+                    <td data-label="IP Address">${maskedIp}</td>
+                    <td data-label="Attempts">${data.attempts}</td>
+                    <td data-label="Top Username">${he.encode(String(data.topUser))}</td>
+                    <td data-label="Top Password" class="pass-cell">${he.encode(String(data.topPass))}</td>
+                    <td data-label="Country">${data.flag} ${he.encode(String(data.country))}</td>
                 </tr>
             `;
         });
@@ -247,6 +243,7 @@ function generateLeaderboardHtml() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Honeypot - Hall of Shame</title>
         <style>
+            /* --- Base & Desktop Styles --- */
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 2em; }
             .container { max-width: 1000px; margin: 0 auto; background-color: #1e1e1e; border-radius: 8px; padding: 2em; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
             h1 { color: #bb86fc; text-align: center; border-bottom: 2px solid #bb86fc; padding-bottom: 0.5em; margin-bottom: 1.5em; }
@@ -256,6 +253,45 @@ function generateLeaderboardHtml() {
             tr:nth-child(even) { background-color: #242424; }
             tr:hover { background-color: #4a4a4a; }
             .pass-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
+            
+            /* --- Responsive Styles for Mobile (< 768px) --- */
+            @media screen and (max-width: 768px) {
+                body { padding: 1em; }
+                .container { padding: 1.5em 1em; }
+                
+                table thead { display: none; }
+                table, tbody, tr, td { display: block; width: 100%; }
+                tr {
+                    margin-bottom: 1.5em;
+                    border: 1px solid #333;
+                    border-radius: 5px;
+                    background-color: #242424;
+                }
+                td {
+                    display: flex;
+                    justify-content: space-between;
+                    text-align: right;
+                    padding: 10px 15px;
+                    border-bottom: 1px dotted #444;
+                }
+                td:last-child { border-bottom: none; }
+                td::before {
+                    content: attr(data-label);
+                    font-weight: bold;
+                    color: #bb86fc;
+                    text-align: left;
+                    padding-right: 1em;
+                }
+                .pass-cell {
+                    max-width: none;
+                    white-space: normal;
+                    word-break: break-all;
+                    justify-content: flex-start;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 5px;
+                }
+            }
         </style>
     </head>
     <body>
@@ -278,31 +314,23 @@ function generateLeaderboardHtml() {
             </table>
         </div>
     </body>
-    </html>
-    `;
+    </html>`;
 }
 
-// --- WebRTC Signaling Server Logic (Existing) ---
-const flights = {}; // Manages active flights (peer groups)
-const clients = new Map(); // Stores WebSocket client connections and their metadata
 
-// --- Allowed Origins for WebSocket Connection (Security Measure) ---
+// --- WebRTC Signaling Server Logic (Existing) ---
+const flights = {};
+const clients = new Map();
+
 const allowedOrigins = new Set([
     'https://dropsilk.xyz',
     'https://www.dropsilk.xyz',
     'https://dropsilk.vercel.app'
 ]);
 
-/**
- * Verifies the client's origin before establishing a WebSocket connection.
- * This is a security measure to prevent Cross-Site WebSocket Hijacking.
- * @param {object} info - Information about the incoming request (req, origin, secure, etc.).
- * @param {function} done - Callback to accept or reject the connection (done(true) or done(false, code, reason)).
- */
 function verifyClient(info, done) {
     const origin = info.req.headers.origin;
 
-    // Strict production environment check
     if (NODE_ENV === 'production') {
         if (allowedOrigins.has(origin)) {
             log('debug', 'Client origin approved (production)', { origin });
@@ -311,49 +339,28 @@ function verifyClient(info, done) {
             log('warn', 'Client connection rejected due to invalid origin (production)', { origin });
             done(false, 403, 'Forbidden: Invalid Origin');
         }
-        return; // Exit after handling production case
+        return;
     }
 
-    // --- Flexible development environment check ---
     log('info', 'Verifying new client connection (development)', { origin });
 
-    // 1. Allow if the origin is one of the "production" domains (for local testing against deployed frontend)
-    if (allowedOrigins.has(origin)) {
-        log('debug', 'Client origin approved (dev mode, matched prod origin)', { origin });
+    if (allowedOrigins.has(origin) || (origin && (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:'))) || !origin) {
+        log('debug', 'Client origin approved (dev mode)', { origin });
         done(true);
-        return;
+    } else {
+        log('warn', 'Client connection rejected due to invalid origin (development)', { origin });
+        done(false, 403, 'Forbidden: Invalid Origin');
     }
-
-    // 2. Allow if origin is from a localhost or 127.0.0.1 URL on ANY port (for IDEs like WebStorm)
-    if (origin && (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:'))) {
-        log('debug', 'Client origin approved (dev mode, matched localhost pattern)', { origin });
-        done(true);
-        return;
-    }
-
-    // 3. Allow if there is NO origin header (e.g., opening file directly via file:// in browser)
-    // This is common for local file-based testing.
-    if (!origin) {
-        log('debug', 'Client origin approved (dev mode, no origin header - likely file://)', { origin });
-        done(true);
-        return;
-    }
-
-    // 4. If none of the above conditions are met, reject the connection in development.
-    log('warn', 'Client connection rejected due to invalid origin (development)', { origin });
-    done(false, 403, 'Forbidden: Invalid Origin');
 }
 
-// --- WebSocket Server Initialization ---
 const wss = new WebSocket.Server({
     server,
-    verifyClient, // Integrate the origin verification function here
-    perMessageDeflate: false, // Disable compression for better performance
-    maxPayload: 1024 * 1024, // 1MB max payload limit per message
-    clientTracking: true // Enable internal client tracking by `ws` library
+    verifyClient,
+    perMessageDeflate: false,
+    maxPayload: 1024 * 1024,
+    clientTracking: true
 });
 
-// --- WebSocket Server Event Handling ---
 wss.on('error', (error) => {
     log('error', 'WebSocket server error', { error: error.message, stack: error.stack });
 });
@@ -362,52 +369,31 @@ wss.on("connection", (ws, req) => {
     let clientId, metadata;
 
     try {
-        clientId = Math.random().toString(36).substr(2, 9); // Generate a unique ID for the client
-        // Extract remote IP from x-forwarded-for (if behind a proxy) or socket
-        const rawIp = req.headers['x-forwarded-for']?.split(',').shift() || req.socket.remoteAddress;
-        const cleanRemoteIp = getCleanIPv4(rawIp);
+        clientId = Math.random().toString(36).substr(2, 9);
+        const cleanRemoteIp = getClientIp(req); // Use the correct IP helper here too
         const userAgent = req.headers['user-agent'] || 'unknown';
 
         metadata = {
             id: clientId,
-            name: "Anonymous", // Default name, updated by client later
-            flightCode: null, // No flight assigned initially
+            name: "Anonymous",
+            flightCode: null,
             remoteIp: cleanRemoteIp,
             connectedAt: new Date().toISOString(),
             userAgent: userAgent
         };
 
         clients.set(ws, metadata);
-        connectionStats.totalConnections++; // Increment connection counter
+        connectionStats.totalConnections++;
 
-        log('info', 'Client connected', {
-            clientId,
-            ip: cleanRemoteIp,
-            userAgent,
-            totalClients: clients.size,
-            totalConnections: connectionStats.totalConnections
-        });
+        log('info', 'Client connected', { clientId, ip: cleanRemoteIp, userAgent, totalClients: clients.size, totalConnections: connectionStats.totalConnections });
 
-        // Keep-alive mechanism for WebSocket connections
         ws.isAlive = true;
-        ws.on('pong', () => {
-            ws.isAlive = true;
-        });
-
-        // Send registration confirmation to the client
+        ws.on('pong', () => { ws.isAlive = true; });
         ws.send(JSON.stringify({ type: "registered", id: clientId }));
-
-        // Send initial list of users on the network (for direct invites)
         broadcastUsersOnSameNetwork();
 
     } catch (error) {
-        log('error', 'Error during client connection setup', {
-            error: error.message,
-            stack: error.stack,
-            clientId: clientId || 'unknown'
-        });
-
-        // Close connection if setup failed
+        log('error', 'Error during client connection setup', { error: error.message, stack: error.stack, clientId: clientId || 'unknown' });
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.close(1011, 'Server error during connection setup');
         }
@@ -416,40 +402,27 @@ wss.on("connection", (ws, req) => {
 
     ws.on("message", (message) => {
         let data;
-        const meta = clients.get(ws); // Get metadata for the current client
+        const meta = clients.get(ws);
 
         if (!meta) {
-            log('warn', 'Received message from unregistered client (no metadata)', { messagePreview: message.toString().substring(0, 100) });
+            log('warn', 'Received message from unregistered client', { messagePreview: message.toString().substring(0, 100) });
             return;
         }
 
         try {
-            // Validate message size to prevent abuse
-            if (message.length > 1024 * 1024) { // 1MB limit
+            if (message.length > 1024 * 1024) {
                 log('warn', 'Message too large', { clientId: meta.id, size: message.length });
                 ws.send(JSON.stringify({ type: "error", message: "Message too large" }));
                 return;
             }
-
-            data = JSON.parse(message); // Parse incoming JSON message
-
+            data = JSON.parse(message);
             if (!data.type) {
                 log('warn', 'Message missing type field', { clientId: meta.id, messagePreview: message.toString().substring(0, 100) });
                 return;
             }
-
-            log('debug', 'Message received', {
-                clientId: meta.id,
-                type: data.type,
-                messageSize: message.length
-            });
-
+            log('debug', 'Message received', { clientId: meta.id, type: data.type, messageSize: message.length });
         } catch (error) {
-            log('error', 'Error parsing message JSON', {
-                clientId: meta.id,
-                error: error.message,
-                messagePreview: message.toString().substring(0, 100)
-            });
+            log('error', 'Error parsing message JSON', { clientId: meta.id, error: error.message, messagePreview: message.toString().substring(0, 100) });
             ws.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
             return;
         }
@@ -457,258 +430,86 @@ wss.on("connection", (ws, req) => {
         try {
             switch (data.type) {
                 case "register-details":
-                    // Validate incoming name
                     if (!data.name || typeof data.name !== 'string' || data.name.length > 50 || data.name.trim().length === 0) {
                         log('warn', 'Invalid name in registration', { clientId: meta.id, name: data.name });
                         ws.send(JSON.stringify({ type: "error", message: "Invalid name" }));
                         return;
                     }
-
-                    const oldName = meta.name;
-                    meta.name = data.name.trim(); // Update client's name
-                    clients.set(ws, meta); // Update metadata in map
-
-                    log('info', 'Client registered details', {
-                        clientId: meta.id,
-                        oldName,
-                        newName: meta.name,
-                        ip: meta.remoteIp
-                    });
-
-                    broadcastUsersOnSameNetwork(); // Notify others of updated client list
+                    meta.name = data.name.trim();
+                    clients.set(ws, meta);
+                    log('info', 'Client registered details', { clientId: meta.id, newName: meta.name, ip: meta.remoteIp });
+                    broadcastUsersOnSameNetwork();
                     break;
-
                 case "create-flight":
                     if (meta.flightCode) {
-                        log('warn', 'Client already in flight trying to create new one', {
-                            clientId: meta.id,
-                            currentFlight: meta.flightCode
-                        });
                         ws.send(JSON.stringify({ type: "error", message: "Already in a flight" }));
                         return;
                     }
-
-                    const flightCode = Math.random().toString(36).substr(2, 6).toUpperCase(); // Generate 6-char code
-                    flights[flightCode] = [ws]; // Create new flight with creator as first participant
-                    meta.flightCode = flightCode; // Assign flight code to client's metadata
-                    connectionStats.totalFlightsCreated++; // Increment stat
-
-                    log('info', 'Flight created', {
-                        flightCode,
-                        creatorId: meta.id,
-                        creatorName: meta.name,
-                        creatorIp: meta.remoteIp,
-                        totalFlights: Object.keys(flights).length,
-                        totalFlightsCreated: connectionStats.totalFlightsCreated
-                    });
-
-                    ws.send(JSON.stringify({ type: "flight-created", flightCode })); // Confirm flight creation to client
-                    broadcastUsersOnSameNetwork(); // Update network visibility
+                    const flightCode = Math.random().toString(36).substr(2, 6).toUpperCase();
+                    flights[flightCode] = [ws];
+                    meta.flightCode = flightCode;
+                    connectionStats.totalFlightsCreated++;
+                    log('info', 'Flight created', { flightCode, creatorId: meta.id });
+                    ws.send(JSON.stringify({ type: "flight-created", flightCode }));
+                    broadcastUsersOnSameNetwork();
                     break;
-
                 case "join-flight":
                     if (!data.flightCode || typeof data.flightCode !== 'string' || data.flightCode.length !== 6) {
-                        log('warn', 'Invalid flight code in join request', {
-                            clientId: meta.id,
-                            flightCode: data.flightCode
-                        });
                         ws.send(JSON.stringify({ type: "error", message: "Invalid flight code" }));
                         return;
                     }
-
                     if (meta.flightCode) {
-                        log('warn', 'Client already in flight trying to join another', {
-                            clientId: meta.id,
-                            currentFlight: meta.flightCode,
-                            requestedFlight: data.flightCode
-                        });
                         ws.send(JSON.stringify({ type: "error", message: "Already in a flight" }));
                         return;
                     }
-
                     const flight = flights[data.flightCode];
-                    if (!flight) {
-                        log('warn', 'Flight not found', {
-                            flightCode: data.flightCode,
-                            joinerId: meta.id
-                        });
-                        ws.send(JSON.stringify({ type: "error", message: "Flight not found" }));
+                    if (!flight || flight.length >= 2) {
+                        ws.send(JSON.stringify({ type: "error", message: "Flight not found or full" }));
                         return;
                     }
-
-                    if (flight.length >= 2) {
-                        log('warn', 'Flight is full', {
-                            flightCode: data.flightCode,
-                            joinerId: meta.id,
-                            currentSize: flight.length
-                        });
-                        ws.send(JSON.stringify({ type: "error", message: "Flight is full" }));
-                        return;
-                    }
-
-                    const creatorWs = flight[0]; // Get the WebSocket of the flight creator
-                    const creatorMeta = clients.get(creatorWs); // Get metadata of the creator
-
-                    // Ensure creator is still connected and valid
+                    const creatorWs = flight[0];
+                    const creatorMeta = clients.get(creatorWs);
                     if (!creatorMeta || creatorWs.readyState !== WebSocket.OPEN) {
-                        log('error', 'Creator websocket invalid during join attempt, deleting flight', {
-                            flightCode: data.flightCode,
-                            joinerId: meta.id,
-                            creatorId: creatorMeta?.id || 'unknown'
-                        });
-                        delete flights[data.flightCode]; // Clean up invalid flight
+                        delete flights[data.flightCode];
                         ws.send(JSON.stringify({ type: "error", message: "Flight creator disconnected" }));
                         return;
                     }
-
-                    // Determine connection type (LAN vs. WAN) based on IP prefixes
                     let connectionType = 'wan';
-                    const creatorIp = creatorMeta.remoteIp;
-                    const joinerIp = meta.remoteIp;
-
-                    if (isPrivateIP(creatorIp) && isPrivateIP(joinerIp)) {
-                        const creatorSubnet = creatorIp.split('.').slice(0, 3).join('.');
-                        const joinerSubnet = joinerIp.split('.').slice(0, 3).join('.');
-                        if (creatorSubnet === joinerSubnet) {
-                            connectionType = 'lan';
-                        }
-                    } else if (creatorIp === joinerIp) {
-                        // Same public IP or loopback, implies LAN (e.g., behind same NAT, or localhost testing)
+                    if (isPrivateIP(creatorMeta.remoteIp) && isPrivateIP(meta.remoteIp) && creatorMeta.remoteIp.split('.').slice(0, 3).join('.') === meta.remoteIp.split('.').slice(0, 3).join('.')) {
+                        connectionType = 'lan';
+                    } else if (creatorMeta.remoteIp === meta.remoteIp) {
                         connectionType = 'lan';
                     }
-
-                    flight.push(ws); // Add joiner to the flight
-                    meta.flightCode = data.flightCode; // Assign flight code to joiner
-                    connectionStats.totalFlightsJoined++; // Increment stat
-
-                    log('info', 'Flight joined', {
-                        flightCode: data.flightCode,
-                        joinerId: meta.id,
-                        joinerName: meta.name,
-                        joinerIp: meta.remoteIp,
-                        creatorId: creatorMeta.id,
-                        creatorName: creatorMeta.name,
-                        creatorIp: creatorMeta.remoteIp,
-                        connectionType: connectionType.toUpperCase(),
-                        totalFlightsJoined: connectionStats.totalFlightsJoined
-                    });
-
-                    // Send personalized "peer-joined" messages to both creator and joiner
-                    const creatorPeerData = { id: creatorMeta.id, name: creatorMeta.name };
-                    const joinerPeerData = { id: meta.id, name: meta.name };
-
-                    ws.send(JSON.stringify({
-                        type: "peer-joined",
-                        flightCode: data.flightCode,
-                        connectionType: connectionType,
-                        peer: creatorPeerData // Joiner receives info about creator
-                    }));
-
-                    creatorWs.send(JSON.stringify({
-                        type: "peer-joined",
-                        flightCode: data.flightCode,
-                        connectionType: connectionType,
-                        peer: joinerPeerData // Creator receives info about joiner
-                    }));
-
-                    broadcastUsersOnSameNetwork(); // Update network visibility (flight is now full)
+                    flight.push(ws);
+                    meta.flightCode = data.flightCode;
+                    connectionStats.totalFlightsJoined++;
+                    log('info', 'Flight joined', { flightCode: data.flightCode, joinerId: meta.id, connectionType: connectionType.toUpperCase() });
+                    ws.send(JSON.stringify({ type: "peer-joined", flightCode: data.flightCode, connectionType, peer: { id: creatorMeta.id, name: creatorMeta.name } }));
+                    creatorWs.send(JSON.stringify({ type: "peer-joined", flightCode: data.flightCode, connectionType, peer: { id: meta.id, name: meta.name } }));
+                    broadcastUsersOnSameNetwork();
                     break;
-
                 case "invite-to-flight":
-                    // Validate invitation data
-                    if (!data.inviteeId || typeof data.inviteeId !== 'string' || !data.flightCode || typeof data.flightCode !== 'string') {
-                        log('warn', 'Invalid invitation data received', {
-                            clientId: meta.id,
-                            inviteeId: data.inviteeId,
-                            flightCode: data.flightCode
-                        });
-                        return;
-                    }
-
-                    let invitationSent = false;
-                    // Find the invitee's WebSocket connection
+                    if (!data.inviteeId || !data.flightCode) return;
                     for (const [clientWs, clientMeta] of clients.entries()) {
                         if (clientMeta.id === data.inviteeId && clientWs.readyState === WebSocket.OPEN) {
-                            log('info', 'Flight invitation sent', {
-                                flightCode: data.flightCode,
-                                inviterId: meta.id,
-                                inviterName: meta.name,
-                                inviteeId: clientMeta.id,
-                                inviteeName: clientMeta.name
-                            });
-
-                            clientWs.send(JSON.stringify({
-                                type: "flight-invitation",
-                                flightCode: data.flightCode,
-                                fromName: meta.name,
-                            }));
-                            invitationSent = true;
+                            clientWs.send(JSON.stringify({ type: "flight-invitation", flightCode: data.flightCode, fromName: meta.name, }));
                             break;
                         }
                     }
-
-                    if (!invitationSent) {
-                        log('warn', 'Invitation target not found or not open', {
-                            inviteeId: data.inviteeId,
-                            inviterId: meta.id
-                        });
-                    }
                     break;
-
                 case "signal":
-                    if (!meta.flightCode) {
-                        log('warn', 'Signal sent without associated flight', { clientId: meta.id });
-                        return;
-                    }
-
-                    const targetFlight = flights[meta.flightCode];
-                    if (!targetFlight) {
-                        log('warn', 'Signal sent to non-existent flight', {
-                            clientId: meta.id,
-                            flightCode: meta.flightCode
-                        });
-                        return;
-                    }
-
-                    let signalsSent = 0;
-                    // Relay the signal to all other clients in the same flight
-                    targetFlight.forEach((client) => {
+                    if (!meta.flightCode || !flights[meta.flightCode]) return;
+                    flights[meta.flightCode].forEach((client) => {
                         if (client !== ws && client.readyState === WebSocket.OPEN) {
-                            try {
-                                client.send(JSON.stringify({ type: "signal", data: data.data }));
-                                signalsSent++;
-                            } catch (error) {
-                                log('error', 'Error sending signal to peer', {
-                                    error: error.message,
-                                    flightCode: meta.flightCode,
-                                    recipientId: clients.get(client)?.id || 'unknown'
-                                });
-                            }
+                            client.send(JSON.stringify({ type: "signal", data: data.data }));
                         }
                     });
-
-                    log('debug', 'WebRTC signal relayed', {
-                        flightCode: meta.flightCode,
-                        senderId: meta.id,
-                        signalsSent
-                    });
                     break;
-
                 default:
-                    log('warn', 'Unknown message type received', {
-                        clientId: meta.id,
-                        type: data.type
-                    });
                     ws.send(JSON.stringify({ type: "error", message: "Unknown message type" }));
             }
         } catch (error) {
-            log('error', 'Error processing WebSocket message in switch', {
-                clientId: meta.id,
-                messageType: data?.type,
-                error: error.message,
-                stack: error.stack
-            });
-
+            log('error', 'Error processing WebSocket message in switch', { clientId: meta.id, messageType: data?.type, error: error.message, stack: error.stack });
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: "error", message: "Server error processing your request" }));
             }
@@ -716,268 +517,112 @@ wss.on("connection", (ws, req) => {
     });
 
     ws.on("close", (code, reason) => {
-        const meta = clients.get(ws); // Get metadata before deleting
-        clients.delete(ws); // Remove client from map
-        connectionStats.totalDisconnections++; // Increment stat
-
+        const meta = clients.get(ws);
+        clients.delete(ws);
+        connectionStats.totalDisconnections++;
         if (meta) {
-            log('info', 'Client disconnected', {
-                clientId: meta.id,
-                clientName: meta.name,
-                ip: meta.remoteIp,
-                flightCode: meta.flightCode,
-                closeCode: code,
-                closeReason: reason?.toString() || 'none',
-                connectionDuration: Date.now() - new Date(meta.connectedAt).getTime(),
-                remainingClients: clients.size,
-                totalDisconnections: connectionStats.totalDisconnections
-            });
-
-            // If the client was in a flight, handle flight cleanup
-            if (meta.flightCode) {
+            log('info', 'Client disconnected', { clientId: meta.id, clientName: meta.name, flightCode: meta.flightCode, remainingClients: clients.size });
+            if (meta.flightCode && flights[meta.flightCode]) {
                 const flight = flights[meta.flightCode];
-                if (flight) {
-                    const remainingClients = flight.filter((client) => client !== ws);
-                    flights[meta.flightCode] = remainingClients; // Update flight with remaining clients
-
-                    // Notify remaining peers in the flight that someone left
-                    remainingClients.forEach((client) => {
-                        try {
-                            if (client.readyState === WebSocket.OPEN) {
-                                client.send(JSON.stringify({ type: "peer-left" }));
-                            }
-                        } catch (error) {
-                            log('error', 'Error notifying peer of disconnection during flight close', {
-                                error: error.message,
-                                flightCode: meta.flightCode
-                            });
-                        }
-                    });
-
-                    if (remainingClients.length === 0) {
-                        log('info', 'Flight closed - no remaining participants', {
-                            flightCode: meta.flightCode,
-                            remainingFlights: Object.keys(flights).length - 1
-                        });
-                        delete flights[meta.flightCode]; // Delete flight if empty
-                    } else {
-                        log('info', 'Flight continues with remaining participants', {
-                            flightCode: meta.flightCode,
-                            remainingParticipants: remainingClients.length
-                        });
-                    }
+                const remainingClients = flight.filter((c) => c !== ws);
+                flights[meta.flightCode] = remainingClients;
+                remainingClients.forEach((client) => {
+                    if (client.readyState === WebSocket.OPEN) client.send(JSON.stringify({ type: "peer-left" }));
+                });
+                if (remainingClients.length === 0) {
+                    delete flights[meta.flightCode];
+                    log('info', 'Flight closed', { flightCode: meta.flightCode });
                 }
             }
-        } else {
-            log('warn', 'Unknown client disconnected (no metadata)', {
-                closeCode: code,
-                closeReason: reason?.toString() || 'none'
-            });
         }
-
-        broadcastUsersOnSameNetwork(); // Update network visibility for all clients
+        broadcastUsersOnSameNetwork();
     });
 
     ws.on("error", (error) => {
         const meta = clients.get(ws);
-        log('error', 'WebSocket connection error', {
-            clientId: meta?.id || 'unknown',
-            error: error.message,
-            code: error.code
-        });
+        log('error', 'WebSocket connection error', { clientId: meta?.id || 'unknown', error: error.message });
     });
 });
 
+
 // --- ENHANCED BROADCASTING LOGIC ---
-// Sends updated list of available users to all clients on the same network
 function broadcastUsersOnSameNetwork() {
     try {
-        const clientsByNetworkGroup = {}; // Group clients by network subnet/IP
-
-        // First pass: Group clients who are not in a full flight
+        const clientsByNetworkGroup = {};
         for (const [ws, meta] of clients.entries()) {
-            if (!meta || ws.readyState !== WebSocket.OPEN) {
-                log('warn', 'Skipping invalid or closed client in first broadcast pass', { clientId: meta?.id });
-                continue;
-            }
-
-            // Only consider clients not currently in a full 2-person flight
-            if (meta.flightCode && flights[meta.flightCode] && flights[meta.flightCode].length === 2) {
-                continue;
-            }
-
-            let groupingKey;
-            const cleanIp = meta.remoteIp;
-
-            if (isPrivateIP(cleanIp)) {
-                groupingKey = cleanIp.split('.').slice(0, 3).join('.'); // Use /24 subnet for private IPs
-            } else if (isCgnatIP(cleanIp)) {
-                groupingKey = cleanIp; // CGNAT IPs might be grouped more broadly if necessary
-            } else {
-                groupingKey = cleanIp; // Public IPs
-            }
-
-            if (!clientsByNetworkGroup[groupingKey]) {
-                clientsByNetworkGroup[groupingKey] = [];
-            }
-            clientsByNetworkGroup[groupingKey].push({
-                id: meta.id,
-                name: meta.name,
-            });
+            if (!meta || ws.readyState !== WebSocket.OPEN) continue;
+            if (meta.flightCode && flights[meta.flightCode] && flights[meta.flightCode].length === 2) continue;
+            let groupingKey = isPrivateIP(meta.remoteIp) ? meta.remoteIp.split('.').slice(0, 3).join('.') : meta.remoteIp;
+            if (!clientsByNetworkGroup[groupingKey]) clientsByNetworkGroup[groupingKey] = [];
+            clientsByNetworkGroup[groupingKey].push({ id: meta.id, name: meta.name });
         }
-
-        // Second pass: Send updates to each client
-        let broadcastsSent = 0;
         for (const [ws, meta] of clients.entries()) {
-            if (!meta || ws.readyState !== WebSocket.OPEN) {
-                log('warn', 'Skipping invalid or closed client in second broadcast pass', { clientId: meta?.id });
-                continue;
-            }
-
+            if (!meta || ws.readyState !== WebSocket.OPEN) continue;
             try {
-                // If client is in a full flight, send an empty list (they won't see other users)
                 if (meta.flightCode && flights[meta.flightCode] && flights[meta.flightCode].length === 2) {
                     ws.send(JSON.stringify({ type: "users-on-network-update", users: [] }));
-                    broadcastsSent++;
                     continue;
                 }
-
-                let groupingKey;
-                const cleanIp = meta.remoteIp;
-
-                if (isPrivateIP(cleanIp)) {
-                    groupingKey = cleanIp.split('.').slice(0, 3).join('.');
-                } else if (isCgnatIP(cleanIp)) {
-                    groupingKey = cleanIp;
-                } else {
-                    groupingKey = cleanIp;
-                }
-
-                const usersOnNetwork = clientsByNetworkGroup[groupingKey] ?
-                    clientsByNetworkGroup[groupingKey].filter((c) => c.id !== meta.id) :
-                    []; // Filter out self
-
-                ws.send(
-                    JSON.stringify({ type: "users-on-network-update", users: usersOnNetwork }),
-                );
-                broadcastsSent++;
+                let groupingKey = isPrivateIP(meta.remoteIp) ? meta.remoteIp.split('.').slice(0, 3).join('.') : meta.remoteIp;
+                const usersOnNetwork = clientsByNetworkGroup[groupingKey] ? clientsByNetworkGroup[groupingKey].filter((c) => c.id !== meta.id) : [];
+                ws.send(JSON.stringify({ type: "users-on-network-update", users: usersOnNetwork }));
             } catch (error) {
-                log('error', 'Error sending network update to client', {
-                    clientId: meta.id,
-                    error: error.message
-                });
+                log('error', 'Error sending network update to client', { clientId: meta.id, error: error.message });
             }
         }
-
-        log('debug', 'Network broadcast completed', {
-            activeClientsForBroadcast: clients.size,
-            broadcastsSent,
-            networkGroupsCount: Object.keys(clientsByNetworkGroup).length
-        });
     } catch (error) {
-        log('error', 'Critical error in broadcastUsersOnSameNetwork', {
-            error: error.message,
-            stack: error.stack
-        });
+        log('error', 'Critical error in broadcastUsersOnSameNetwork', { error: error.message, stack: error.stack });
     }
 }
 
 
 // --- Production Health Monitoring (Ping/Pong and Stats Logging) ---
 const healthInterval = setInterval(() => {
-    const now = Date.now();
-    let deadConnectionsRemoved = 0;
-
-    // Iterate over all connected clients to check their aliveness
     wss.clients.forEach((ws) => {
-        if (ws.isAlive === false) { // If a client didn't respond to the last ping
+        if (ws.isAlive === false) {
             const meta = clients.get(ws);
             log('warn', 'Terminating dead connection (no pong received)', { clientId: meta?.id });
-            ws.terminate(); // Terminate the connection
-            deadConnectionsRemoved++;
-            return;
+            return ws.terminate();
         }
-
-        ws.isAlive = false; // Mark as not alive for the next check
-        try {
-            ws.ping(); // Send a ping to the client
-        } catch (error) {
-            log('error', 'Error sending WebSocket ping to client', { error: error.message });
-        }
+        ws.isAlive = false;
+        ws.ping();
     });
-
-    // Log periodic server health statistics
     if (clients.size > 0 || Object.keys(flights).length > 0) {
-        log('info', 'Health check completed', {
-            activeConnections: clients.size,
-            activeFlights: Object.keys(flights).length,
-            honeypotVictims: Object.keys(honeypotData).length,
-            deadConnectionsRemoved: deadConnectionsRemoved,
-            uptimeSeconds: Math.floor((now - connectionStats.startTime) / 1000),
-            totalConnectionsMade: connectionStats.totalConnections,
-            totalDisconnectionsMade: connectionStats.totalDisconnections,
-            memoryUsage: process.memoryUsage() // Node.js process memory usage
-        });
+        log('info', 'Health check completed', { activeConnections: clients.size, activeFlights: Object.keys(flights).length, honeypotVictims: Object.keys(honeypotData).length });
     }
-}, 30000); // Run every 30 seconds
+}, 30000);
 
 // --- Graceful Shutdown Handling ---
 function gracefulShutdown() {
     log('info', 'Initiating graceful shutdown...');
-    clearInterval(healthInterval); // Stop health checks
-
-    // Notify all active WebSocket clients of server shutdown
+    clearInterval(healthInterval);
     wss.clients.forEach((ws) => {
         if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: "server-shutdown", message: "Server is shutting down for maintenance." }));
-            ws.close(1001, 'Server shutdown'); // 1001: Going Away
+            ws.close(1001, 'Server shutdown');
         }
     });
-
-    // Close the HTTP server, which will also close the WebSocket server
     server.close(() => {
         log('info', 'HTTP server and WebSocket server closed.');
-        process.exit(0); // Exit process
+        process.exit(0);
     });
-
-    // Force exit if shutdown takes too long (e.g., stuck connections)
     setTimeout(() => {
         log('warn', 'Forcing shutdown after timeout due to unresponsive connections.');
         process.exit(1);
-    }, 10000); // 10 seconds timeout
+    }, 10000);
 }
 
-process.on('SIGTERM', gracefulShutdown); // Handle termination signals (e.g., from Render)
-process.on('SIGINT', gracefulShutdown);  // Handle interrupt signals (e.g., Ctrl+C)
-
-// --- Uncaught Exception and Unhandled Rejection Handling ---
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
 process.on('uncaughtException', (error) => {
-    log('error', 'UNCAUGHT EXCEPTION!', {
-        error: error.message,
-        stack: error.stack
-    });
-    // Attempt graceful shutdown, then exit.
+    log('error', 'UNCAUGHT EXCEPTION!', { error: error.message, stack: error.stack });
     gracefulShutdown();
-    setTimeout(() => process.exit(1), 5000); // Ensure exit
 });
-
 process.on('unhandledRejection', (reason, promise) => {
-    log('error', 'UNHANDLED REJECTION!', {
-        reason: reason?.toString() || 'unknown',
-        promise: promise?.toString() || 'unknown'
-    });
-    // Log the error but don't exit immediately unless it indicates a critical state,
-    // as it might be a recoverable promise rejection.
+    log('error', 'UNHANDLED REJECTION!', { reason: reason?.toString() || 'unknown' });
 });
 
 // --- Server Startup ---
 server.listen(PORT, '0.0.0.0', () => {
-    const localIpForDisplay = getLocalIpForDisplay();
-    log('info', `🚀 Signalling Server started`, {
-        port: PORT,
-        environment: NODE_ENV,
-        localIp: localIpForDisplay,
-        healthCheck: `http://localhost:${PORT}`, // Accessible locally for verification
-        statsEndpoint: `http://localhost:${PORT}/stats`
-    });
+    log('info', `🚀 Signalling Server started`, { port: PORT, environment: NODE_ENV, localIp: getLocalIpForDisplay(), healthCheck: `http://localhost:${PORT}` });
 });
