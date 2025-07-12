@@ -11,8 +11,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
-    "ws": "^8.18.2"
+    "ws": "^8.18.2",
+    "geoip-lite": "^1.4.3"
   }
 }

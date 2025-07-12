@@ -1,0 +1,20 @@
+{
+    "rewrites": [
+      {
+        "source": "/wp-admin/:path*",
+        "destination": "https://dropsilk-server.onrender.com/wp-admin/:path*"
+      },
+      {
+        "source": "/wordpress/:path*",
+        "destination": "https://dropsilk-server.onrender.com/wordpress/:path*"
+      },
+      {
+        "source": "/wp-login.php",
+        "destination": "https://dropsilk-server.onrender.com/wp-login.php"
+      },
+      {
+        "source": "/honeypot-leaderboard",
+        "destination": "https://dropsilk-server.onrender.com/honeypot-leaderboard"
+      }
+    ]
+  }
