@@ -223,8 +223,7 @@ function generateLeaderboardHtml() {
             const data = honeypotData[ip];
             const maskedIp = ip.split('.').slice(0, 2).join('.') + '.***.***';
 
-            // **FIX**: Wrap the content of each cell in a <span> tag.
-            // This gives us a specific element to target for alignment and word wrapping.
+            // The <span> wrapper is correct and stays.
             tableRows += `
                 <tr>
                     <td data-label="Rank"><span>${index + 1}</span></td>
@@ -257,7 +256,7 @@ function generateLeaderboardHtml() {
             tr:hover { background-color: #4a4a4a; }
             .pass-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
             
-            /* --- **REVISED** Responsive Styles for Mobile (< 768px) --- */
+            /* --- **FINAL** Responsive Styles for Mobile (< 768px) --- */
             @media screen and (max-width: 768px) {
                 body { padding: 1em; }
                 .container { padding: 1.5em 1em; }
@@ -270,43 +269,37 @@ function generateLeaderboardHtml() {
                     border: 1px solid #333;
                     border-radius: 5px;
                     background-color: #242424;
-                    overflow: hidden; /* Prevents content from poking out of rounded corners */
+                    overflow: hidden;
                 }
                 
                 td {
-                    display: flex; /* Use flexbox for robust alignment */
-                    align-items: center; /* Vertically align label and value */
-                    justify-content: space-between; /* Put space between label and value */
+                    display: flex;
+                    align-items: center;
                     padding: 12px 15px;
                     border-bottom: 1px dotted #444;
-                    text-align: left; /* Reset text alignment */
+                    /* REMOVED: justify-content: space-between; This was the source of the problem. */
                 }
                 
                 td:last-child { border-bottom: none; }
 
-                /* Style the label (the ::before pseudo-element) */
                 td::before {
                     content: attr(data-label);
                     font-weight: bold;
                     color: #bb86fc;
-                    padding-right: 1em; /* Space between label and value */
+                    padding-right: 1em;
                     flex-shrink: 0; /* Prevents the label from shrinking */
                 }
                 
-                /* Style the value (the new <span> element) */
+                /* THE KEY FIX: The value's container now grows to fill space */
                 td span {
-                    text-align: right; /* Align the value text to the right */
-                    word-break: break-all; /* THIS IS THE KEY FIX: forces long text to wrap */
+                    flex-grow: 1; /* NEW: Allows the span to take up all available space */
+                    min-width: 0; /* NEW: A crucial flexbox property to allow shrinking and wrapping */
+                    text-align: right; /* Aligns the text *inside* the flexible span */
+                    word-break: break-all; /* Ensures long words still wrap */
                 }
 
-                /* Special handling for password cell to make it more readable */
-                .pass-cell {
-                    align-items: flex-start; /* Align to top */
-                }
-                .pass-cell span {
-                    font-family: monospace;
-                    color: #ccc; /* Make password slightly less prominent */
-                }
+                .pass-cell { align-items: flex-start; }
+                .pass-cell span { font-family: monospace; color: #ccc; }
             }
         </style>
     </head>
