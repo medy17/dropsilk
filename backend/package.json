@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "ws": "^8.18.2",
-    "geoip-lite": "^1.4.3"
+    "geoip-lite": "^1.4.3",
+    "he": "^1.2.0"
   }
 }

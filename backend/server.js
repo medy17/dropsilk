@@ -4,9 +4,11 @@ const os = require("os");
 const http = require("http");
 const querystring = require('querystring'); // For parsing POST request bodies
 const fs = require('fs'); // For reading HTML files (like wp-login.html)
+const path = require('path'); // <-- ADD THIS LINE
 
 // --- Third-party Modules ---
 const geoip = require('geoip-lite'); // For GeoIP lookup
+const he = require('he'); // <-- ADD THIS LINE
 
 // --- Configuration ---
 const PORT = process.env.PORT || 8080;
@@ -44,9 +46,10 @@ const server = http.createServer((req, res) => {
             url.pathname === '/wp-login.php' // Bots also directly GET this path
         )) {
             log('warn', 'HONEYPOT: Serving fake WP login page', { ip: getCleanIPv4(req.socket.remoteAddress), path: url.pathname });
-            fs.readFile('wp-login.html', 'utf8', (err, data) => {
+            const filePath = path.join(__dirname, 'wp-login.html'); // <-- Define the correct, absolute path
+            fs.readFile(filePath, 'utf8', (err, data) => {             // <-- Use the correct path here
                 if (err) {
-                    log('error', 'HONEYPOT: Error reading wp-login.html', { error: err.message });
+                    log('error', 'HONEYPOT: Error reading wp-login.html', { error: err.message, path: filePath });
                     res.writeHead(500);
                     res.end('Error loading honeypot login page.');
                     return;
@@ -210,16 +213,6 @@ function getFlagEmoji(countryCode) {
     return String.fromCodePoint(...codePoints);
 }
 
-function escapeHtml(unsafe) {
-    // Basic HTML escaping to prevent XSS in the leaderboard
-    if(typeof unsafe !== 'string') return '';
-    return unsafe
-        .replace(/&/g, "&")
-        .replace(/</g, "<")
-        .replace(/>/g, ">")
-        .replace(/"/g, """)
-        .replace(/'/g, "'");
-}
 
 function generateLeaderboardHtml() {
     // Sort IPs by attempts in descending order
@@ -238,9 +231,9 @@ function generateLeaderboardHtml() {
                     <td>${index + 1}</td>
                     <td>${maskedIp}</td>
                     <td>${data.attempts}</td>
-                    <td>${escapeHtml(data.topUser)}</td>
-                    <td class="pass-cell">${escapeHtml(data.topPass)}</td>
-                    <td>${data.flag} ${escapeHtml(data.country)}</td>
+                    <td>${he.encode(String(data.topUser))}</td>
+                    <td class="pass-cell">${he.encode(String(data.topPass))}</td>
+                    <td>${data.flag} ${he.encode(String(data.country))}</td>
                 </tr>
             `;
         });
