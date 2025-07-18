@@ -181,6 +181,83 @@ body {
 body[data-theme="dark"] #theme-toggle .sun-icon { display: block; }
 body[data-theme="dark"] #theme-toggle .moon-icon { display: none; }
 
+/* --- 404 Page Styles --- */
+.not-found-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-grow: 1; /* Takes up space between header and footer */
+    padding: 2rem;
+    min-height: calc(100vh - 12rem); /* Ensure it's tall enough on its own */
+}
+
+.not-found-content {
+    background: var(--c-panel-bg);
+    border: 2px solid var(--c-panel-border);
+    box-shadow: var(--c-panel-shadow);
+    border-radius: 20px;
+    padding: 3rem 4rem;
+    max-width: 600px;
+}
+
+.not-found-svg {
+    color: var(--c-secondary);
+    margin-bottom: 1.5rem;
+    animation: wobble 5s ease-in-out infinite;
+}
+
+@keyframes wobble {
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
+}
+
+.not-found-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(5em, 20vw, 8em);
+    font-weight: 800;
+    line-height: 1;
+    margin: 0;
+    color: var(--c-primary);
+    text-shadow: 0 4px 1px var(--c-secondary);
+    opacity: 0.3;
+}
+
+body[data-theme="dark"] .not-found-title {
+    text-shadow: none;
+    background: -webkit-linear-gradient(var(--c-primary), var(--c-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+.not-found-headline {
+    font-size: clamp(1.5em, 5vw, 2.5em);
+    margin: 0.5rem 0 1rem 0;
+    color: var(--c-text-primary);
+    font-weight: 700;
+}
+
+.not-found-text {
+    color: var(--c-text-secondary);
+    margin: 0 0 2.5rem 0;
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.not-found-btn {
+    padding: 1em 2em;
+    font-size: 1em;
+}
+
+@media (max-width: 600px) {
+    .not-found-content {
+        padding: 2rem 1.5rem;
+    }
+}
+
 
 /* --- Initial Setup Screen --- */
 .main-content {
