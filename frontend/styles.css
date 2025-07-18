@@ -235,7 +235,7 @@ body[data-theme="dark"] .not-found-title {
 .not-found-headline {
     font-size: clamp(1.5em, 5vw, 2.5em);
     margin: 0.5rem 0 1rem 0;
-    color: var(--c-text-primary);
+    color: var(--c-danger);
     font-weight: 700;
 }
 
