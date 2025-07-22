@@ -670,7 +670,7 @@ function startFileSend(file) {
             drainQueue();
         }
     };
-    worker.postMessage(file);
+    worker.postMessage({ file: file });
 }
 
 function drainQueue() {
