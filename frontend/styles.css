@@ -45,10 +45,10 @@ body[data-theme="dark"] {
     --c-panel-border: rgba(245, 169, 184, 0.4);
     --c-panel-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.2);
 
+    --c-header-bg: rgba(24, 24, 27, 0.001); /* From solid black to semi-transparent */
     /*
-    --c-header-bg: #111113;
+    --c-header-border: rgba(255, 255, 255, 0.1); !* A subtle white border *!
     */
-    --c-header-border: var(--c-primary);
     --c-footer-bg: #111113;
     --c-footer-border: rgba(255, 255, 255, 0.1);
 
@@ -63,10 +63,6 @@ body[data-theme="dark"] {
 
     --c-success: #3ec6a8;
     --c-danger: #f87171;
-    background-color: rgba(24, 24, 27, 0.6); /* Semi-transparent version of panel bg */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px); /* For Safari support */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Subtle edge highlight */
 }
 
 /* --- Global Styles --- */
@@ -153,8 +149,10 @@ body[data-theme="dark"] #aurora-container {
     left: 0;
     z-index: 1000;
     background: var(--c-header-bg);
-    border-bottom: 0px solid var(--c-header-border);
+    border-bottom: 1px solid var(--c-header-border); /* Changed from 0px to 1px */
     transition: background 0.3s ease, border-color 0.3s ease;
+    backdrop-filter: blur(12px); /* Add this line for the blur */
+    -webkit-backdrop-filter: blur(12px); /* Add this for Safari support */
 }
 .header .logo {
     font-size: 1.5em;
