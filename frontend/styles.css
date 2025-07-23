@@ -79,6 +79,42 @@ body {
     display: flex;
     flex-direction: column;
     transition: background 0.3s ease, color 0.3s ease;
+    position: relative; /* Needed for the pseudo-elements */
+}
+
+/* --- NEW: Aurora Background --- */
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    mix-blend-mode: soft-light;
+    filter: blur(100px);
+    will-change: transform;
+}
+
+body::before {
+    background: radial-gradient(circle at 20% 30%, var(--c-primary), transparent 40%);
+    animation: float 15s ease-in-out infinite alternate;
+}
+
+body::after {
+    background: radial-gradient(circle at 80% 70%, var(--c-secondary), transparent 40%);
+    animation: float 20s ease-in-out infinite alternate;
+    animation-delay: -5s;
+}
+
+@keyframes float {
+    0% {
+        transform: translateX(-10%) translateY(-10%) rotate(0deg);
+    }
+    100% {
+        transform: translateX(10%) translateY(10%) rotate(360deg);
+    }
 }
 
 .header {
@@ -310,6 +346,7 @@ body[data-theme="dark"] .tagline-section h1 { text-shadow: none; }
     position: relative;
     width: 100%;
     max-width: 380px;
+    perspective: 1000px; /* Add perspective for the 3D effect */
 }
 body[data-theme="dark"] .flight-ticket-panel-wrapper {
     filter: drop-shadow(0 0 15px rgba(91, 206, 250, 0.1));
@@ -322,7 +359,8 @@ body[data-theme="dark"] .flight-ticket-panel-wrapper {
     padding: 2rem;
     box-shadow: 0 4px 32px 0 rgba(91, 206, 250, 0.07), 0 1.5px 0 0 var(--c-secondary);
     border: 1.5px solid var(--c-primary);
-    transition: box-shadow 0.2s, background 0.3s ease, color 0.3s ease;
+    transition: box-shadow 0.2s, background 0.3s ease, color 0.3s ease, transform 0.1s ease-out; /* Add transform transition */
+    transform-style: preserve-3d; /* Enable 3D transformations for children */
 }
 body[data-theme="dark"] .flight-ticket {
     box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.2), 0 1.5px 0 0 var(--c-secondary);
@@ -594,6 +632,30 @@ body[data-theme="dark"] #dashboard-flight-code .copy-feedback {
 .flight-actions {
     display: flex;
     gap: 0.8rem;
+}
+
+/* --- NEW: Dashboard Panel Animation --- */
+.panel.fade-in {
+    animation: panel-fade-in 0.6s cubic-bezier(0.215, 0.610, 0.355, 1) both;
+}
+
+/* Stagger the animation for a more dynamic entry */
+.dashboard-grid .panel:nth-child(1) { animation-delay: 0.1s; }
+.dashboard-grid .panel:nth-child(2) { animation-delay: 0.2s; }
+.dashboard-grid .panel:nth-child(3) { animation-delay: 0.3s; }
+.dashboard-grid .panel:nth-child(4) { animation-delay: 0.4s; }
+.dashboard-footer-grid .panel:nth-child(1) { animation-delay: 0.5s; }
+.dashboard-footer-grid .panel:nth-child(2) { animation-delay: 0.6s; }
+
+@keyframes panel-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .modal-overlay {
@@ -922,6 +984,33 @@ body[data-theme="dark"] .btn {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+}
+
+/* --- NEW: Dynamic Drop Zone State --- */
+#dashboard:not(.is-connected) .drop-zone {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(80%);
+}
+
+#dashboard:not(.is-connected) .drop-zone__icon,
+#dashboard:not(.is-connected) .drop-zone__buttons {
+    pointer-events: none;
+}
+
+#dashboard.is-connected .drop-zone {
+    animation: pulse-glow 2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+    from {
+        border-color: var(--c-primary);
+        box-shadow: 0 0 5px rgba(91, 206, 250, 0.2), 0 0 10px rgba(91, 206, 250, 0.1);
+    }
+    to {
+        border-color: var(--c-secondary);
+        box-shadow: 0 0 15px rgba(245, 169, 184, 0.3), 0 0 30px rgba(245, 169, 184, 0.2);
+    }
 }
 
 .drop-zone.drag-over {
