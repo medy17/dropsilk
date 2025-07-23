@@ -98,15 +98,18 @@ body::after {
 }
 
 body::before {
-    background: radial-gradient(circle at 20% 30%, var(--c-primary), transparent 40%);
+    /* Stepped for smoother rendering */
+    background: radial-gradient(circle at 20% 30%, var(--c-primary), rgba(91, 206, 250, 0.5) 20%, transparent 40%);
     animation: float 15s ease-in-out infinite alternate;
 }
 
 body::after {
-    background: radial-gradient(circle at 80% 70%, var(--c-secondary), transparent 40%);
+    /* Stepped for smoother rendering */
+    background: radial-gradient(circle at 80% 70%, var(--c-secondary), rgba(245, 169, 184, 0.5) 20%, transparent 40%);
     animation: float 20s ease-in-out infinite alternate;
     animation-delay: -5s;
 }
+
 
 @keyframes float {
     0% {
