@@ -81,6 +81,61 @@ body {
     transition: background 0.3s ease, color 0.3s ease;
 }
 
+/* --- NEW: Aurora Background --- */
+#aurora-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+    overflow: hidden;
+}
+body[data-theme="dark"] #aurora-container {
+    opacity: 1;
+}
+.aurora-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    will-change: transform;
+    opacity: 0.8;
+    mix-blend-mode: screen;
+}
+.aurora-blob:nth-child(1) {
+    width: 60vmax; height: 60vmax;
+    top: -20vmax; left: -20vmax;
+    background: rgba(91, 206, 250, 0.3);
+    animation: moveBlob1 25s infinite alternate ease-in-out;
+}
+.aurora-blob:nth-child(2) {
+    width: 50vmax; height: 50vmax;
+    top: auto; bottom: -15vmax; left: auto; right: -15vmax;
+    background: rgba(245, 169, 184, 0.25);
+    animation: moveBlob2 30s infinite alternate ease-in-out;
+}
+.aurora-blob:nth-child(3) {
+    width: 40vmax; height: 40vmax;
+    top: 20vh; left: 40vw;
+    background: rgba(192, 132, 252, 0.2); /* A nice purple */
+    animation: moveBlob3 20s infinite alternate ease-in-out;
+}
+
+@keyframes moveBlob1 {
+    from { transform: translate(0, 0) rotate(0deg) scale(1); }
+    to { transform: translate(20vw, 30vh) rotate(180deg) scale(1.2); }
+}
+@keyframes moveBlob2 {
+    from { transform: translate(0, 0) rotate(0deg) scale(1.1); }
+    to { transform: translate(-30vw, -20vh) rotate(270deg) scale(0.9); }
+}
+@keyframes moveBlob3 {
+    from { transform: translate(0, 0) rotate(0deg) scale(1); }
+    to { transform: translate(10vw, -15vh) rotate(-90deg) scale(1.3); }
+}
+
+
 .header {
     width: 100%;
     padding: 1.5em 1.5em;
@@ -191,6 +246,8 @@ body[data-theme="dark"] #theme-toggle .moon-icon { display: none; }
     flex-grow: 1; /* Takes up space between header and footer */
     padding: 2rem;
     min-height: calc(100vh - 12rem); /* Ensure it's tall enough on its own */
+    position: relative;
+    z-index: 1; /* Sit above aurora */
 }
 
 .not-found-content {
@@ -270,7 +327,13 @@ body[data-theme="dark"] .not-found-title {
     padding: 8rem 2em 2em;
     gap: 3em;
     background: var(--c-bg);
+    position: relative;
+    z-index: 1; /* Sit above aurora */
 }
+body[data-theme="dark"] .main-content {
+    background: transparent; /* Let aurora show through */
+}
+
 
 .tagline-section {
     flex-basis: 50%;
@@ -310,6 +373,7 @@ body[data-theme="dark"] .tagline-section h1 { text-shadow: none; }
     position: relative;
     width: 100%;
     max-width: 380px;
+    perspective: 1000px; /* NEW: For 3D tilt effect */
 }
 body[data-theme="dark"] .flight-ticket-panel-wrapper {
     filter: drop-shadow(0 0 15px rgba(91, 206, 250, 0.1));
@@ -322,7 +386,8 @@ body[data-theme="dark"] .flight-ticket-panel-wrapper {
     padding: 2rem;
     box-shadow: 0 4px 32px 0 rgba(91, 206, 250, 0.07), 0 1.5px 0 0 var(--c-secondary);
     border: 1.5px solid var(--c-primary);
-    transition: box-shadow 0.2s, background 0.3s ease, color 0.3s ease;
+    transition: box-shadow 0.2s, background 0.3s ease, color 0.3s ease, transform 0.4s ease-out; /* MODIFIED: Added transform transition */
+    transform-style: preserve-3d; /* NEW: For 3D tilt effect */
 }
 body[data-theme="dark"] .flight-ticket {
     box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.2), 0 1.5px 0 0 var(--c-secondary);
@@ -473,6 +538,8 @@ body[data-theme="dark"] .flight-ticket h2 { text-shadow: none; }
     flex-direction: column;
     gap: 1.5rem;
     flex-grow: 1;
+    position: relative;
+    z-index: 1; /* Sit above aurora */
 }
 @media (min-width: 768px) {
     #dashboard {
@@ -924,6 +991,23 @@ body[data-theme="dark"] .btn {
     overflow: hidden;
 }
 
+/* --- NEW: Disabled Drop Zone styles --- */
+.drop-zone.disabled {
+    cursor: not-allowed;
+    border-style: solid;
+    filter: grayscale(80%);
+    opacity: 0.6;
+}
+.drop-zone.disabled * {
+    pointer-events: none;
+    user-select: none;
+}
+.drop-zone.disabled .drop-zone__icon,
+.drop-zone.disabled .drop-zone__buttons {
+    display: none;
+}
+
+
 .drop-zone.drag-over {
     border-color: var(--c-primary);
     background: var(--c-dropzone-hover-bg);
@@ -1263,6 +1347,8 @@ body[data-theme="dark"] .file-action a {
     color: var(--c-text-secondary);
     margin-top: auto;
     transition: background 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    z-index: 1; /* Sit above aurora */
 }
 
 .footer-content {

@@ -116,6 +116,9 @@ const sendingQueueDiv = document.getElementById("sending-queue");
 const receiverQueueDiv = document.getElementById("receiver-queue");
 const toastContainer = document.getElementById("toast-container");
 const qrCanvas = document.getElementById('qrCanvas'); // Moved to global scope
+const dropZone = document.querySelector('.drop-zone'); // NEW: For disabling/enabling
+const dropZoneText = dropZone.querySelector('p');
+const dropZoneSecondaryText = dropZone.querySelector('.secondary-text');
 
 // --- MODIFIED: Dynamic connection panel elements ---
 const connectionPanelTitle = document.getElementById("connection-panel-title");
@@ -173,6 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setupContainer.style.display = "none";
         dashboard.style.display = "flex";
         setFlightCode(flightCode);
+        disableDropZone(); // NEW: Initially disable the drop zone
         // Re-render the network list to enable invite buttons if not yet connected
         if (!peerInfo) {
             renderNetworkUsersView(lastNetworkUsers || []);
@@ -376,7 +380,6 @@ function setupAllModalsAndNav() {
 }
 
 function setupDragAndDrop() {
-    const dropZone = document.querySelector('.drop-zone');
     let dragCounter = 0;
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => document.addEventListener(eventName, e => {e.preventDefault(); e.stopPropagation();}));
@@ -389,27 +392,30 @@ function setupDragAndDrop() {
     document.addEventListener('drop', e => { dragCounter = 0; document.body.classList.remove('dragging'); });
 
     function handleDragEnter(e) {
+        if (dropZone.classList.contains('disabled')) return; // NEW check
         dropZone.classList.add('drag-over');
         if (e.dataTransfer.types.includes('Files')) {
             dropZone.classList.add('drag-active');
-            if (dropZone.querySelector('p').textContent === 'Drag & Drop files or folders') {
-                dropZone.querySelector('p').textContent = 'Drop your files here!';
-                dropZone.querySelector('.secondary-text').textContent = 'Release to add to queue';
+            if (dropZoneText.textContent === 'Drag & Drop files or folders') {
+                dropZoneText.textContent = 'Drop your files here!';
+                dropZoneSecondaryText.textContent = 'Release to add to queue';
             }
         }
     }
 
     function handleDragLeave(e) {
         if (!dropZone.contains(e.relatedTarget)) {
+            if (dropZone.classList.contains('disabled')) return; // NEW check
             dropZone.classList.remove('drag-over', 'drag-active');
-            dropZone.querySelector('p').textContent = 'Drag & Drop files or folders';
-            dropZone.querySelector('.secondary-text').textContent = 'or select manually';
+            dropZoneText.textContent = 'Drag & Drop files or folders';
+            dropZoneSecondaryText.textContent = 'or select manually';
         }
     }
     function handleDrop(e) {
+        if (dropZone.classList.contains('disabled')) return; // NEW check
         dropZone.classList.remove('drag-over', 'drag-active');
-        dropZone.querySelector('p').textContent = 'Drag & Drop files or folders';
-        dropZone.querySelector('.secondary-text').textContent = 'or select manually';
+        dropZoneText.textContent = 'Drag & Drop files or folders';
+        dropZoneSecondaryText.textContent = 'or select manually';
         handleFileSelection(e.dataTransfer.files);
     }
 }
@@ -506,7 +512,7 @@ function handlePeerJoined(flightCode) {
     dashboardFlightStatus.style.backgroundColor = '#f0fdf4';
     dashboardFlightStatus.style.borderColor = '#bbf7d0';
     renderInFlightView();
-    processFileToSendQueue();
+    // Don't enable drop zone yet, wait for data channel to open
 }
 
 function handlePeerLeft() {
@@ -517,6 +523,7 @@ function handlePeerLeft() {
     dashboardFlightStatus.style.color = '#d97706';
     dashboardFlightStatus.style.backgroundColor = '#fffbe6';
     dashboardFlightStatus.style.borderColor = '#fde68a';
+    disableDropZone(); // NEW: Disable drop zone when peer leaves
     // Revert to network view. The server will send a `users-on-network-update` which will
     // trigger the render, but we can be proactive to make the UI feel instant.
     renderNetworkUsersView(lastNetworkUsers);
@@ -530,8 +537,8 @@ let incomingFileInfo = null, incomingFileData = [], incomingFileReceived = 0;
 function setupDataChannel() {
     dataChannel.onopen = () => {
         console.log("Data channel opened!");
-        // The peer-joined message from the server already handles the UI update.
-        // Re-calling handlePeerJoined here would be redundant.
+        enableDropZone(); // NEW: Enable drop zone now that channel is open
+        processFileToSendQueue();
 
         // NEW: Start tracking metrics when channel opens
         lastMetricsUpdateTime = Date.now();
@@ -723,7 +730,6 @@ function handleFileSelection(files) {
     if (files.length === 0) return;
 
     // Add success animation for drag and drop
-    const dropZone = document.querySelector('.drop-zone');
     if (dropZone) {
         dropZone.style.transform = 'scale(0.98)';
         dropZone.style.transition = 'transform 0.1s ease-out';
@@ -808,6 +814,33 @@ function setupEventListeners() {
             }
         }
     });
+
+    // --- NEW: Dynamic Ticket Tilt Effect ---
+    const ticketWrapper = document.querySelector('.flight-ticket-panel-wrapper');
+    if (ticketWrapper) {
+        const ticket = ticketWrapper.querySelector('.flight-ticket');
+
+        ticketWrapper.addEventListener('mousemove', (e) => {
+            const rect = ticketWrapper.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const deltaX = x - centerX;
+            const deltaY = y - centerY;
+
+            const rotateX = (deltaY / centerY) * -6; // Max 6 degrees
+            const rotateY = (deltaX / centerX) * 6;  // Max 6 degrees
+
+            ticket.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        ticketWrapper.addEventListener('mouseleave', () => {
+            ticket.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        });
+    }
 
     document.getElementById('shareAppBtn').onclick = () => document.getElementById('inviteBtn').click();
 
@@ -909,6 +942,19 @@ function renderInFlightView() {
                 <span class="inflight-user-id">ID: ${peerInfo.id}</span>
             </div>
         `;
+}
+
+// --- NEW: Drop Zone Control ---
+function disableDropZone() {
+    dropZone.classList.add('disabled');
+    dropZoneText.textContent = 'Waiting for a peer to connect...';
+    dropZoneSecondaryText.textContent = 'You can invite them using the button above.';
+}
+
+function enableDropZone() {
+    dropZone.classList.remove('disabled');
+    dropZoneText.textContent = 'Drag & Drop files or folders';
+    dropZoneSecondaryText.textContent = 'or select manually';
 }
 
 // --- NEW: Generic Toast Creation Function ---
