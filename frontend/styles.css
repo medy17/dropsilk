@@ -79,7 +79,7 @@ body {
     flex-direction: column;
     transition: background 0.3s ease, color 0.3s ease;
 }
-/* --- GORGEOUS COSMIC DRIFT BACKGROUND (V2 - Seamless Looping) --- */
+/* --- GORGEOUS COSMIC DRIFT BACKGROUND (Seamless Looping) --- */
 @keyframes star-drift {
     from { background-position: 0 0; }
     to { background-position: -10000px 5000px; }
@@ -116,10 +116,8 @@ body[data-theme="dark"] .aurora-background {
     position: absolute;
     mix-blend-mode: hard-light;
     filter: blur(8vh);
-    /* Opacity is now controlled within the keyframes for seamless looping */
 }
 
-/* --- Blob Definitions with Staggered Delays for Continuous Flow --- */
 
 .aurora-blob:nth-child(1) {
     width: 50vmax; height: 50vmax;
@@ -132,7 +130,6 @@ body[data-theme="dark"] .aurora-background {
     width: 60vmax; height: 60vmax;
     background-color: var(--c-secondary);
     border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-    /* Negative delay starts the animation partway through its cycle */
     animation: moveBlobB 38s linear infinite -10s;
 }
 
@@ -150,7 +147,6 @@ body[data-theme="dark"] .aurora-background {
     animation: moveBlobD 55s linear infinite -35s;
 }
 
-/* --- Refined Keyframes with Integrated Spawn/Despawn --- */
 @keyframes moveBlobA {
     0% { transform: translate(-20vw, -20vh) rotate(0deg) scale(0); opacity: 0; }
     10% { transform: translate(-18vw, -15vh) rotate(38deg) scale(1); opacity: 0.6; }
@@ -179,7 +175,6 @@ body[data-theme="dark"] .aurora-background {
     100% { transform: translate(-30vw, 10vh) rotate(400deg) scale(0); opacity: 0; }
 }
 
-/* Ensure content areas are transparent in dark mode to see the background */
 body[data-theme="dark"] .main-content,
 body[data-theme="dark"] .not-found-content {
     background: transparent;
@@ -195,10 +190,10 @@ body[data-theme="dark"] .not-found-content {
     left: 0;
     z-index: 1000;
     background: var(--c-header-bg);
-    border-bottom: 1px solid var(--c-header-border); /* Changed from 0px to 1px */
+    border-bottom: 0px solid var(--c-header-border);
     transition: background 0.3s ease, border-color 0.3s ease;
-    backdrop-filter: blur(12px); /* Add this line for the blur */
-    -webkit-backdrop-filter: blur(12px); /* Add this for Safari support */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 .header .logo {
     font-size: 1.5em;
@@ -243,25 +238,25 @@ body[data-theme="dark"] .not-found-content {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px; /* Added for pill shape */
+    border-radius: 6px;
     min-width: 38px;
     min-height: 38px;
 }
 .brand-text {
-    font-size: clamp(1rem, 4vw, 2rem); /* Dynamic resizing */
-    white-space: nowrap;               /* No wrapping by default */
+    font-size: clamp(1rem, 4vw, 2rem);
+    white-space: nowrap;
     transition: font-size 0.2s;
 }
 
 @media (max-width: 400px) {
     .brand-text {
-        white-space: normal;             /* Allow wrapping below 400px */
+        white-space: normal;
     }
 }
 
 @media (max-width: 350px) {
     .brand-text {
-        display: none;                   /* Hide below 350px */
+        display: none;
     }
 }
 
@@ -293,11 +288,11 @@ body[data-theme="dark"] #theme-toggle .moon-icon { display: none; }
     align-items: center;
     justify-content: center;
     text-align: center;
-    flex-grow: 1; /* Takes up space between header and footer */
+    flex-grow: 1;
     padding: 2rem;
-    min-height: calc(100vh - 12rem); /* Ensure it's tall enough on its own */
+    min-height: calc(100vh - 12rem);
     position: relative;
-    z-index: 1; /* Sit above aurora */
+    z-index: 1;
 }
 
 .not-found-content {
@@ -312,7 +307,7 @@ body[data-theme="dark"] #theme-toggle .moon-icon { display: none; }
 .not-found-svg {
     color: var(--c-secondary);
     margin-bottom: 1.5rem;
-    animation: wobble 5s ease-in-out infinite;
+    animation: wobble 3s ease-in-out infinite;
 }
 
 @keyframes wobble {
@@ -381,7 +376,7 @@ body[data-theme="dark"] .not-found-title {
     z-index: 1; /* Sit above aurora */
 }
 body[data-theme="dark"] .main-content {
-    background: transparent; /* Let aurora show through */
+    background: transparent;
 }
 
 
@@ -423,7 +418,7 @@ body[data-theme="dark"] .tagline-section h1 { text-shadow: none; }
     position: relative;
     width: 100%;
     max-width: 380px;
-    perspective: 1000px; /* NEW: For 3D tilt effect */
+    perspective: 1000px;
 }
 body[data-theme="dark"] .flight-ticket-panel-wrapper {
     filter: drop-shadow(0 0 15px rgba(91, 206, 250, 0.1));
@@ -436,8 +431,8 @@ body[data-theme="dark"] .flight-ticket-panel-wrapper {
     padding: 2rem;
     box-shadow: 0 4px 32px 0 rgba(91, 206, 250, 0.07), 0 1.5px 0 0 var(--c-secondary);
     border: 1.5px solid var(--c-primary);
-    transition: box-shadow 0.2s, background 0.3s ease, color 0.3s ease, transform 0.4s ease-out; /* MODIFIED: Added transform transition */
-    transform-style: preserve-3d; /* NEW: For 3D tilt effect */
+    transition: box-shadow 0.2s, background 0.3s ease, color 0.3s ease, transform 0.4s ease-out;
+    transform-style: preserve-3d;
 }
 body[data-theme="dark"] .flight-ticket {
     box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.2), 0 1.5px 0 0 var(--c-secondary);
@@ -821,7 +816,6 @@ body[data-theme="dark"] #dashboard-flight-code .copy-feedback {
     transform: scale(0.97);
 }
 
-/* --- NEW: Staggered Modal Content Animation --- */
 .modal-overlay .modal-header,
 .modal-overlay .modal-body,
 .modal-overlay .flight-code-display,
@@ -1556,9 +1550,7 @@ body[data-theme="dark"] .file-action a {
     transition-duration: 0.1s;
 }
 
-/* --- APPEND TO END OF styles.css --- */
 
-/* --- NEW: Action buttons for receiver queue --- */
 .file-action-group {
     display: flex;
     gap: 0.5rem;
@@ -1566,33 +1558,30 @@ body[data-theme="dark"] .file-action a {
 .file-action-group .btn {
     padding: 0.8em 1em;
     font-size: 0.85em;
-    flex-grow: 1; /* Make buttons take up equal space */
+    flex-grow: 1;
 }
 .file-action a.btn {
     padding: 0.8em 1em;
     font-size: 0.9em;
 }
 
-/* --- NEW: VIDEO PLAYER STYLES --- */
 #video-player-container {
-    position: relative; /* Changed from fixed */
-    z-index: 1; /* Sits above the overlay */
+    position: relative;
+    z-index: 1;
     background-color: #000;
     font-family: 'IBM Plex Sans', sans-serif;
-    display: flex; /* Helps center the video element */
+    display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 16px;
-    overflow: hidden; /* Important for rounded corners on the video */
+    overflow: hidden;
     box-shadow: 0 20px 60px rgba(0,0,0,0.4);
     border: 2px solid var(--c-primary);
 
-    /* Responsive aspect-ratio magic */
     max-width: 90vw;
     max-height: 85vh;
-    aspect-ratio: 16 / 9; /* Default aspect ratio, will be overridden by video */
+    aspect-ratio: 16 / 9;
 
-    /* Animation for modal pop-in */
     transform: scale(0.95) translateY(20px);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1603,7 +1592,6 @@ body[data-theme="dark"] .file-action a {
 
 #video-element {
     display: block;
-    /* This makes the video fill the container while respecting its own aspect ratio */
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -1725,7 +1713,7 @@ input[type=range].volume-slider::-moz-range-thumb { background-color: #fff; heig
 #video-player-container.fullscreen .fullscreen-btn .exit-fullscreen-icon { display: block; }
 #video-player-container.fullscreen .fullscreen-btn .enter-fullscreen-icon { display: none; }
 .audio-track-btn, .captions-btn {
-    display: flex !important; /* Overcome inline style from demo */
+    display: flex !important;
 }
 .audio-track-btn svg, .captions-btn svg { fill: currentColor; stroke-width: 0; }
 @media (max-width: 600px) {
@@ -1733,7 +1721,6 @@ input[type=range].volume-slider::-moz-range-thumb { background-color: #fff; heig
     .time-container { display: none; }
     .download-btn { display: none; }
 }
-/* --- NEW: reCAPTCHA container styling --- */
 #recaptcha-container {
     display: flex;
     justify-content: center;
