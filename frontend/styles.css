@@ -989,6 +989,7 @@ body[data-theme="dark"] .btn {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    min-height: 290px;
 }
 
 /* --- NEW: Disabled Drop Zone styles --- */
@@ -1004,7 +1005,8 @@ body[data-theme="dark"] .btn {
 }
 .drop-zone.disabled .drop-zone__icon,
 .drop-zone.disabled .drop-zone__buttons {
-    display: none;
+    visibility: hidden;
+    opacity: 0;
 }
 
 
