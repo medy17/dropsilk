@@ -171,14 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
     enterFlightMode = function(flightCode) {
         currentFlightCode = flightCode;
         setupContainer.style.display = "none";
-
-        // NEW: Animate panels on dashboard entry
-        document.querySelectorAll('#dashboard .panel').forEach(panel => {
-            panel.classList.remove('fade-in'); // Reset animation
-            void panel.offsetWidth; // Trigger reflow
-            panel.classList.add('fade-in');
-        });
-
         dashboard.style.display = "flex";
         setFlightCode(flightCode);
         // Re-render the network list to enable invite buttons if not yet connected
@@ -400,8 +392,8 @@ function setupDragAndDrop() {
         dropZone.classList.add('drag-over');
         if (e.dataTransfer.types.includes('Files')) {
             dropZone.classList.add('drag-active');
-            if (dropZone.querySelector('.drop-zone-text').textContent === 'Drag & Drop files or folders') {
-                dropZone.querySelector('.drop-zone-text').textContent = 'Drop your files here!';
+            if (dropZone.querySelector('p').textContent === 'Drag & Drop files or folders') {
+                dropZone.querySelector('p').textContent = 'Drop your files here!';
                 dropZone.querySelector('.secondary-text').textContent = 'Release to add to queue';
             }
         }
@@ -410,13 +402,13 @@ function setupDragAndDrop() {
     function handleDragLeave(e) {
         if (!dropZone.contains(e.relatedTarget)) {
             dropZone.classList.remove('drag-over', 'drag-active');
-            dropZone.querySelector('.drop-zone-text').textContent = 'Drag & Drop files or folders';
+            dropZone.querySelector('p').textContent = 'Drag & Drop files or folders';
             dropZone.querySelector('.secondary-text').textContent = 'or select manually';
         }
     }
     function handleDrop(e) {
         dropZone.classList.remove('drag-over', 'drag-active');
-        dropZone.querySelector('.drop-zone-text').textContent = 'Drag & Drop files or folders';
+        dropZone.querySelector('p').textContent = 'Drag & Drop files or folders';
         dropZone.querySelector('.secondary-text').textContent = 'or select manually';
         handleFileSelection(e.dataTransfer.files);
     }
@@ -509,14 +501,6 @@ function handlePeerJoined(flightCode) {
     if (!peerConnection) {
         initializePeerConnection(isFlightCreator);
     }
-
-    // NEW: Activate the dashboard and drop zone
-    dashboard.classList.add('is-connected');
-    const dropZoneText = document.querySelector('.drop-zone-text');
-    const dropZoneDisconnectedText = document.querySelector('.drop-zone-disconnected-text');
-    if (dropZoneText) dropZoneText.style.display = 'block';
-    if (dropZoneDisconnectedText) dropZoneDisconnectedText.style.display = 'none';
-
     dashboardFlightStatus.textContent = `Peer Connected! (${connectionType.toUpperCase()} mode)`;
     dashboardFlightStatus.style.color = '#15803d';
     dashboardFlightStatus.style.backgroundColor = '#f0fdf4';
@@ -529,14 +513,6 @@ function handlePeerLeft() {
     console.log("Peer has left the flight.");
     peerInfo = null; // Clear peer info
     resetPeerConnectionState();
-
-    // NEW: Deactivate the dashboard and drop zone
-    dashboard.classList.remove('is-connected');
-    const dropZoneText = document.querySelector('.drop-zone-text');
-    const dropZoneDisconnectedText = document.querySelector('.drop-zone-disconnected-text');
-    if (dropZoneText) dropZoneText.style.display = 'none';
-    if (dropZoneDisconnectedText) dropZoneDisconnectedText.style.display = 'block';
-
     dashboardFlightStatus.textContent = 'Peer disconnected. Waiting...';
     dashboardFlightStatus.style.color = '#d97706';
     dashboardFlightStatus.style.backgroundColor = '#fffbe6';
@@ -838,8 +814,6 @@ function setupEventListeners() {
     // Initialize drag and drop and ALL modals
     setupDragAndDrop();
     setupAllModalsAndNav();
-    // NEW: Initialize the parallax effect for the flight ticket
-    setupParallaxEffect();
 }
 
 
@@ -868,32 +842,6 @@ function updateMetrics() {
     lastMetricsUpdateTime = now;
     sentInInterval = 0;
     receivedInInterval = 0;
-}
-
-// --- NEW: Parallax Effect for Flight Ticket ---
-function setupParallaxEffect() {
-    const wrapper = document.querySelector('.flight-ticket-panel-wrapper');
-    const ticket = document.querySelector('.flight-ticket');
-
-    if (!wrapper || !ticket) return;
-
-    wrapper.addEventListener('mousemove', (e) => {
-        const rect = wrapper.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        const rotateX = ((y - centerY) / centerY) * -5; // Max rotation 5 degrees
-        const rotateY = ((x - centerX) / centerX) * 5;  // Max rotation 5 degrees
-
-        ticket.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    });
-
-    wrapper.addEventListener('mouseleave', () => {
-        ticket.style.transform = 'rotateX(0deg) rotateY(0deg)';
-    });
 }
 
 
