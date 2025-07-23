@@ -34,6 +34,9 @@
     --c-success: #50c878;
     --c-danger: #ef4444;
 }
+@view-transition {
+    navigation: auto;
+}
 
 body[data-theme="dark"] {
     /* --- Themed Variables (Dark Mode Overrides) --- */
@@ -114,10 +117,12 @@ body[data-theme="dark"] .aurora-background {
 
 .aurora-blob {
     position: absolute;
-    mix-blend-mode: hard-light;
-    filter: blur(8vh);
-}
+    mix-blend-mode: overlay;
+    filter: contrast(100%) brightness(100%);
+    filter: blur(4vh);
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 178 178' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='20' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 
+}
 
 .aurora-blob:nth-child(1) {
     width: 50vmax; height: 50vmax;
