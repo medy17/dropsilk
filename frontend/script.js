@@ -1,4 +1,4 @@
-// --- NEW: THEME TOGGLE LOGIC ---
+// --- THEME TOGGLE LOGIC ---
 const themeToggle = document.getElementById('theme-toggle');
 const body = document.body;
 
@@ -17,7 +17,6 @@ const applyTheme = (theme, persist = true) => {
     }
     const inviteModal = document.getElementById('inviteModal');
     if (inviteModal && inviteModal.classList.contains('show')) {
-        // This call to the global generateQRCode function now works correctly.
         generateQRCode();
     }
 };
@@ -41,9 +40,8 @@ initializeTheme(); // Apply theme on initial script load to prevent FOUC
 themeToggle.addEventListener('click', toggleTheme);
 
 
-// --- NEW: Global QR Code Generator ---
+// --- Global QR Code Generator ---
 function generateQRCode() {
-    // Check if the canvas element exists, a flight code is set, and the QRCode library is loaded.
     if (!qrCanvas || !currentFlightCode || typeof QRCode === 'undefined') {
         if (qrCanvas) qrCanvas.style.display = 'none';
         if (typeof QRCode === 'undefined') console.error('QRCode library not loaded');
@@ -52,13 +50,11 @@ function generateQRCode() {
 
     const url = `https://dropsilk.xyz?code=${currentFlightCode}`;
 
-    // Dynamically get the primary theme color from the CSS variables.
-    // This ensures the QR code is always "coloured" according to your theme.
     const qrDotColor = getComputedStyle(document.documentElement).getPropertyValue('--c-primary').trim();
 
     const qrColors = {
-        dark: qrDotColor,  // The color of the QR code's "dots" will now be your theme's primary color.
-        light: '#00000000' // A transparent background for the "light" areas.
+        dark: qrDotColor,
+        light: '#00000000'
     };
 
     // Render the QR code to the canvas.
@@ -71,7 +67,6 @@ function generateQRCode() {
 
 
 // --- CONFIG ---
-// We will replace this URL after deploying the backend in the next step.
 const WEBSOCKET_URL = "wss://dropsilk-server.onrender.com";
 const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 
@@ -82,15 +77,15 @@ let myId = "",
     currentFlightCode = null,
     isFlightCreator = false,
     connectionType = 'wan',
-    peerInfo = null, // NEW: To store connected peer's info
+    peerInfo = null, // To store connected peer's info
     lastNetworkUsers = []; // Keep track of last user list
 let fileToSendQueue = [];
 let currentlySendingFile = null;
 const fileIdMap = new Map();
-let captchaWidgetId = null; // NEW: To hold the ID of the rendered CAPTCHA
+let captchaWidgetId = null; // To hold the ID of the rendered CAPTCHA
 
 
-// --- NEW: METRICS STATE ---
+// --- METRICS STATE ---
 let totalBytesSent = 0,
     totalBytesReceived = 0,
     metricsInterval = null,
@@ -105,7 +100,7 @@ const userNameDisplay = document.getElementById("userNameDisplay");
 const createFlightBtn = document.getElementById("createFlightBtn");
 const joinFlightBtn = document.getElementById("joinFlightBtn");
 const flightCodeInput = document.getElementById("flightCodeInput");
-const flightCodeInputWrapper = flightCodeInput.closest('.flight-code-input-wrapper'); // NEW
+const flightCodeInputWrapper = flightCodeInput.closest('.flight-code-input-wrapper');
 
 const dashboard = document.getElementById("dashboard");
 const dashboardFlightCode = document.getElementById("dashboard-flight-code");
@@ -116,16 +111,16 @@ const sendingQueueDiv = document.getElementById("sending-queue");
 const receiverQueueDiv = document.getElementById("receiver-queue");
 const toastContainer = document.getElementById("toast-container");
 const qrCanvas = document.getElementById('qrCanvas'); // Moved to global scope
-const dropZone = document.querySelector('.drop-zone'); // NEW: For disabling/enabling
+const dropZone = document.querySelector('.drop-zone'); // For disabling/enabling
 const dropZoneText = dropZone.querySelector('p');
 const dropZoneSecondaryText = dropZone.querySelector('.secondary-text');
 
-// --- MODIFIED: Dynamic connection panel elements ---
+// --- Dynamic connection panel elements ---
 const connectionPanelTitle = document.getElementById("connection-panel-title");
 const connectionPanelList = document.getElementById("connection-panel-list");
 
 
-// --- NEW: METRICS UI ELEMENTS ---
+// --- METRICS UI ELEMENTS ---
 const metricsSentEl = document.getElementById('metrics-sent');
 const metricsReceivedEl = document.getElementById('metrics-received');
 const metricsSpeedEl = document.getElementById('metrics-speed');
@@ -176,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setupContainer.style.display = "none";
         dashboard.style.display = "flex";
         setFlightCode(flightCode);
-        disableDropZone(); // NEW: Initially disable the drop zone
+        disableDropZone(); // Initially disable the drop zone
         // Re-render the network list to enable invite buttons if not yet connected
         if (!peerInfo) {
             renderNetworkUsersView(lastNetworkUsers || []);
@@ -188,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupEventListeners();
 });
 
-// --- NEW HELPER: IP ADDRESS CHECKS ---
+// --- IP ADDRESS CHECKS ---
 function isPrivateIp(ip) {
     if (!ip) return false;
     // Exclude CGNAT range 100.64.0.0/10 as it's not a true private network for our purpose
@@ -202,7 +197,7 @@ function isPrivateIp(ip) {
         ip.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./);
 }
 
-// --- NEW: GLOBAL MODAL UTILITIES ---
+// --- GLOBAL MODAL UTILITIES ---
 async function copyToClipboard(text, button, successText = 'Copied!') {
     try {
         await navigator.clipboard.writeText(text);
@@ -235,7 +230,7 @@ function showButtonSuccess(button, text) {
     }, 2000);
 }
 
-// --- MODIFIED: Refactored Modal Setup ---
+// --- Refactored Modal Setup ---
 function setupAllModalsAndNav() {
     const modals = {
         invite: { overlay: document.getElementById('inviteModal'), trigger: document.getElementById('inviteBtn'), close: document.getElementById('closeInviteModal') },
@@ -259,12 +254,12 @@ function setupAllModalsAndNav() {
                 const initialState = document.getElementById('email-view-initial-state');
                 const captchaState = document.getElementById('email-view-captcha-state');
                 const revealedState = document.getElementById('email-view-revealed-state');
-                const captchaPretext = document.getElementById('captcha-pretext'); // <-- Get element here too
+                const captchaPretext = document.getElementById('captcha-pretext');
 
                 if(initialState) initialState.style.display = 'block';
                 if(captchaState) captchaState.style.display = 'none';
                 if(revealedState) revealedState.style.display = 'none';
-                if(captchaPretext) captchaPretext.style.display = 'block'; // <-- ADD THIS LINE
+                if(captchaPretext) captchaPretext.style.display = 'block';
 
                 // Reset the reCAPTCHA widget if it exists and grecaptcha is available
                 if (window.grecaptcha && captchaWidgetId !== null) {
@@ -328,7 +323,7 @@ function setupAllModalsAndNav() {
         const captchaState = document.getElementById('email-view-captcha-state');
         const revealedState = document.getElementById('email-view-revealed-state');
         const recaptchaContainer = document.getElementById('recaptcha-container');
-        const captchaPretext = document.getElementById('captcha-pretext'); // <-- ADD THIS LINE
+        const captchaPretext = document.getElementById('captcha-pretext');
 
         let captchaReady = false;
 
@@ -392,7 +387,7 @@ function setupDragAndDrop() {
     document.addEventListener('drop', e => { dragCounter = 0; document.body.classList.remove('dragging'); });
 
     function handleDragEnter(e) {
-        if (dropZone.classList.contains('disabled')) return; // NEW check
+        if (dropZone.classList.contains('disabled')) return;
         dropZone.classList.add('drag-over');
         if (e.dataTransfer.types.includes('Files')) {
             dropZone.classList.add('drag-active');
@@ -405,14 +400,14 @@ function setupDragAndDrop() {
 
     function handleDragLeave(e) {
         if (!dropZone.contains(e.relatedTarget)) {
-            if (dropZone.classList.contains('disabled')) return; // NEW check
+            if (dropZone.classList.contains('disabled')) return;
             dropZone.classList.remove('drag-over', 'drag-active');
             dropZoneText.textContent = 'Drag & Drop files or folders';
             dropZoneSecondaryText.textContent = 'or select manually';
         }
     }
     function handleDrop(e) {
-        if (dropZone.classList.contains('disabled')) return; // NEW check
+        if (dropZone.classList.contains('disabled')) return;
         dropZone.classList.remove('drag-over', 'drag-active');
         dropZoneText.textContent = 'Drag & Drop files or folders';
         dropZoneSecondaryText.textContent = 'or select manually';
@@ -420,7 +415,6 @@ function setupDragAndDrop() {
     }
 }
 
-// --- CODE TRUNCATE ---
 const input = document.querySelector('.flight-code-input-wrapper input');
 input.addEventListener('input', function () {
     if (this.value.length > 6) {
@@ -474,7 +468,7 @@ function initializeWebSocket() {
     ws.onerror = (error) => console.error("WebSocket error:", error);
 }
 
-// --- NEW: Centralized Error Handling ---
+// --- Centralized Error Handling ---
 function handleServerError(message) {
     console.error("Server error:", message);
     // Check for specific, user-facing errors
@@ -523,9 +517,7 @@ function handlePeerLeft() {
     dashboardFlightStatus.style.color = '#d97706';
     dashboardFlightStatus.style.backgroundColor = '#fffbe6';
     dashboardFlightStatus.style.borderColor = '#fde68a';
-    disableDropZone(); // NEW: Disable drop zone when peer leaves
-    // Revert to network view. The server will send a `users-on-network-update` which will
-    // trigger the render, but we can be proactive to make the UI feel instant.
+    disableDropZone(); // Disable drop zone when peer leaves
     renderNetworkUsersView(lastNetworkUsers);
 }
 
@@ -537,10 +529,10 @@ let incomingFileInfo = null, incomingFileData = [], incomingFileReceived = 0;
 function setupDataChannel() {
     dataChannel.onopen = () => {
         console.log("Data channel opened!");
-        enableDropZone(); // NEW: Enable drop zone now that channel is open
+        enableDropZone(); // Enable drop zone now that channel is open
         processFileToSendQueue();
 
-        // NEW: Start tracking metrics when channel opens
+        // Start tracking metrics when channel opens
         lastMetricsUpdateTime = Date.now();
         if (metricsInterval) clearInterval(metricsInterval);
         metricsInterval = setInterval(updateMetrics, 1000);
@@ -548,7 +540,7 @@ function setupDataChannel() {
     dataChannel.onclose = () => {
         console.log("Data channel closed.");
         handlePeerLeft();
-        // NEW: Stop tracking metrics when channel closes
+        // Stop tracking metrics when channel closes
         if (metricsInterval) clearInterval(metricsInterval);
         metricsSpeedEl.textContent = '0 KB/s';
     };
@@ -622,9 +614,7 @@ function setupDataChannel() {
             }
             return;
         }
-        // CHUNK
         const chunkSize = event.data.byteLength || event.data.size || 0;
-        // NEW: Update received metrics
         totalBytesReceived += chunkSize;
         receivedInInterval += chunkSize;
         metricsReceivedEl.textContent = formatBytes(totalBytesReceived);
@@ -692,7 +682,6 @@ function drainQueue() {
         const chunk = chunkQueue.shift();
         dataChannel.send(chunk);
 
-        // NEW: Update sent metrics
         const chunkSize = chunk.byteLength;
         totalBytesSent += chunkSize;
         sentInInterval += chunkSize;
@@ -759,7 +748,6 @@ function handleFileSelection(files) {
             </div>
         `);
 
-        // Animate the new file item in
         const fileElement = document.getElementById(fileId);
         setTimeout(() => {
             fileElement.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
@@ -793,7 +781,7 @@ function setupEventListeners() {
         }
     };
 
-    // --- MODIFIED: Event delegation for invite buttons on the dynamic panel ---
+    // --- Event delegation for invite buttons on the dynamic panel ---
     connectionPanelList.addEventListener('click', (e) => {
         const inviteBtn = e.target.closest('.invite-user-btn');
         if (inviteBtn && !inviteBtn.disabled) {
@@ -815,7 +803,7 @@ function setupEventListeners() {
         }
     });
 
-    // --- NEW: Dynamic Ticket Tilt Effect ---
+    // --- Dynamic Ticket Tilt Effect ---
     const ticketWrapper = document.querySelector('.flight-ticket-panel-wrapper');
     if (ticketWrapper) {
         const ticket = ticketWrapper.querySelector('.flight-ticket');
@@ -851,7 +839,7 @@ function setupEventListeners() {
 
 
 
-// --- NEW: METRICS FUNCTIONS ---
+// --- METRICS FUNCTIONS ---
 function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -923,7 +911,7 @@ function renderNetworkUsersView(users) {
     });
 }
 
-// --- NEW: Renders the "In Flight" view ---
+// --- Renders the "In Flight" view ---
 function renderInFlightView() {
     if (!peerInfo) return; // Safety check
     connectionPanelTitle.textContent = "In Flight With";
@@ -944,7 +932,7 @@ function renderInFlightView() {
         `;
 }
 
-// --- NEW: Drop Zone Control ---
+// Drop Zone Control
 function disableDropZone() {
     dropZone.classList.add('disabled');
     dropZoneText.textContent = 'Waiting for a peer to connect...';
@@ -957,7 +945,7 @@ function enableDropZone() {
     dropZoneSecondaryText.textContent = 'or select manually';
 }
 
-// --- NEW: Generic Toast Creation Function ---
+// --- Generic Toast Creation Function ---
 function showToast({ type = 'info', title, body, duration = 10000, actions = [] }) {
     const toastId = `toast-${Date.now()}`;
     const toast = document.createElement('div');
@@ -1047,7 +1035,7 @@ function resetState() {
     sendingQueueDiv.innerHTML = '<div class="empty-state">Select files to send</div>';
     receiverQueueDiv.innerHTML = '<div class="empty-state">Waiting for incoming files</div>';
 
-    // NEW: Reset metrics UI and state
+    // Reset metrics UI and state
     totalBytesSent = 0;
     totalBytesReceived = 0;
     metricsSentEl.textContent = '0.00 GB';
@@ -1068,13 +1056,9 @@ function resetPeerConnectionState() {
 
 // --- WEBRTC & SERVER COMMUNICATION FUNCTIONS ---
 discoverLocalIpAndRegister = function() {
-    // This function is now mainly for the client to register its name.
-    // The local IP discovery part is less critical but can still help the server's LAN/WAN detection heuristic.
-    // console.log("Registering user details with server...");
     ws.send(JSON.stringify({
         type: "register-details",
         name: myName,
-        // We can still attempt to get local IP for the LAN/WAN detection, but don't rely on it for grouping.
         localIpPrefix: "unknown",
         localIp: "unknown"
     }));

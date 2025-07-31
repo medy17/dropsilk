@@ -118,10 +118,8 @@ body[data-theme="dark"] .aurora-background {
 .aurora-blob {
     position: absolute;
     mix-blend-mode: overlay;
-    filter: contrast(100%) brightness(100%);
-    filter: blur(4vh);
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 178 178' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='20' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-
+    /*filter: contrast(100%) brightness(100%);
+    filter: blur(4vh);*/
 }
 
 .aurora-blob:nth-child(1) {
@@ -438,6 +436,8 @@ body[data-theme="dark"] .flight-ticket-panel-wrapper {
     border: 1.5px solid var(--c-primary);
     transition: box-shadow 0.2s, background 0.3s ease, color 0.3s ease, transform 0.4s ease-out;
     transform-style: preserve-3d;
+    position: relative; /* For pseudo-element positioning */
+    overflow: hidden; /* To clip the glint gradient */
 }
 body[data-theme="dark"] .flight-ticket {
     box-shadow: 0 4px 32px 0 rgba(0, 0, 0, 0.2), 0 1.5px 0 0 var(--c-secondary);
