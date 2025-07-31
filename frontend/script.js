@@ -69,11 +69,15 @@ function generateQRCode() {
 // --- CONFIG ---
 const WEBSOCKET_URL = "wss://dropsilk-server.onrender.com";
 const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
+const RECONNECTION_ATTEMPT_INTERVAL = 2000; // Try to reconnect every 2 seconds
+const MAX_RECONNECTION_ATTEMPTS = 15; // Give up after 30 seconds
 
 // --- STATE ---
 let ws, peerConnection, dataChannel, worker;
 let myId = "",
     myName = "",
+    // *** NEW: Persistent session ID ***
+    mySessionId = null,
     currentFlightCode = null,
     isFlightCreator = false,
     connectionType = 'wan',
@@ -82,7 +86,13 @@ let myId = "",
 let fileToSendQueue = [];
 let currentlySendingFile = null;
 const fileIdMap = new Map();
-let captchaWidgetId = null; // To hold the ID of the rendered CAPTCHA
+let captchaWidgetId = null;
+
+// *** NEW: Reconnection state ***
+let reconnectionAttempts = 0;
+let reconnectionTimer = null;
+let isLeavingIntentionally = false;
+let pendingFilesAfterReconnect = []; // The "Holding Pen"
 
 
 // --- METRICS STATE ---
@@ -166,6 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    initializeSession();
     enterFlightMode = function(flightCode) {
         currentFlightCode = flightCode;
         setupContainer.style.display = "none";
@@ -182,6 +193,15 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeWebSocket();
     setupEventListeners();
 });
+
+function initializeSession() {
+    mySessionId = sessionStorage.getItem('dropsilk-sessionId');
+    if (!mySessionId) {
+        mySessionId = crypto.randomUUID();
+        sessionStorage.setItem('dropsilk-sessionId', mySessionId);
+    }
+    console.log("My persistent session ID is:", mySessionId);
+}
 
 // --- IP ADDRESS CHECKS ---
 function isPrivateIp(ip) {
@@ -430,13 +450,49 @@ function generateRandomName() {
 }
 
 function initializeWebSocket() {
+    if (reconnectionTimer) clearTimeout(reconnectionTimer);
+
+    // When we start a new connection attempt, we are by definition not trying to leave.
+    isLeavingIntentionally = false;
+
     ws = new WebSocket(WEBSOCKET_URL);
-    ws.onopen = () => discoverLocalIpAndRegister(); // Still useful for LAN/WAN detection
+    ws.onopen = () => {
+        console.log("WebSocket connection opened. Registering...");
+        // *** NEW: Send persistent ID on connect ***
+        ws.send(JSON.stringify({
+            type: "register-or-reconnect",
+            sessionId: mySessionId
+        }));
+        // If we were trying to reconnect, we succeeded.
+        if (reconnectionAttempts > 0) {
+            showToast({ type: 'success', title: 'Reconnected!', body: 'Your session has been restored.', duration: 4000 });
+        }
+        reconnectionAttempts = 0; // Reset counter
+
+        // Also register user details, in case they were lost or this is the first connection
+        ws.send(JSON.stringify({ type: "register-details", name: myName }));
+    };
     ws.onmessage = async (event) => {
         const msg = JSON.parse(event.data);
         // console.log("Received:", msg);
         switch (msg.type) {
             case "registered": myId = msg.id; break;
+            case "session-resumed":
+                console.log("Session successfully resumed by server.", msg);
+                myId = msg.id;
+                myName = msg.name;
+                peerInfo = msg.peer;
+                if (msg.flightCode) {
+                    enterFlightMode(msg.flightCode);
+                    if (peerInfo) {
+                        handlePeerJoined(msg.flightCode);
+                    } else {
+                        dashboardFlightStatus.textContent = 'Waiting for a peer...';
+                        dashboardFlightStatus.style.color = '#d97706';
+                        disableDropZone();
+                    }
+                }
+                break;
             case "users-on-network-update":
                 lastNetworkUsers = msg.users;
                 if (!peerInfo) { // Only render if we're not in an active P2P session
@@ -454,16 +510,32 @@ function initializeWebSocket() {
             case "signal": if (!peerConnection) initializePeerConnection(isFlightCreator); await handleSignal(msg.data); break;
             case "peer-left": handlePeerLeft(); break;
             case "error": handleServerError(msg.message); break;
+            case "peer-connection-unstable":
+                dashboardFlightStatus.textContent = 'Peer connection unstable...';
+                dashboardFlightStatus.style.color = '#d97706';
+                dashboardFlightStatus.style.backgroundColor = '#fffbe6';
+                dashboardFlightStatus.style.borderColor = '#fde68a';
+                break;
+            case "peer-reconnected":
+                dashboardFlightStatus.textContent = `Peer Connected! (${connectionType.toUpperCase()} mode)`;
+                dashboardFlightStatus.style.color = '#15803d';
+                dashboardFlightStatus.style.backgroundColor = '#f0fdf4';
+                dashboardFlightStatus.style.borderColor = '#bbf7d0';
+                break;
         }
     };
-    ws.onclose = () => {
-        showToast({
-            type: 'danger',
-            title: 'Connection Lost',
-            body: 'Connection to the server was lost. Please refresh the page to reconnect.',
-            duration: 0 // Persist until dismissed
-        });
-        resetState();
+    ws.onclose = (event) => {
+        console.warn(`WebSocket closed. Code: ${event.code}.`);
+        if (isLeavingIntentionally) {
+            console.log("WebSocket closed intentionally. No reconnection will be attempted.");
+            return;
+        }
+        if (event.code === 1001) { // Server-initiated shutdown
+            showToast({ type: 'info', title: 'Server Maintenance', body: 'The server is shutting down.', duration: 0 });
+            resetState();
+            return;
+        }
+        handleDisconnection();
     };
     ws.onerror = (error) => console.error("WebSocket error:", error);
 }
@@ -493,6 +565,35 @@ function handleServerError(message) {
     }
 }
 
+function handleDisconnection() {
+    if (reconnectionTimer) return;
+
+    reconnectionAttempts++;
+    if (reconnectionAttempts > MAX_RECONNECTION_ATTEMPTS) {
+        console.error("Max reconnection attempts reached. Giving up.");
+        showToast({
+            type: 'danger',
+            title: 'Connection Lost',
+            body: 'Could not restore the connection. Please refresh the page to start over.',
+            duration: 0
+        });
+        resetState(); // This is where we finally give up and boot them.
+        return;
+    }
+
+    if (dashboard.style.display !== "none") {
+        dashboardFlightStatus.textContent = `Reconnecting... (${reconnectionAttempts}/${MAX_RECONNECTION_ATTEMPTS})`;
+        dashboardFlightStatus.style.color = '#d97706';
+        dashboardFlightStatus.style.backgroundColor = '#fffbe6';
+        dashboardFlightStatus.style.borderColor = '#fde68a';
+        disableDropZone();
+        connectionPanelTitle.textContent = "Connection Lost";
+        connectionPanelList.innerHTML = '<div class="empty-state">Attempting to reconnect...</div>';
+    }
+
+    resetPeerConnectionState();
+    reconnectionTimer = setTimeout(initializeWebSocket, RECONNECTION_ATTEMPT_INTERVAL);
+}
 
 function handlePeerJoined(flightCode) {
     if (!currentFlightCode) { // Receiver joins
@@ -530,6 +631,18 @@ function setupDataChannel() {
     dataChannel.onopen = () => {
         console.log("Data channel opened!");
         enableDropZone(); // Enable drop zone now that channel is open
+
+        // After the data channel is confirmed open, check if we have any pending files.
+        if (pendingFilesAfterReconnect.length > 0) {
+            console.log(`Processing ${pendingFilesAfterReconnect.length} pending files from the holding pen.`);
+            // Use a copy of the array and clear the original immediately to prevent race conditions.
+            const filesToProcess = [...pendingFilesAfterReconnect];
+            pendingFilesAfterReconnect = [];
+
+            // Now, feed these files into the main handling function.
+            handleFileSelection(filesToProcess);
+        }
+
         processFileToSendQueue();
 
         // Start tracking metrics when channel opens
@@ -539,7 +652,6 @@ function setupDataChannel() {
     };
     dataChannel.onclose = () => {
         console.log("Data channel closed.");
-        handlePeerLeft();
         // Stop tracking metrics when channel closes
         if (metricsInterval) clearInterval(metricsInterval);
         metricsSpeedEl.textContent = '0 KB/s';
@@ -718,15 +830,25 @@ function processFileToSendQueue() {
 function handleFileSelection(files) {
     if (files.length === 0) return;
 
-    // Add success animation for drag and drop
+    // Check if the connection is fully ready for transfers.
+    // If not, put the files in the holding pen and notify the user.
+    if (!ws || ws.readyState !== WebSocket.OPEN || !dataChannel || dataChannel.readyState !== 'open') {
+        Array.from(files).forEach(file => pendingFilesAfterReconnect.push(file));
+
+        showToast({
+            type: 'info',
+            title: 'Connection Pending',
+            body: `${files.length} file(s) are ready and will be added to the queue automatically once the connection is fully restored.`,
+            duration: 8000
+        });
+
+        console.log(`${files.length} file(s) added to the pending queue, awaiting a stable connection.`);
+        return; // IMPORTANT: We stop here and do not proceed to the queuing logic yet.
+    }
+
     if (dropZone) {
         dropZone.style.transform = 'scale(0.98)';
-        dropZone.style.transition = 'transform 0.1s ease-out';
-
-        setTimeout(() => {
-            dropZone.style.transform = '';
-            dropZone.style.transition = '';
-        }, 100);
+        setTimeout(() => { dropZone.style.transform = ''; }, 100);
     }
 
     if (sendingQueueDiv.querySelector('.empty-state')) {
@@ -757,7 +879,7 @@ function handleFileSelection(files) {
     });
 
     processFileToSendQueue();
-    console.log(`Added ${files.length} file(s) to the sending queue`);
+    console.log(`Added ${files.length} file(s) to the active sending queue.`);
 }
 
 // --- EVENT LISTENERS & UI HELPERS ---
@@ -772,7 +894,17 @@ function setupEventListeners() {
             showToast({ type: 'danger', title: 'Empty Code', body: 'Please enter a 6-character flight code to join.', duration: 5000 });
         }
     };
-    leaveFlightBtnDashboard.onclick = () => { location.reload(); };
+    leaveFlightBtnDashboard.onclick = () => {
+        // If we're already disconnected, just refresh to go home.
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            sessionStorage.removeItem('dropsilk-sessionId');
+            location.reload();
+            return;
+        }
+        isLeavingIntentionally = true;
+        ws.send(JSON.stringify({ type: "leave-flight" }));
+        setTimeout(() => { ws.close(1000, "User left intentionally"); sessionStorage.removeItem('dropsilk-sessionId'); location.reload(); }, 100);
+    };
 
     fileInputTransfer.onchange = () => {
         if (fileInputTransfer.files.length > 0) {
@@ -1024,6 +1156,7 @@ function showInvitationToast(fromName, flightCode) {
 
 
 function resetState() {
+    if (reconnectionTimer) clearTimeout(reconnectionTimer);
     if (metricsInterval) clearInterval(metricsInterval);
     resetPeerConnectionState();
     currentFlightCode = null; isFlightCreator = false; connectionType = 'wan'; fileToSendQueue = [];
@@ -1038,8 +1171,8 @@ function resetState() {
     // Reset metrics UI and state
     totalBytesSent = 0;
     totalBytesReceived = 0;
-    metricsSentEl.textContent = '0.00 GB';
-    metricsReceivedEl.textContent = '0.00 GB';
+    metricsSentEl.textContent = '0 Bytes';
+    metricsReceivedEl.textContent = '0 Bytes';
     metricsSpeedEl.textContent = '0 KB/s';
 
     initializeUser();
@@ -1055,15 +1188,6 @@ function resetPeerConnectionState() {
 }
 
 // --- WEBRTC & SERVER COMMUNICATION FUNCTIONS ---
-discoverLocalIpAndRegister = function() {
-    ws.send(JSON.stringify({
-        type: "register-details",
-        name: myName,
-        localIpPrefix: "unknown",
-        localIp: "unknown"
-    }));
-}
-
 initializePeerConnection = function(isOfferer) {
     if (peerConnection) return;
     let pcConfig;
@@ -1082,7 +1206,7 @@ initializePeerConnection = function(isOfferer) {
         console.log("Peer connection state:", peerConnection.connectionState);
         if (peerConnection.connectionState === "disconnected" || peerConnection.connectionState === "failed" || peerConnection.connectionState === "closed") {
             console.log("Peer connection lost or failed. Resetting state.");
-            handlePeerLeft();
+            handlePeerLeft(); // This is a permanent WebRTC failure, so it's correct to treat it as a peer leaving.
         }
     };
     if (isOfferer) {
@@ -1103,6 +1227,6 @@ handleSignal = async function(data) {
             }
         } catch (error) { console.error("Error setting remote description or creating answer:", error); }
     } else if (data.candidate) {
-        try { await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)); } catch (error) { console.error("Error adding ICE candidate:", error); }
+        try { await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)); } catch (error) { /* console.error("Error adding ICE candidate:", error); */ } // Often benign, can be noisy.
     }
 }

@@ -13,6 +13,8 @@ const he = require('he'); // For HTML entity encoding
 // --- Configuration ---
 const PORT = process.env.PORT || 8080;
 const NODE_ENV = process.env.NODE_ENV || 'development';
+// *** NEW: Grace period for disconnections (in milliseconds) ***
+const SESSION_GRACE_PERIOD_MS = 30000; // 30 seconds
 
 // --- Honeypot Data Store (in-memory, resets on server restart) ---
 const honeypotData = {};
@@ -64,7 +66,7 @@ const server = http.createServer((req, res) => {
         // --- HONEYPOT: Handling POST requests to the fake login endpoint ---
         if (req.method === 'POST' && url.pathname === '/wp-login.php') {
             let body = '';
-            req.on('data', chunk => {
+            req.on('data', (chunk) => {
                 body += chunk.toString();
             });
             req.on('end', () => {
@@ -121,7 +123,8 @@ const server = http.createServer((req, res) => {
             log('info', 'Health check accessed', { ip: clientIp });
         } else if (req.method === 'GET' && req.url === '/stats') {
             const stats = {
-                activeConnections: clients.size,
+                activeConnections: wss.clients.size, // Direct count of live sockets
+                activeSessions: Object.keys(sessions).length, // Count of all logical sessions
                 activeFlights: Object.keys(flights).length,
                 honeypotVictims: Object.keys(honeypotData).length,
                 uptime: process.uptime(),
@@ -334,8 +337,12 @@ function generateLeaderboardHtml() {
 
 
 // --- WebRTC Signaling Server Logic (Existing) ---
+// *** REFACTORED: We now use a session-based model instead of a client map ***
 const flights = {};
-const clients = new Map();
+// The primary session store. Keyed by persistent sessionId.
+const sessions = {};
+// A map from the temporary WebSocket object to the persistent sessionId.
+const wsToSessionId = new Map();
 
 const allowedOrigins = new Set([
     'https://dropsilk.xyz',
@@ -372,8 +379,8 @@ const wss = new WebSocket.Server({
     server,
     verifyClient,
     perMessageDeflate: false,
-    maxPayload: 1024 * 1024,
-    clientTracking: true
+    maxPayload: 1024 * 1024, // 1MB
+    clientTracking: false // We are doing our own tracking now
 });
 
 wss.on('error', (error) => {
@@ -381,48 +388,15 @@ wss.on('error', (error) => {
 });
 
 wss.on("connection", (ws, req) => {
-    let clientId, metadata;
+    log('info', 'WebSocket connection initiated', { ip: getClientIp(req) });
 
-    try {
-        clientId = Math.random().toString(36).substr(2, 9);
-        const cleanRemoteIp = getClientIp(req); // Use the correct IP helper here too
-        const userAgent = req.headers['user-agent'] || 'unknown';
-
-        metadata = {
-            id: clientId,
-            name: "Anonymous",
-            flightCode: null,
-            remoteIp: cleanRemoteIp,
-            connectedAt: new Date().toISOString(),
-            userAgent: userAgent
-        };
-
-        clients.set(ws, metadata);
-        connectionStats.totalConnections++;
-
-        log('info', 'Client connected', { clientId, ip: cleanRemoteIp, userAgent, totalClients: clients.size, totalConnections: connectionStats.totalConnections });
-
-        ws.isAlive = true;
-        ws.on('pong', () => { ws.isAlive = true; });
-        ws.send(JSON.stringify({ type: "registered", id: clientId }));
-        broadcastUsersOnSameNetwork();
-
-    } catch (error) {
-        log('error', 'Error during client connection setup', { error: error.message, stack: error.stack, clientId: clientId || 'unknown' });
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.close(1011, 'Server error during connection setup');
-        }
-        return;
-    }
+    ws.isAlive = true;
+    ws.on('pong', () => { ws.isAlive = true; });
 
     ws.on("message", (message) => {
         let data;
-        const meta = clients.get(ws);
-
-        if (!meta) {
-            log('warn', 'Received message from unregistered client', { messagePreview: message.toString().substring(0, 100) });
-            return;
-        }
+        const sessionId = wsToSessionId.get(ws);
+        const session = sessionId ? sessions[sessionId] : null;
 
         try {
             if (message.length > 1024 * 1024) {
@@ -432,36 +406,51 @@ wss.on("connection", (ws, req) => {
             }
             data = JSON.parse(message);
             if (!data.type) {
-                log('warn', 'Message missing type field', { clientId: meta.id, messagePreview: message.toString().substring(0, 100) });
+                log('warn', 'Message missing type field', { sessionId });
                 return;
             }
-            log('debug', 'Message received', { clientId: meta.id, type: data.type, messageSize: message.length });
         } catch (error) {
-            log('error', 'Error parsing message JSON', { clientId: meta.id, error: error.message, messagePreview: message.toString().substring(0, 100) });
+            log('error', 'Error parsing message JSON', { sessionId, error: error.message });
             ws.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
             return;
         }
 
         try {
+            // The first message from a client MUST be to register/reconnect
+            if (!session) {
+                if (data.type === 'register-or-reconnect' && data.sessionId) {
+                    handleSessionInitialization(ws, req, data.sessionId);
+                } else {
+                    log('warn', 'First message from client was not register-or-reconnect', { type: data.type });
+                    ws.close(1002, 'Protocol violation: First message must be for registration.');
+                }
+                return;
+            }
+
+            const meta = session.metadata;
+            log('debug', 'Message received', { sessionId: meta.id, type: data.type });
+
             switch (data.type) {
+                case "leave-flight":
+                    log('info', 'Client signaled INTENT TO LEAVE.', { sessionId });
+                    // We flag the session. The actual cleanup happens in ws.on('close').
+                    session.isLeaving = true;
+                    ws.send(JSON.stringify({ type: 'leave-ack' }));
+                    break;
                 case "register-details":
                     if (!data.name || typeof data.name !== 'string' || data.name.length > 50 || data.name.trim().length === 0) {
-                        log('warn', 'Invalid name in registration', { clientId: meta.id, name: data.name });
-                        ws.send(JSON.stringify({ type: "error", message: "Invalid name" }));
                         return;
                     }
                     meta.name = data.name.trim();
-                    clients.set(ws, meta);
-                    log('info', 'Client registered details', { clientId: meta.id, newName: meta.name, ip: meta.remoteIp });
+                    log('info', 'Client updated details', { sessionId: meta.id, newName: meta.name });
                     broadcastUsersOnSameNetwork();
                     break;
                 case "create-flight":
                     if (meta.flightCode) {
-                        ws.send(JSON.stringify({ type: "error", message: "Already in a flight" }));
                         return;
                     }
                     const flightCode = Math.random().toString(36).substr(2, 6).toUpperCase();
-                    flights[flightCode] = [ws];
+                    flights[flightCode] = [sessionId]; // Store sessionId instead of ws object
                     meta.flightCode = flightCode;
                     connectionStats.totalFlightsCreated++;
                     log('info', 'Flight created', { flightCode, creatorId: meta.id });
@@ -469,54 +458,52 @@ wss.on("connection", (ws, req) => {
                     broadcastUsersOnSameNetwork();
                     break;
                 case "join-flight":
-                    if (!data.flightCode || typeof data.flightCode !== 'string' || data.flightCode.length !== 6) {
-                        ws.send(JSON.stringify({ type: "error", message: "Invalid flight code" }));
-                        return;
-                    }
-                    if (meta.flightCode) {
-                        ws.send(JSON.stringify({ type: "error", message: "Already in a flight" }));
-                        return;
-                    }
-                    const flight = flights[data.flightCode];
-                    if (!flight || flight.length >= 2) {
+                    const flightSessionIds = flights[data.flightCode];
+                    if (meta.flightCode || !data.flightCode || !flightSessionIds || flightSessionIds.length >= 2) {
                         ws.send(JSON.stringify({ type: "error", message: "Flight not found or full" }));
                         return;
                     }
-                    const creatorWs = flight[0];
-                    const creatorMeta = clients.get(creatorWs);
-                    if (!creatorMeta || creatorWs.readyState !== WebSocket.OPEN) {
+                    const creatorSessionId = flightSessionIds[0];
+                    const creatorSession = sessions[creatorSessionId];
+                    if (!creatorSession || !creatorSession.ws || creatorSession.ws.readyState !== WebSocket.OPEN) {
                         delete flights[data.flightCode];
                         ws.send(JSON.stringify({ type: "error", message: "Flight creator disconnected" }));
                         return;
                     }
+                    const creatorMeta = creatorSession.metadata;
                     let connectionType = 'wan';
                     if (isPrivateIP(creatorMeta.remoteIp) && isPrivateIP(meta.remoteIp) && creatorMeta.remoteIp.split('.').slice(0, 3).join('.') === meta.remoteIp.split('.').slice(0, 3).join('.')) {
                         connectionType = 'lan';
                     } else if (creatorMeta.remoteIp === meta.remoteIp) {
                         connectionType = 'lan';
                     }
-                    flight.push(ws);
+                    flightSessionIds.push(sessionId);
                     meta.flightCode = data.flightCode;
                     connectionStats.totalFlightsJoined++;
                     log('info', 'Flight joined', { flightCode: data.flightCode, joinerId: meta.id, connectionType: connectionType.toUpperCase() });
                     ws.send(JSON.stringify({ type: "peer-joined", flightCode: data.flightCode, connectionType, peer: { id: creatorMeta.id, name: creatorMeta.name } }));
-                    creatorWs.send(JSON.stringify({ type: "peer-joined", flightCode: data.flightCode, connectionType, peer: { id: meta.id, name: meta.name } }));
+                    creatorSession.ws.send(JSON.stringify({ type: "peer-joined", flightCode: data.flightCode, connectionType, peer: { id: meta.id, name: meta.name } }));
                     broadcastUsersOnSameNetwork();
                     break;
                 case "invite-to-flight":
                     if (!data.inviteeId || !data.flightCode) return;
-                    for (const [clientWs, clientMeta] of clients.entries()) {
-                        if (clientMeta.id === data.inviteeId && clientWs.readyState === WebSocket.OPEN) {
-                            clientWs.send(JSON.stringify({ type: "flight-invitation", flightCode: data.flightCode, fromName: meta.name, }));
-                            break;
+                    // Find the session ID for the given invitee's client ID
+                    const inviteeSessionId = Object.keys(sessions).find(sid => sessions[sid].metadata.id === data.inviteeId);
+                    if (inviteeSessionId) {
+                        const inviteeSession = sessions[inviteeSessionId];
+                        if (inviteeSession && inviteeSession.ws && inviteeSession.ws.readyState === WebSocket.OPEN) {
+                            inviteeSession.ws.send(JSON.stringify({ type: "flight-invitation", flightCode: data.flightCode, fromName: meta.name }));
                         }
                     }
                     break;
                 case "signal":
                     if (!meta.flightCode || !flights[meta.flightCode]) return;
-                    flights[meta.flightCode].forEach((client) => {
-                        if (client !== ws && client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({ type: "signal", data: data.data }));
+                    flights[meta.flightCode].forEach((peerSessionId) => {
+                        if (peerSessionId !== sessionId) {
+                            const peerSession = sessions[peerSessionId];
+                            if (peerSession && peerSession.ws && peerSession.ws.readyState === WebSocket.OPEN) {
+                                peerSession.ws.send(JSON.stringify({ type: "signal", data: data.data }));
+                            }
                         }
                     });
                     break;
@@ -524,55 +511,141 @@ wss.on("connection", (ws, req) => {
                     ws.send(JSON.stringify({ type: "error", message: "Unknown message type" }));
             }
         } catch (error) {
-            log('error', 'Error processing WebSocket message in switch', { clientId: meta.id, messageType: data?.type, error: error.message, stack: error.stack });
+            log('error', 'Error processing WebSocket message in switch', { sessionId, messageType: data?.type, error: error.message, stack: error.stack });
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: "error", message: "Server error processing your request" }));
             }
         }
     });
 
-    ws.on("close", (code, reason) => {
-        const meta = clients.get(ws);
-        clients.delete(ws);
+    ws.on("close", () => {
+        const sessionId = wsToSessionId.get(ws);
+        if (!sessionId || !sessions[sessionId]) {
+            log('info', 'Unregistered client disconnected.');
+            return;
+        }
+
+        const session = sessions[sessionId];
+        session.ws = null; // Clear the dead socket
+        wsToSessionId.delete(ws); // Clean up the map
         connectionStats.totalDisconnections++;
-        if (meta) {
-            log('info', 'Client disconnected', { clientId: meta.id, clientName: meta.name, flightCode: meta.flightCode, remainingClients: clients.size });
-            if (meta.flightCode && flights[meta.flightCode]) {
-                const flight = flights[meta.flightCode];
-                const remainingClients = flight.filter((c) => c !== ws);
-                flights[meta.flightCode] = remainingClients;
-                remainingClients.forEach((client) => {
-                    if (client.readyState === WebSocket.OPEN) client.send(JSON.stringify({ type: "peer-left" }));
-                });
-                if (remainingClients.length === 0) {
-                    delete flights[meta.flightCode];
-                    log('info', 'Flight closed', { flightCode: meta.flightCode });
+
+        if (session.isLeaving) {
+            log('info', 'Client disconnected intentionally. Cleaning up immediately.', { sessionId, name: session.metadata.name });
+            cleanupSession(sessionId);
+        } else {
+            // Otherwise, it was an unexpected disconnect. Start the grace period.
+            log('warn', 'Client disconnected unexpectedly. Assuming suspend/crash, starting grace period.', { sessionId, name: session.metadata.name, duration: `${SESSION_GRACE_PERIOD_MS}ms` });
+
+            // Notify peer immediately that the connection is unstable
+            if (session.metadata.flightCode && flights[session.metadata.flightCode]) {
+                const peerSessionId = flights[session.metadata.flightCode].find(id => id !== sessionId);
+                if (peerSessionId && sessions[peerSessionId] && sessions[peerSessionId].ws) {
+                    sessions[peerSessionId].ws.send(JSON.stringify({ type: "peer-connection-unstable" }));
                 }
             }
+
+            // Start the timer to *actually* clean up the session
+            session.disconnectTimer = setTimeout(() => {
+                // The timer has fired, so the client did not reconnect in time.
+                log('error', 'Grace period expired. Terminating session.', { sessionId, name: session.metadata.name });
+                cleanupSession(sessionId);
+            }, SESSION_GRACE_PERIOD_MS);
         }
+
         broadcastUsersOnSameNetwork();
     });
 
     ws.on("error", (error) => {
-        const meta = clients.get(ws);
-        log('error', 'WebSocket connection error', { clientId: meta?.id || 'unknown', error: error.message });
+        const sessionId = wsToSessionId.get(ws);
+        log('error', 'WebSocket connection error', { sessionId: sessionId || 'unknown', error: error.message });
     });
 });
+
+function handleSessionInitialization(ws, req, sessionId) {
+    const existingSession = sessions[sessionId];
+
+    if (existingSession) {
+        // --- THIS IS A RECONNECTION ---
+        if (existingSession.disconnectTimer) {
+            clearTimeout(existingSession.disconnectTimer);
+            existingSession.disconnectTimer = null;
+        }
+        existingSession.ws = ws;
+        wsToSessionId.set(ws, sessionId);
+        ws.isAlive = true; // Mark as alive immediately
+
+        log('info', 'Client reconnected and session resumed', { sessionId, name: existingSession.metadata.name });
+
+        const { id, name, flightCode } = existingSession.metadata;
+        let peer = null;
+        if (flightCode && flights[flightCode]) {
+            const peerSessionId = flights[flightCode].find(id => id !== sessionId);
+            if(peerSessionId && sessions[peerSessionId]) {
+                peer = { id: sessions[peerSessionId].metadata.id, name: sessions[peerSessionId].metadata.name };
+                // If they were in a flight, notify the peer that they are back
+                if (sessions[peerSessionId].ws) {
+                    sessions[peerSessionId].ws.send(JSON.stringify({ type: "peer-reconnected" }));
+                }
+            }
+        }
+
+        ws.send(JSON.stringify({
+            type: "session-resumed",
+            id,
+            name,
+            flightCode,
+            peer
+        }));
+    } else {
+        // --- THIS IS A NEW CONNECTION ---
+        const cleanRemoteIp = getClientIp(req);
+        const userAgent = req.headers['user-agent'] || 'unknown';
+        const clientId = Math.random().toString(36).substr(2, 9);
+
+        const newSession = {
+            ws: ws,
+            disconnectTimer: null,
+            isLeaving: false,
+            metadata: {
+                id: clientId, // The short, user-facing ID
+                sessionId: sessionId, // The persistent, internal ID
+                name: "Anonymous",
+                flightCode: null,
+                remoteIp: cleanRemoteIp,
+                connectedAt: new Date().toISOString(),
+                userAgent: userAgent
+            }
+        };
+
+        sessions[sessionId] = newSession;
+        wsToSessionId.set(ws, sessionId);
+        connectionStats.totalConnections++;
+
+        log('info', 'New client registered', { sessionId, clientId, ip: cleanRemoteIp, totalSessions: Object.keys(sessions).length });
+
+        ws.send(JSON.stringify({ type: "registered", id: clientId }));
+    }
+
+    broadcastUsersOnSameNetwork();
+}
 
 
 // --- ENHANCED BROADCASTING LOGIC ---
 function broadcastUsersOnSameNetwork() {
     try {
         const clientsByNetworkGroup = {};
-        for (const [ws, meta] of clients.entries()) {
-            if (!meta || ws.readyState !== WebSocket.OPEN) continue;
+        for (const session of Object.values(sessions)) {
+            const { ws, metadata: meta } = session;
+            if (!meta || !ws || ws.readyState !== WebSocket.OPEN) continue;
             if (meta.flightCode && flights[meta.flightCode] && flights[meta.flightCode].length === 2) continue;
             let groupingKey = isPrivateIP(meta.remoteIp) ? meta.remoteIp.split('.').slice(0, 3).join('.') : meta.remoteIp;
             if (!clientsByNetworkGroup[groupingKey]) clientsByNetworkGroup[groupingKey] = [];
             clientsByNetworkGroup[groupingKey].push({ id: meta.id, name: meta.name });
         }
-        for (const [ws, meta] of clients.entries()) {
-            if (!meta || ws.readyState !== WebSocket.OPEN) continue;
+        for (const session of Object.values(sessions)) {
+            const { ws, metadata: meta } = session;
+            if (!meta || !ws || ws.readyState !== WebSocket.OPEN) continue;
             try {
                 if (meta.flightCode && flights[meta.flightCode] && flights[meta.flightCode].length === 2) {
                     ws.send(JSON.stringify({ type: "users-on-network-update", users: [] }));
@@ -582,7 +655,7 @@ function broadcastUsersOnSameNetwork() {
                 const usersOnNetwork = clientsByNetworkGroup[groupingKey] ? clientsByNetworkGroup[groupingKey].filter((c) => c.id !== meta.id) : [];
                 ws.send(JSON.stringify({ type: "users-on-network-update", users: usersOnNetwork }));
             } catch (error) {
-                log('error', 'Error sending network update to client', { clientId: meta.id, error: error.message });
+                log('error', 'Error sending network update to client', { sessionId: meta.sessionId, error: error.message });
             }
         }
     } catch (error) {
@@ -590,21 +663,44 @@ function broadcastUsersOnSameNetwork() {
     }
 }
 
+function cleanupSession(sessionId) {
+    const session = sessions[sessionId];
+    if (!session) return; // Already cleaned up
+
+    const { flightCode, name, id } = session.metadata;
+
+    if (flightCode && flights[flightCode]) {
+        const remainingSessionIds = flights[flightCode].filter(sid => sid !== sessionId);
+        // Notify the other peer that this user has permanently left
+        remainingSessionIds.forEach(peerSessionId => {
+            const peerSession = sessions[peerSessionId];
+            if (peerSession && peerSession.ws) {
+                peerSession.ws.send(JSON.stringify({ type: 'peer-left' }));
+            }
+        });
+        flights[flightCode] = remainingSessionIds;
+        // If the flight is now empty, delete it
+        if (remainingSessionIds.length === 0) {
+            delete flights[flightCode];
+            log('info', 'Flight closed due to session termination', { flightCode });
+        }
+    }
+
+    delete sessions[sessionId];
+    log('info', 'Session permanently removed', { sessionId, name, id, remainingSessions: Object.keys(sessions).length });
+    broadcastUsersOnSameNetwork();
+}
+
 
 // --- Production Health Monitoring (Ping/Pong and Stats Logging) ---
 const healthInterval = setInterval(() => {
     wss.clients.forEach((ws) => {
         if (ws.isAlive === false) {
-            const meta = clients.get(ws);
-            log('warn', 'Terminating dead connection (no pong received)', { clientId: meta?.id });
             return ws.terminate();
         }
         ws.isAlive = false;
         ws.ping();
     });
-    if (clients.size > 0 || Object.keys(flights).length > 0) {
-        log('info', 'Health check completed', { activeConnections: clients.size, activeFlights: Object.keys(flights).length, honeypotVictims: Object.keys(honeypotData).length });
-    }
 }, 30000);
 
 // --- Graceful Shutdown Handling ---
