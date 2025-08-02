@@ -67,7 +67,7 @@ function generateQRCode() {
 
 
 // --- CONFIG ---
-const WEBSOCKET_URL = "wss://dropsilk-server.onrender.com:8080";
+const WEBSOCKET_URL = "wss://dropsilk-server.onrender.com";
 const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 
 // --- STATE ---
