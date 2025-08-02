@@ -67,7 +67,7 @@ function generateQRCode() {
 
 
 // --- CONFIG ---
-const WEBSOCKET_URL = "ws://localhost:8080";
+const WEBSOCKET_URL = "wss://localhost:8080";
 const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 
 // --- STATE ---
