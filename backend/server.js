@@ -210,7 +210,6 @@ function getFlagEmoji(countryCode) {
 }
 
 
-// --- **FIX 2: RESPONSIVE LEADERBOARD HTML GENERATION** ---
 function generateLeaderboardHtml() {
     // Sort IPs by attempts in descending order
     const sortedIps = Object.keys(honeypotData).sort((a, b) => honeypotData[b].attempts - honeypotData[a].attempts);
@@ -223,7 +222,6 @@ function generateLeaderboardHtml() {
             const data = honeypotData[ip];
             const maskedIp = ip.split('.').slice(0, 2).join('.') + '.***.***';
 
-            // The <span> wrapper is correct and stays.
             tableRows += `
                 <tr>
                     <td data-label="Rank"><span>${index + 1}</span></td>
@@ -245,7 +243,6 @@ function generateLeaderboardHtml() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Honeypot - Hall of Shame</title>
         <style>
-            /* --- Base & Desktop Styles (Unchanged) --- */
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 2em; }
             .container { max-width: 1000px; margin: 0 auto; background-color: #1e1e1e; border-radius: 8px; padding: 2em; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
             h1 { color: #bb86fc; text-align: center; border-bottom: 2px solid #bb86fc; padding-bottom: 0.5em; margin-bottom: 1.5em; }
@@ -256,7 +253,6 @@ function generateLeaderboardHtml() {
             tr:hover { background-color: #4a4a4a; }
             .pass-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
             
-            /* --- **FIXED** Responsive Styles for Mobile (< 768px) --- */
             @media screen and (max-width: 768px) {
                 body { padding: 1em; }
                 .container { padding: 1.5em 1em; }
@@ -277,7 +273,7 @@ function generateLeaderboardHtml() {
                     align-items: center;
                     padding: 12px 15px;
                     border-bottom: 1px dotted #444;
-                    gap: 1em; /* ADDED: Consistent spacing between label and value */
+                    gap: 1em;
                 }
                 
                 td:last-child { border-bottom: none; }
@@ -286,25 +282,24 @@ function generateLeaderboardHtml() {
                     content: attr(data-label);
                     font-weight: bold;
                     color: #bb86fc;
-                    flex-shrink: 0; /* Prevents the label from shrinking */
-                    min-width: 120px; /* ADDED: Consistent width for labels */
+                    flex-shrink: 0; 
+                    min-width: 120px; 
                 }
                 
-                /* FIXED: Better value container styling */
                 td span {
                     flex-grow: 1;
-                    min-width: 0; /* Allows shrinking */
-                    text-align: left; /* CHANGED: From right to left alignment */
-                    word-break: break-word; /* CHANGED: From break-all to break-word for better readability */
-                    padding-right: 8px; /* ADDED: Small right padding to prevent edge touching */
-                    overflow-wrap: break-word; /* ADDED: Better word wrapping */
+                    min-width: 0; 
+                    text-align: left; 
+                    word-break: break-word; 
+                    padding-right: 8px; 
+                    overflow-wrap: break-word; 
                 }
             
                 .pass-cell { align-items: flex-start; }
                 .pass-cell span { 
                     font-family: monospace; 
                     color: #ccc; 
-                    font-size: 0.9em; /* ADDED: Slightly smaller font for long passwords */
+                    font-size: 0.9em;
                 }
             }
         </style>
@@ -341,7 +336,6 @@ const allowedOrigins = new Set([
     'https://dropsilk.xyz',
     'https://www.dropsilk.xyz',
     'https://dropsilk.vercel.app',
-    'http://192.168.1.10:3000',
 ]);
 
 function verifyClient(info, done) {
