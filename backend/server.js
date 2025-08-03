@@ -340,7 +340,8 @@ const clients = new Map();
 const allowedOrigins = new Set([
     'https://dropsilk.xyz',
     'https://www.dropsilk.xyz',
-    'https://dropsilk.vercel.app'
+    'https://dropsilk.vercel.app',
+    'http://192.168.1.10:3000',
 ]);
 
 function verifyClient(info, done) {
