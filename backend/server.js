@@ -119,7 +119,17 @@ const server = http.createServer((req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('Server is alive and waiting for WebSocket connections.');
             log('info', 'Health check accessed', { ip: clientIp });
-        } else if (req.method === 'GET' && req.url === '/stats') {
+        } 
+        // --- NEW KEEP-ALIVE ENDPOINT ---
+        // This endpoint is for external services (like Render's own health checks or UptimeRobot)
+        // to ping the server and prevent it from going to sleep on free hosting tiers.
+        else if (req.method === 'GET' && req.url === '/keep-alive') {
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end('OK');
+            log('info', 'Keep-alive ping received', { ip: clientIp });
+        } 
+        // --- END OF NEW KEEP-ALIVE ENDPOINT ---
+        else if (req.method === 'GET' && req.url === '/stats') {
             const stats = {
                 activeConnections: clients.size,
                 activeFlights: Object.keys(flights).length,
