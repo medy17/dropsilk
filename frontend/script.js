@@ -863,7 +863,6 @@ function setupEventListeners() {
 }
 
 // --- NEW: Handle Folder Selection with Warnings ---
-// --- NEW: Handle Folder Selection with Warnings (Replaces old version) ---
 function handleFolderSelection(files) {
     const fileLimit = 50;
     const sizeLimit = 1 * 1024 * 1024 * 1024; // 1 GB
@@ -882,44 +881,29 @@ function handleFolderSelection(files) {
         }
     }
 
-    if (hasLargeFile) {
-        warningMessages.push(`This folder contains at least one file larger than 1 GB.`);
-    }
-
-    // If there are warnings, show a custom toast confirmation.
     if (warningMessages.length > 0) {
-        const warningBody = warningMessages.join('<br>') + '<br><br><b>Sending may cause performance issues. Do you want to continue?</b>';
-
+        const confirmationMessageHTML = warningMessages.join('<br>') + '<br><br>Sending may cause performance issues. Do you want to continue?';
         showToast({
-            type: 'danger', // Use the danger style for attention
+            type: 'info',
             title: 'Folder Selection Warning',
-            body: warningBody,
-            duration: 0, // Makes the toast persistent until an action is taken
+            body: confirmationMessageHTML,
+            duration: 0, // Persist until user action
             actions: [
                 {
                     text: 'Cancel',
                     class: 'btn-secondary',
-                    callback: () => {
-                        // User clicked cancel, do nothing.
-                        console.log('Folder selection canceled by user.');
-                    }
+                    callback: () => showToast({ type: 'info', title: 'Folder Canceled', body: 'The folder selection was canceled by the user.', duration: 5000 })
                 },
                 {
-                    text: 'Continue Anyway',
+                    text: 'Continue',
                     class: 'btn-primary',
-                    callback: () => {
-                        // User confirmed, proceed with adding files.
-                        handleFileSelection(files);
-                    }
+                    callback: () => handleFileSelection(files)
                 }
             ]
         });
-
-        return; // Stop execution here, let the toast callback handle the next step.
+    } else {
+        handleFileSelection(files);
     }
-
-    // If there are no warnings, proceed directly.
-    handleFileSelection(files);
 }
 
 
@@ -1049,43 +1033,54 @@ async function downloadAllFilesAsZip() {
     const totalSize = receivedFiles.reduce((sum, file) => sum + file.blob.size, 0);
     const sizeWarningLimit = 1 * 1024 * 1024 * 1024; // 1 GB
 
-    if (totalSize > sizeWarningLimit) {
-        if (!confirm(`The total size of the files is ${formatBytes(totalSize)}, which is over 1 GB. Zipping may take a while and use significant memory. Do you want to proceed?`)) {
-            return; // User canceled
+    const proceedWithZipping = async () => {
+        const originalBtnHTML = downloadAllBtn.innerHTML;
+        downloadAllBtn.disabled = true;
+        downloadAllBtn.innerHTML = `
+            <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
+            <span>Zipping...</span>
+        `;
+
+        try {
+            const zip = new JSZip();
+            receivedFiles.forEach(file => {
+                zip.file(file.name, file.blob);
+            });
+
+            const zipBlob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } }, (metadata) => {
+                // Update UI with progress
+                downloadAllBtn.querySelector('span').textContent = `Zipping... ${Math.round(metadata.percent)}%`;
+            });
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(zipBlob);
+            link.download = `dropsilk-files-${new Date().toISOString().split('T')[0]}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        } catch (error) {
+            console.error("Error creating zip file:", error);
+            showToast({ type: 'danger', title: 'Zipping Failed', body: 'An error occurred while creating the zip file.', duration: 8000 });
+        } finally {
+            downloadAllBtn.disabled = false;
+            downloadAllBtn.innerHTML = originalBtnHTML;
         }
-    }
+    };
 
-    const originalBtnHTML = downloadAllBtn.innerHTML;
-    downloadAllBtn.disabled = true;
-    downloadAllBtn.innerHTML = `
-        <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
-        <span>Zipping...</span>
-    `;
-
-    try {
-        const zip = new JSZip();
-        receivedFiles.forEach(file => {
-            zip.file(file.name, file.blob);
+    if (totalSize > sizeWarningLimit) {
+        showToast({
+            type: 'info',
+            title: 'Large Download Warning',
+            body: `The total size of the files is ${formatBytes(totalSize)}, which is over 1 GB. Zipping may take a while and use significant memory. Do you want to proceed?`,
+            duration: 0,
+            actions: [
+                { text: 'Cancel', class: 'btn-secondary', callback: () => {} },
+                { text: 'Proceed', class: 'btn-primary', callback: proceedWithZipping }
+            ]
         });
-
-        const zipBlob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } }, (metadata) => {
-            // Update UI with progress
-            downloadAllBtn.querySelector('span').textContent = `Zipping... ${Math.round(metadata.percent)}%`;
-        });
-
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(zipBlob);
-        link.download = `dropsilk-files-${new Date().toISOString().split('T')[0]}.zip`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-    } catch (error) {
-        console.error("Error creating zip file:", error);
-        showToast({ type: 'danger', title: 'Zipping Failed', body: 'An error occurred while creating the zip file.', duration: 8000 });
-    } finally {
-        downloadAllBtn.disabled = false;
-        downloadAllBtn.innerHTML = originalBtnHTML;
+    } else {
+        await proceedWithZipping();
     }
 }
 
