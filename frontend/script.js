@@ -863,6 +863,7 @@ function setupEventListeners() {
 }
 
 // --- NEW: Handle Folder Selection with Warnings ---
+// --- NEW: Handle Folder Selection with Warnings ---
 function handleFolderSelection(files) {
     const fileLimit = 50;
     const sizeLimit = 1 * 1024 * 1024 * 1024; // 1 GB
@@ -879,6 +880,10 @@ function handleFolderSelection(files) {
             hasLargeFile = true;
             break; // Found one, no need to check further
         }
+    }
+
+    if (hasLargeFile) {
+        warningMessages.push(`This folder contains at least one file larger than 1 GB.`);
     }
 
     if (warningMessages.length > 0) {
@@ -902,6 +907,7 @@ function handleFolderSelection(files) {
             ]
         });
     } else {
+        // CORRECTED: This now calls the correct function to process the files.
         handleFileSelection(files);
     }
 }
