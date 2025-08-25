@@ -156,7 +156,8 @@ export function checkQueueOverflow(queueId) {
                 queueDiv.classList.add('expanded'); // Mark as permanently expanded for this session
                 btn.remove();
             };
-            queueDiv.appendChild(btn);
+            const panel = queueDiv.parentElement;
+            panel.appendChild(btn);
         }
     }
 }

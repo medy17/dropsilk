@@ -605,6 +605,7 @@ body[data-theme="dark"] .flight-ticket h2 { text-shadow: none; }
     border: 2px solid var(--c-panel-border);
     min-width: 0;
     transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    position: relative; /* Positioning context for child elements like expand button */
 }
 
 #dashboard-header {
@@ -901,7 +902,8 @@ body[data-theme="dark"] #dashboard-flight-code .copy-feedback {
 .share-btn:hover {
     background: var(--c-primary);
     color: var(--brilliant-white);
-    transform: scale(1.1);
+    border-color: var(--c-secondary);
+    transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(91, 206, 250, 0.25);
 }
 
@@ -980,6 +982,9 @@ body[data-theme="dark"] #dashboard-flight-code .copy-feedback {
     gap: 0.5em;
     text-decoration: none;
     box-shadow: 0 1px 4px rgba(91, 206, 250, 0.06);
+    backdrop-filter: blur(6px) saturate(1.2);
+    -webkit-backdrop-filter: blur(6px) saturate(1.2);
+    outline: 1px solid rgba(255,255,255,0.18);
 }
 body[data-theme="dark"] .btn {
     outline: none;
@@ -1335,22 +1340,18 @@ body[data-theme="dark"] .file-details__name {
     justify-content: center;
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: 12px; /* Change from circle to rounded square */
     background: var(--c-btn-primary-bg);
     color: var(--c-primary);
     border: 1.5px solid var(--c-primary);
     cursor: pointer;
     transition: all 0.2s ease, transform 0.1s ease-out;
     box-shadow: 0 1px 4px rgba(91, 206, 250, 0.06);
-    backdrop-filter: blur(6px) saturate(1.2);
-    -webkit-backdrop-filter: blur(6px) saturate(1.2);
-    outline: 1px solid rgba(255,255,255,0.18);
 }
 .file-action-btn:hover {
     background: var(--c-primary);
     color: var(--brilliant-white);
-    border-color: var(--c-secondary);
-    transform: translateY(-1px);
+    transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(91, 206, 250, 0.25);
 }
 
@@ -1559,22 +1560,6 @@ body[data-theme="dark"] .file-details__name {
     transition-duration: 0.1s;
 }
 
-.file-action-btn svg {
-    width: 20px;
-    height: 20px;
-}
-
-.file-action-group .file-action-btn.preview-btn {
-    background: var(--c-btn-secondary-bg);
-    border-color: var(--c-secondary);
-    color: var(--c-secondary);
-}
-
-.file-action-group .file-action-btn.preview-btn:hover {
-    background: var(--c-secondary);
-    color: var(--brilliant-white);
-    box-shadow: 0 4px 12px rgba(245, 169, 184, 0.25);
-}
 /* --- NEW: Spinner Styles --- */
 .spinner {
     animation: rotate 2s linear infinite;
@@ -1606,6 +1591,23 @@ body[data-theme="dark"] .file-details__name {
     }
 }
 
+
+.file-action-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.file-action-group .file-action-btn.preview-btn {
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-secondary);
+    color: var(--c-secondary);
+}
+
+.file-action-group .file-action-btn.preview-btn:hover {
+    background: var(--c-secondary);
+    color: var(--brilliant-white);
+    box-shadow: 0 4px 12px rgba(245, 169, 184, 0.25);
+}
 
 #video-player-container {
     position: relative;
@@ -1985,10 +1987,24 @@ body[data-theme="dark"] #zip-modal-warning-footer {
 
 .expand-queue-btn {
     position: absolute;
-    bottom: 0.75rem;
+    bottom: 1.5rem; /* Aligns with panel padding */
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
     padding: 0.6em 1.2em;
     font-size: 0.9em;
+}
+
+/* Override default button hover to prevent jump */
+.expand-queue-btn:hover {
+    transform: translateX(-50%) translateY(-1px);
+}
+.expand-queue-btn:active {
+    transform: translateX(-50%) scale(0.97);
+}
+
+/* Tone down the hover effect for the zip modal download button */
+#downloadSelectedBtn:hover {
+    transform: translateY(0); /* Remove the "pop" */
+    box-shadow: 0 2px 8px rgba(91, 206, 250, 0.2);
 }
