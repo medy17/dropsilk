@@ -92,7 +92,7 @@ function handlePeerLeft() {
     renderNetworkUsersView();
 }
 
-function handleServerError(message) {
+async function handleServerError(message) {
     console.error("Server error:", message);
     if (message.includes("Flight not found")) {
         const { flightCodeInputWrapper } = await import('../ui/dom.js');
