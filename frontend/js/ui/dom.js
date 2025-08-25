@@ -33,6 +33,14 @@ export const uiElements = {
     zipSelectionInfo: document.getElementById('zipSelectionInfo'),
     downloadSelectedBtn: document.getElementById('downloadSelectedBtn'),
 
+    // Zip Modal Specific
+    zipModalDefaultFooter: document.getElementById('zip-modal-default-footer'),
+    zipModalWarningFooter: document.getElementById('zip-modal-warning-footer'),
+    zipWarningText: document.getElementById('zipWarningText'),
+    cancelZipBtn: document.getElementById('cancelZipBtn'),
+    proceedZipBtn: document.getElementById('proceedZipBtn'),
+
+
     // Modals & Nav
     toastContainer: document.getElementById("toast-container"),
 

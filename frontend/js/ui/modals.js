@@ -92,6 +92,23 @@ async function copyToClipboard(text, button, successText = 'Copied!') {
     }, 2000);
 }
 
+// Helper function to reset the Zip Modal to its default state
+function resetZipModal() {
+    uiElements.selectAllZipCheckbox.checked = false;
+    updateZipSelection();
+    // Ensure the default footer is visible and the warning is hidden
+    if (uiElements.zipModalDefaultFooter) {
+        uiElements.zipModalDefaultFooter.style.display = 'block';
+    }
+    if (uiElements.zipModalWarningFooter) {
+        uiElements.zipModalWarningFooter.style.display = 'none';
+    }
+    // Make sure the main download button is re-enabled
+    if (uiElements.downloadSelectedBtn) {
+        uiElements.downloadSelectedBtn.disabled = true; // It will be re-enabled by updateZipSelection if needed
+    }
+}
+
 export function initializeModals() {
     initializeTheme();
 
@@ -118,8 +135,7 @@ export function initializeModals() {
             uiElements.body.style.overflow = '';
             if (name === 'contact') resetContactModal();
             if (name === 'zip') {
-                uiElements.selectAllZipCheckbox.checked = false;
-                updateZipSelection();
+                resetZipModal();
             }
         };
 
@@ -261,7 +277,7 @@ function setupZipModal() {
 
         if (selectedFiles.length > 0) {
             downloadAllFilesAsZip(selectedFiles);
-            document.getElementById('closeZipModal').click();
+            // DO NOT close the modal here anymore. zipHandler will do it on success.
         }
     });
 }

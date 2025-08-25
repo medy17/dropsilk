@@ -273,7 +273,7 @@
     </div>
 </div>
 
-<!-- NEW: Zip Download Modal -->
+<!-- MODIFIED: Zip Download Modal -->
 <div class="modal-overlay" id="zipModal">
     <div class="invite-modal">
         <div class="modal-header">
@@ -288,18 +288,29 @@
             </div>
         </div>
         <div class="modal-footer">
-            <div class="zip-actions-header">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="selectAllZipCheckbox" class="custom-checkbox-input">
-                    <span class="custom-checkbox"></span>
-                    <span>Select All</span>
-                </label>
-                <span id="zipSelectionInfo">0 files selected (0 Bytes)</span>
+            <!-- State 1: Default Footer -->
+            <div id="zip-modal-default-footer">
+                <div class="zip-actions-header">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="selectAllZipCheckbox" class="custom-checkbox-input">
+                        <span class="custom-checkbox"></span>
+                        <span>Select All</span>
+                    </label>
+                    <span id="zipSelectionInfo">0 files selected (0 Bytes)</span>
+                </div>
+                <button id="downloadSelectedBtn" class="share-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                    <span>Download Selected as Zip</span>
+                </button>
             </div>
-            <button id="downloadSelectedBtn" class="share-btn" disabled>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
-                <span>Download Selected as Zip</span>
-            </button>
+            <!-- State 2: Warning Footer -->
+            <div id="zip-modal-warning-footer" style="display: none;">
+                <p id="zipWarningText" class="zip-warning-text"></p>
+                <div class="zip-warning-actions">
+                    <button id="cancelZipBtn" class="btn btn-secondary">Cancel</button>
+                    <button id="proceedZipBtn" class="btn btn-primary">Proceed Anyway</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

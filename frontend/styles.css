@@ -1908,3 +1908,43 @@ body[data-theme="dark"] .zip-file-list {
     transform: none;
     box-shadow: none;
 }
+#downloadSelectedBtn:disabled:hover {
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-text-secondary);
+    color: var(--c-text-secondary);
+    transform: none;
+    box-shadow: none;
+}
+
+/* --- NEW: Zip Modal Warning Footer Styles --- */
+#zip-modal-warning-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 1rem;
+    border-radius: 12px;
+}
+body[data-theme="dark"] #zip-modal-warning-footer {
+    background-color: rgba(248, 113, 113, 0.08);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+
+.zip-warning-text {
+    color: var(--c-danger);
+    font-size: 0.95em;
+    line-height: 1.5;
+    margin: 0;
+    text-align: center;
+}
+
+.zip-warning-text strong {
+    font-weight: 700;
+}
+
+.zip-warning-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
