@@ -7,6 +7,30 @@ import { uiElements } from './dom.js';
 
 let captchaWidgetId = null;
 
+function onRecaptchaLoadCallback() {
+    const recaptchaContainer = document.getElementById('recaptcha-container');
+    // We only render the widget if the container exists and is empty.
+    if (recaptchaContainer && recaptchaContainer.innerHTML.trim() === '') {
+        captchaWidgetId = grecaptcha.render('recaptcha-container', {
+            'sitekey': RECAPTCHA_SITE_KEY,
+            'callback': 'onCaptchaSuccessCallback', // We provide the *name* of the success function as a string.
+            'theme': uiElements.body.getAttribute('data-theme') || 'light'
+        });
+    }
+}
+window.onRecaptchaLoad = onRecaptchaLoadCallback; // Attach it to the window.
+
+
+function onCaptchaSuccessCallback() {
+    document.getElementById('email-view-captcha-state').style.display = 'none';
+    document.getElementById('email-view-revealed-state').style.display = 'block';
+    document.getElementById('captcha-pretext').style.display = 'none';
+}
+window.onCaptchaSuccessCallback = onCaptchaSuccessCallback; // Attach it to the window.
+
+
+// --- MODULE LOGIC ---
+
 function applyTheme(theme, persist = true) {
     uiElements.body.setAttribute('data-theme', theme);
     if (persist) {
@@ -134,33 +158,19 @@ function setupContactModal() {
     const copyEmailBtn = document.getElementById('copyEmailBtn');
     const initialState = document.getElementById('email-view-initial-state');
     const captchaState = document.getElementById('email-view-captcha-state');
-    const recaptchaContainer = document.getElementById('recaptcha-container');
-
-    // This function is defined on window by the recaptcha script itself.
-    window.onRecaptchaLoad = () => {
-        if (recaptchaContainer && recaptchaContainer.innerHTML.trim() === '') {
-            captchaWidgetId = grecaptcha.render('recaptcha-container', {
-                'sitekey': RECAPTCHA_SITE_KEY,
-                'callback': onCaptchaSuccess,
-                'theme': uiElements.body.getAttribute('data-theme') || 'light'
-            });
-        }
-    };
 
     viewEmailBtn?.addEventListener('click', () => {
         initialState.style.display = 'none';
         captchaState.style.display = 'block';
+
+        // This handles cases where the modal is opened *after* the google script has already loaded.
+        if (window.grecaptcha && captchaWidgetId === null) {
+            onRecaptchaLoadCallback();
+        }
     });
 
     copyEmailBtn?.addEventListener('click', (e) => copyToClipboard('ahmed@dropsilk.xyz', e.currentTarget, 'Email Copied!'));
 }
-
-function onCaptchaSuccess() {
-    document.getElementById('email-view-captcha-state').style.display = 'none';
-    document.getElementById('email-view-revealed-state').style.display = 'block';
-    document.getElementById('captcha-pretext').style.display = 'none';
-}
-window.onCaptchaSuccess = onCaptchaSuccess; // Make it global for reCAPTCHA script
 
 function resetContactModal() {
     const initialState = document.getElementById('email-view-initial-state');
