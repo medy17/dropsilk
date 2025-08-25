@@ -94,19 +94,27 @@ async function copyToClipboard(text, button, successText = 'Copied!') {
 
 // Helper function to reset the Zip Modal to its default state
 function resetZipModal() {
+    const modal = document.getElementById('zipModal');
+    if (modal) modal.classList.remove('zipping-in-progress');
+
     uiElements.selectAllZipCheckbox.checked = false;
     updateZipSelection();
-    // Ensure the default footer is visible and the warning is hidden
+
     if (uiElements.zipModalDefaultFooter) {
         uiElements.zipModalDefaultFooter.style.display = 'block';
     }
     if (uiElements.zipModalWarningFooter) {
         uiElements.zipModalWarningFooter.style.display = 'none';
     }
-    // Make sure the main download button is re-enabled
-    if (uiElements.downloadSelectedBtn) {
-        uiElements.downloadSelectedBtn.disabled = true; // It will be re-enabled by updateZipSelection if needed
-    }
+
+    const btn = uiElements.downloadSelectedBtn;
+    const btnSpan = btn.querySelector('span');
+    const downloadIcon = btn.querySelector('.download-icon');
+    const spinnerIcon = btn.querySelector('.spinner-icon');
+
+    if (btnSpan) btnSpan.textContent = 'Download Selected as Zip';
+    if (downloadIcon) downloadIcon.style.display = 'inline-block';
+    if (spinnerIcon) spinnerIcon.style.display = 'none';
 }
 
 export function initializeModals() {
@@ -147,6 +155,10 @@ export function initializeModals() {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             document.querySelectorAll('.modal-overlay.show').forEach(m => {
+                // Prevent closing the zip modal while it's busy
+                if (m.id === 'zipModal' && m.classList.contains('zipping-in-progress')) {
+                    return;
+                }
                 const modalName = Object.keys(modals).find(key => modals[key].overlay === m.id);
                 if (modalName) document.getElementById(modals[modalName].close)?.click();
             });
@@ -277,7 +289,6 @@ function setupZipModal() {
 
         if (selectedFiles.length > 0) {
             downloadAllFilesAsZip(selectedFiles);
-            // DO NOT close the modal here anymore. zipHandler will do it on success.
         }
     });
 }

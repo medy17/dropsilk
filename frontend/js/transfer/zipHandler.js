@@ -9,25 +9,34 @@ import { formatBytes } from '../utils/helpers.js';
 function resetZipModalUI() {
     uiElements.zipModalDefaultFooter.style.display = 'block';
     uiElements.zipModalWarningFooter.style.display = 'none';
+
     const btn = uiElements.downloadSelectedBtn;
     const btnSpan = btn.querySelector('span');
-    if (btnSpan) {
-        btnSpan.textContent = 'Download Selected as Zip';
-    }
-    // Let updateZipSelection handle the disabled state correctly
+    const downloadIcon = btn.querySelector('.download-icon');
+    const spinnerIcon = btn.querySelector('.spinner-icon');
+
+    if (btnSpan) btnSpan.textContent = 'Download Selected as Zip';
+    if (downloadIcon) downloadIcon.style.display = 'inline-block';
+    if (spinnerIcon) spinnerIcon.style.display = 'none';
+
     const checkboxes = uiElements.zipFileList.querySelectorAll('.zip-file-checkbox:checked');
     btn.disabled = checkboxes.length === 0;
 }
 
 async function proceedWithZipping(files) {
+    const modal = document.getElementById('zipModal');
     const btn = uiElements.downloadSelectedBtn;
-    const originalBtnHTML = btn.innerHTML; // We can simplify this later if we want
-    btn.disabled = true;
-    btn.innerHTML = `<svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg><span>Zipping...</span>`;
+    const btnSpan = btn.querySelector('span');
+    const downloadIcon = btn.querySelector('.download-icon');
+    const spinnerIcon = btn.querySelector('.spinner-icon');
 
-    // Also disable the other buttons just in case
-    uiElements.proceedZipBtn.disabled = true;
-    uiElements.cancelZipBtn.disabled = true;
+    // --- LOCK THE UI ---
+    modal.classList.add('zipping-in-progress');
+    btn.disabled = true;
+    if (downloadIcon) downloadIcon.style.display = 'none';
+    if (spinnerIcon) spinnerIcon.style.display = 'inline-block';
+    if (btnSpan) btnSpan.textContent = 'Zipping...';
+
 
     try {
         const zip = new JSZip();
@@ -36,8 +45,7 @@ async function proceedWithZipping(files) {
         });
 
         const zipBlob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } }, (metadata) => {
-            const btnSpan = btn.querySelector('span');
-            if(btnSpan) btnSpan.textContent = `Zipping... ${Math.round(metadata.percent)}%`;
+            if (btnSpan) btnSpan.textContent = `Zipping... ${Math.round(metadata.percent)}%`;
         });
 
         const link = document.createElement('a');
@@ -50,13 +58,10 @@ async function proceedWithZipping(files) {
 
     } catch (error) {
         showToast({ type: 'danger', title: 'Zipping Failed', body: 'An error occurred while creating the zip file.', duration: 8000 });
-        // If it fails, restore the button to its original state so the user can try again
-        btn.disabled = false;
-        btn.innerHTML = originalBtnHTML;
     } finally {
-        // Re-enable warning buttons in case of failure
-        uiElements.proceedZipBtn.disabled = false;
-        uiElements.cancelZipBtn.disabled = false;
+        // --- GUARANTEED UI CLEANUP ---
+        modal.classList.remove('zipping-in-progress');
+        resetZipModalUI(); // Reset to a clean, non-busy state
     }
 };
 
@@ -68,7 +73,6 @@ export async function downloadAllFilesAsZip(filesToZip) {
 
     const files = filesToZip || store.getState().receivedFiles;
     if (files.length === 0) {
-        // Use an in-modal warning for consistency if possible, but a toast is fine here.
         showToast({ type: 'info', title: 'No Files Selected', body: 'Please select at least one file to download.', duration: 5000 });
         return;
     }
@@ -81,7 +85,6 @@ export async function downloadAllFilesAsZip(filesToZip) {
         uiElements.zipModalWarningFooter.style.display = 'flex';
         uiElements.zipWarningText.innerHTML = `The total size of the selected files is <strong>${formatBytes(totalSize)}</strong>. Zipping may use significant memory and take some time. Do you want to proceed?`;
 
-        // Define handlers that also clean up after themselves
         const cleanup = () => {
             uiElements.proceedZipBtn.onclick = null;
             uiElements.cancelZipBtn.onclick = null;
@@ -89,8 +92,7 @@ export async function downloadAllFilesAsZip(filesToZip) {
 
         const proceedHandler = () => {
             cleanup();
-            // FIX: Reset the UI *before* starting the zipping process
-            resetZipModalUI();
+            resetZipModalUI(); // Reset the footer to the default view
             proceedWithZipping(files);
         };
 

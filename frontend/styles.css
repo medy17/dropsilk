@@ -1825,7 +1825,7 @@ input[type=range].volume-slider::-moz-range-thumb { background-color: #fff; heig
     padding: 0.5rem;
     margin-bottom: 1.5rem;
     background: linear-gradient(90deg, rgba(91,206,250,0.02) 0%, rgba(245,169,184,0.01) 100%);
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, opacity 0.3s;
 }
 body[data-theme="dark"] .zip-file-list {
     background: rgba(255,255,255,0.02);
@@ -1880,6 +1880,7 @@ body[data-theme="dark"] .zip-file-list {
     align-items: center;
     font-size: 0.95em;
     padding: 0 0.25rem;
+    transition: opacity 0.3s;
 }
 
 .zip-actions-header .checkbox-label {
@@ -1908,12 +1909,10 @@ body[data-theme="dark"] .zip-file-list {
     transform: none;
     box-shadow: none;
 }
-#downloadSelectedBtn:disabled:hover {
-    background: var(--c-btn-secondary-bg);
-    border-color: var(--c-text-secondary);
-    color: var(--c-text-secondary);
-    transform: none;
-    box-shadow: none;
+.spinner-icon {
+    width: 20px; /* Match the download icon size */
+    height: 20px;
+    flex-shrink: 0;
 }
 
 /* --- NEW: Zip Modal Warning Footer Styles --- */
@@ -1947,4 +1946,17 @@ body[data-theme="dark"] #zip-modal-warning-footer {
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
+}
+
+/* --- NEW: Zipping In Progress State --- */
+.modal-overlay.zipping-in-progress .zip-file-list,
+.modal-overlay.zipping-in-progress .zip-actions-header {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.modal-overlay.zipping-in-progress .modal-close {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
 }
