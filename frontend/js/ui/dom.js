@@ -28,6 +28,10 @@ export const uiElements = {
     selectFolderBtn: document.querySelector('.drop-zone__buttons button.btn-secondary'),
     receiverActionsContainer: document.getElementById('receiver-actions'),
     downloadAllBtn: document.getElementById('downloadAllBtn'),
+    selectAllZipCheckbox: document.getElementById('selectAllZipCheckbox'),
+    zipFileList: document.getElementById('zip-file-list'),
+    zipSelectionInfo: document.getElementById('zipSelectionInfo'),
+    downloadSelectedBtn: document.getElementById('downloadSelectedBtn'),
 
     // Modals & Nav
     toastContainer: document.getElementById("toast-container"),
