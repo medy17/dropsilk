@@ -151,7 +151,12 @@
             <div id="sending-queue"><div class="empty-state">Select files to send</div></div>
         </div>
         <div class="panel grid-col-span-2">
-            <div class="panel-header"><h3>Receiver Queue</h3></div>
+            <div class="panel-header">
+                <h3>Receiver Queue</h3>
+                <div id="receiver-actions" style="display: none;">
+                    <button id="downloadAllBtn" class="btn btn-primary">Download All as Zip</button>
+                </div>
+            </div>
             <div id="receiver-queue"><div class="empty-state">Waiting for incoming files</div></div>
         </div>
     </div>
@@ -466,6 +471,7 @@
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://unpkg.com/qrcode@1.4.4/build/qrcode.min.js"></script>
 <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
 <script src="video.js" defer></script>

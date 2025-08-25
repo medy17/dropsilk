@@ -82,6 +82,7 @@ let myId = "",
 let fileToSendQueue = [];
 let currentlySendingFile = null;
 const fileIdMap = new Map();
+let receivedFiles = []; // To store { name, blob } for zipping
 let captchaWidgetId = null; // To hold the ID of the rendered CAPTCHA
 
 
@@ -114,6 +115,14 @@ const qrCanvas = document.getElementById('qrCanvas'); // Moved to global scope
 const dropZone = document.querySelector('.drop-zone'); // For disabling/enabling
 const dropZoneText = dropZone.querySelector('p');
 const dropZoneSecondaryText = dropZone.querySelector('.secondary-text');
+const receiverActionsContainer = document.getElementById('receiver-actions');
+const downloadAllBtn = document.getElementById('downloadAllBtn');
+const selectFolderBtn = document.querySelector('.drop-zone__buttons button.btn-secondary');
+const folderInputTransfer = document.createElement('input');
+folderInputTransfer.type = 'file';
+folderInputTransfer.style.display = 'none';
+folderInputTransfer.webkitdirectory = true;
+document.body.appendChild(folderInputTransfer);
 
 // --- Dynamic connection panel elements ---
 const connectionPanelTitle = document.getElementById("connection-panel-title");
@@ -573,6 +582,10 @@ function setupDataChannel() {
         // EOF
         if (event.data === "EOF") {
             const receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
+            // Add to our list for the zip feature
+            receivedFiles.push({ name: incomingFileInfo.name, blob: receivedBlob });
+            updateReceiverActions(); // Call the new UI update function
+
             const fileId = fileIdMap.get(incomingFileInfo.name);
             const fileElement = document.getElementById(fileId);
 
@@ -781,6 +794,18 @@ function setupEventListeners() {
         }
     };
 
+    selectFolderBtn.onclick = () => folderInputTransfer.click();
+    folderInputTransfer.onchange = () => {
+        if (folderInputTransfer.files.length > 0) {
+            handleFolderSelection(folderInputTransfer.files);
+            // Clear the input to allow selecting the same folder again
+            folderInputTransfer.value = "";
+        }
+    };
+
+    // --- Listener for the "Download All as Zip" button ---
+    downloadAllBtn.onclick = downloadAllFilesAsZip;
+
     // --- Event delegation for invite buttons on the dynamic panel ---
     connectionPanelList.addEventListener('click', (e) => {
         const inviteBtn = e.target.closest('.invite-user-btn');
@@ -837,6 +862,39 @@ function setupEventListeners() {
     setupAllModalsAndNav();
 }
 
+// --- NEW: Handle Folder Selection with Warnings ---
+function handleFolderSelection(files) {
+    const fileLimit = 50;
+    const sizeLimit = 1 * 1024 * 1024 * 1024; // 1 GB
+    let warningMessages = [];
+    let hasLargeFile = false;
+
+    if (files.length > fileLimit) {
+        warningMessages.push(`This folder contains ${files.length} files (the recommended maximum is ${fileLimit}).`);
+    }
+
+    // Check for any single file exceeding the size limit
+    for (const file of Array.from(files)) {
+        if (file.size > sizeLimit) {
+            hasLargeFile = true;
+            break; // Found one, no need to check further
+        }
+    }
+
+    if (hasLargeFile) {
+        warningMessages.push(`This folder contains at least one file larger than 1 GB.`);
+    }
+
+    if (warningMessages.length > 0) {
+        const confirmationMessage = warningMessages.join('\n') + '\n\nSending may cause performance issues. Do you want to continue?';
+        if (!confirm(confirmationMessage)) {
+            showToast({ type: 'info', title: 'Folder Canceled', body: 'The folder selection was canceled by the user.', duration: 5000 });
+            return; // User canceled
+        }
+    }
+
+    handleFileSelection(files);
+}
 
 
 // --- METRICS FUNCTIONS ---
@@ -945,6 +1003,66 @@ function enableDropZone() {
     dropZoneSecondaryText.textContent = 'or select manually';
 }
 
+// --- NEW: Show/Hide "Download All" button based on file count ---
+function updateReceiverActions() {
+    if (receivedFiles.length > 3) {
+        receiverActionsContainer.style.display = 'block';
+    } else {
+        receiverActionsContainer.style.display = 'none';
+    }
+}
+
+// --- NEW: Logic to zip and download all received files ---
+async function downloadAllFilesAsZip() {
+    if (typeof JSZip === 'undefined') {
+        showToast({ type: 'danger', title: 'Error', body: 'Zipping library is not available. Please refresh the page.', duration: 8000 });
+        console.error('JSZip library not found!');
+        return;
+    }
+
+    const totalSize = receivedFiles.reduce((sum, file) => sum + file.blob.size, 0);
+    const sizeWarningLimit = 1 * 1024 * 1024 * 1024; // 1 GB
+
+    if (totalSize > sizeWarningLimit) {
+        if (!confirm(`The total size of the files is ${formatBytes(totalSize)}, which is over 1 GB. Zipping may take a while and use significant memory. Do you want to proceed?`)) {
+            return; // User canceled
+        }
+    }
+
+    const originalBtnHTML = downloadAllBtn.innerHTML;
+    downloadAllBtn.disabled = true;
+    downloadAllBtn.innerHTML = `
+        <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
+        <span>Zipping...</span>
+    `;
+
+    try {
+        const zip = new JSZip();
+        receivedFiles.forEach(file => {
+            zip.file(file.name, file.blob);
+        });
+
+        const zipBlob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } }, (metadata) => {
+            // Update UI with progress
+            downloadAllBtn.querySelector('span').textContent = `Zipping... ${Math.round(metadata.percent)}%`;
+        });
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(zipBlob);
+        link.download = `dropsilk-files-${new Date().toISOString().split('T')[0]}.zip`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+    } catch (error) {
+        console.error("Error creating zip file:", error);
+        showToast({ type: 'danger', title: 'Zipping Failed', body: 'An error occurred while creating the zip file.', duration: 8000 });
+    } finally {
+        downloadAllBtn.disabled = false;
+        downloadAllBtn.innerHTML = originalBtnHTML;
+    }
+}
+
 // --- Generic Toast Creation Function ---
 function showToast({ type = 'info', title, body, duration = 10000, actions = [] }) {
     const toastId = `toast-${Date.now()}`;
@@ -1034,6 +1152,8 @@ function resetState() {
     fileInputTransfer.value = "";
     sendingQueueDiv.innerHTML = '<div class="empty-state">Select files to send</div>';
     receiverQueueDiv.innerHTML = '<div class="empty-state">Waiting for incoming files</div>';
+    receivedFiles = []; // Clear the received files array
+    updateReceiverActions(); // Hide the download all button
 
     // Reset metrics UI and state
     totalBytesSent = 0;
