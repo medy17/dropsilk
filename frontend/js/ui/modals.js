@@ -209,8 +209,9 @@ function populateZipModal() {
 
     receivedFiles.forEach((file, index) => {
         uiElements.zipFileList.insertAdjacentHTML('beforeend', `
-            <label class="zip-file-item">
-                <input type="checkbox" class="zip-file-checkbox" data-index="${index}">
+            <label class="zip-file-item checkbox-label">
+                <input type="checkbox" class="zip-file-checkbox custom-checkbox-input" data-index="${index}">
+                <span class="custom-checkbox"></span>
                 <div class="zip-file-details">
                     <span class="zip-file-name" title="${file.name}">${file.name}</span>
                     <span class="zip-file-size">${formatBytes(file.blob.size)}</span>

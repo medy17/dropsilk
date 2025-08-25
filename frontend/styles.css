@@ -1763,39 +1763,91 @@ input[type=range].volume-slider::-moz-range-thumb { background-color: #fff; heig
     margin: 1.5rem 0;
 }
 
+/* --- NEW: Custom Checkbox Styles --- */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    gap: 0.75rem;
+}
+.custom-checkbox-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+.custom-checkbox {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: var(--c-panel-bg);
+    border: 2px solid var(--c-text-secondary);
+    border-radius: 6px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+.checkbox-label:hover .custom-checkbox {
+    border-color: var(--c-primary);
+}
+.custom-checkbox-input:checked + .custom-checkbox {
+    background-color: var(--c-primary);
+    border-color: var(--c-primary);
+    transform: scale(1.05);
+}
+.custom-checkbox::after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--brilliant-white);
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.custom-checkbox-input:checked + .custom-checkbox::after {
+    display: block;
+    transform: rotate(45deg) scale(1);
+}
+
+/* --- Refined Zip Download Modal Styles --- */
 .zip-file-list {
     max-height: 40vh;
     overflow-y: auto;
-    border: 1.5px solid var(--c-primary);
+    border: 2px solid var(--c-panel-border);
     border-radius: 12px;
     padding: 0.5rem;
     margin-bottom: 1.5rem;
-    background: linear-gradient(90deg, rgba(91,206,250,0.05) 0%, rgba(245,169,184,0.04) 100%);
+    background: linear-gradient(90deg, rgba(91,206,250,0.02) 0%, rgba(245,169,184,0.01) 100%);
+    transition: border-color 0.3s;
+}
+body[data-theme="dark"] .zip-file-list {
+    background: rgba(255,255,255,0.02);
 }
 
 .zip-file-item {
     display: flex;
     align-items: center;
     padding: 0.75rem;
-    border-radius: 8px;
-    transition: background-color 0.2s;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+    font-weight: 500;
 }
 
 .zip-file-item:hover {
-    background-color: rgba(91, 206, 250, 0.1);
-}
-
-.zip-file-item input[type="checkbox"] {
-    margin-right: 1rem;
-    width: 18px;
-    height: 18px;
-    accent-color: var(--c-primary);
-    cursor: pointer;
+    background-color: rgba(91, 206, 250, 0.08);
 }
 
 .zip-file-details {
     flex-grow: 1;
     min-width: 0;
+    padding-left: 0.5rem; /* Space from checkbox */
 }
 
 .zip-file-name {
@@ -1803,19 +1855,20 @@ input[type=range].volume-slider::-moz-range-thumb { background-color: #fff; heig
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--c-text-primary);
 }
 
 .zip-file-size {
     display: block;
-    font-size: 0.85em;
+    font-size: 0.9em;
     color: var(--c-text-secondary);
 }
 
 .modal-footer {
     margin-top: 1.5rem;
     padding-top: 1rem;
-    border-top: 2px solid var(--c-primary);
+    border-top: 2px solid var(--c-panel-border);
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -1825,9 +1878,33 @@ input[type=range].volume-slider::-moz-range-thumb { background-color: #fff; heig
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 0.95em;
+    padding: 0 0.25rem;
+}
+
+.zip-actions-header .checkbox-label {
+    font-weight: 500;
+}
+
+#zipSelectionInfo {
+    color: var(--c-text-secondary);
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.9em;
 }
 
-.checkbox-label {
-    display: flex;
+#downloadSelectedBtn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-text-secondary);
+    color: var(--c-text-secondary);
+    box-shadow: none;
+    transform: none;
+}
+#downloadSelectedBtn:disabled:hover {
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-text-secondary);
+    color: var(--c-text-secondary);
+    transform: none;
+    box-shadow: none;
 }
