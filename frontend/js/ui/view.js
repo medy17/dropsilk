@@ -5,6 +5,32 @@ import { uiElements } from './dom.js';
 import { store } from '../state.js';
 import { getFileIcon, formatBytes } from '../utils/helpers.js';
 
+// --- NEW OVERLAY FUNCTIONS ---
+export function showBoardingOverlay(flightCode) {
+    if (uiElements.boardingOverlay) {
+        // Hide the main landing page content to prevent it from flashing
+        uiElements.setupContainer.style.display = "none";
+        document.getElementById('boarding-flight-code').textContent = flightCode.toUpperCase();
+        uiElements.boardingOverlay.classList.add('show');
+    }
+}
+
+export function hideBoardingOverlay() {
+    if (uiElements.boardingOverlay) {
+        uiElements.boardingOverlay.classList.remove('show');
+    }
+}
+
+export function failBoarding() {
+    if (uiElements.boardingOverlay) {
+        uiElements.boardingOverlay.classList.remove('show');
+        // IMPORTANT: Show the main landing page again so the user can take manual action
+        uiElements.setupContainer.style.display = "flex";
+    }
+}
+// --- END NEW OVERLAY FUNCTIONS ---
+
+
 export function renderUserName() {
     uiElements.userNameDisplay.textContent = store.getState().myName;
 }

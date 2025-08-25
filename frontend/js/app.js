@@ -2,7 +2,7 @@
 // This is the main entry point for the application.
 
 import { store } from './state.js';
-import { renderUserName } from './ui/view.js';
+import { renderUserName, showBoardingOverlay } from './ui/view.js'; // MODIFIED: Import showBoardingOverlay
 import { initializeEventListeners } from './ui/events.js';
 import { initializeModals } from './ui/modals.js';
 import { connect as connectWebSocket } from './network/websocket.js';
@@ -37,9 +37,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const isAppPage = document.querySelector(".main-content");
 
+    // --- MODIFIED BLOCK ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const flightCodeFromUrl = urlParams.get('code');
+
     if (isAppPage) {
+        // If there's a valid code in the URL, show the boarding screen immediately.
+        if (flightCodeFromUrl && flightCodeFromUrl.length === 6) {
+            showBoardingOverlay(flightCodeFromUrl);
+        }
         initializeAppCore();
     } else {
         console.log("On a non-app page (e.g., 404). Core logic will not be initialized.");
     }
+    // --- END MODIFIED BLOCK ---
 });

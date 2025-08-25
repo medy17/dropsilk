@@ -12,6 +12,9 @@ export const uiElements = {
     flightCodeInput: document.getElementById("flightCodeInput"),
     flightCodeInputWrapper: document.querySelector('.flight-code-input-wrapper'),
 
+    // NEW
+    boardingOverlay: document.getElementById('boarding-overlay'),
+
     // Dashboard
     dashboard: document.getElementById("dashboard"),
     dashboardFlightCodeBtn: document.getElementById("dashboard-flight-code"),

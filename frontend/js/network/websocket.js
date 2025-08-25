@@ -5,7 +5,8 @@ import { WEBSOCKET_URL } from '../config.js';
 import { store } from '../state.js';
 import { showInvitationToast, showToast } from '../utils/toast.js';
 import { initializePeerConnection, handleSignal, resetPeerConnectionState } from './webrtc.js';
-import { enterFlightMode, updateDashboardStatus, renderInFlightView, renderNetworkUsersView, disableDropZone } from '../ui/view.js';
+// MODIFIED: Import new overlay functions
+import { enterFlightMode, updateDashboardStatus, renderInFlightView, renderNetworkUsersView, disableDropZone, hideBoardingOverlay, failBoarding } from '../ui/view.js';
 
 let ws;
 
@@ -31,29 +32,19 @@ function onOpen() {
         localIp: "unknown"
     });
 
-    // --- NEW: Auto-join from URL parameter ---
     try {
         const urlParams = new URLSearchParams(window.location.search);
         const flightCodeFromUrl = urlParams.get('code');
 
-        // Check if the code exists and has the correct length.
         if (flightCodeFromUrl && flightCodeFromUrl.length === 6) {
             console.log(`Found flight code in URL, attempting to auto-join: ${flightCodeFromUrl}`);
-
-            // Set the user as a joiner, not a creator.
             store.actions.setIsFlightCreator(false);
-
-            // Send the join message directly. The server will respond with `peer-joined` or an error.
             sendMessage({ type: "join-flight", flightCode: flightCodeFromUrl.toUpperCase() });
-
-            // For a cleaner user experience, remove the code from the URL after using it.
-            // This prevents the user from trying to re-join the same room on a page refresh.
             window.history.replaceState({}, document.title, window.location.pathname);
         }
     } catch (e) {
         console.error("Error processing URL for auto-join:", e);
     }
-    // --- END NEW ---
 }
 
 async function onMessage(event) {
@@ -77,6 +68,8 @@ async function onMessage(event) {
             enterFlightMode(msg.flightCode);
             break;
         case "peer-joined":
+            // MODIFIED: Hide overlay on success
+            hideBoardingOverlay();
             if (!state.currentFlightCode) {
                 enterFlightMode(msg.flightCode);
             }
@@ -85,7 +78,6 @@ async function onMessage(event) {
             updateDashboardStatus(`Peer Connected! (${store.getState().connectionType.toUpperCase()} mode)`, 'connected');
             renderInFlightView();
             initializePeerConnection(state.isFlightCreator);
-            // Scroll to top on connection
             window.scrollTo({ top: 0, behavior: 'smooth' });
             break;
         case "signal":
@@ -95,12 +87,16 @@ async function onMessage(event) {
             handlePeerLeft();
             break;
         case "error":
+            // MODIFIED: Handle boarding failure on error
+            failBoarding();
             handleServerError(msg.message);
             break;
     }
 }
 
 function onClose() {
+    // MODIFIED: Handle boarding failure on connection close
+    failBoarding();
     showToast({ type: 'danger', title: 'Connection Lost', body: 'Connection to the server was lost. Please refresh the page to reconnect.', duration: 0 });
     store.actions.resetState();
 }
@@ -110,12 +106,9 @@ function onError(error) {
 }
 
 export function handlePeerLeft() {
-    // Add a guard to prevent this from running multiple times if triggered by different events
     if (!store.getState().peerInfo) return;
-
     console.log("Peer has left the flight.");
     store.actions.clearPeerInfo();
-    // Reset scroll flags for the next connection
     store.actions.setHasScrolledForSend(false);
     store.actions.setHasScrolledForReceive(false);
     resetPeerConnectionState();
