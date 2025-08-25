@@ -863,6 +863,7 @@ function setupEventListeners() {
 }
 
 // --- NEW: Handle Folder Selection with Warnings ---
+// --- NEW: Handle Folder Selection with Warnings (Replaces old version) ---
 function handleFolderSelection(files) {
     const fileLimit = 50;
     const sizeLimit = 1 * 1024 * 1024 * 1024; // 1 GB
@@ -885,14 +886,39 @@ function handleFolderSelection(files) {
         warningMessages.push(`This folder contains at least one file larger than 1 GB.`);
     }
 
+    // If there are warnings, show a custom toast confirmation.
     if (warningMessages.length > 0) {
-        const confirmationMessage = warningMessages.join('\n') + '\n\nSending may cause performance issues. Do you want to continue?';
-        if (!confirm(confirmationMessage)) {
-            showToast({ type: 'info', title: 'Folder Canceled', body: 'The folder selection was canceled by the user.', duration: 5000 });
-            return; // User canceled
-        }
+        const warningBody = warningMessages.join('<br>') + '<br><br><b>Sending may cause performance issues. Do you want to continue?</b>';
+
+        showToast({
+            type: 'danger', // Use the danger style for attention
+            title: 'Folder Selection Warning',
+            body: warningBody,
+            duration: 0, // Makes the toast persistent until an action is taken
+            actions: [
+                {
+                    text: 'Cancel',
+                    class: 'btn-secondary',
+                    callback: () => {
+                        // User clicked cancel, do nothing.
+                        console.log('Folder selection canceled by user.');
+                    }
+                },
+                {
+                    text: 'Continue Anyway',
+                    class: 'btn-primary',
+                    callback: () => {
+                        // User confirmed, proceed with adding files.
+                        handleFileSelection(files);
+                    }
+                }
+            ]
+        });
+
+        return; // Stop execution here, let the toast callback handle the next step.
     }
 
+    // If there are no warnings, proceed directly.
     handleFileSelection(files);
 }
 
