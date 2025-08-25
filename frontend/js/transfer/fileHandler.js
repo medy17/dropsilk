@@ -176,24 +176,26 @@ export function handleDataChannelMessage(event) {
         }
         if (data === "EOF") { // End of File
             const receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
-            store.actions.addReceivedFile({ name: incomingFileInfo.name, blob: receivedBlob });
+            const finalFileInfo = { ...incomingFileInfo }; // Capture file info before it's reset
+
+            store.actions.addReceivedFile({ name: finalFileInfo.name, blob: receivedBlob });
             updateReceiverActions();
 
-            const fileId = store.actions.getFileId(incomingFileInfo.name);
+            const fileId = store.actions.getFileId(finalFileInfo.name);
             const fileElement = document.getElementById(fileId);
 
             if (fileElement) {
                 const actionContainer = fileElement.querySelector('.file-action');
-                const isVideo = incomingFileInfo.type.startsWith('video/') || incomingFileInfo.name.toLowerCase().endsWith('.mkv');
+                const isVideo = finalFileInfo.type.startsWith('video/') || finalFileInfo.name.toLowerCase().endsWith('.mkv');
 
                 if (isVideo && window.videoPlayer) {
                     actionContainer.innerHTML = `<div class="file-action-group">
                         <button class="btn btn-secondary preview-btn">Preview</button>
-                        <a href="${URL.createObjectURL(receivedBlob)}" download="${incomingFileInfo.name}" class="btn btn-primary">Save</a>
+                        <a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="btn btn-primary">Save</a>
                      </div>`;
-                    actionContainer.querySelector('.preview-btn').onclick = () => window.videoPlayer.open(receivedBlob, incomingFileInfo.name);
+                    actionContainer.querySelector('.preview-btn').onclick = () => window.videoPlayer.open(receivedBlob, finalFileInfo.name);
                 } else {
-                    actionContainer.innerHTML = `<a href="${URL.createObjectURL(receivedBlob)}" download="${incomingFileInfo.name}" class="btn btn-primary">Download</a>`;
+                    actionContainer.innerHTML = `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="btn btn-primary">Download</a>`;
                 }
                 fileElement.querySelector('.percent').textContent = 'Complete!';
             }

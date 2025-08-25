@@ -83,7 +83,10 @@ function onError(error) {
     console.error("WebSocket error:", error);
 }
 
-function handlePeerLeft() {
+export function handlePeerLeft() {
+    // Add a guard to prevent this from running multiple times if triggered by different events
+    if (!store.getState().peerInfo) return;
+
     console.log("Peer has left the flight.");
     store.actions.clearPeerInfo();
     resetPeerConnectionState();

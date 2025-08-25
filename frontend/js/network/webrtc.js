@@ -3,7 +3,7 @@
 
 import { ICE_SERVERS } from '../config.js';
 import { store } from '../state.js';
-import { sendMessage } from './websocket.js';
+import { sendMessage, handlePeerLeft } from './websocket.js';
 import { enableDropZone, updateDashboardStatus, disableDropZone, renderNetworkUsersView } from '../ui/view.js';
 import { handleDataChannelMessage, processFileToSendQueue, drainQueue } from '../transfer/fileHandler.js';
 
@@ -95,16 +95,6 @@ function setupDataChannel() {
     dataChannel.onmessage = (event) => handleDataChannelMessage(event);
 }
 
-function handlePeerLeft() {
-    if (!store.getState().peerInfo) return;
-    console.log("Peer has left the flight.");
-    store.actions.clearPeerInfo();
-    resetPeerConnectionState();
-    updateDashboardStatus('Peer disconnected. Waiting...', 'disconnected');
-    disableDropZone();
-    renderNetworkUsersView();
-}
-
 export function resetPeerConnectionState() {
     if (peerConnection) {
         peerConnection.close();
@@ -113,8 +103,11 @@ export function resetPeerConnectionState() {
     const { metricsInterval } = store.getState();
     if (metricsInterval) clearInterval(metricsInterval);
     dataChannel = null;
-    const { resetTransferState } = import('../transfer/fileHandler.js');
-    resetTransferState();
+    import('../transfer/fileHandler.js')
+        .then(({ resetTransferState }) => {
+            if (resetTransferState) resetTransferState();
+        })
+        .catch(err => console.error("Error resetting transfer state:", err));
 }
 
 export function sendData(data) {
