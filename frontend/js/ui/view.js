@@ -130,3 +130,33 @@ export function updateMetricsUI() {
 
     store.actions.resetIntervalMetrics(now);
 }
+
+export function checkQueueOverflow(queueId) {
+    const queueDiv = document.getElementById(queueId);
+    if (!queueDiv) return;
+
+    // We count .queue-item specifically, to ignore the expand button if it exists
+    const itemCount = queueDiv.querySelectorAll('.queue-item').length;
+    const isCollapsible = itemCount > 4;
+
+    if (isCollapsible && !queueDiv.classList.contains('expanded')) {
+        queueDiv.classList.add('queue-collapsible');
+
+        let expandBtn = queueDiv.querySelector('.expand-queue-btn');
+        if (!expandBtn) {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-primary expand-queue-btn';
+            btn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
+                <span>Expand</span>
+            `;
+
+            btn.onclick = () => {
+                queueDiv.classList.remove('queue-collapsible');
+                queueDiv.classList.add('expanded'); // Mark as permanently expanded for this session
+                btn.remove();
+            };
+            queueDiv.appendChild(btn);
+        }
+    }
+}

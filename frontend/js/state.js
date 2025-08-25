@@ -26,6 +26,10 @@ const initialState = {
     lastMetricsUpdateTime: 0,
     sentInInterval: 0,
     receivedInInterval: 0,
+
+    // UI State
+    hasScrolledForSend: false,
+    hasScrolledForReceive: false,
 };
 
 let state = { ...initialState };
@@ -81,6 +85,8 @@ export const store = {
             state.lastMetricsUpdateTime = time;
             state.sentInInterval = 0;
             state.receivedInInterval = 0;
-        }
+        },
+        setHasScrolledForSend: (value) => { state.hasScrolledForSend = value; },
+        setHasScrolledForReceive: (value) => { state.hasScrolledForReceive = value; }
     }
 };

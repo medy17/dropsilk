@@ -61,6 +61,8 @@ async function onMessage(event) {
             updateDashboardStatus(`Peer Connected! (${store.getState().connectionType.toUpperCase()} mode)`, 'connected');
             renderInFlightView();
             initializePeerConnection(state.isFlightCreator);
+            // Scroll to top on connection
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             break;
         case "signal":
             await handleSignal(msg.data);
@@ -89,6 +91,9 @@ export function handlePeerLeft() {
 
     console.log("Peer has left the flight.");
     store.actions.clearPeerInfo();
+    // Reset scroll flags for the next connection
+    store.actions.setHasScrolledForSend(false);
+    store.actions.setHasScrolledForReceive(false);
     resetPeerConnectionState();
     updateDashboardStatus('Peer disconnected. Waiting...', 'disconnected');
     disableDropZone();

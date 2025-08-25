@@ -6,8 +6,8 @@ import { showToast } from '../utils/toast.js';
 import { sendData, getBufferedAmount } from '../network/webrtc.js';
 import { HIGH_WATER_MARK } from '../config.js';
 import { uiElements } from '../ui/dom.js';
-import { getFileIcon, formatBytes } from '../utils/helpers.js';
-import { updateReceiverActions } from '../ui/view.js';
+import { getFileIcon } from '../utils/helpers.js';
+import { updateReceiverActions, checkQueueOverflow } from '../ui/view.js';
 
 let worker;
 let chunkQueue = [];
@@ -20,6 +20,7 @@ let incomingFileReceived = 0;
 
 export function handleFileSelection(files) {
     if (files.length === 0) return;
+    const isFirstSend = store.getState().fileToSendQueue.length === 0;
     store.actions.addFilesToQueue(files);
 
     if (uiElements.sendingQueueDiv.querySelector('.empty-state')) {
@@ -39,6 +40,13 @@ export function handleFileSelection(files) {
                 </div>
             </div>`);
     });
+
+    // Auto-scroll to sending queue for the first file added
+    if (isFirstSend && !store.getState().hasScrolledForSend) {
+        uiElements.sendingQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        store.actions.setHasScrolledForSend(true);
+    }
+    checkQueueOverflow('sending-queue');
 
     processFileToSendQueue();
 }
@@ -154,6 +162,7 @@ export function handleDataChannelMessage(event) {
             incomingFileInfo = JSON.parse(data);
             incomingFileData = [];
             incomingFileReceived = 0;
+            const isFirstReceivedFile = store.getState().receivedFiles.length === 0;
 
             if (uiElements.receiverQueueDiv.querySelector('.empty-state')) {
                 uiElements.receiverQueueDiv.innerHTML = '';
@@ -172,6 +181,14 @@ export function handleDataChannelMessage(event) {
                     </div>
                     <div class="file-action"></div>
                 </div>`);
+
+            // Auto-scroll to receiving queue for the first file
+            if (isFirstReceivedFile && !store.getState().hasScrolledForReceive) {
+                uiElements.receiverQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                store.actions.setHasScrolledForReceive(true);
+            }
+            checkQueueOverflow('receiver-queue');
+
             return;
         }
         if (data === "EOF") { // End of File
@@ -187,15 +204,17 @@ export function handleDataChannelMessage(event) {
             if (fileElement) {
                 const actionContainer = fileElement.querySelector('.file-action');
                 const isVideo = finalFileInfo.type.startsWith('video/') || finalFileInfo.name.toLowerCase().endsWith('.mkv');
+                const downloadIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>`;
+                const previewIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>`;
 
                 if (isVideo && window.videoPlayer) {
                     actionContainer.innerHTML = `<div class="file-action-group">
-                        <button class="btn btn-secondary preview-btn">Preview</button>
-                        <a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="btn btn-primary">Save</a>
+                        <button class="file-action-btn preview-btn" title="Preview">${previewIconSVG}</button>
+                        <a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>
                      </div>`;
                     actionContainer.querySelector('.preview-btn').onclick = () => window.videoPlayer.open(receivedBlob, finalFileInfo.name);
                 } else {
-                    actionContainer.innerHTML = `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="btn btn-primary">Download</a>`;
+                    actionContainer.innerHTML = `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn download-btn" title="Download">${downloadIconSVG}</a>`;
                 }
                 fileElement.querySelector('.percent').textContent = 'Complete!';
             }

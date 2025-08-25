@@ -901,8 +901,7 @@ body[data-theme="dark"] #dashboard-flight-code .copy-feedback {
 .share-btn:hover {
     background: var(--c-primary);
     color: var(--brilliant-white);
-    border-color: var(--c-secondary);
-    transform: translateY(-1px);
+    transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(91, 206, 250, 0.25);
 }
 
@@ -981,9 +980,6 @@ body[data-theme="dark"] #dashboard-flight-code .copy-feedback {
     gap: 0.5em;
     text-decoration: none;
     box-shadow: 0 1px 4px rgba(91, 206, 250, 0.06);
-    backdrop-filter: blur(6px) saturate(1.2);
-    -webkit-backdrop-filter: blur(6px) saturate(1.2);
-    outline: 1px solid rgba(255,255,255,0.18);
 }
 body[data-theme="dark"] .btn {
     outline: none;
@@ -1319,30 +1315,38 @@ body[data-theme="dark"] .file-details__name {
 }
 .file-action {
     flex-shrink: 0;
-    min-width: 170px;
-    text-align: right;
+    min-width: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-left: 1rem;
 }
 .file-action a {
-    display: block;
-    padding: 0.8em 1.2em;
-    border-radius: 8px;
     text-decoration: none;
-    font-weight: 600;
-    text-align: center;
-    white-space: nowrap;
-    transition: all 0.2s ease, transform 0.1s ease-out;
+}
+.file-action-group {
+    display: flex;
+    gap: 0.75rem;
+}
+.file-action-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     background: var(--c-btn-primary-bg);
     color: var(--c-primary);
     border: 1.5px solid var(--c-primary);
+    cursor: pointer;
+    transition: all 0.2s ease, transform 0.1s ease-out;
     box-shadow: 0 1px 4px rgba(91, 206, 250, 0.06);
     backdrop-filter: blur(6px) saturate(1.2);
     -webkit-backdrop-filter: blur(6px) saturate(1.2);
     outline: 1px solid rgba(255,255,255,0.18);
 }
-body[data-theme="dark"] .file-action a {
-    outline: none;
-}
-.file-action a:hover {
+.file-action-btn:hover {
     background: var(--c-primary);
     color: var(--brilliant-white);
     border-color: var(--c-secondary);
@@ -1555,6 +1559,22 @@ body[data-theme="dark"] .file-action a {
     transition-duration: 0.1s;
 }
 
+.file-action-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.file-action-group .file-action-btn.preview-btn {
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-secondary);
+    color: var(--c-secondary);
+}
+
+.file-action-group .file-action-btn.preview-btn:hover {
+    background: var(--c-secondary);
+    color: var(--brilliant-white);
+    box-shadow: 0 4px 12px rgba(245, 169, 184, 0.25);
+}
 /* --- NEW: Spinner Styles --- */
 .spinner {
     animation: rotate 2s linear infinite;
@@ -1586,20 +1606,6 @@ body[data-theme="dark"] .file-action a {
     }
 }
 
-
-.file-action-group {
-    display: flex;
-    gap: 0.5rem;
-}
-.file-action-group .btn {
-    padding: 0.8em 1em;
-    font-size: 0.85em;
-    flex-grow: 1;
-}
-.file-action a.btn {
-    padding: 0.8em 1em;
-    font-size: 0.9em;
-}
 
 #video-player-container {
     position: relative;
@@ -1959,4 +1965,30 @@ body[data-theme="dark"] #zip-modal-warning-footer {
     pointer-events: none;
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* --- Queue Collapsing Styles --- */
+#sending-queue, #receiver-queue {
+    position: relative;
+}
+
+.queue-collapsible {
+    /* Show approx 4.5 items */
+    max-height: 380px;
+    overflow: hidden;
+    /* Make space for the button and fade effect */
+    padding-bottom: 3.5rem;
+    /* Apply the fade-out effect at the bottom */
+    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 80px), transparent 100%);
+    mask-image: linear-gradient(to bottom, black calc(100% - 80px), transparent 100%);
+}
+
+.expand-queue-btn {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    padding: 0.6em 1.2em;
+    font-size: 0.9em;
 }
