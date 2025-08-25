@@ -72,7 +72,8 @@ function generateQRCode() {
         return;
     }
 
-    const url = `https://dropsilk.xyz?code=${currentFlightCode}`;
+    // --- MODIFIED LINE ---
+    const url = `https://dropsilk.xyz/?code=${currentFlightCode}`;
     const qrDotColor = getComputedStyle(document.documentElement).getPropertyValue('--c-primary').trim();
     const qrColors = { dark: qrDotColor, light: '#00000000' };
 
@@ -181,11 +182,11 @@ function setupInviteModal() {
     const shareNativeBtn = document.getElementById('shareNativeBtn');
     if (shareNativeBtn && navigator.share) shareNativeBtn.style.display = 'flex';
 
-    document.getElementById('copyLinkBtn')?.addEventListener('click', (e) => copyToClipboard(`https://dropsilk.xyz?code=${store.getState().currentFlightCode}`, e.currentTarget, 'Link Copied!'));
+    document.getElementById('copyLinkBtn')?.addEventListener('click', (e) => copyToClipboard(`https://dropsilk.xyz/?code=${store.getState().currentFlightCode}`, e.currentTarget, 'Link Copied!'));
     document.getElementById('copyCodeBtn')?.addEventListener('click', (e) => copyToClipboard(store.getState().currentFlightCode, e.currentTarget, 'Code Copied!'));
     shareNativeBtn?.addEventListener('click', async () => {
         const { currentFlightCode } = store.getState();
-        if (navigator.share) await navigator.share({ title: 'Join my DropSilk flight!', text: `Join my file transfer session with code: ${currentFlightCode}`, url: `https://dropsilk.xyz?code=${currentFlightCode}` });
+        if (navigator.share) await navigator.share({ title: 'Join my DropSilk flight!', text: `Join my file transfer session with code: ${currentFlightCode}`, url: `https://dropsilk.xyz/?code=${currentFlightCode}` });
     });
 }
 

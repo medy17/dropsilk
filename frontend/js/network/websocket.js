@@ -30,6 +30,30 @@ function onOpen() {
         localIpPrefix: "unknown",
         localIp: "unknown"
     });
+
+    // --- NEW: Auto-join from URL parameter ---
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const flightCodeFromUrl = urlParams.get('code');
+
+        // Check if the code exists and has the correct length.
+        if (flightCodeFromUrl && flightCodeFromUrl.length === 6) {
+            console.log(`Found flight code in URL, attempting to auto-join: ${flightCodeFromUrl}`);
+
+            // Set the user as a joiner, not a creator.
+            store.actions.setIsFlightCreator(false);
+
+            // Send the join message directly. The server will respond with `peer-joined` or an error.
+            sendMessage({ type: "join-flight", flightCode: flightCodeFromUrl.toUpperCase() });
+
+            // For a cleaner user experience, remove the code from the URL after using it.
+            // This prevents the user from trying to re-join the same room on a page refresh.
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    } catch (e) {
+        console.error("Error processing URL for auto-join:", e);
+    }
+    // --- END NEW ---
 }
 
 async function onMessage(event) {
