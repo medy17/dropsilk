@@ -1763,7 +1763,7 @@ input[type=range].volume-slider::-moz-range-thumb { background-color: #fff; heig
 @media (max-width: 600px) {
     .controls-left, .controls-right { gap: 0.5rem; }
     .time-container { display: none; }
-    .download-btn { display: none; }
+    .controls-right .download-btn { display: none; }
 }
 #recaptcha-container {
     display: flex;
