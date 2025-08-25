@@ -4,6 +4,8 @@
 import { RECAPTCHA_SITE_KEY } from '../config.js';
 import { store } from '../state.js';
 import { uiElements } from './dom.js';
+import { formatBytes } from '../utils/helpers.js';
+import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 
 let captchaWidgetId = null;
 
@@ -95,6 +97,7 @@ export function initializeModals() {
 
     const modals = {
         invite: { trigger: 'inviteBtn', close: 'closeInviteModal', overlay: 'inviteModal' },
+        zip: { trigger: 'downloadAllBtn', close: 'closeZipModal', overlay: 'zipModal' },
         about: { trigger: 'aboutBtn', close: 'closeAboutModal', overlay: 'aboutModal' },
         contact: { trigger: 'contactBtn', close: 'closeContactModal', overlay: 'contactModal' },
         terms: { trigger: 'termsBtn', close: 'closeTermsModal', overlay: 'termsModal' },
@@ -114,6 +117,10 @@ export function initializeModals() {
             overlay.classList.remove('show');
             uiElements.body.style.overflow = '';
             if (name === 'contact') resetContactModal();
+            if (name === 'zip') {
+                uiElements.selectAllZipCheckbox.checked = false;
+                updateZipSelection();
+            }
         };
 
         trigger.addEventListener('click', show);
@@ -132,6 +139,7 @@ export function initializeModals() {
 
     setupInviteModal();
     setupContactModal();
+    setupZipModal();
 }
 
 function setupInviteModal() {
@@ -188,4 +196,71 @@ function resetContactModal() {
     if (window.grecaptcha && captchaWidgetId !== null) {
         grecaptcha.reset(captchaWidgetId);
     }
+}
+
+function populateZipModal() {
+    const { receivedFiles } = store.getState();
+    uiElements.zipFileList.innerHTML = '';
+
+    if (receivedFiles.length === 0) {
+        uiElements.zipFileList.innerHTML = '<div class="empty-state">No files to download.</div>';
+        return;
+    }
+
+    receivedFiles.forEach((file, index) => {
+        uiElements.zipFileList.insertAdjacentHTML('beforeend', `
+            <label class="zip-file-item">
+                <input type="checkbox" class="zip-file-checkbox" data-index="${index}">
+                <div class="zip-file-details">
+                    <span class="zip-file-name" title="${file.name}">${file.name}</span>
+                    <span class="zip-file-size">${formatBytes(file.blob.size)}</span>
+                </div>
+            </label>
+        `);
+    });
+}
+
+function updateZipSelection() {
+    const { receivedFiles } = store.getState();
+    const checkboxes = uiElements.zipFileList.querySelectorAll('.zip-file-checkbox:checked');
+    const selectedIndexes = Array.from(checkboxes).map(cb => parseInt(cb.dataset.index, 10));
+
+    const totalSelected = selectedIndexes.length;
+    const totalSize = selectedIndexes.reduce((sum, index) => sum + receivedFiles[index].blob.size, 0);
+
+    uiElements.zipSelectionInfo.textContent = `${totalSelected} files selected (${formatBytes(totalSize)})`;
+    uiElements.downloadSelectedBtn.disabled = totalSelected === 0;
+
+    const allCheckboxes = uiElements.zipFileList.querySelectorAll('.zip-file-checkbox');
+    uiElements.selectAllZipCheckbox.checked = allCheckboxes.length > 0 && totalSelected === allCheckboxes.length;
+}
+
+function setupZipModal() {
+    const trigger = document.getElementById('downloadAllBtn');
+    if (!trigger) return;
+
+    trigger.addEventListener('click', populateZipModal);
+
+    uiElements.zipFileList.addEventListener('change', (e) => {
+        if (e.target.classList.contains('zip-file-checkbox')) {
+            updateZipSelection();
+        }
+    });
+
+    uiElements.selectAllZipCheckbox.addEventListener('change', () => {
+        const isChecked = uiElements.selectAllZipCheckbox.checked;
+        uiElements.zipFileList.querySelectorAll('.zip-file-checkbox').forEach(cb => { cb.checked = isChecked; });
+        updateZipSelection();
+    });
+
+    uiElements.downloadSelectedBtn.addEventListener('click', () => {
+        const { receivedFiles } = store.getState();
+        const checkboxes = uiElements.zipFileList.querySelectorAll('.zip-file-checkbox:checked');
+        const selectedFiles = Array.from(checkboxes).map(cb => receivedFiles[parseInt(cb.dataset.index, 10)]);
+
+        if (selectedFiles.length > 0) {
+            downloadAllFilesAsZip(selectedFiles);
+            document.getElementById('closeZipModal').click();
+        }
+    });
 }

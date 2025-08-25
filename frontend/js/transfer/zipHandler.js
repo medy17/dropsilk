@@ -6,25 +6,30 @@ import { showToast } from '../utils/toast.js';
 import { uiElements } from '../ui/dom.js';
 import { formatBytes } from '../utils/helpers.js';
 
-export async function downloadAllFilesAsZip() {
+export async function downloadAllFilesAsZip(filesToZip) {
     if (typeof JSZip === 'undefined') {
         showToast({ type: 'danger', title: 'Error', body: 'Zipping library is not available. Please refresh the page.', duration: 8000 });
         return;
     }
 
-    const { receivedFiles } = store.getState();
-    const totalSize = receivedFiles.reduce((sum, file) => sum + file.blob.size, 0);
+    const files = filesToZip || store.getState().receivedFiles;
+    if (files.length === 0) {
+        showToast({ type: 'info', title: 'No Files Selected', body: 'Please select at least one file to download.', duration: 5000 });
+        return;
+    }
+
+    const totalSize = files.reduce((sum, file) => sum + file.blob.size, 0);
     const sizeWarningLimit = 1 * 1024 * 1024 * 1024; // 1 GB
 
     const proceedWithZipping = async () => {
-        const btn = uiElements.downloadAllBtn;
+        const btn = uiElements.downloadSelectedBtn;
         const originalBtnHTML = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = `<svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg><span>Zipping...</span>`;
 
         try {
             const zip = new JSZip();
-            receivedFiles.forEach(file => {
+            files.forEach(file => {
                 zip.file(file.name, file.blob);
             });
 

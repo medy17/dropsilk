@@ -45,7 +45,7 @@ export function initializeEventListeners() {
         }
     };
 
-    uiElements.downloadAllBtn?.addEventListener('click', downloadAllFilesAsZip);
+    // uiElements.downloadAllBtn?.addEventListener('click', downloadAllFilesAsZip); // This is now handled in modals.js
 
     uiElements.connectionPanelList?.addEventListener('click', (e) => {
         const inviteBtn = e.target.closest('.invite-user-btn');
