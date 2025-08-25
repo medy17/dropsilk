@@ -273,6 +273,36 @@
     </div>
 </div>
 
+<!-- NEW: Zip Download Modal -->
+<div class="modal-overlay" id="zipModal">
+    <div class="invite-modal">
+        <div class="modal-header">
+            <h3>Download Files as Zip</h3>
+            <button class="modal-close" id="closeZipModal" aria-label="Close modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="zip-file-list" class="zip-file-list">
+                <!-- File items will be dynamically inserted here -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="zip-actions-header">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="selectAllZipCheckbox">
+                    <span>Select All</span>
+                </label>
+                <span id="zipSelectionInfo">0 files selected (0 Bytes)</span>
+            </div>
+            <button id="downloadSelectedBtn" class="share-btn" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                <span>Download Selected as Zip</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- NEW: Contact Modal -->
 <div class="modal-overlay" id="contactModal">
     <div class="invite-modal">
@@ -473,7 +503,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://unpkg.com/qrcode@1.4.4/build/qrcode.min.js"></script>
-<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoadCallback&render=explicit" async defer></script>
+<script src="https: //www.google.com/recaptcha/api.js?onload=onRecaptchaLoadCallback&render=explicit" async defer></script>
 <script src="video.js" defer></script>
 <script src="js/app.js" type="module" defer></script>
 </body>
