@@ -839,11 +839,7 @@ body {
     }
 
     .dashboard-grid {
-        grid-template-columns: 2fr 1fr;
-    }
-
-    .dashboard-grid > .panel:not(.grid-col-span-2) {
-        min-width: auto;
+        grid-template-columns: 1.5fr 1fr;
     }
 
     .grid-col-span-2 {
