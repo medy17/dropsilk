@@ -1,6 +1,5 @@
 // js/transfer/fileHandler.js
 // Contains the core logic for file transfers, including queueing, chunking, and handling selections.
-
 import { store } from '../state.js';
 import { showToast } from '../utils/toast.js';
 import { sendData, getBufferedAmount } from '../network/webrtc.js';
@@ -41,6 +40,9 @@ export function cancelFileSend(fileId) {
         fileReadingDone = false;
         sentOffset = 0;
         store.actions.setCurrentlySendingFile(null);
+
+        // MODIFIED: Remove the cancelled file from the queue before processing the next one.
+        store.actions.removeFirstFileFromQueue();
 
         // Immediately try to send the next file in the queue
         processFileToSendQueue();
@@ -118,7 +120,8 @@ export function handleFolderSelection(files) {
 export function processFileToSendQueue() {
     const state = store.getState();
     if (state.fileToSendQueue.length > 0 && !state.currentlySendingFile && state.peerInfo) {
-        const nextFile = store.actions.dequeueNextFile();
+        // MODIFIED: Peek at the next file instead of dequeuing it.
+        const nextFile = state.fileToSendQueue[0];
         startFileSend(nextFile);
     }
 }
@@ -207,7 +210,11 @@ export function drainQueue() {
             const cancelButton = fileElement.querySelector('.cancel-file-btn');
             if (cancelButton) cancelButton.remove();
         }
+
+        // MODIFIED: This is the crucial change.
+        // We now remove the file from the queue AFTER it's done sending.
         store.actions.setCurrentlySendingFile(null);
+        store.actions.removeFirstFileFromQueue();
         processFileToSendQueue();
     }
 }

@@ -64,7 +64,16 @@ export const store = {
             state.fileToSendQueue.push(...Array.from(files));
         },
         setCurrentlySendingFile: (file) => { state.currentlySendingFile = file; },
-        dequeueNextFile: () => { return state.fileToSendQueue.shift(); },
+
+        // REMOVED: This action was the source of the bug.
+        // dequeueNextFile: () => { return state.fileToSendQueue.shift(); },
+
+        // NEW: This action removes the top file from the queue after it's sent/cancelled.
+        removeFirstFileFromQueue: () => {
+            if (state.fileToSendQueue.length > 0) {
+                state.fileToSendQueue.shift();
+            }
+        },
 
         removeFileFromQueue: (fileId) => {
             let fileToRemove = null;
