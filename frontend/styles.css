@@ -744,7 +744,7 @@ body {
         font-size: 1.2rem;
         font-weight: 700;
         letter-spacing: 1em;
-        width: calc(1ch * 6+1.5em);
+        width: calc(1ch * 6 + 1.5em);
         background: none;
         border: none;
         color: var(--c-text-primary);
@@ -1606,7 +1606,7 @@ body {
     }
 
     to {
-        transform: translateX(calc(-100%+200px));
+        transform: translateX(calc(-100% + 200px));
     }
 }
 
@@ -2294,7 +2294,7 @@ body {
 
 .settings-menu {
     position: absolute;
-    bottom: calc(100%+10px);
+    bottom: calc(100% + 10px);
     right: 0;
     background: rgb(24 24 27 / .9);
     backdrop-filter: blur(8px);
