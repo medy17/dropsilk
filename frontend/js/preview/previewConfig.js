@@ -4,7 +4,7 @@
 export const previewConfig = {
     // Handler for common image formats
     image: {
-        extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'],
+        extensions: ['avif', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'],
         handler: () => import('./handlers/imagePreview.js'),
     },
     // Handler for plain text and common code formats

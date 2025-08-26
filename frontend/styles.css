@@ -2189,3 +2189,79 @@ body[data-theme="dark"] .pdf-page-canvas {
     scrollbar-width: thin;
     scrollbar-color: var(--c-secondary) transparent;
 }
+/* js/styles.css */
+/* ... (existing styles) ... */
+
+#pdf-viewer-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background-color: var(--c-panel-bg);
+    border-radius: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* --- MODIFIED: From .pdf-page-canvas to a container --- */
+.pdf-page-container {
+    position: relative;
+    background-color: #f0f2f5; /* Light grey placeholder */
+    border: 1px solid var(--c-panel-border);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="dark"] .pdf-page-container {
+    background-color: #2c2c34; /* Dark grey placeholder */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.pdf-page-container .page-loader {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-primary);
+}
+.pdf-page-container .page-loader .spinner {
+    width: 40px; height: 40px;
+}
+
+
+.pdf-page-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+body[data-theme="dark"] .pdf-page-canvas {
+    filter: brightness(0.9);
+}
+
+/* Custom scrollbar for PDF viewer */
+#pdf-viewer-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+#pdf-viewer-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#pdf-viewer-container::-webkit-scrollbar-thumb {
+    background-color: var(--c-secondary);
+    border-radius: 20px;
+    border: 2px solid var(--c-panel-bg);
+}
+
+#pdf-viewer-container::-webkit-scrollbar-thumb:hover {
+    background-color: #f77e9b;
+}
+
+#pdf-viewer-container {
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-secondary) transparent;
+}
