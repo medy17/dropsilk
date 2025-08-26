@@ -88,29 +88,20 @@ function setDashboardFlightCode(code) {
     }
 }
 
-export function updateDashboardStatus(text, type) {
-    const statusEl = uiElements.dashboardFlightStatus;
-    statusEl.textContent = text;
-    const styles = {
-        connected: { color: '#15803d', bgColor: '#f0fdf4', borderColor: '#bbf7d0' },
-        disconnected: { color: '#d97706', bgColor: '#fffbe6', borderColor: '#fde68a' },
-        default: { color: 'var(--c-secondary)', bgColor: 'var(--c-panel-bg)', borderColor: 'var(--c-primary)' }
-    };
-    const style = styles[type] || styles.default;
-    statusEl.style.color = style.color;
-    statusEl.style.backgroundColor = style.bgColor;
-    statusEl.style.borderColor = style.borderColor;
-}
-
 export function renderNetworkUsersView() {
     const { lastNetworkUsers, currentFlightCode } = store.getState();
     uiElements.connectionPanelTitle.textContent = "Users on Your Network";
     const list = uiElements.connectionPanelList;
     list.innerHTML = '';
+
     if (lastNetworkUsers.length === 0) {
         list.innerHTML = '<div class="empty-state">No other users found on your network.</div>';
         return;
     }
+
+    const hasSeenPulse = localStorage.getItem('hasSeenInvitePulse') === 'true';
+    const canShowPulse = !hasSeenPulse && lastNetworkUsers.length > 0 && currentFlightCode;
+
     lastNetworkUsers.forEach(user => {
         const userEl = document.createElement('div');
         userEl.className = 'network-user-item';
@@ -123,26 +114,24 @@ export function renderNetworkUsersView() {
                 Invite
             </button>`;
         list.appendChild(userEl);
+
+        if (canShowPulse) {
+            const inviteBtn = userEl.querySelector('.invite-user-btn');
+            if (inviteBtn) {
+                addPulseEffect(inviteBtn);
+            }
+        }
     });
 
-    const hasSeenPulse = localStorage.getItem('hasSeenInvitePulse') === 'true';
-    // Only show the pulse if it's the first visit, a flight is active, and there are users to invite.
-    if (!hasSeenPulse && lastNetworkUsers.length > 0 && currentFlightCode) {
-        // Add pulse effect to the user list buttons
-        list.querySelectorAll('.invite-user-btn').forEach(btn => {
-            addPulseEffect(btn);
-        });
-
-        // Add pulse effect to the main invite button in the dashboard header
+    if (canShowPulse) {
         const mainInviteBtn = document.getElementById('inviteBtn');
         if (mainInviteBtn) {
             addPulseEffect(mainInviteBtn);
         }
-
-        // Set the flag in localStorage so it doesn't show again on subsequent visits.
         localStorage.setItem('hasSeenInvitePulse', 'true');
     }
 }
+
 
 export function renderInFlightView() {
     const { peerInfo, myId, myName } = store.getState();
