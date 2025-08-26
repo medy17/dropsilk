@@ -8,6 +8,8 @@ import { HIGH_WATER_MARK } from '../config.js';
 import { uiElements } from '../ui/dom.js';
 import { getFileIcon } from '../utils/helpers.js';
 import { updateReceiverActions, checkQueueOverflow } from '../ui/view.js';
+import { isPreviewable } from '../preview/previewConfig.js';
+import { showPreview } from '../preview/previewManager.js';
 
 let worker;
 let chunkQueue = [];
@@ -203,19 +205,53 @@ export function handleDataChannelMessage(event) {
 
             if (fileElement) {
                 const actionContainer = fileElement.querySelector('.file-action');
-                const isVideo = finalFileInfo.type.startsWith('video/') || finalFileInfo.name.toLowerCase().endsWith('.mkv');
+
+                // Define SVG icons for the buttons
                 const downloadIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>`;
                 const previewIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>`;
 
+                // Determine file extension (lowercase)
+                const fileExtension = finalFileInfo.name.toLowerCase().split('.').pop();
+
+                // Heuristic for video vs. code:
+                // 1. If MIME type explicitly states video, it's a video.
+                // 2. If the extension is known video like 'mkv', and not explicitly a text type, it's a video.
+                // 3. For 'ts' extension: if MIME type is video/mp2t, it's a video.
+                //    Otherwise, if it's 'ts' and not a video MIME type, it's likely code.
+                const isVideo = finalFileInfo.type.startsWith('video/') ||
+                    (['mkv'].includes(fileExtension) && !finalFileInfo.type.startsWith('text/')) ||
+                    (fileExtension === 'ts' && finalFileInfo.type === 'video/mp2t'); // Explicit check for video/mp2t for .ts
+
+                const canPreview = isPreviewable(finalFileInfo.name); // Checks previewConfig.js
+
+                let buttonsHTML = '';
+
+                // If it's identified as a video AND we have a video player, show the video preview button.
                 if (isVideo && window.videoPlayer) {
-                    actionContainer.innerHTML = `<div class="file-action-group">
-                        <button class="file-action-btn preview-btn" title="Preview">${previewIconSVG}</button>
-                        <a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>
-                     </div>`;
-                    actionContainer.querySelector('.preview-btn').onclick = () => window.videoPlayer.open(receivedBlob, finalFileInfo.name);
-                } else {
-                    actionContainer.innerHTML = `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn download-btn" title="Download">${downloadIconSVG}</a>`;
+                    buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="video" title="Preview Video">${previewIconSVG}</button>`;
+                    // Else if it's previewable by the generic system (e.g., code, image) but NOT a video, show the generic preview button.
+                } else if (canPreview) {
+                    buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="generic" title="Preview File">${previewIconSVG}</button>`;
                 }
+
+                // Always add the download button
+                buttonsHTML += `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>`;
+
+                // Set the inner HTML of the action container
+                actionContainer.innerHTML = `<div class="file-action-group">${buttonsHTML}</div>`;
+
+                // Attach event listener based on the data attribute we set earlier
+                const previewBtn = actionContainer.querySelector('.preview-btn');
+                if (previewBtn) {
+                    const previewType = previewBtn.dataset.previewType;
+                    if (previewType === 'video') {
+                        previewBtn.onclick = () => window.videoPlayer.open(receivedBlob, finalFileInfo.name);
+                    } else if (previewType === 'generic') {
+                        // The `showPreview` function from previewManager handles general file types
+                        previewBtn.onclick = () => showPreview(finalFileInfo.name);
+                    }
+                }
+
                 fileElement.querySelector('.percent').textContent = 'Complete!';
             }
             incomingFileInfo = null;

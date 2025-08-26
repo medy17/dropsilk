@@ -1,6 +1,8 @@
 // js/ui/modals.js
 // Handles all modal interactions, including theme toggling.
 
+import { showPreview } from '../preview/previewManager.js';
+import { isPreviewable } from '../preview/previewConfig.js';
 import { RECAPTCHA_SITE_KEY } from '../config.js';
 import { store } from '../state.js';
 import { uiElements } from './dom.js';
@@ -118,6 +120,16 @@ function resetZipModal() {
     if (spinnerIcon) spinnerIcon.style.display = 'none';
 }
 
+function resetPreviewModal() {
+    const contentElement = document.getElementById('preview-content');
+    // Revoke object URL to prevent memory leaks, crucial for large image previews
+    if (contentElement.dataset.objectUrl) {
+        URL.revokeObjectURL(contentElement.dataset.objectUrl);
+        delete contentElement.dataset.objectUrl;
+    }
+    contentElement.innerHTML = ''; // Clear the content
+}
+
 export function initializeModals() {
     initializeTheme();
 
@@ -129,7 +141,8 @@ export function initializeModals() {
         terms: { trigger: 'termsBtn', close: 'closeTermsModal', overlay: 'termsModal' },
         privacy: { trigger: 'privacyBtn', close: 'closePrivacyModal', overlay: 'privacyModal' },
         security: { trigger: 'securityBtn', close: 'closeSecurityModal', overlay: 'securityModal' },
-        faq: { trigger: 'faqBtn', close: 'closeFaqModal', overlay: 'faqModal' }
+        faq: { trigger: 'faqBtn', close: 'closeFaqModal', overlay: 'faqModal' },
+        preview: { trigger: 'openPreviewModal', close: 'closePreviewModal', overlay: 'previewModal' }
     };
 
     Object.entries(modals).forEach(([name, config]) => {
@@ -143,9 +156,8 @@ export function initializeModals() {
             overlay.classList.remove('show');
             uiElements.body.style.overflow = '';
             if (name === 'contact') resetContactModal();
-            if (name === 'zip') {
-                resetZipModal();
-            }
+            if (name === 'zip') resetZipModal();
+            if (name === 'preview') resetPreviewModal();
         };
 
         trigger.addEventListener('click', show);
