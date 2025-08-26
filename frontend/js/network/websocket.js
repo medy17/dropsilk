@@ -5,8 +5,7 @@ import { WEBSOCKET_URL } from '../config.js';
 import { store } from '../state.js';
 import { showInvitationToast, showToast } from '../utils/toast.js';
 import { initializePeerConnection, handleSignal, resetPeerConnectionState } from './webrtc.js';
-// MODIFIED: Import new overlay functions
-import { enterFlightMode, updateDashboardStatus, renderInFlightView, renderNetworkUsersView, disableDropZone, hideBoardingOverlay, failBoarding } from '../ui/view.js';
+import { enterFlightMode, updateDashboardStatus, renderInFlightView, renderNetworkUsersView, disableDropZone, hideBoardingOverlay, failBoarding, clearAllPulseEffects } from '../ui/view.js';
 
 let ws;
 
@@ -77,6 +76,10 @@ async function onMessage(event) {
 
             document.getElementById('closeInviteModal')?.click();
             hideBoardingOverlay();
+
+            // MODIFICATION: Clear the pulse effect on successful connection.
+            clearAllPulseEffects();
+
             if (!state.currentFlightCode) {
                 enterFlightMode(msg.flightCode);
             }

@@ -2950,12 +2950,10 @@ input[type=range].volume-slider {
 .pulse-ring {
     content: '';
     position: absolute;
-    /* Position just outside the button's 1.5px border */
     top: -3px;
     left: -3px;
     right: -3px;
     bottom: -3px;
-    /* Button border-radius is 12px, add 2px to keep it concentric */
     border-radius: 14px;
     animation-name: pulse-animation;
     animation-duration: 2.5s;
@@ -2964,7 +2962,7 @@ input[type=range].volume-slider {
     pointer-events: none;
     opacity: 0;
     border-style: solid;
-    border-width: 2px;
+    border-width: 1px;
 }
 
 /* Stagger the animations for the echo effect */

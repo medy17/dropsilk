@@ -5,6 +5,7 @@ import { uiElements } from './dom.js';
 import { store } from '../state.js';
 import { getFileIcon, formatBytes } from '../utils/helpers.js';
 
+// --- NEW OVERLAY FUNCTIONS ---
 export function showBoardingOverlay(flightCode) {
     if (uiElements.boardingOverlay) {
         // Hide the main landing page content to prevent it from flashing
@@ -27,7 +28,9 @@ export function failBoarding() {
         uiElements.setupContainer.style.display = "flex";
     }
 }
+// --- END NEW OVERLAY FUNCTIONS ---
 
+// --- HELPER FUNCTIONS for the pulse effect ---
 function addPulseEffect(element) {
     if (!element || element.querySelector('.pulse-ring')) return; // Prevent duplicates
     element.classList.add('pulse-effect');
@@ -38,6 +41,17 @@ function addPulseEffect(element) {
         <span class="pulse-ring"></span>
     `);
 }
+
+/**
+ * Finds all elements with the pulse effect and removes the animation classes and elements.
+ */
+export function clearAllPulseEffects() {
+    document.querySelectorAll('.pulse-effect').forEach(element => {
+        element.classList.remove('pulse-effect');
+        element.querySelectorAll('.pulse-ring').forEach(ring => ring.remove());
+    });
+}
+
 
 export function renderUserName() {
     uiElements.userNameDisplay.textContent = store.getState().myName;
@@ -128,7 +142,6 @@ export function renderNetworkUsersView() {
         // Set the flag in localStorage so it doesn't show again on subsequent visits.
         localStorage.setItem('hasSeenInvitePulse', 'true');
     }
-
 }
 
 export function renderInFlightView() {
