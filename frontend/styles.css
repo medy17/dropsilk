@@ -3025,7 +3025,7 @@ input[type=range].volume-slider {
 }
 
 .queue-item.drag-over {
-    border-top: 2px solid var(--c-primary);
+    border-top: 5px solid var(--c-primary);
 }
 
 /* Ensure the first item doesn't get a double border */
