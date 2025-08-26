@@ -2902,3 +2902,19 @@ input[type=range].volume-slider {
         }
     }
 }
+
+.cancel-file-btn {
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-secondary);
+    color: var(--c-secondary);
+    opacity: 0.7;
+
+    &:hover {
+        background: var(--c-danger);
+        border-color: var(--c-danger);
+        color: var(--brilliant-white);
+        opacity: 1;
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+}

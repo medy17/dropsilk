@@ -37,6 +37,16 @@ export function initializeEventListeners() {
         };
     }
 
+    uiElements.sendingQueueDiv?.addEventListener('click', (e) => {
+        const cancelBtn = e.target.closest('.cancel-file-btn');
+        if (cancelBtn) {
+            const fileId = cancelBtn.dataset.fileId;
+            if (fileId) {
+                cancelFileSend(fileId);
+            }
+        }
+    });
+
     uiElements.selectFolderBtn?.addEventListener('click', () => folderInputTransfer.click());
     folderInputTransfer.onchange = () => {
         if (folderInputTransfer.files.length > 0) {

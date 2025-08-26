@@ -66,6 +66,26 @@ export const store = {
         setCurrentlySendingFile: (file) => { state.currentlySendingFile = file; },
         dequeueNextFile: () => { return state.fileToSendQueue.shift(); },
 
+        removeFileFromQueue: (fileId) => {
+            let fileToRemove = null;
+            // Find the file object associated with the DOM ID
+            for (const [file, id] of state.fileIdMap.entries()) {
+                if (id === fileId) {
+                    fileToRemove = file;
+                    break;
+                }
+            }
+
+            if (fileToRemove) {
+                // Filter it out of the queue
+                state.fileToSendQueue = state.fileToSendQueue.filter(f => f !== fileToRemove);
+                // Remove it from the ID map to prevent memory leaks
+                state.fileIdMap.delete(fileToRemove);
+                console.log(`Removed ${fileToRemove.name} from the send queue.`);
+            }
+        },
+
+
         addFileIdMapping: (file, id) => { state.fileIdMap.set(file, id); },
         getFileId: (file) => { return state.fileIdMap.get(file); },
 

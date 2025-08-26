@@ -20,6 +20,37 @@ let incomingFileInfo = null;
 let incomingFileData = [];
 let incomingFileReceived = 0;
 
+export function cancelFileSend(fileId) {
+    const element = document.getElementById(fileId);
+    if (element) {
+        element.remove();
+    }
+
+    const state = store.getState();
+    const currentlySendingFile = state.currentlySendingFile;
+    const currentFileId = currentlySendingFile ? store.actions.getFileId(currentlySendingFile) : null;
+
+    if (fileId === currentFileId) {
+        // The file is actively being sent
+        console.log("Cancelling active transfer:", currentlySendingFile.name);
+        if (worker) {
+            worker.terminate();
+            worker = null;
+        }
+        chunkQueue = [];
+        fileReadingDone = false;
+        sentOffset = 0;
+        store.actions.setCurrentlySendingFile(null);
+
+        // Immediately try to send the next file in the queue
+        processFileToSendQueue();
+    } else {
+        // The file is in the queue but not actively sending
+        store.actions.removeFileFromQueue(fileId);
+    }
+    checkQueueOverflow('sending-queue');
+}
+
 export function handleFileSelection(files) {
     if (files.length === 0) return;
     const isFirstSend = store.getState().fileToSendQueue.length === 0;
@@ -33,6 +64,7 @@ export function handleFileSelection(files) {
         const fileId = `send-${Date.now()}-${Math.random()}`;
         store.actions.addFileIdMapping(file, fileId);
 
+        // MODIFIED: Added cancel button
         uiElements.sendingQueueDiv.insertAdjacentHTML('beforeend', `
             <div class="queue-item" id="${fileId}">
                 <div class="file-icon">${getFileIcon(file.name)}</div>
@@ -40,8 +72,14 @@ export function handleFileSelection(files) {
                     <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
                     <div class="file-details__status"><span class="status-text">Queued</span></div>
                 </div>
+                <div class="file-action">
+                    <button class="file-action-btn cancel-file-btn" data-file-id="${fileId}" title="Cancel transfer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+                    </button>
+                </div>
             </div>`);
     });
+
 
     // Auto-scroll to sending queue for the first file added
     if (isFirstSend && !store.getState().hasScrolledForSend) {
@@ -86,6 +124,7 @@ function startFileSend(file) {
     const fileElement = document.getElementById(fileId);
 
     if (fileElement) {
+        // MODIFIED: Added cancel button to the 'in-progress' view
         fileElement.innerHTML = `
             <div class="file-icon">${getFileIcon(file.name)}</div>
             <div class="file-details">
@@ -95,6 +134,11 @@ function startFileSend(file) {
                     <span class="percent">0%</span>
                     <span class="status-text">Sending...</span>
                 </div>
+            </div>
+            <div class="file-action">
+                <button class="file-action-btn cancel-file-btn" data-file-id="${fileId}" title="Cancel transfer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+                </button>
             </div>`;
     }
 
@@ -150,6 +194,8 @@ export function drainQueue() {
         if (fileElement) {
             fileElement.querySelector('.status-text').textContent = 'Sent!';
             fileElement.querySelector('.percent').textContent = `100%`;
+            const cancelButton = fileElement.querySelector('.cancel-file-btn');
+            if (cancelButton) cancelButton.remove();
         }
         store.actions.setCurrentlySendingFile(null);
         processFileToSendQueue();
