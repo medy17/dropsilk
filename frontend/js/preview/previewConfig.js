@@ -26,11 +26,11 @@ export const previewConfig = {
     // Future handler for PDFs
     pdf: {
         extensions: ['pdf'],
-        // pdf.js is a bit more complex, often requiring a worker script
+        // Load the main PDF.js library. The worker will be configured within the handler.
         dependencies: [
             'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
         ],
-        // handler: () => import('./handlers/pdfPreview.js'), // To be created
+        handler: () => import('./handlers/pdfPreview.js'),
     },
     // Future handler for DOCX
     docx: {

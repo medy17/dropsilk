@@ -2138,3 +2138,54 @@ body[data-theme="dark"] .boarding-overlay {
     background-color: var(--c-primary);
     border-radius: 20px;
 }
+
+#pdf-viewer-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; /* Enable scrolling for PDF pages */
+    background-color: var(--c-panel-bg); /* Match modal background */
+    border-radius: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex; /* Use flex to center pages if they are narrower than the container */
+    flex-direction: column;
+    align-items: center; /* Center pages horizontally */
+    gap: 15px; /* Space between pages */
+}
+
+.pdf-page-canvas {
+    border: 1px solid var(--c-panel-border);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: block; /* Important for canvases */
+    max-width: 100%; /* Ensure pages don't overflow horizontally */
+    height: auto;
+}
+
+body[data-theme="dark"] .pdf-page-canvas {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    filter: brightness(0.9); /* Slightly darken PDF content in dark mode */
+}
+
+/* Custom scrollbar for PDF viewer */
+#pdf-viewer-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+#pdf-viewer-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#pdf-viewer-container::-webkit-scrollbar-thumb {
+    background-color: var(--c-secondary);
+    border-radius: 20px;
+    border: 2px solid var(--c-panel-bg);
+}
+
+#pdf-viewer-container::-webkit-scrollbar-thumb:hover {
+    background-color: #f77e9b; /* Slightly darker pink on hover */
+}
+
+#pdf-viewer-container {
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-secondary) transparent;
+}
