@@ -64,9 +64,14 @@ export function handleFileSelection(files) {
         const fileId = `send-${Date.now()}-${Math.random()}`;
         store.actions.addFileIdMapping(file, fileId);
 
-        // MODIFIED: Added cancel button
+        // MODIFIED: Added drag handle and draggable attribute
         uiElements.sendingQueueDiv.insertAdjacentHTML('beforeend', `
-            <div class="queue-item" id="${fileId}">
+            <div class="queue-item" id="${fileId}" draggable="true">
+                <div class="drag-handle" title="Drag to reorder">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                    </svg>
+                </div>
                 <div class="file-icon">${getFileIcon(file.name)}</div>
                 <div class="file-details">
                     <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
@@ -124,7 +129,11 @@ function startFileSend(file) {
     const fileElement = document.getElementById(fileId);
 
     if (fileElement) {
-        // MODIFIED: Added cancel button to the 'in-progress' view
+        // MODIFIED: Make the item non-draggable and add a class to hide the handle via CSS
+        fileElement.draggable = false;
+        fileElement.classList.add('is-sending');
+
+        // MODIFIED: The innerHTML is replaced, removing the drag handle for the active item
         fileElement.innerHTML = `
             <div class="file-icon">${getFileIcon(file.name)}</div>
             <div class="file-details">
@@ -192,6 +201,7 @@ export function drainQueue() {
     if (fileReadingDone && chunkQueue.length === 0) {
         sendData("EOF");
         if (fileElement) {
+            fileElement.classList.remove('is-sending'); // MODIFIED: Clean up class
             fileElement.querySelector('.status-text').textContent = 'Sent!';
             fileElement.querySelector('.percent').textContent = `100%`;
             const cancelButton = fileElement.querySelector('.cancel-file-btn');

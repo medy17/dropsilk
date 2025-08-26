@@ -2995,3 +2995,40 @@ input[type=range].volume-slider {
         border-color: var(--c-primary);
     }
 }
+
+/* --- NEW: Drag & Drop Queue Styles --- */
+
+.drag-handle {
+    flex-shrink: 0;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: var(--c-text-secondary);
+    opacity: 0.5;
+    transition: opacity 0.2s, color 0.2s;
+}
+
+.queue-item:hover .drag-handle {
+    opacity: 1;
+    color: var(--c-primary);
+}
+
+.queue-item.is-sending .drag-handle {
+    display: none;
+}
+
+.queue-item.dragging {
+    opacity: 0.5;
+    background: var(--c-dropzone-hover-bg);
+}
+
+.queue-item.drag-over {
+    border-top: 2px solid var(--c-primary);
+}
+
+/* Ensure the first item doesn't get a double border */
+.queue-item.drag-over + .queue-item {
+    border-top-color: transparent;
+}

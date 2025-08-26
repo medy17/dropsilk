@@ -4,7 +4,7 @@
 import { uiElements, folderInputTransfer } from './dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
-import { handleFileSelection, handleFolderSelection, cancelFileSend } from '../transfer/fileHandler.js';
+import { handleFileSelection, handleFolderSelection, cancelFileSend, processFileToSendQueue } from '../transfer/fileHandler.js';
 import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 import { showToast } from '../utils/toast.js';
 
@@ -37,15 +37,90 @@ export function initializeEventListeners() {
         };
     }
 
-    uiElements.sendingQueueDiv?.addEventListener('click', (e) => {
-        const cancelBtn = e.target.closest('.cancel-file-btn');
-        if (cancelBtn) {
-            const fileId = cancelBtn.dataset.fileId;
-            if (fileId) {
-                cancelFileSend(fileId);
+    // MODIFIED: Added comprehensive drag-and-drop reordering logic
+    if (uiElements.sendingQueueDiv) {
+        let draggedElement = null;
+
+        // Click handler for cancel buttons
+        uiElements.sendingQueueDiv.addEventListener('click', (e) => {
+            const cancelBtn = e.target.closest('.cancel-file-btn');
+            if (cancelBtn) {
+                const fileId = cancelBtn.dataset.fileId;
+                if (fileId) cancelFileSend(fileId);
             }
-        }
-    });
+        });
+
+        // Drag and drop handlers for reordering
+        uiElements.sendingQueueDiv.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('queue-item')) {
+                draggedElement = e.target;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', draggedElement.id);
+                setTimeout(() => draggedElement.classList.add('dragging'), 0);
+            }
+        });
+
+        uiElements.sendingQueueDiv.addEventListener('dragend', () => {
+            if (draggedElement) {
+                draggedElement.classList.remove('dragging');
+                draggedElement = null;
+            }
+        });
+
+        const getDragAfterElement = (container, y) => {
+            const draggableElements = [...container.querySelectorAll('.queue-item:not(.dragging)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        };
+
+        uiElements.sendingQueueDiv.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(uiElements.sendingQueueDiv, e.clientY);
+            document.querySelectorAll('.queue-item').forEach(item => item.classList.remove('drag-over'));
+            if (afterElement) {
+                afterElement.classList.add('drag-over');
+            } else {
+                // If dragging to the end, no specific element gets the class,
+                // which is visually fine as it will append.
+            }
+        });
+
+        uiElements.sendingQueueDiv.addEventListener('dragleave', () => {
+            document.querySelectorAll('.queue-item.drag-over').forEach(item => item.classList.remove('drag-over'));
+        });
+
+
+        uiElements.sendingQueueDiv.addEventListener('drop', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.queue-item.drag-over').forEach(item => item.classList.remove('drag-over'));
+            if (!draggedElement) return;
+
+            const afterElement = getDragAfterElement(uiElements.sendingQueueDiv, e.clientY);
+            const draggedId = draggedElement.id;
+            const targetId = afterElement ? afterElement.id : null;
+
+            // Reorder DOM
+            if (afterElement == null) {
+                uiElements.sendingQueueDiv.appendChild(draggedElement);
+            } else {
+                uiElements.sendingQueueDiv.insertBefore(draggedElement, afterElement);
+            }
+
+            // Update state
+            store.actions.reorderFileToSendQueue(draggedId, targetId);
+
+            // If nothing is sending, the newly arranged top file might need to be sent
+            processFileToSendQueue();
+        });
+    }
+
 
     uiElements.selectFolderBtn?.addEventListener('click', () => folderInputTransfer.click());
     folderInputTransfer.onchange = () => {

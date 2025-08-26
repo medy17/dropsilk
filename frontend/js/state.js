@@ -85,6 +85,38 @@ export const store = {
             }
         },
 
+        // NEW ACTION: Reorders the file queue based on drag-and-drop
+        reorderFileToSendQueue: (draggedId, targetId) => {
+            let draggedFile = null;
+            let targetFile = null;
+            const { fileIdMap, fileToSendQueue } = state;
+
+            // Find the actual File objects from the map
+            for (const [file, id] of fileIdMap.entries()) {
+                if (id === draggedId) draggedFile = file;
+                if (id === targetId) targetFile = file;
+            }
+
+            if (!draggedFile) return;
+
+            // Create a new queue without the dragged file
+            const newQueue = fileToSendQueue.filter(f => f !== draggedFile);
+
+            if (targetId) { // If dropped before a specific target
+                const targetIndex = newQueue.indexOf(targetFile);
+                if (targetIndex !== -1) {
+                    newQueue.splice(targetIndex, 0, draggedFile);
+                } else { // Fallback if target not found (should not happen)
+                    newQueue.push(draggedFile);
+                }
+            } else { // If dropped at the end of the list
+                newQueue.push(draggedFile);
+            }
+
+            state.fileToSendQueue = newQueue;
+            console.log("Reordered send queue:", state.fileToSendQueue.map(f => f.name));
+        },
+
 
         addFileIdMapping: (file, id) => { state.fileIdMap.set(file, id); },
         getFileId: (file) => { return state.fileIdMap.get(file); },
