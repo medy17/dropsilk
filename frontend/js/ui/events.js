@@ -14,12 +14,12 @@ import { showToast } from '../utils/toast.js';
 function initializeSortableQueue() {
     if (uiElements.sendingQueueDiv && typeof Sortable !== 'undefined') {
         new Sortable(uiElements.sendingQueueDiv, {
-            handle: '.drag-handle', // Drag starts only on the handle
-            animation: 250, // Animation speed in ms
-            filter: '.is-sending', // Elements with this class will not be draggable
-            forceFallback: true, // ADD THIS LINE: This is the key to locking the axis.
+            handle: '.drag-handle', // Restrict dragging to the handle element
+            animation: 250, // Smooth animation speed in ms
+            filter: '.is-sending', // Elements with this class cannot be dragged
+            forceFallback: true, // This is the key to locking the axis.
             onEnd: () => {
-                // Get the new order of element IDs from the DOM
+                // Get the new order of element IDs directly from the DOM
                 const orderedIds = Array.from(uiElements.sendingQueueDiv.children)
                     .map(child => child.id)
                     .filter(id => id.startsWith('send-')); // Ensure we only get file items
@@ -65,9 +65,18 @@ export function initializeEventListeners() {
         };
     }
 
-    // Handles both cancel clicks and drag-and-drop reordering via SortableJS
+    // Handles cancel clicks, text selection prevention, and drag-and-drop
     if (uiElements.sendingQueueDiv) {
-        // Simple click handler for cancel buttons within the queue
+
+        // --- THIS IS THE NEW FIX ---
+        // Prevent text selection when starting a drag on the handle.
+        uiElements.sendingQueueDiv.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.drag-handle')) {
+                e.preventDefault(); // This stops the browser's default text selection behavior.
+            }
+        });
+
+        // Click handler for cancel buttons remains the same.
         uiElements.sendingQueueDiv.addEventListener('click', (e) => {
             const cancelBtn = e.target.closest('.cancel-file-btn');
             if (cancelBtn) {
