@@ -127,7 +127,7 @@ body {
         }
 
         .file-details__name {
-            -webkit-mask-image: linear-gradient(to right, var(--dark-bg-base) 90%, transparent 100%);
+            -webkit-mask-image: -webkit-linear-gradient(to right, var(--dark-bg-base) 90%, transparent 100%);
             mask-image: linear-gradient(to right, var(--dark-bg-base) 90%, transparent 100%);
         }
 
@@ -1662,7 +1662,7 @@ body {
     margin-bottom: .3em;
     white-space: nowrap;
     overflow: hidden;
-    -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+    -webkit-mask-image: -webkit-linear-gradient(to right, black 90%, transparent 100%);
     mask-image: linear-gradient(to right, black 90%, transparent 100%);
 
     span {
@@ -2592,7 +2592,7 @@ input[type=range].volume-slider {
     max-height: 380px;
     overflow: hidden;
     padding-bottom: 3.5rem;
-    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 80px), transparent 100%);
+    -webkit-mask-image: -webkit-linear-gradient(to bottom, black calc(100% - 80px), transparent 100%);
     mask-image: linear-gradient(to bottom, black calc(100% - 80px), transparent 100%);
 }
 
