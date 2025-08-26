@@ -108,23 +108,25 @@ export function renderNetworkUsersView() {
     const list = uiElements.connectionPanelList;
     list.innerHTML = ''; // Clear previous list
 
-    if (lastNetworkUsers.length === 0) {
-        list.innerHTML = '<div class="empty-state">No other users found on your network.</div>';
-        return;
-    }
-
-    // --- MODIFIED LOGIC ---
-    // The pulse effect should appear whenever a flight is active and the user hasn't
-    // completed a connection before. It no longer depends on other users being on the network.
+    // --- CORRECTED LOGIC ---
+    // 1. Handle the main invite button pulse effect. This is now independent of the network user list.
+    const hasSeenPulse = localStorage.getItem('hasSeenInvitePulse') === 'true';
     const shouldShowPulse = !hasSeenPulse && currentFlightCode;
 
     if (shouldShowPulse) {
         const mainInviteBtn = document.getElementById('inviteBtn');
         if (mainInviteBtn) {
             addPulseEffect(mainInviteBtn);
-            }
         }
+    }
 
+    // 2. Handle the network user list itself.
+    if (lastNetworkUsers.length === 0) {
+        list.innerHTML = '<div class="empty-state">No other users found on your network.</div>';
+        return; // Nothing more to do for the list.
+    }
+
+    // 3. If there are users, build the list and apply the pulse effect to their individual buttons.
     lastNetworkUsers.forEach(user => {
         const userEl = document.createElement('div');
         userEl.className = 'network-user-item';
@@ -138,7 +140,7 @@ export function renderNetworkUsersView() {
             </button>`;
         list.appendChild(userEl);
 
-        // Also apply pulse to the per-user invite buttons if the conditions are met.
+        // Apply pulse to the per-user invite buttons if the conditions are met.
         if (shouldShowPulse) {
             const inviteBtn = userEl.querySelector('.invite-user-btn');
             if (inviteBtn) {
