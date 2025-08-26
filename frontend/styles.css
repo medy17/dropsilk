@@ -3034,3 +3034,7 @@ input[type=range].volume-slider {
     opacity: 0.3;
     background: var(--c-dropzone-hover-bg);
 }
+
+.sortable-fallback {
+    display: none !important;
+}

@@ -14,11 +14,12 @@ import { showToast } from '../utils/toast.js';
 function initializeSortableQueue() {
     if (uiElements.sendingQueueDiv && typeof Sortable !== 'undefined') {
         new Sortable(uiElements.sendingQueueDiv, {
-            handle: '.drag-handle', // Restrict dragging to the handle element
-            animation: 250, // Smooth animation speed in ms
-            filter: '.is-sending', // Elements with this class cannot be dragged
+            handle: '.drag-handle', // Drag starts only on the handle
+            animation: 250, // Animation speed in ms
+            filter: '.is-sending', // Elements with this class will not be draggable
+            forceFallback: true, // ADD THIS LINE: This is the key to locking the axis.
             onEnd: () => {
-                // Get the new order of element IDs directly from the DOM
+                // Get the new order of element IDs from the DOM
                 const orderedIds = Array.from(uiElements.sendingQueueDiv.children)
                     .map(child => child.id)
                     .filter(id => id.startsWith('send-')); // Ensure we only get file items
