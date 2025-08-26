@@ -2265,3 +2265,63 @@ body[data-theme="dark"] .pdf-page-canvas {
     scrollbar-width: thin;
     scrollbar-color: var(--c-secondary) transparent;
 }
+
+.docx-preview-container {
+    padding: 2rem;
+    line-height: 1.6;
+    background-color: var(--c-bg);
+    color: var(--c-text-primary);
+    overflow-wrap: break-word;
+}
+
+.docx-preview-container p {
+    margin-bottom: 1em;
+}
+
+.docx-preview-container h1,
+.docx-preview-container h2,
+.docx-preview-container h3,
+.docx-preview-container h4,
+.docx-preview-container h5,
+.docx-preview-container h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: 700;
+    color: var(--c-primary);
+}
+
+.docx-preview-container ul,
+.docx-preview-container ol {
+    padding-left: 2em;
+    margin-bottom: 1em;
+}
+
+.docx-preview-container li {
+    margin-bottom: 0.5em;
+}
+
+.docx-preview-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+.docx-preview-container th,
+.docx-preview-container td {
+    border: 1px solid var(--c-panel-border);
+    padding: 0.5em;
+    text-align: left;
+}
+
+.docx-preview-container th {
+    background-color: rgba(91, 206, 250, 0.1);
+}
+
+.docx-preview-container a {
+    color: var(--c-secondary);
+    text-decoration: underline;
+}
+
+.docx-preview-container a:hover {
+    color: var(--c-primary);
+}

@@ -23,7 +23,7 @@ export const previewConfig = {
         ],
         handler: () => import('./handlers/codePreview.js'),
     },
-    // Future handler for PDFs
+    // handler for PDFs
     pdf: {
         extensions: ['pdf'],
         // Load the main PDF.js library. The worker will be configured within the handler.
@@ -32,13 +32,13 @@ export const previewConfig = {
         ],
         handler: () => import('./handlers/pdfPreview.js'),
     },
-    // Future handler for DOCX
+    // handler for DOCX
     docx: {
-        extensions: ['docx'],
+        extensions: ['docx', 'odt', 'doc', 'odf', 'wpd', 'rtf'],
         dependencies: [
             'https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js'
         ],
-        // handler: () => import('./handlers/docxPreview.js'), // To be created
+        handler: () => import('./handlers/docxPreview.js'),
     }
 };
 
