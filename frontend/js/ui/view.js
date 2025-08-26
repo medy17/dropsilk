@@ -113,11 +113,19 @@ export function renderNetworkUsersView() {
         return;
     }
 
-    // Determine if the pulse effect should be shown
+    // --- MODIFIED LOGIC ---
+    // The pulse effect should appear whenever a flight is active and the user hasn't
+    // completed a connection before. It no longer depends on other users being on the network.
     const hasSeenPulse = localStorage.getItem('hasSeenInvitePulse') === 'true';
-    const canShowPulse = !hasSeenPulse && lastNetworkUsers.length > 0 && currentFlightCode;
+    const shouldShowPulse = !hasSeenPulse && currentFlightCode;
 
-    // Build the user list and apply pulse effect individually
+    if (shouldShowPulse) {
+        const mainInviteBtn = document.getElementById('inviteBtn');
+        if (mainInviteBtn) {
+            addPulseEffect(mainInviteBtn);
+        }
+    }
+
     lastNetworkUsers.forEach(user => {
         const userEl = document.createElement('div');
         userEl.className = 'network-user-item';
@@ -131,22 +139,14 @@ export function renderNetworkUsersView() {
             </button>`;
         list.appendChild(userEl);
 
-        // If conditions are met, apply pulse effect to the button just created
-        if (canShowPulse) {
+        // Also apply pulse to the per-user invite buttons if the conditions are met.
+        if (shouldShowPulse) {
             const inviteBtn = userEl.querySelector('.invite-user-btn');
             if (inviteBtn) {
                 addPulseEffect(inviteBtn);
             }
         }
     });
-
-    // Handle the main invite button and set the flag so this only runs once
-    if (canShowPulse) {
-        const mainInviteBtn = document.getElementById('inviteBtn');
-        if (mainInviteBtn) {
-            addPulseEffect(mainInviteBtn);
-        }
-    }
 }
 
 export function renderInFlightView() {
