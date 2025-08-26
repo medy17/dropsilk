@@ -5,7 +5,6 @@ import { uiElements } from './dom.js';
 import { store } from '../state.js';
 import { getFileIcon, formatBytes } from '../utils/helpers.js';
 
-// --- NEW OVERLAY FUNCTIONS ---
 export function showBoardingOverlay(flightCode) {
     if (uiElements.boardingOverlay) {
         // Hide the main landing page content to prevent it from flashing
@@ -28,8 +27,17 @@ export function failBoarding() {
         uiElements.setupContainer.style.display = "flex";
     }
 }
-// --- END NEW OVERLAY FUNCTIONS ---
 
+function addPulseEffect(element) {
+    if (!element || element.querySelector('.pulse-ring')) return; // Prevent duplicates
+    element.classList.add('pulse-effect');
+    // Add the span elements for the rings
+    element.insertAdjacentHTML('beforeend', `
+        <span class="pulse-ring"></span>
+        <span class="pulse-ring"></span>
+        <span class="pulse-ring"></span>
+    `);
+}
 
 export function renderUserName() {
     uiElements.userNameDisplay.textContent = store.getState().myName;
@@ -102,6 +110,25 @@ export function renderNetworkUsersView() {
             </button>`;
         list.appendChild(userEl);
     });
+
+    const hasSeenPulse = localStorage.getItem('hasSeenInvitePulse') === 'true';
+    // Only show the pulse if it's the first visit, a flight is active, and there are users to invite.
+    if (!hasSeenPulse && lastNetworkUsers.length > 0 && currentFlightCode) {
+        // Add pulse effect to the user list buttons
+        list.querySelectorAll('.invite-user-btn').forEach(btn => {
+            addPulseEffect(btn);
+        });
+
+        // Add pulse effect to the main invite button in the dashboard header
+        const mainInviteBtn = document.getElementById('inviteBtn');
+        if (mainInviteBtn) {
+            addPulseEffect(mainInviteBtn);
+        }
+
+        // Set the flag in localStorage so it doesn't show again on subsequent visits.
+        localStorage.setItem('hasSeenInvitePulse', 'true');
+    }
+
 }
 
 export function renderInFlightView() {
