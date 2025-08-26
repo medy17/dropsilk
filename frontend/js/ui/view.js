@@ -88,20 +88,36 @@ function setDashboardFlightCode(code) {
     }
 }
 
+export function updateDashboardStatus(text, type) {
+    const statusEl = uiElements.dashboardFlightStatus;
+    statusEl.textContent = text;
+    const styles = {
+        connected: { color: '#15803d', bgColor: '#f0fdf4', borderColor: '#bbf7d0' },
+        disconnected: { color: '#d97706', bgColor: '#fffbe6', borderColor: '#fde68a' },
+        default: { color: 'var(--c-secondary)', bgColor: 'var(--c-panel-bg)', borderColor: 'var(--c-primary)' }
+    };
+    const style = styles[type] || styles.default;
+    statusEl.style.color = style.color;
+    statusEl.style.backgroundColor = style.bgColor;
+    statusEl.style.borderColor = style.borderColor;
+}
+
 export function renderNetworkUsersView() {
     const { lastNetworkUsers, currentFlightCode } = store.getState();
     uiElements.connectionPanelTitle.textContent = "Users on Your Network";
     const list = uiElements.connectionPanelList;
-    list.innerHTML = '';
+    list.innerHTML = ''; // Clear previous list
 
     if (lastNetworkUsers.length === 0) {
         list.innerHTML = '<div class="empty-state">No other users found on your network.</div>';
         return;
     }
 
+    // Determine if the pulse effect should be shown
     const hasSeenPulse = localStorage.getItem('hasSeenInvitePulse') === 'true';
     const canShowPulse = !hasSeenPulse && lastNetworkUsers.length > 0 && currentFlightCode;
 
+    // Build the user list and apply pulse effect individually
     lastNetworkUsers.forEach(user => {
         const userEl = document.createElement('div');
         userEl.className = 'network-user-item';
@@ -115,6 +131,7 @@ export function renderNetworkUsersView() {
             </button>`;
         list.appendChild(userEl);
 
+        // If conditions are met, apply pulse effect to the button just created
         if (canShowPulse) {
             const inviteBtn = userEl.querySelector('.invite-user-btn');
             if (inviteBtn) {
@@ -123,6 +140,7 @@ export function renderNetworkUsersView() {
         }
     });
 
+    // Handle the main invite button and set the flag so this only runs once
     if (canShowPulse) {
         const mainInviteBtn = document.getElementById('inviteBtn');
         if (mainInviteBtn) {
@@ -131,7 +149,6 @@ export function renderNetworkUsersView() {
         localStorage.setItem('hasSeenInvitePulse', 'true');
     }
 }
-
 
 export function renderInFlightView() {
     const { peerInfo, myId, myName } = store.getState();
