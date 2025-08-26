@@ -68,7 +68,14 @@ async function onMessage(event) {
             enterFlightMode(msg.flightCode);
             break;
         case "peer-joined":
-            // MODIFIED: Hide overlay on success
+            showToast({
+                type: 'success', // A new type, but will default gracefully
+                title: 'Peer Connected!',
+                body: `${msg.peer.name} has joined the flight.`,
+                duration: 5000
+            });
+
+            document.getElementById('closeInviteModal')?.click();
             hideBoardingOverlay();
             if (!state.currentFlightCode) {
                 enterFlightMode(msg.flightCode);
@@ -89,7 +96,7 @@ async function onMessage(event) {
         case "error":
             // MODIFIED: Handle boarding failure on error
             failBoarding();
-            handleServerError(msg.message);
+            await handleServerError(msg.message);
             break;
     }
 }
