@@ -4,7 +4,7 @@
 import { uiElements, folderInputTransfer } from './dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
-import { handleFileSelection, handleFolderSelection } from '../transfer/fileHandler.js';
+import { handleFileSelection, handleFolderSelection, cancelFileSend } from '../transfer/fileHandler.js';
 import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 import { showToast } from '../utils/toast.js';
 
