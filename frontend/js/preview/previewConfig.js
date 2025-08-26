@@ -34,9 +34,9 @@ export const previewConfig = {
     },
     // handler for DOCX
     docx: {
-        extensions: ['docx', 'odt', 'doc', 'odf', 'wpd', 'rtf'],
+        extensions: ['docx', 'odt', 'doc', 'odf', 'wpd'],
         dependencies: [
-            'https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js'
+            'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.10.0/mammoth.browser.min.js'
         ],
         handler: () => import('./handlers/docxPreview.js'),
     }
