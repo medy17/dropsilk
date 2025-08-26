@@ -522,27 +522,28 @@
             </div>
         </div>
     </div>
-</div>
-<div class="modal-overlay" id="previewModal">
-<div class="invite-modal preview-modal-content">
-    <div class="modal-header">
-        <h3 id="preview-header-title">File Preview</h3>
-        <button class="modal-close" id="closePreviewModal" aria-label="Close modal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
-        </button>
-    </div>
-    <div class="modal-body preview-modal-body">
-        <!-- Loading State -->
-        <div id="preview-loader" class="preview-loader">
-            <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
-            <span>Preparing preview...</span>
+    <div class="modal-overlay" id="previewModal">
+        <div class="invite-modal preview-modal-content">
+            <div class="modal-header">
+                <h3 id="preview-header-title">File Preview</h3>
+                <button class="modal-close" id="closePreviewModal" aria-label="Close modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body preview-modal-body">
+                <!-- Loading State -->
+                <div id="preview-loader" class="preview-loader">
+                    <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
+                    <span>Preparing preview...</span>
+                </div>
+                <!-- Content will be injected here -->
+                <div id="preview-content"></div>
+            </div>
         </div>
-        <!-- Content will be injected here -->
-        <div id="preview-content"></div>
     </div>
+    <button id="openPreviewModal" data-modal-trigger="preview" style="display: none;"></button>
+
 </div>
-</div>
-<button id="openPreviewModal" data-modal-trigger="preview" style="display: none;"></button>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://unpkg.com/qrcode@1.4.4/build/qrcode.min.js"></script>
 <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoadCallback&render=explicit" async defer></script>
