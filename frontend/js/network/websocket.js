@@ -80,6 +80,9 @@ async function onMessage(event) {
             // MODIFICATION: Clear the pulse effect on successful connection.
             clearAllPulseEffects();
 
+            localStorage.setItem('hasSeenInvitePulse', 'true');
+
+
             if (!state.currentFlightCode) {
                 enterFlightMode(msg.flightCode);
             }

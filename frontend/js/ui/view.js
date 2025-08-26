@@ -146,7 +146,6 @@ export function renderNetworkUsersView() {
         if (mainInviteBtn) {
             addPulseEffect(mainInviteBtn);
         }
-        localStorage.setItem('hasSeenInvitePulse', 'true');
     }
 }
 
