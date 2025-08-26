@@ -3015,20 +3015,22 @@ input[type=range].volume-slider {
     color: var(--c-primary);
 }
 
+.queue-item.is-sending {
+    opacity: 0.8;
+}
+
 .queue-item.is-sending .drag-handle {
     display: none;
 }
 
-.queue-item.dragging {
-    opacity: 0.5;
+.queue-item.sortable-chosen {
+    cursor: grabbing;
+    box-shadow: var(--c-panel-shadow);
+    transform: scale(1.02);
+    background: var(--c-panel-bg);
+}
+
+.queue-item.sortable-ghost {
+    opacity: 0.3;
     background: var(--c-dropzone-hover-bg);
-}
-
-.queue-item.drag-over {
-    border-top: 5px solid var(--c-primary);
-}
-
-/* Ensure the first item doesn't get a double border */
-.queue-item.drag-over + .queue-item {
-    border-top-color: transparent;
 }

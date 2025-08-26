@@ -65,10 +65,7 @@ export const store = {
         },
         setCurrentlySendingFile: (file) => { state.currentlySendingFile = file; },
 
-        // REMOVED: This action was the source of the bug.
-        // dequeueNextFile: () => { return state.fileToSendQueue.shift(); },
-
-        // NEW: This action removes the top file from the queue after it's sent/cancelled.
+        // This action removes the top file from the queue after it's sent/cancelled.
         removeFirstFileFromQueue: () => {
             if (state.fileToSendQueue.length > 0) {
                 state.fileToSendQueue.shift();
@@ -94,38 +91,29 @@ export const store = {
             }
         },
 
-        // NEW ACTION: Reorders the file queue based on drag-and-drop
-        reorderFileToSendQueue: (draggedId, targetId) => {
-            let draggedFile = null;
-            let targetFile = null;
-            const { fileIdMap, fileToSendQueue } = state;
+        // Reorders the entire queue based on an array of DOM element IDs in their new order.
+        reorderQueueByDom: (idArray) => {
+            const { fileIdMap } = state;
 
-            // Find the actual File objects from the map
+            // Create a map of ID -> File for quick lookups
+            const idToFileMap = new Map();
             for (const [file, id] of fileIdMap.entries()) {
-                if (id === draggedId) draggedFile = file;
-                if (id === targetId) targetFile = file;
+                idToFileMap.set(id, file);
             }
 
-            if (!draggedFile) return;
+            // Build the new queue in the correct order from the DOM
+            const newQueue = idArray.map(id => idToFileMap.get(id)).filter(Boolean);
 
-            // Create a new queue without the dragged file
-            const newQueue = fileToSendQueue.filter(f => f !== draggedFile);
-
-            if (targetId) { // If dropped before a specific target
-                const targetIndex = newQueue.indexOf(targetFile);
-                if (targetIndex !== -1) {
-                    newQueue.splice(targetIndex, 0, draggedFile);
-                } else { // Fallback if target not found (should not happen)
-                    newQueue.push(draggedFile);
-                }
-            } else { // If dropped at the end of the list
-                newQueue.push(draggedFile);
+            // The actively sending file might not be in the `idArray` if its class prevents dragging.
+            // We must ensure it remains at the top of the queue in our state.
+            const currentlySendingFile = state.currentlySendingFile;
+            if (currentlySendingFile && !newQueue.includes(currentlySendingFile)) {
+                newQueue.unshift(currentlySendingFile);
             }
 
             state.fileToSendQueue = newQueue;
             console.log("Reordered send queue:", state.fileToSendQueue.map(f => f.name));
         },
-
 
         addFileIdMapping: (file, id) => { state.fileIdMap.set(file, id); },
         getFileId: (file) => { return state.fileIdMap.get(file); },

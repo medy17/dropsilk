@@ -8,6 +8,33 @@ import { handleFileSelection, handleFolderSelection, cancelFileSend, processFile
 import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 import { showToast } from '../utils/toast.js';
 
+/**
+ * Initializes the SortableJS library on the sending queue for smooth drag-and-drop reordering.
+ */
+function initializeSortableQueue() {
+    if (uiElements.sendingQueueDiv && typeof Sortable !== 'undefined') {
+        new Sortable(uiElements.sendingQueueDiv, {
+            handle: '.drag-handle', // Restrict dragging to the handle element
+            animation: 250, // Smooth animation speed in ms
+            filter: '.is-sending', // Elements with this class cannot be dragged
+            onEnd: () => {
+                // Get the new order of element IDs directly from the DOM
+                const orderedIds = Array.from(uiElements.sendingQueueDiv.children)
+                    .map(child => child.id)
+                    .filter(id => id.startsWith('send-')); // Ensure we only get file items
+
+                // Update the application's state to match the new visual order
+                store.actions.reorderQueueByDom(orderedIds);
+
+                // If nothing is currently being sent, this will start the new top item
+                processFileToSendQueue();
+            },
+        });
+    } else {
+        console.warn('SortableJS library not found or sending queue element is missing.');
+    }
+}
+
 export function initializeEventListeners() {
     uiElements.createFlightBtn?.addEventListener('click', () => {
         store.actions.setIsFlightCreator(true);
@@ -37,90 +64,22 @@ export function initializeEventListeners() {
         };
     }
 
-    // MODIFIED: Added comprehensive drag-and-drop reordering logic
+    // Handles both cancel clicks and drag-and-drop reordering via SortableJS
     if (uiElements.sendingQueueDiv) {
-        let draggedElement = null;
-
-        // Click handler for cancel buttons
+        // Simple click handler for cancel buttons within the queue
         uiElements.sendingQueueDiv.addEventListener('click', (e) => {
             const cancelBtn = e.target.closest('.cancel-file-btn');
             if (cancelBtn) {
                 const fileId = cancelBtn.dataset.fileId;
-                if (fileId) cancelFileSend(fileId);
-            }
-        });
-
-        // Drag and drop handlers for reordering
-        uiElements.sendingQueueDiv.addEventListener('dragstart', (e) => {
-            if (e.target.classList.contains('queue-item')) {
-                draggedElement = e.target;
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', draggedElement.id);
-                setTimeout(() => draggedElement.classList.add('dragging'), 0);
-            }
-        });
-
-        uiElements.sendingQueueDiv.addEventListener('dragend', () => {
-            if (draggedElement) {
-                draggedElement.classList.remove('dragging');
-                draggedElement = null;
-            }
-        });
-
-        const getDragAfterElement = (container, y) => {
-            const draggableElements = [...container.querySelectorAll('.queue-item:not(.dragging)')];
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = y - box.top - box.height / 2;
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset: offset, element: child };
-                } else {
-                    return closest;
+                if (fileId) {
+                    cancelFileSend(fileId);
                 }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
-        };
-
-        uiElements.sendingQueueDiv.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            const afterElement = getDragAfterElement(uiElements.sendingQueueDiv, e.clientY);
-            document.querySelectorAll('.queue-item').forEach(item => item.classList.remove('drag-over'));
-            if (afterElement) {
-                afterElement.classList.add('drag-over');
-            } else {
-                // If dragging to the end, no specific element gets the class,
-                // which is visually fine as it will append.
             }
         });
 
-        uiElements.sendingQueueDiv.addEventListener('dragleave', () => {
-            document.querySelectorAll('.queue-item.drag-over').forEach(item => item.classList.remove('drag-over'));
-        });
-
-
-        uiElements.sendingQueueDiv.addEventListener('drop', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.queue-item.drag-over').forEach(item => item.classList.remove('drag-over'));
-            if (!draggedElement) return;
-
-            const afterElement = getDragAfterElement(uiElements.sendingQueueDiv, e.clientY);
-            const draggedId = draggedElement.id;
-            const targetId = afterElement ? afterElement.id : null;
-
-            // Reorder DOM
-            if (afterElement == null) {
-                uiElements.sendingQueueDiv.appendChild(draggedElement);
-            } else {
-                uiElements.sendingQueueDiv.insertBefore(draggedElement, afterElement);
-            }
-
-            // Update state
-            store.actions.reorderFileToSendQueue(draggedId, targetId);
-
-            // If nothing is sending, the newly arranged top file might need to be sent
-            processFileToSendQueue();
-        });
+        // Initialize the smooth, animated drag-and-drop functionality
+        initializeSortableQueue();
     }
-
 
     uiElements.selectFolderBtn?.addEventListener('click', () => folderInputTransfer.click());
     folderInputTransfer.onchange = () => {
