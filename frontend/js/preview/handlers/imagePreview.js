@@ -1,10 +1,10 @@
 // js/preview/handlers/imagePreview.js
 // Renders image files in the preview modal.
 
-export default function renderImagePreview(blob, contentElement) {
-    return new Promise((resolve, reject) => {
-        const imageUrl = URL.createObjectURL(blob);
+export default async function renderImagePreview(blob, contentElement) {
+    const imageUrl = URL.createObjectURL(blob);
 
+    try {
         const image = new Image();
         image.src = imageUrl;
         image.style.maxWidth = '100%';
@@ -12,15 +12,15 @@ export default function renderImagePreview(blob, contentElement) {
         image.style.display = 'block';
         image.style.margin = 'auto';
 
-        image.onload = () => {
-            contentElement.appendChild(image);
-            // The object URL is revoked when the modal is closed (see modals.js)
-            contentElement.dataset.objectUrl = imageUrl; // Store URL for cleanup
-            resolve();
-        };
-        image.onerror = () => {
-            URL.revokeObjectURL(imageUrl);
-            reject(new Error('Failed to load image.'));
-        };
-    });
+        await image.decode();
+
+        contentElement.appendChild(image);
+        // Store URL for cleanup when the modal is closed
+        contentElement.dataset.objectUrl = imageUrl;
+
+    } catch (error) {
+        console.error('Failed to load or decode image:', error);
+        URL.revokeObjectURL(imageUrl); // Clean up immediately on error
+        throw new Error('Failed to load image. The format may be unsupported by your browser.');
+    }
 }
