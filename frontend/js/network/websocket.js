@@ -91,7 +91,7 @@ async function onMessage(event) {
             if (state.isFlightCreator) {
                 initializePeerConnection(true);
             } else {
-                setTimeout(() => initializePeerConnection(false), 50);
+                setTimeout(() => initializePeerConnection(false), 500);
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
