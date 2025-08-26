@@ -2,7 +2,7 @@
 // Renders PDF files in the preview modal using PDF.js.
 
 // PDF.js will be available globally as 'pdfjsLib' after pdf.min.js is loaded.
-// We explicitly set the worker source to the CDN path.
+// We will explicitly set the worker source to the CDN path.
 const PDF_WORKER_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 export default async function renderPdfPreview(blob, contentElement) {
