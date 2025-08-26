@@ -2907,14 +2907,35 @@ input[type=range].volume-slider {
     background: var(--c-btn-secondary-bg);
     border-color: var(--c-secondary);
     color: var(--c-secondary);
-    opacity: 0.7;
+    opacity: 0.7; /* Make it slightly less prominent */
+}
 
-    &:hover {
-        background: var(--c-danger);
-        border-color: var(--c-danger);
-        color: var(--brilliant-white);
-        opacity: 1;
-        transform: scale(1.1);
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+.cancel-file-btn:hover {
+    background: var(--c-danger);
+    border-color: var(--c-danger);
+    color: var(--brilliant-white);
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); /* Reddish shadow on hover */
+}
+
+
+/* You can also add this to make the file-action container more consistent between sending and receiving queues */
+
+.file-action {
+    flex-shrink: 0;
+    min-width: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-left: 1rem;
+
+    a {
+        text-decoration: none;
+
+        &:active {
+            transform: translateY(0) scale(.97);
+            transition-duration: 0.1s;
+        }
     }
 }
