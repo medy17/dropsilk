@@ -116,15 +116,14 @@ export function renderNetworkUsersView() {
     // --- MODIFIED LOGIC ---
     // The pulse effect should appear whenever a flight is active and the user hasn't
     // completed a connection before. It no longer depends on other users being on the network.
-    const hasSeenPulse = localStorage.getItem('hasSeenInvitePulse') === 'true';
     const shouldShowPulse = !hasSeenPulse && currentFlightCode;
 
     if (shouldShowPulse) {
         const mainInviteBtn = document.getElementById('inviteBtn');
         if (mainInviteBtn) {
             addPulseEffect(mainInviteBtn);
+            }
         }
-    }
 
     lastNetworkUsers.forEach(user => {
         const userEl = document.createElement('div');
