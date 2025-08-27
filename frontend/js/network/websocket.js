@@ -9,6 +9,44 @@ import { enterFlightMode, updateDashboardStatus, renderInFlightView, renderNetwo
 
 let ws;
 
+/**
+ * Uses a WebRTC trick to get the user's local IP address.
+ * Creates a temporary peer connection and inspects the ICE candidates.
+ * @returns {Promise<string|null>} A promise that resolves with the local IP or null.
+ */
+function getLocalIpAddress() {
+    return new Promise((resolve, reject) => {
+        const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+        pc.createDataChannel("");
+        pc.createOffer()
+            .then(offer => pc.setLocalDescription(offer))
+            .catch(err => reject(err));
+
+        pc.onicecandidate = (event) => {
+            if (!event || !event.candidate || !event.candidate.candidate) {
+                if (!event.candidate) pc.close();
+                return;
+            }
+
+            const localIpRegex = /(192\.168\.[0-9]{1,3}\.[0-9]{1,3}|10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9]{1,3}\.[0-9]{1,3})/;
+            const match = event.candidate.candidate.match(localIpRegex);
+
+            if (match) {
+                resolve(match[1]);
+                pc.onicecandidate = null;
+                pc.close();
+            }
+        };
+        setTimeout(() => {
+            if (pc.iceGatheringState !== 'complete') {
+                pc.close();
+                resolve(null); // Resolve with null instead of rejecting on timeout
+            }
+        }, 1000); // 1-second timeout
+    });
+}
+
+
 export function connect() {
     ws = new WebSocket(WEBSOCKET_URL);
     ws.onopen = onOpen;
@@ -23,12 +61,26 @@ export function sendMessage(payload) {
     }
 }
 
-function onOpen() {
+async function onOpen() {
+    let localIp = "unknown";
+    let localIpPrefix = "unknown";
+
+    try {
+        const ip = await getLocalIpAddress();
+        if (ip) {
+            localIp = ip;
+            localIpPrefix = ip.substring(0, ip.lastIndexOf('.'));
+            console.log(`Local IP detected: ${localIp}, Prefix: ${localIpPrefix}`);
+        }
+    } catch (error) {
+        console.warn("Could not determine local IP address:", error.message);
+    }
+
     sendMessage({
         type: "register-details",
         name: store.getState().myName,
-        localIpPrefix: "unknown",
-        localIp: "unknown"
+        localIpPrefix: localIpPrefix,
+        localIp: localIp
     });
 
     try {
