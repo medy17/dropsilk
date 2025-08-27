@@ -174,7 +174,10 @@ function startFileSend(file) {
             drainQueue();
         }
     };
-    worker.postMessage({ file: file });
+    // Choose larger chunks on LAN for higher throughput, smaller on WAN for reliability
+    const connectionType = store.getState().connectionType;
+    const desiredChunkSize = connectionType === 'lan' ? (1024 * 1024) : 262144; // 1MB vs 256KB
+    worker.postMessage({ file: file, config: { chunkSize: desiredChunkSize } });
 }
 
 export function drainQueue() {

@@ -1,7 +1,7 @@
 // js/network/webrtc.js
 // Handles the creation and management of the WebRTC peer connection.
 
-import { ICE_SERVERS } from '../config.js';
+import { ICE_SERVERS, HIGH_WATER_MARK } from '../config.js';
 import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
 import { enableDropZone, updateDashboardStatus, disableDropZone, renderNetworkUsersView } from '../ui/view.js';
@@ -20,6 +20,14 @@ export function initializePeerConnection(isOfferer) {
 
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
+            // Prefer direct/local paths; skip relayed candidates to avoid internet routing
+            const cand = event.candidate;
+            const candidateStr = cand.candidate || "";
+            const isRelay = (cand.type && cand.type === 'relay') || candidateStr.includes(' typ relay');
+            if (isRelay) {
+                console.log('Skipping relay ICE candidate');
+                return;
+            }
             sendMessage({ type: "signal", data: { candidate: event.candidate } });
         }
     };
@@ -59,7 +67,19 @@ export async function handleSignal(data) {
                 sendMessage({ type: "signal", data: { sdp: peerConnection.localDescription } });
             }
         } else if (data.candidate) {
-            await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            try {
+                // Ignore relayed candidates to prefer LAN/direct paths
+                const cand = data.candidate;
+                const candidateStr = (cand && cand.candidate) || "";
+                const isRelay = (cand && cand.type === 'relay') || candidateStr.includes(' typ relay');
+                if (isRelay) {
+                    console.log('Ignoring incoming relay ICE candidate');
+                    return;
+                }
+                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            } catch (error) {
+                console.error("Error adding ICE candidate:", error);
+            }
         }
     } catch (error) {
         console.error("Error handling signal:", error);
@@ -67,6 +87,8 @@ export async function handleSignal(data) {
 }
 
 function setupDataChannel() {
+    // Tune backpressure: trigger onbufferedamountlow when buffer drops sufficiently
+    try { dataChannel.bufferedAmountLowThreshold = Math.floor(HIGH_WATER_MARK / 2); } catch (e) { /* no-op */ }
     dataChannel.onopen = () => {
         console.log("Data channel opened!");
         enableDropZone();
