@@ -13,8 +13,7 @@ let dataChannel;
 export function initializePeerConnection(isOfferer) {
     if (peerConnection) return;
 
-    const { connectionType } = store.getState();
-    const pcConfig = connectionType === 'lan' ? { iceServers: [] } : { iceServers: ICE_SERVERS };
+    const pcConfig = { iceServers: ICE_SERVERS };
 
     peerConnection = new RTCPeerConnection(pcConfig);
 
