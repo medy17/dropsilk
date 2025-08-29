@@ -8,20 +8,25 @@ import { handleFileSelection, handleFolderSelection, cancelFileSend, processFile
 import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 import { showToast } from '../utils/toast.js';
 
+/**
+ * Initializes the SortableJS library on the sending queue for smooth drag-and-drop reordering.
+ */
 function initializeSortableQueue() {
     if (uiElements.sendingQueueDiv && typeof Sortable !== 'undefined') {
         new Sortable(uiElements.sendingQueueDiv, {
             handle: '.drag-handle', // Restrict dragging to the handle element
             animation: 250, // Smooth animation speed in ms
-            filter: '.is-sending', // Elements with this class cannot be dragged
+            filter: '.is-sending', // Correctly prevents dragging the active item
             onEnd: () => {
                 // Get the new order of element IDs directly from the DOM
                 const orderedIds = Array.from(uiElements.sendingQueueDiv.children)
                     .map(child => child.id)
                     .filter(id => id.startsWith('send-')); // Ensure we only get file items
 
+                // Update the application's state to match the new visual order
                 store.actions.reorderQueueByDom(orderedIds);
 
+                // If nothing is currently being sent, this will start the new top item
                 processFileToSendQueue();
             },
         });
@@ -59,16 +64,11 @@ export function initializeEventListeners() {
         };
     }
 
-    // Handles cancel clicks, text selection prevention, and drag-and-drop
+    // Handles cancel clicks and drag-and-drop initialization
     if (uiElements.sendingQueueDiv) {
+        // **FIX**: The problematic `mousedown` listener has been completely removed.
+        // We now only have the click listener for the cancel button.
 
-        uiElements.sendingQueueDiv.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.drag-handle')) {
-                e.preventDefault(); // This stops the browser's default text selection behavior.
-            }
-        });
-
-        // Click handler for cancel buttons remains the same.
         uiElements.sendingQueueDiv.addEventListener('click', (e) => {
             const cancelBtn = e.target.closest('.cancel-file-btn');
             if (cancelBtn) {
@@ -101,10 +101,9 @@ export function initializeEventListeners() {
                 inviteBtn.textContent = 'Invited';
                 inviteBtn.disabled = true;
                 setTimeout(() => {
-                    inviteBtn.textContent = 'Invite';
-                    // Check if the button still exists before modifying it
-                    const currentBtn = document.querySelector(`[data-invitee-id="${inviteeId}"]`);
+                    const currentBtn = document.querySelector(`.invite-user-btn[data-invitee-id="${inviteeId}"]`);
                     if (currentBtn) {
+                        currentBtn.textContent = 'Invite';
                         currentBtn.disabled = false;
                     }
                 }, 3000);

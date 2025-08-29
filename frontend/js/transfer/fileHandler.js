@@ -62,8 +62,7 @@ export function handleFileSelection(files) {
         const fileId = `send-${Date.now()}-${Math.random()}`;
         store.actions.addFileIdMapping(file, fileId);
 
-        // *** THE CRITICAL FIX: `draggable="true"` is restored here! ***
-        // This attribute is essential for the browser's native drag-and-drop API, which SortableJS uses.
+        // This `draggable="true"` is essential for SortableJS to work correctly.
         uiElements.sendingQueueDiv.insertAdjacentHTML('beforeend', `
             <div class="queue-item" id="${fileId}" draggable="true">
                 <div class="drag-handle" title="Drag to reorder">
@@ -83,6 +82,7 @@ export function handleFileSelection(files) {
                 </div>
             </div>`);
     });
+
 
     if (isFirstSend && !store.getState().hasScrolledForSend) {
         uiElements.sendingQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -126,11 +126,8 @@ function startFileSend(file) {
     const fileElement = document.getElementById(fileId);
 
     if (fileElement) {
-        // Make the item non-draggable and add a class to hide the handle via CSS
-        fileElement.draggable = false;
         fileElement.classList.add('is-sending');
 
-        // The innerHTML is replaced, removing the drag handle for the active item
         fileElement.innerHTML = `
             <div class="file-icon">${getFileIcon(file.name)}</div>
             <div class="file-details">
@@ -198,7 +195,7 @@ export function drainQueue() {
     if (fileReadingDone && chunkQueue.length === 0) {
         sendData("EOF");
         if (fileElement) {
-            fileElement.classList.remove('is-sending'); // Clean up class
+            fileElement.classList.remove('is-sending');
             fileElement.querySelector('.status-text').textContent = 'Sent!';
             fileElement.querySelector('.percent').textContent = `100%`;
             const cancelButton = fileElement.querySelector('.cancel-file-btn');
@@ -264,25 +261,20 @@ export function handleDataChannelMessage(event) {
                 const previewIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>`;
 
                 const fileExtension = finalFileInfo.name.toLowerCase().split('.').pop();
-
                 const isVideo = finalFileInfo.type.startsWith('video/') ||
                     (['mkv'].includes(fileExtension) && !finalFileInfo.type.startsWith('text/')) ||
                     (fileExtension === 'ts' && finalFileInfo.type === 'video/mp2t');
-
                 const isStandardImage = finalFileInfo.type.startsWith('image/');
                 const canPreviewByExt = isPreviewable(finalFileInfo.name);
                 const canPreview = isStandardImage || canPreviewByExt;
 
                 let buttonsHTML = '';
-
                 if (isVideo && window.videoPlayer) {
                     buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="video" title="Preview Video">${previewIconSVG}</button>`;
                 } else if (canPreview) {
                     buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="generic" title="Preview File">${previewIconSVG}</button>`;
                 }
-
                 buttonsHTML += `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>`;
-
                 actionContainer.innerHTML = `<div class="file-action-group">${buttonsHTML}</div>`;
 
                 const previewBtn = actionContainer.querySelector('.preview-btn');
@@ -304,7 +296,6 @@ export function handleDataChannelMessage(event) {
 
     const chunkSize = data.byteLength || data.size || 0;
     store.actions.updateMetricsOnReceive(chunkSize);
-
     incomingFileData.push(data);
     incomingFileReceived += chunkSize;
     if (incomingFileInfo?.size) {
