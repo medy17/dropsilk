@@ -60,14 +60,19 @@ export const store = {
         },
         setCurrentlySendingFile: (file) => { state.currentlySendingFile = file; },
 
-        // --- NEW ATOMIC ACTION ---
-        // This action completes the current file transfer in a single, atomic step.
-        // It clears the "currently sending" slot AND removes the file from the queue.
-        finishCurrentFileSend: () => {
+        /**
+         * Atomically completes the current file transfer.
+         * It clears the "currently sending" slot, removes the file from the queue,
+         * AND crucially removes it from the ID map to prevent re-addition.
+         * @param {File} completedFile The file object that has finished sending.
+         */
+        finishCurrentFileSend: (completedFile) => {
+            if (!completedFile) return;
             state.currentlySendingFile = null;
-            if (state.fileToSendQueue.length > 0) {
+            if (state.fileToSendQueue.length > 0 && state.fileToSendQueue[0] === completedFile) {
                 state.fileToSendQueue.shift();
             }
+            state.fileIdMap.delete(completedFile);
         },
 
         removeFileFromQueue: (fileId) => {

@@ -55,7 +55,7 @@ export function cancelFileSend(fileId) {
         chunkQueue = [];
         fileReadingDone = false;
         sentOffset = 0;
-        store.actions.finishCurrentFileSend();
+        store.actions.finishCurrentFileSend(currentlySendingFile);
     } else {
         // The file is in the queue but not actively sending.
         store.actions.removeFileFromQueue(fileId);
@@ -213,7 +213,8 @@ export function drainQueue() {
             if (cancelButton) cancelButton.remove();
         }
 
-        store.actions.finishCurrentFileSend();
+        // Pass the completed file to the action for full cleanup.
+        store.actions.finishCurrentFileSend(file);
 
         // After a file finishes, ensure the manager runs to start the next one.
         ensureQueueIsActive();
