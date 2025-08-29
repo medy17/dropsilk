@@ -30,7 +30,7 @@ export function cancelFileSend(fileId) {
     const currentFileId = currentlySendingFile ? store.actions.getFileId(currentlySendingFile) : null;
 
     if (fileId === currentFileId) {
-        // --- CANCELLING THE ACTIVE TRANSFER ---
+        // The file is actively being sent
         console.log("Cancelling active transfer:", currentlySendingFile.name);
         if (worker) {
             worker.terminate();
@@ -40,15 +40,10 @@ export function cancelFileSend(fileId) {
         fileReadingDone = false;
         sentOffset = 0;
         store.actions.setCurrentlySendingFile(null);
-
-        // **FIX**: The file being cancelled is at the top of the queue. Remove it now.
         store.actions.removeFirstFileFromQueue();
-
-        // Immediately try to send the next file in the queue
         processFileToSendQueue();
     } else {
-        // --- CANCELLING A QUEUED (INACTIVE) FILE ---
-        // This is simpler; just remove it from the state.
+        // The file is in the queue but not actively sending
         store.actions.removeFileFromQueue(fileId);
     }
     checkQueueOverflow('sending-queue');
@@ -67,10 +62,10 @@ export function handleFileSelection(files) {
         const fileId = `send-${Date.now()}-${Math.random()}`;
         store.actions.addFileIdMapping(file, fileId);
 
-        // **FIX**: Removed draggable="true". SortableJS handles dragging via the drag handle,
-        // which prevents conflicts and makes the behavior more consistent.
+        // *** THE CRITICAL FIX: `draggable="true"` is restored here! ***
+        // This attribute is essential for the browser's native drag-and-drop API, which SortableJS uses.
         uiElements.sendingQueueDiv.insertAdjacentHTML('beforeend', `
-            <div class="queue-item" id="${fileId}">
+            <div class="queue-item" id="${fileId}" draggable="true">
                 <div class="drag-handle" title="Drag to reorder">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
@@ -89,8 +84,6 @@ export function handleFileSelection(files) {
             </div>`);
     });
 
-
-    // Auto-scroll to sending queue for the first file added
     if (isFirstSend && !store.getState().hasScrolledForSend) {
         uiElements.sendingQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         store.actions.setHasScrolledForSend(true);
@@ -121,9 +114,6 @@ export function handleFolderSelection(files) {
 
 export function processFileToSendQueue() {
     const state = store.getState();
-    // **FIX**: This is the "PEEK" part of the strategy.
-    // We check if there's a file to send AND if we aren't already sending one.
-    // We get the next file but DO NOT remove it from the queue yet.
     if (state.fileToSendQueue.length > 0 && !state.currentlySendingFile && state.peerInfo) {
         const nextFile = state.fileToSendQueue[0];
         startFileSend(nextFile);
@@ -136,10 +126,11 @@ function startFileSend(file) {
     const fileElement = document.getElementById(fileId);
 
     if (fileElement) {
-        // This class is used by SortableJS to prevent dragging the active item.
+        // Make the item non-draggable and add a class to hide the handle via CSS
+        fileElement.draggable = false;
         fileElement.classList.add('is-sending');
 
-        // The innerHTML is replaced to show progress and remove the drag handle visually.
+        // The innerHTML is replaced, removing the drag handle for the active item
         fileElement.innerHTML = `
             <div class="file-icon">${getFileIcon(file.name)}</div>
             <div class="file-details">
@@ -204,24 +195,18 @@ export function drainQueue() {
         }
     }
 
-    // This block is only entered when the file has been fully read by the worker
-    // AND all its chunks have been sent from the queue.
     if (fileReadingDone && chunkQueue.length === 0) {
         sendData("EOF");
         if (fileElement) {
-            fileElement.classList.remove('is-sending');
+            fileElement.classList.remove('is-sending'); // Clean up class
             fileElement.querySelector('.status-text').textContent = 'Sent!';
             fileElement.querySelector('.percent').textContent = `100%`;
             const cancelButton = fileElement.querySelector('.cancel-file-btn');
             if (cancelButton) cancelButton.remove();
         }
 
-        // **FIX**: This is the "REMOVE ON COMPLETION" part of the strategy.
-        // The file transfer is complete. We can now safely modify the state.
         store.actions.setCurrentlySendingFile(null);
-        store.actions.removeFirstFileFromQueue(); // This actually removes the file from the state queue.
-
-        // With the state updated, we trigger the process again for the next file.
+        store.actions.removeFirstFileFromQueue();
         processFileToSendQueue();
     }
 }
@@ -254,7 +239,6 @@ export function handleDataChannelMessage(event) {
                     <div class="file-action"></div>
                 </div>`);
 
-            // Auto-scroll to receiving queue for the first file
             if (isFirstReceivedFile && !store.getState().hasScrolledForReceive) {
                 uiElements.receiverQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 store.actions.setHasScrolledForReceive(true);
@@ -265,7 +249,7 @@ export function handleDataChannelMessage(event) {
         }
         if (data === "EOF") { // End of File
             const receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
-            const finalFileInfo = { ...incomingFileInfo }; // Capture file info before it's reset
+            const finalFileInfo = { ...incomingFileInfo };
 
             store.actions.addReceivedFile({ name: finalFileInfo.name, blob: receivedBlob });
             updateReceiverActions();
@@ -285,7 +269,6 @@ export function handleDataChannelMessage(event) {
                     (['mkv'].includes(fileExtension) && !finalFileInfo.type.startsWith('text/')) ||
                     (fileExtension === 'ts' && finalFileInfo.type === 'video/mp2t');
 
-                // A file is previewable if its MIME type is image/* OR if its extension is in our config list.
                 const isStandardImage = finalFileInfo.type.startsWith('image/');
                 const canPreviewByExt = isPreviewable(finalFileInfo.name);
                 const canPreview = isStandardImage || canPreviewByExt;
@@ -319,7 +302,6 @@ export function handleDataChannelMessage(event) {
         }
     }
 
-    // Binary data chunk
     const chunkSize = data.byteLength || data.size || 0;
     store.actions.updateMetricsOnReceive(chunkSize);
 
