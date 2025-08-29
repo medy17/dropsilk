@@ -5,7 +5,7 @@ import { ICE_SERVERS } from '../config.js';
 import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
 import { enableDropZone, updateDashboardStatus, disableDropZone, renderNetworkUsersView } from '../ui/view.js';
-import { handleDataChannelMessage, processFileToSendQueue, drainQueue } from '../transfer/fileHandler.js';
+import { handleDataChannelMessage, ensureQueueIsActive, drainQueue } from '../transfer/fileHandler.js';
 
 let peerConnection;
 let dataChannel;
@@ -70,7 +70,9 @@ function setupDataChannel() {
     dataChannel.onopen = () => {
         console.log("Data channel opened!");
         enableDropZone();
-        processFileToSendQueue();
+
+        // When the connection is ready, ensure the queue manager runs.
+        ensureQueueIsActive();
 
         const { metricsInterval } = store.getState();
         if (metricsInterval) clearInterval(metricsInterval);

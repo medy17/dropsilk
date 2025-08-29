@@ -4,7 +4,7 @@
 import { uiElements, folderInputTransfer } from './dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
-import { handleFileSelection, handleFolderSelection, cancelFileSend, processFileToSendQueue } from '../transfer/fileHandler.js';
+import { handleFileSelection, handleFolderSelection, cancelFileSend } from '../transfer/fileHandler.js';
 import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 import { showToast } from '../utils/toast.js';
 
@@ -23,11 +23,10 @@ function initializeSortableQueue() {
                     .map(child => child.id)
                     .filter(id => id.startsWith('send-')); // Ensure we only get file items
 
-                // Update the application's state to match the new visual order
+                // Update the application's state to match the new visual order.
+                // The running queue manager will automatically pick up the new order
+                // when the current file is complete. We do not need to call it here.
                 store.actions.reorderQueueByDom(orderedIds);
-
-                // If nothing is currently being sent, this will start the new top item
-                processFileToSendQueue();
             },
         });
     } else {

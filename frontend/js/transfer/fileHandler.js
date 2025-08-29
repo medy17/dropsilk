@@ -19,6 +19,14 @@ let incomingFileInfo = null;
 let incomingFileData = [];
 let incomingFileReceived = 0;
 
+export function ensureQueueIsActive() {
+    const state = store.getState();
+    if (state.peerInfo && !state.currentlySendingFile && state.fileToSendQueue.length > 0) {
+        const nextFile = state.fileToSendQueue[0];
+        startFileSend(nextFile);
+    }
+}
+
 export function cancelFileSend(fileId) {
     const element = document.getElementById(fileId);
     if (element) {
@@ -30,7 +38,7 @@ export function cancelFileSend(fileId) {
     const currentFileId = currentlySendingFile ? store.actions.getFileId(currentlySendingFile) : null;
 
     if (fileId === currentFileId) {
-        // The file is actively being sent
+        // The file is actively being sent. Terminate its resources.
         console.log("Cancelling active transfer:", currentlySendingFile.name);
         if (worker) {
             worker.terminate();
@@ -39,14 +47,16 @@ export function cancelFileSend(fileId) {
         chunkQueue = [];
         fileReadingDone = false;
         sentOffset = 0;
-        store.actions.setCurrentlySendingFile(null);
-        store.actions.removeFirstFileFromQueue();
-        processFileToSendQueue();
+        store.actions.finishCurrentFileSend();
     } else {
-        // The file is in the queue but not actively sending
+        // The file is in the queue but not actively sending.
         store.actions.removeFileFromQueue(fileId);
     }
+
     checkQueueOverflow('sending-queue');
+
+    // After any queue mutation, ensure the manager runs to check the state.
+    ensureQueueIsActive();
 }
 
 export function handleFileSelection(files) {
@@ -90,7 +100,8 @@ export function handleFileSelection(files) {
     }
     checkQueueOverflow('sending-queue');
 
-    processFileToSendQueue();
+    // After adding files, ensure the manager runs.
+    ensureQueueIsActive();
 }
 
 export function handleFolderSelection(files) {
@@ -109,14 +120,6 @@ export function handleFolderSelection(files) {
         });
     } else {
         handleFileSelection(files);
-    }
-}
-
-export function processFileToSendQueue() {
-    const state = store.getState();
-    if (state.fileToSendQueue.length > 0 && !state.currentlySendingFile && state.peerInfo) {
-        const nextFile = state.fileToSendQueue[0];
-        startFileSend(nextFile);
     }
 }
 
@@ -202,9 +205,10 @@ export function drainQueue() {
             if (cancelButton) cancelButton.remove();
         }
 
-        store.actions.setCurrentlySendingFile(null);
-        store.actions.removeFirstFileFromQueue();
-        processFileToSendQueue();
+        store.actions.finishCurrentFileSend();
+
+        // After a file finishes, ensure the manager runs to start the next one.
+        ensureQueueIsActive();
     }
 }
 
