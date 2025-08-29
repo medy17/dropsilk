@@ -49,6 +49,64 @@ export function initializeEventListeners() {
         }
     });
 
+    let qrScanner = null;
+
+    const stopScanner = () => {
+        if (qrScanner) {
+            qrScanner.stop();
+            qrScanner.destroy();
+            qrScanner = null;
+        }
+        uiElements.qrScannerOverlay.classList.remove('show');
+    };
+
+    uiElements.scanQrBtn?.addEventListener('click', async () => {
+        // Prevent re-initialization
+        if (qrScanner) return;
+
+        uiElements.qrScannerOverlay.classList.add('show');
+
+        // The library needs this to be imported globally from the script tag
+        // We wrap it in a try-catch for when the user denies camera permissions
+        try {
+            qrScanner = new QrScanner(
+                uiElements.qrVideo,
+                result => {
+                    console.log('QR Code detected:', result.data);
+                    try {
+                        const url = new URL(result.data);
+                        const code = url.searchParams.get('code');
+
+                        if (code && code.length === 6) {
+                            uiElements.flightCodeInput.value = code.toUpperCase();
+                            stopScanner();
+                            // Reuse existing join logic by simulating a click
+                            uiElements.joinFlightBtn.click();
+                        } else {
+                            showToast({ type: 'danger', title: 'Invalid QR Code', body: 'The QR code does not contain a valid flight link.' });
+                            stopScanner();
+                        }
+                    } catch (e) {
+                        showToast({ type: 'danger', title: 'Invalid QR Code', body: 'This does not look like a DropSilk link.' });
+                        stopScanner();
+                    }
+                },
+                {
+                    highlightScanRegion: true,
+                    highlightCodeOutline: true,
+                },
+            );
+            await qrScanner.start();
+        } catch (error) {
+            console.error("QR Scanner Error:", error);
+            showToast({ type: 'danger', title: 'Camera Error', body: 'Could not access the camera. Please check permissions.', duration: 8000 });
+            stopScanner();
+        }
+    });
+
+    uiElements.closeQrScannerBtn?.addEventListener('click', stopScanner);
+
+
     uiElements.leaveFlightBtnDashboard?.addEventListener('click', () => location.reload());
 
     if (uiElements.fileInputTransfer) {

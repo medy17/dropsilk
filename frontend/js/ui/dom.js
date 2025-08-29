@@ -12,7 +12,13 @@ export const uiElements = {
     flightCodeInput: document.getElementById("flightCodeInput"),
     flightCodeInputWrapper: document.querySelector('.flight-code-input-wrapper'),
 
-    // NEW
+    // Scan QR Code
+    scanQrBtn: document.getElementById('scanQrBtn'),
+    qrScannerOverlay: document.getElementById('qr-scanner-overlay'),
+    qrVideo: document.getElementById('qr-video'),
+    closeQrScannerBtn: document.getElementById('closeQrScannerBtn'),
+
+    // Boarding Overlay
     boardingOverlay: document.getElementById('boarding-overlay'),
 
     // Dashboard

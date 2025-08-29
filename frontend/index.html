@@ -1,4 +1,5 @@
 <!doctype html>
+<!--suppress HtmlDeprecatedAttribute -->
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -87,6 +88,15 @@
             <p>Your file transfer ticket</p>
             <div class="ticket-actions">
                 <button id="createFlightBtn">Create a Flight</button>
+                <button id="scanQrBtn" class="btn btn-secondary">
+                    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M4 8V4h4m8 4V4h-4m-8 8v4h4m8-4v4h-4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="8" y="8" width="4" height="4" rx="1" fill="currentColor" stroke="none"/>
+                    </svg>Scan QR Code Invite<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M4 8V4h4m8 4V4h-4m-8 8v4h4m8-4v4h-4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="8" y="8" width="4" height="4" rx="1" fill="currentColor" stroke="none"/>
+                </svg>
+                </button>
                 <div class="or-separator">OR</div>
                 <div class="flight-code-input-wrapper">
                     <input id="flightCodeInput" type="text" placeholder="TRJXØD" value="" maxlength="6" pattern="[A-Za-z0-9]{6}" />
@@ -209,6 +219,12 @@
     </div>
 </div>
 
+<div id="qr-scanner-overlay">
+    <video id="qr-video"></video>
+    <button id="closeQrScannerBtn" aria-label="Close QR Scanner">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+    </button>
+</div>
 
 <footer class="site-footer">
     <div class="footer-content">
@@ -387,7 +403,7 @@
 
             <p><strong>1. Use of Service:</strong> DropSilk is a free, experimental service for peer-to-peer file transfer between devices. You agree to use DropSilk only for lawful purposes. You must not use the service to send, receive, or share any files that are illegal, infringe on the rights of others, or violate any applicable laws or regulations. You are solely responsible for the content of the files you transfer. You must have the legal right to share any files you send using DropSilk.</p>
 
-            <p><strong>2. No Warranty:</strong> DropSilk is provided “as is” and “as available,” without any warranties of any kind, either express or implied. We do not guarantee that the service will be secure, uninterrupted, error-free, or free from viruses or other harmful components. We may modify, suspend, or discontinue the service at any time without notice.</p>
+            <p><strong>2. No Warranty:</strong> DropSilk is provided “as is” and "as available", without any warranties of any kind, either express or implied. We do not guarantee that the service will be secure, uninterrupted, error-free, or free from viruses or other harmful components. We may modify, suspend, or discontinue the service at any time without notice.</p>
 
             <p><strong>3. Limitation of Liability:</strong> To the fullest extent permitted by law, DropSilk and its creator(s) are not liable for any direct, indirect, incidental, special, consequential, or exemplary damages, including but not to-do loss of data, loss of profits, or other losses resulting from your use of (or inability to use) the service. You use DropSilk at your own risk.</p>
 
@@ -399,7 +415,7 @@
 
             <p><strong>7. Contact:</strong> If you have any questions or concerns about these terms, please contact us at <a href="mailto:ahmed@dropsilk.xyz">ahmed@dropsilk.xyz</a>.</p>
 
-            <p><em>This Terms of Service is provided for informational purposes and does not constitute legal advice. For a production or commercial service, please consult a qualified legal professional.</em></p>
+            <p><em>These Terms of Service are provided for informational purposes and do not constitute legal advice. For a production or commercial service, please consult a qualified legal professional.</em></p>
         </div>
     </div>
 </div>
@@ -416,7 +432,7 @@
         <div class="modal-body">
             <p><strong>Your privacy is paramount.</strong> DropSilk is designed to be as private as possible.</p>
             <p><strong>File Transfers:</strong> Your files are never uploaded to or stored on our servers. They are sent directly from your device to the recipient's device using an encrypted, peer-to-peer (P2P) connection via WebRTC.</p>
-            <p><strong>Signaling Server:</strong> To establish a P2P connection, your device and the recipient's device need to exchange connection information (like IP addresses and network capabilities). This exchange is facilitated by our signaling server. The server only sees this temporary metadata and your randomly generated user name; it does not see the content of your files. This connection data is discarded after you leave the session.</p>
+            <p><strong>Signalling Server:</strong> To establish a P2P connection, your device and the recipient's device need to exchange connection information (like IP addresses and network capabilities). This exchange is facilitated by our signalling server. The server only sees this temporary metadata and your randomly generated username; it does not see the content of your files. This connection data is discarded after you leave the session.</p>
             <p><strong>Analytics:</strong> We do not use third-party analytics or tracking cookies. All metrics displayed, such as transfer speed and data volume, are calculated locally on your device and are not sent to our servers.</p>
             <p><em>This is a simplified privacy statement. A full-fledged service would require a more detailed policy.</em></p>
         </div>
@@ -434,7 +450,7 @@
         </div>
         <div class="modal-body">
             <p>Security is a core feature of DropSilk's design.</p>
-            <p><strong>End-to-End Encryption:</strong> All data transferred via WebRTC, including your files, is encrypted end-to-end using DTLS (Datagram Transport Layer Security). This means only you and the recipient can decrypt the data. Our signaling server, or any other intermediary, cannot access the contents of your files.</p>
+            <p><strong>End-to-End Encryption:</strong> All data transferred via WebRTC, including your files, is encrypted end-to-end using DTLS (Datagram Transport Layer Security). This means only you and the recipient can decrypt the data. Our signalling server, or any other intermediary, cannot access the contents of your files.</p>
             <p><strong>No Cloud Storage:</strong> Since your files are never stored on a central server, there is no risk of a cloud data breach exposing your files. The transfer happens directly between the peers in a "flight".</p>
             <p><strong>Flight Codes:</strong> Each transfer session ("flight") is protected by a unique, randomly generated 6-character code. Only users with this code can join the session and receive files.</p>
             <p><strong>Best Practices:</strong> While we implement these security measures, always be sure you are sharing files with a person you know and trust. Verify the flight code with them through a separate, secure channel.</p>
@@ -462,7 +478,7 @@
             <p>No. Your files are sent directly from your browser to the recipient's browser. They are never stored on any server.</p>
 
             <p><strong>What is a "Flight"?</strong></p>
-            <p>A "flight" is our term for a temporary, private file transfer session between two or more devices. You can create a flight to send files, or join an existing flight with a code to receive them.</p>
+            <p>A "flight" is our term for a temporary, private file transfer session between two or more devices. You can create a flight to send files or join an existing flight with a code to receive them.</p>
         </div>
     </div>
 </div>
@@ -543,6 +559,7 @@
     </div>
 </div>
 <button id="openPreviewModal" data-modal-trigger="preview" style="display: none;"></button>
+<script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://unpkg.com/qrcode@1.4.4/build/qrcode.min.js"></script>

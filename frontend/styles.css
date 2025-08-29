@@ -3050,3 +3050,65 @@ body.sortable-drag * {
 body.sortable-drag {
     cursor: grabbing !important;
 }
+
+#scanQrBtn {
+    /* Hide by default on desktop */
+    display: none;
+    margin-top: 0.5rem;
+}
+
+/* Show the button only on screens smaller than 768px (tablets and phones) */
+@media (max-width: 768px) {
+    #scanQrBtn {
+        display: inline-flex;
+    }
+}
+
+#qr-scanner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10000;
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+}
+
+#qr-scanner-overlay.show {
+    display: flex;
+}
+
+#qr-video {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    border-radius: 16px;
+    border: 2px solid var(--c-primary);
+    transform: scaleY(-1); /* Correctly mirror the camera feed for user */
+}
+
+#closeQrScannerBtn {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+}
+
+#closeQrScannerBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
