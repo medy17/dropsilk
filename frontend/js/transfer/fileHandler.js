@@ -19,6 +19,14 @@ let incomingFileInfo = null;
 let incomingFileData = [];
 let incomingFileReceived = 0;
 
+/**
+ * The single, authoritative function for processing the send queue.
+ * It is safe to call at any time. It checks the current state and starts
+ * a new file transfer if and only if all conditions are met:
+ * 1. A peer is connected.
+ * 2. There is no file currently being sent.
+ * 3. The send queue is not empty.
+ */
 export function ensureQueueIsActive() {
     const state = store.getState();
     if (state.peerInfo && !state.currentlySendingFile && state.fileToSendQueue.length > 0) {

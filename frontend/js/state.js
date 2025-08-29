@@ -34,14 +34,9 @@ const initialState = {
 
 let state = { ...initialState };
 
-// We don't need listeners for this simple refactor.
-// The `view.js` will manually re-render when needed.
-
 export const store = {
     getState: () => ({ ...state }),
 
-    // ACTIONS: Functions that are allowed to modify the state.
-    // This is a more direct mutation approach, mirroring the original script.
     actions: {
         initializeUser: () => {
             state.myName = generateRandomName();
@@ -65,8 +60,11 @@ export const store = {
         },
         setCurrentlySendingFile: (file) => { state.currentlySendingFile = file; },
 
-        // This action removes the top file from the queue after it's sent/cancelled.
-        removeFirstFileFromQueue: () => {
+        // --- NEW ATOMIC ACTION ---
+        // This action completes the current file transfer in a single, atomic step.
+        // It clears the "currently sending" slot AND removes the file from the queue.
+        finishCurrentFileSend: () => {
+            state.currentlySendingFile = null;
             if (state.fileToSendQueue.length > 0) {
                 state.fileToSendQueue.shift();
             }
@@ -74,43 +72,30 @@ export const store = {
 
         removeFileFromQueue: (fileId) => {
             let fileToRemove = null;
-            // Find the file object associated with the DOM ID
             for (const [file, id] of state.fileIdMap.entries()) {
                 if (id === fileId) {
                     fileToRemove = file;
                     break;
                 }
             }
-
             if (fileToRemove) {
-                // Filter it out of the queue
                 state.fileToSendQueue = state.fileToSendQueue.filter(f => f !== fileToRemove);
-                // Remove it from the ID map to prevent memory leaks
                 state.fileIdMap.delete(fileToRemove);
                 console.log(`Removed ${fileToRemove.name} from the send queue.`);
             }
         },
 
-        // Reorders the entire queue based on an array of DOM element IDs in their new order.
         reorderQueueByDom: (idArray) => {
             const { fileIdMap } = state;
-
-            // Create a map of ID -> File for quick lookups
             const idToFileMap = new Map();
             for (const [file, id] of fileIdMap.entries()) {
                 idToFileMap.set(id, file);
             }
-
-            // Build the new queue in the correct order from the DOM
             const newQueue = idArray.map(id => idToFileMap.get(id)).filter(Boolean);
-
-            // The actively sending file might not be in the `idArray` if its class prevents dragging.
-            // We must ensure it remains at the top of the queue in our state.
             const currentlySendingFile = state.currentlySendingFile;
             if (currentlySendingFile && !newQueue.includes(currentlySendingFile)) {
                 newQueue.unshift(currentlySendingFile);
             }
-
             state.fileToSendQueue = newQueue;
             console.log("Reordered send queue:", state.fileToSendQueue.map(f => f.name));
         },
