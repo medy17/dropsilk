@@ -96,10 +96,7 @@ async function onMessage(event) {
             // can be processed before the peer connection is fully ready to receive them.
             if (state.isFlightCreator) {
                 initializePeerConnection(true);
-            } else {
-                setTimeout(() => initializePeerConnection(false), 10);
             }
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
             break;
         case "signal":
