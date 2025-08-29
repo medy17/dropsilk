@@ -30,7 +30,7 @@ export function cancelFileSend(fileId) {
     const currentFileId = currentlySendingFile ? store.actions.getFileId(currentlySendingFile) : null;
 
     if (fileId === currentFileId) {
-        // The file is actively being sent
+        // --- CANCELLING THE ACTIVE TRANSFER ---
         console.log("Cancelling active transfer:", currentlySendingFile.name);
         if (worker) {
             worker.terminate();
@@ -41,13 +41,14 @@ export function cancelFileSend(fileId) {
         sentOffset = 0;
         store.actions.setCurrentlySendingFile(null);
 
-        // MODIFIED: Remove the cancelled file from the queue before processing the next one.
+        // **FIX**: The file being cancelled is at the top of the queue. Remove it now.
         store.actions.removeFirstFileFromQueue();
 
         // Immediately try to send the next file in the queue
         processFileToSendQueue();
     } else {
-        // The file is in the queue but not actively sending
+        // --- CANCELLING A QUEUED (INACTIVE) FILE ---
+        // This is simpler; just remove it from the state.
         store.actions.removeFileFromQueue(fileId);
     }
     checkQueueOverflow('sending-queue');
@@ -66,7 +67,8 @@ export function handleFileSelection(files) {
         const fileId = `send-${Date.now()}-${Math.random()}`;
         store.actions.addFileIdMapping(file, fileId);
 
-        // MODIFIED: Removed draggable="true" attribute.
+        // **FIX**: Removed draggable="true". SortableJS handles dragging via the drag handle,
+        // which prevents conflicts and makes the behavior more consistent.
         uiElements.sendingQueueDiv.insertAdjacentHTML('beforeend', `
             <div class="queue-item" id="${fileId}">
                 <div class="drag-handle" title="Drag to reorder">
@@ -119,8 +121,10 @@ export function handleFolderSelection(files) {
 
 export function processFileToSendQueue() {
     const state = store.getState();
+    // **FIX**: This is the "PEEK" part of the strategy.
+    // We check if there's a file to send AND if we aren't already sending one.
+    // We get the next file but DO NOT remove it from the queue yet.
     if (state.fileToSendQueue.length > 0 && !state.currentlySendingFile && state.peerInfo) {
-        // MODIFIED: Peek at the next file instead of dequeuing it.
         const nextFile = state.fileToSendQueue[0];
         startFileSend(nextFile);
     }
@@ -132,11 +136,10 @@ function startFileSend(file) {
     const fileElement = document.getElementById(fileId);
 
     if (fileElement) {
-        // MODIFIED: Make the item non-draggable and add a class to hide the handle via CSS
-        fileElement.draggable = false;
+        // This class is used by SortableJS to prevent dragging the active item.
         fileElement.classList.add('is-sending');
 
-        // MODIFIED: The innerHTML is replaced, removing the drag handle for the active item
+        // The innerHTML is replaced to show progress and remove the drag handle visually.
         fileElement.innerHTML = `
             <div class="file-icon">${getFileIcon(file.name)}</div>
             <div class="file-details">
@@ -201,20 +204,24 @@ export function drainQueue() {
         }
     }
 
+    // This block is only entered when the file has been fully read by the worker
+    // AND all its chunks have been sent from the queue.
     if (fileReadingDone && chunkQueue.length === 0) {
         sendData("EOF");
         if (fileElement) {
-            fileElement.classList.remove('is-sending'); // MODIFIED: Clean up class
+            fileElement.classList.remove('is-sending');
             fileElement.querySelector('.status-text').textContent = 'Sent!';
             fileElement.querySelector('.percent').textContent = `100%`;
             const cancelButton = fileElement.querySelector('.cancel-file-btn');
             if (cancelButton) cancelButton.remove();
         }
 
-        // MODIFIED: This is the crucial change.
-        // We now remove the file from the queue AFTER it's done sending.
+        // **FIX**: This is the "REMOVE ON COMPLETION" part of the strategy.
+        // The file transfer is complete. We can now safely modify the state.
         store.actions.setCurrentlySendingFile(null);
-        store.actions.removeFirstFileFromQueue();
+        store.actions.removeFirstFileFromQueue(); // This actually removes the file from the state queue.
+
+        // With the state updated, we trigger the process again for the next file.
         processFileToSendQueue();
     }
 }

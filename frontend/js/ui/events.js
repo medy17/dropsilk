@@ -17,7 +17,6 @@ function initializeSortableQueue() {
             handle: '.drag-handle', // Restrict dragging to the handle element
             animation: 250, // Smooth animation speed in ms
             filter: '.is-sending', // Elements with this class cannot be dragged
-            forceFallback: true, // This is the key to locking the axis.
             onEnd: () => {
                 // Get the new order of element IDs directly from the DOM
                 const orderedIds = Array.from(uiElements.sendingQueueDiv.children)
@@ -68,15 +67,16 @@ export function initializeEventListeners() {
     // Handles cancel clicks, text selection prevention, and drag-and-drop
     if (uiElements.sendingQueueDiv) {
 
-        // --- THIS IS THE NEW FIX ---
-        // Prevent text selection when starting a drag on the handle.
+        // **FIX**: This prevents the browser's default text selection behavior when you
+        // start dragging the handle. This makes the drag operation much smoother and
+        // prevents SortableJS from getting confused.
         uiElements.sendingQueueDiv.addEventListener('mousedown', (e) => {
             if (e.target.closest('.drag-handle')) {
-                e.preventDefault(); // This stops the browser's default text selection behavior.
+                e.preventDefault();
             }
         });
 
-        // Click handler for cancel buttons remains the same.
+        // Click handler for cancel buttons.
         uiElements.sendingQueueDiv.addEventListener('click', (e) => {
             const cancelBtn = e.target.closest('.cancel-file-btn');
             if (cancelBtn) {
@@ -99,8 +99,6 @@ export function initializeEventListeners() {
         }
     };
 
-    // uiElements.downloadAllBtn?.addEventListener('click', downloadAllFilesAsZip); // This is now handled in modals.js
-
     uiElements.connectionPanelList?.addEventListener('click', (e) => {
         const inviteBtn = e.target.closest('.invite-user-btn');
         if (inviteBtn && !inviteBtn.disabled) {
@@ -112,6 +110,7 @@ export function initializeEventListeners() {
                 inviteBtn.disabled = true;
                 setTimeout(() => {
                     inviteBtn.textContent = 'Invite';
+                    inviteBtn.disabled = false; // Re-enable after a while
                 }, 3000);
             }
         }
