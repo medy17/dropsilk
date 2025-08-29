@@ -1,5 +1,5 @@
 // js/state.js
-// Manages the application's global state. This is the single source of truth.
+// Manages the application's global state.
 
 import { generateRandomName } from './utils/helpers.js';
 
@@ -60,12 +60,6 @@ export const store = {
         },
         setCurrentlySendingFile: (file) => { state.currentlySendingFile = file; },
 
-        /**
-         * Atomically completes the current file transfer.
-         * It clears the "currently sending" slot, removes the file from the queue,
-         * AND crucially removes it from the ID map to prevent re-addition.
-         * @param {File} completedFile The file object that has finished sending.
-         */
         finishCurrentFileSend: (completedFile) => {
             if (!completedFile) return;
             state.currentlySendingFile = null;

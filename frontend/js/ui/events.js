@@ -14,18 +14,15 @@ import { showToast } from '../utils/toast.js';
 function initializeSortableQueue() {
     if (uiElements.sendingQueueDiv && typeof Sortable !== 'undefined') {
         new Sortable(uiElements.sendingQueueDiv, {
-            handle: '.drag-handle', // Restrict dragging to the handle element
-            animation: 250, // Smooth animation speed in ms
-            filter: '.is-sending', // Correctly prevents dragging the active item
+            handle: '.drag-handle',
+            animation: 250,
+            filter: '.is-sending',
             onEnd: () => {
                 // Get the new order of element IDs directly from the DOM
                 const orderedIds = Array.from(uiElements.sendingQueueDiv.children)
                     .map(child => child.id)
                     .filter(id => id.startsWith('send-')); // Ensure we only get file items
 
-                // Update the application's state to match the new visual order.
-                // The running queue manager will automatically pick up the new order
-                // when the current file is complete. We do not need to call it here.
                 store.actions.reorderQueueByDom(orderedIds);
             },
         });
@@ -63,10 +60,7 @@ export function initializeEventListeners() {
         };
     }
 
-    // Handles cancel clicks and drag-and-drop initialization
     if (uiElements.sendingQueueDiv) {
-        // **FIX**: The problematic `mousedown` listener has been completely removed.
-        // We now only have the click listener for the cancel button.
 
         uiElements.sendingQueueDiv.addEventListener('click', (e) => {
             const cancelBtn = e.target.closest('.cancel-file-btn');

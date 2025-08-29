@@ -77,7 +77,6 @@ async function onMessage(event) {
             document.getElementById('closeInviteModal')?.click();
             hideBoardingOverlay();
 
-            // MODIFICATION: Clear the pulse effect on successful connection.
             clearAllPulseEffects();
 
             localStorage.setItem('hasSeenInvitePulse', 'true');
@@ -91,9 +90,6 @@ async function onMessage(event) {
             updateDashboardStatus(`Peer Connected! (${store.getState().connectionType.toUpperCase()} mode)`, 'connected');
             renderInFlightView();
 
-            // MODIFICATION: Defer peer connection initialization for the joiner.
-            // This prevents a race condition observed in Chrome where signaling messages
-            // can be processed before the peer connection is fully ready to receive them.
             if (state.isFlightCreator) {
                 initializePeerConnection(true);
             }
@@ -106,7 +102,6 @@ async function onMessage(event) {
             handlePeerLeft();
             break;
         case "error":
-            // MODIFIED: Handle boarding failure on error
             failBoarding();
             await handleServerError(msg.message);
             break;
@@ -114,7 +109,6 @@ async function onMessage(event) {
 }
 
 function onClose() {
-    // MODIFIED: Handle boarding failure on connection close
     failBoarding();
     showToast({ type: 'danger', title: 'Connection Lost', body: 'Connection to the server was lost. Please refresh the page to reconnect.', duration: 0 });
     store.actions.resetState();

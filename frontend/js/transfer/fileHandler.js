@@ -19,14 +19,6 @@ let incomingFileInfo = null;
 let incomingFileData = [];
 let incomingFileReceived = 0;
 
-/**
- * The single, authoritative function for processing the send queue.
- * It is safe to call at any time. It checks the current state and starts
- * a new file transfer if and only if all conditions are met:
- * 1. A peer is connected.
- * 2. There is no file currently being sent.
- * 3. The send queue is not empty.
- */
 export function ensureQueueIsActive() {
     const state = store.getState();
     if (state.peerInfo && !state.currentlySendingFile && state.fileToSendQueue.length > 0) {
@@ -46,7 +38,6 @@ export function cancelFileSend(fileId) {
     const currentFileId = currentlySendingFile ? store.actions.getFileId(currentlySendingFile) : null;
 
     if (fileId === currentFileId) {
-        // The file is actively being sent. Terminate its resources.
         console.log("Cancelling active transfer:", currentlySendingFile.name);
         if (worker) {
             worker.terminate();
@@ -57,13 +48,11 @@ export function cancelFileSend(fileId) {
         sentOffset = 0;
         store.actions.finishCurrentFileSend(currentlySendingFile);
     } else {
-        // The file is in the queue but not actively sending.
         store.actions.removeFileFromQueue(fileId);
     }
 
     checkQueueOverflow('sending-queue');
 
-    // After any queue mutation, ensure the manager runs to check the state.
     ensureQueueIsActive();
 }
 
@@ -80,7 +69,6 @@ export function handleFileSelection(files) {
         const fileId = `send-${Date.now()}-${Math.random()}`;
         store.actions.addFileIdMapping(file, fileId);
 
-        // This `draggable="true"` is essential for SortableJS to work correctly.
         uiElements.sendingQueueDiv.insertAdjacentHTML('beforeend', `
             <div class="queue-item" id="${fileId}" draggable="true">
                 <div class="drag-handle" title="Drag to reorder">
@@ -108,7 +96,6 @@ export function handleFileSelection(files) {
     }
     checkQueueOverflow('sending-queue');
 
-    // After adding files, ensure the manager runs.
     ensureQueueIsActive();
 }
 
