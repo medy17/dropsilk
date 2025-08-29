@@ -7,6 +7,9 @@ import { sendMessage } from '../network/websocket.js';
 import { handleFileSelection, handleFolderSelection, cancelFileSend } from '../transfer/fileHandler.js';
 import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 import { showToast } from '../utils/toast.js';
+import QrScanner from 'qr-scanner';
+import Sortable from 'sortablejs';
+
 
 /**
  * Initializes the SortableJS library on the sending queue for smooth drag-and-drop reordering.

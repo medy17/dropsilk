@@ -386,7 +386,7 @@ body.sortable-drag * {
     gap: .75rem;
 }
 
-@media (min-width:768px) {
+@media (min-width: 768px) {
     .header {
         padding: 1.5em 2em;
     }
@@ -456,13 +456,13 @@ body.sortable-drag * {
     transition: font-size 0.2s;
 }
 
-@media (max-width:400px) {
+@media (max-width: 400px) {
     .brand-text {
         white-space: normal;
     }
 }
 
-@media (max-width:350px) {
+@media (max-width: 350px) {
     .brand-text {
         display: none;
     }
@@ -549,7 +549,7 @@ body.sortable-drag * {
     font-size: 1em;
 }
 
-@media (max-width:600px) {
+@media (max-width: 600px) {
     .not-found-content {
         padding: 2rem 1.5rem;
     }
@@ -829,7 +829,7 @@ body.sortable-drag * {
     }
 }
 
-@media (min-width:992px) {
+@media (min-width: 992px) {
     .main-content {
         flex-direction: row;
     }
@@ -1298,7 +1298,7 @@ body.sortable-drag * {
     font-weight: 500;
 }
 
-@media (max-width:480px) {
+@media (max-width: 480px) {
     .invite-modal {
         padding: 1.5rem;
         margin: 1rem;
@@ -2333,13 +2333,13 @@ body.sortable-drag * {
 
 .settings-menu button:hover {
     background-color: var(--c-primary);
-    color: var(--brilliant-white)!important;
+    color: var(--brilliant-white) !important;
     transform: none;
 }
 
 .settings-menu button.active {
     background-color: var(--c-secondary);
-    color: var(--brilliant-white)!important;
+    color: var(--brilliant-white) !important;
     font-weight: 600;
 }
 
@@ -2384,7 +2384,7 @@ input[type=range].volume-slider::-moz-range-thumb {
 }
 
 .audio-track-btn {
-    display: flex!important;
+    display: flex !important;
 }
 
 .audio-track-btn svg {
@@ -2393,7 +2393,7 @@ input[type=range].volume-slider::-moz-range-thumb {
 }
 
 .captions-btn {
-    display: flex!important;
+    display: flex !important;
 }
 
 .captions-btn svg {
@@ -3009,7 +3009,7 @@ input[type=range].volume-slider::-moz-range-thumb {
     margin-top: 0.5rem;
 }
 
-@media (max-width:768px) {
+@media (max-width: 768px) {
     #scanQrBtn {
         display: inline-flex;
     }

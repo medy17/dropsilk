@@ -8,6 +8,7 @@ import { store } from '../state.js';
 import { uiElements } from './dom.js';
 import { formatBytes } from '../utils/helpers.js';
 import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
+import QRCode from 'qrcode';
 
 let captchaWidgetId = null;
 
@@ -69,7 +70,7 @@ function generateQRCode() {
     const qrCanvas = document.getElementById('qrCanvas');
     const { currentFlightCode } = store.getState();
 
-    if (!qrCanvas || !currentFlightCode || typeof QRCode === 'undefined') {
+    if (!qrCanvas || !currentFlightCode || !QRCode) {
         if (qrCanvas) qrCanvas.style.display = 'none';
         return;
     }

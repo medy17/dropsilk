@@ -5,6 +5,7 @@ import { store } from '../state.js';
 import { showToast } from '../utils/toast.js';
 import { uiElements } from '../ui/dom.js';
 import { formatBytes } from '../utils/helpers.js';
+import JSZip from 'jszip';
 
 function resetZipModalUI() {
     uiElements.zipModalDefaultFooter.style.display = 'block';
@@ -66,7 +67,7 @@ async function proceedWithZipping(files) {
 };
 
 export async function downloadAllFilesAsZip(filesToZip) {
-    if (typeof JSZip === 'undefined') {
+    if (!JSZip) {
         showToast({ type: 'danger', title: 'Error', body: 'Zipping library is not available. Please refresh the page.', duration: 8000 });
         return;
     }
