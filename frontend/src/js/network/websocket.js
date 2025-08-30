@@ -1,5 +1,5 @@
 // js/network/websocket.js
-// Manages the WebSocket signaling server connection.
+// Manages the WebSocket signalling server connection.
 
 import { WEBSOCKET_URL } from '../config.js';
 import { store } from '../state.js';
