@@ -2,8 +2,7 @@
 // Contains the core logic for file transfers, including queueing, chunking, and handling selections.
 import { store } from '../state.js';
 import { showToast } from '../utils/toast.js';
-// MODIFICATION: Import 'getDataChannel' to access the data channel instance.
-import { sendData, getBufferedAmount, getDataChannel } from '../network/webrtc.js';
+import { sendData, getBufferedAmount } from '../network/webrtc.js';
 import { HIGH_WATER_MARK } from '../config.js';
 import { uiElements } from '../ui/dom.js';
 import { getFileIcon } from '../utils/helpers.js';
@@ -20,17 +19,11 @@ let incomingFileInfo = null;
 let incomingFileData = [];
 let incomingFileReceived = 0;
 
-// NEW FUNCTION: This is called by webrtc.js when the data channel opens.
-export function setupSendingLogic() {
-    const dataChannel = getDataChannel();
-    if (dataChannel) {
-        // Here we attach the backpressure handler. This is the fix.
-        dataChannel.onbufferedamountlow = () => drainQueue();
-
-        // Now that the handler is attached, we can start processing the queue.
-        processFileToSendQueue();
-    } else {
-        console.error("setupSendingLogic called but dataChannel is not available.");
+export function ensureQueueIsActive() {
+    const state = store.getState();
+    if (state.peerInfo && !state.currentlySendingFile && state.fileToSendQueue.length > 0) {
+        const nextFile = state.fileToSendQueue[0];
+        startFileSend(nextFile);
     }
 }
 
@@ -45,7 +38,6 @@ export function cancelFileSend(fileId) {
     const currentFileId = currentlySendingFile ? store.actions.getFileId(currentlySendingFile) : null;
 
     if (fileId === currentFileId) {
-        // The file is actively being sent
         console.log("Cancelling active transfer:", currentlySendingFile.name);
         if (worker) {
             worker.terminate();
@@ -54,17 +46,14 @@ export function cancelFileSend(fileId) {
         chunkQueue = [];
         fileReadingDone = false;
         sentOffset = 0;
-        store.actions.setCurrentlySendingFile(null);
-
-        store.actions.removeFirstFileFromQueue();
-
-        // Immediately try to send the next file in the queue
-        processFileToSendQueue();
+        store.actions.finishCurrentFileSend(currentlySendingFile);
     } else {
-        // The file is in the queue but not actively sending
         store.actions.removeFileFromQueue(fileId);
     }
+
     checkQueueOverflow('sending-queue');
+
+    ensureQueueIsActive();
 }
 
 export function handleFileSelection(files) {
@@ -81,7 +70,7 @@ export function handleFileSelection(files) {
         store.actions.addFileIdMapping(file, fileId);
 
         uiElements.sendingQueueDiv.insertAdjacentHTML('beforeend', `
-            <div class="queue-item" id="${fileId}">
+            <div class="queue-item" id="${fileId}" draggable="true">
                 <div class="drag-handle" title="Drag to reorder">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
@@ -101,14 +90,13 @@ export function handleFileSelection(files) {
     });
 
 
-    // Auto-scroll to sending queue for the first file added
     if (isFirstSend && !store.getState().hasScrolledForSend) {
         uiElements.sendingQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         store.actions.setHasScrolledForSend(true);
     }
     checkQueueOverflow('sending-queue');
 
-    processFileToSendQueue();
+    ensureQueueIsActive();
 }
 
 export function handleFolderSelection(files) {
@@ -130,23 +118,14 @@ export function handleFolderSelection(files) {
     }
 }
 
-export function processFileToSendQueue() {
-    const state = store.getState();
-    const dataChannel = getDataChannel(); // MODIFICATION: Check if the data channel is ready.
-    if (state.fileToSendQueue.length > 0 && !state.currentlySendingFile && state.peerInfo && dataChannel && dataChannel.readyState === 'open') {
-        const nextFile = state.fileToSendQueue[0];
-        startFileSend(nextFile);
-    }
-}
-
 function startFileSend(file) {
     store.actions.setCurrentlySendingFile(file);
     const fileId = store.actions.getFileId(file);
     const fileElement = document.getElementById(fileId);
 
     if (fileElement) {
-        fileElement.draggable = false;
         fileElement.classList.add('is-sending');
+
         fileElement.innerHTML = `
             <div class="file-icon">${getFileIcon(file.name)}</div>
             <div class="file-details">
@@ -221,9 +200,11 @@ export function drainQueue() {
             if (cancelButton) cancelButton.remove();
         }
 
-        store.actions.setCurrentlySendingFile(null);
-        store.actions.removeFirstFileFromQueue();
-        processFileToSendQueue();
+        // Pass the completed file to the action for full cleanup.
+        store.actions.finishCurrentFileSend(file);
+
+        // After a file finishes, ensure the manager runs to start the next one.
+        ensureQueueIsActive();
     }
 }
 
@@ -255,7 +236,6 @@ export function handleDataChannelMessage(event) {
                     <div class="file-action"></div>
                 </div>`);
 
-            // Auto-scroll to receiving queue for the first file
             if (isFirstReceivedFile && !store.getState().hasScrolledForReceive) {
                 uiElements.receiverQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 store.actions.setHasScrolledForReceive(true);
@@ -266,7 +246,7 @@ export function handleDataChannelMessage(event) {
         }
         if (data === "EOF") { // End of File
             const receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
-            const finalFileInfo = { ...incomingFileInfo }; // Capture file info before it's reset
+            const finalFileInfo = { ...incomingFileInfo };
 
             store.actions.addReceivedFile({ name: finalFileInfo.name, blob: receivedBlob });
             updateReceiverActions();
@@ -281,26 +261,20 @@ export function handleDataChannelMessage(event) {
                 const previewIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>`;
 
                 const fileExtension = finalFileInfo.name.toLowerCase().split('.').pop();
-
                 const isVideo = finalFileInfo.type.startsWith('video/') ||
                     (['mkv'].includes(fileExtension) && !finalFileInfo.type.startsWith('text/')) ||
                     (fileExtension === 'ts' && finalFileInfo.type === 'video/mp2t');
-
-                // A file is previewable if its MIME type is image/* OR if its extension is in our config list.
                 const isStandardImage = finalFileInfo.type.startsWith('image/');
                 const canPreviewByExt = isPreviewable(finalFileInfo.name);
                 const canPreview = isStandardImage || canPreviewByExt;
 
                 let buttonsHTML = '';
-
                 if (isVideo && window.videoPlayer) {
                     buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="video" title="Preview Video">${previewIconSVG}</button>`;
                 } else if (canPreview) {
                     buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="generic" title="Preview File">${previewIconSVG}</button>`;
                 }
-
                 buttonsHTML += `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>`;
-
                 actionContainer.innerHTML = `<div class="file-action-group">${buttonsHTML}</div>`;
 
                 const previewBtn = actionContainer.querySelector('.preview-btn');
@@ -320,10 +294,8 @@ export function handleDataChannelMessage(event) {
         }
     }
 
-    // Binary data chunk
     const chunkSize = data.byteLength || data.size || 0;
     store.actions.updateMetricsOnReceive(chunkSize);
-
     incomingFileData.push(data);
     incomingFileReceived += chunkSize;
     if (incomingFileInfo?.size) {
