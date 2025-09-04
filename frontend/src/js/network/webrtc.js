@@ -4,11 +4,17 @@
 import { ICE_SERVERS } from '../config.js';
 import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
-import { enableDropZone, updateDashboardStatus, disableDropZone, renderNetworkUsersView } from '../ui/view.js';
-import { handleDataChannelMessage, ensureQueueIsActive, drainQueue } from '../transfer/fileHandler.js';
+import { enableDropZone } from '../ui/view.js';
+// MODIFICATION: Removed 'processFileToSendQueue' and 'drainQueue' to break circular dependency
+import { handleDataChannelMessage } from '../transfer/fileHandler.js';
 
 let peerConnection;
 let dataChannel;
+
+// NEW: Export a getter so other modules can access the data channel safely.
+export function getDataChannel() {
+    return dataChannel;
+}
 
 export function initializePeerConnection(isOfferer) {
     if (peerConnection) return;
@@ -67,12 +73,15 @@ export async function handleSignal(data) {
 }
 
 function setupDataChannel() {
-    dataChannel.onopen = () => {
+    dataChannel.onopen = async () => {
         console.log("Data channel opened!");
         enableDropZone();
 
-        // When the connection is ready, ensure the queue manager runs.
-        ensureQueueIsActive();
+        // MODIFICATION: Instead of calling fileHandler functions directly, we import
+        // and call a new setup function from fileHandler. This keeps the dependency
+        // direction clean (fileHandler -> webrtc).
+        const { setupSendingLogic } = await import('../transfer/fileHandler.js');
+        setupSendingLogic();
 
         const { metricsInterval } = store.getState();
         if (metricsInterval) clearInterval(metricsInterval);
@@ -92,7 +101,8 @@ function setupDataChannel() {
 
     dataChannel.onerror = (error) => console.error("Data channel error:", error);
 
-    dataChannel.onbufferedamountlow = () => drainQueue();
+    // MODIFICATION: REMOVED the onbufferedamountlow handler.
+    // The higher-level fileHandler module is now responsible for this.
 
     dataChannel.onmessage = (event) => handleDataChannelMessage(event);
 }
