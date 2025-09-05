@@ -3079,7 +3079,6 @@ input[type=range].volume-slider::-moz-range-thumb {
 .flight-actions {
     display: flex;
     gap: .8rem;
-    margin-right: -1rem;
 }
 
 .flight-actions .btn {
