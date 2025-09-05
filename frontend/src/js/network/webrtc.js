@@ -174,3 +174,6 @@ export function stopScreenShare(notifyPeer = true) {
         }
     }
     localScreenStream = null;
+    screenTrackSender = null;
+    updateShareButton(false);
+}
