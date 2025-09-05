@@ -3076,23 +3076,18 @@ input[type=range].volume-slider::-moz-range-thumb {
     object-fit: contain;
 }
 
-/* Styling for the Dashboard Header Actions to match the screenshot */
 .flight-actions {
     display: flex;
     gap: .8rem;
-    /* This creates the "overflow" effect by pulling the container
-       to the edge of the panel's padding boundary. */
     margin-right: -1rem;
 }
 
-/* Adjust the buttons within the flight actions container */
 .flight-actions .btn {
-    padding: .7em 1.2em; /* Slightly chunkier padding */
-    font-size: .85em; /* Slightly smaller font for a cleaner look */
-    flex-shrink: 0; /* Prevent buttons from shrinking on small screens */
+    padding: .7em 1.2em;
+    font-size: .85em;
+    flex-shrink: 0;
 }
 
-/* Make sure SVGs inside the buttons are aligned properly */
 .flight-actions .btn svg {
     width: 18px;
     height: 18px;

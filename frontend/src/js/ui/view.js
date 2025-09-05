@@ -210,18 +210,22 @@ export function hideScreenShareView() {
 export function updateShareButton(isSharing) {
     const btn = document.getElementById('shareScreenBtn');
     if (!btn) return;
-    btn.classList.remove('hidden'); // Make it visible once a peer connects
-    const span = btn.querySelector('span');
+
+    // Find the text node to update, ignoring the SVG element
+    const textNode = Array.from(btn.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+
+    btn.classList.remove('hidden');
     if (isSharing) {
         btn.classList.add('is-sharing', 'btn-secondary');
         btn.classList.remove('btn-primary');
-        if (span) span.textContent = 'Stop Sharing';
+        if (textNode) textNode.nodeValue = ' Stop Sharing';
     } else {
         btn.classList.remove('is-sharing', 'btn-secondary');
         btn.classList.add('btn-primary');
-        if (span) span.textContent = 'Share Screen';
+        if (textNode) textNode.nodeValue = ' Share Screen';
     }
 }
+
 
 export function updateReceiverActions() {
     const { receivedFiles } = store.getState();
