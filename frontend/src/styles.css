@@ -3092,6 +3092,28 @@ input[type=range].volume-slider::-moz-range-thumb {
     width: 18px;
     height: 18px;
 }
+#shareScreenBtn.is-sharing {
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-secondary);
+    color: var(--c-secondary);
+}
+
+#shareScreenBtn.is-sharing:hover {
+    background: var(--c-secondary);
+    color: var(--brilliant-white);
+    border-color: var(--c-primary);
+}
+
+/* Hide the empty box path when sharing */
+#shareScreenBtn.is-sharing .toggle-icon .unchecked {
+    display: none;
+}
+
+/* Show the checked box path when sharing */
+#shareScreenBtn.is-sharing .toggle-icon .checked {
+    display: block;
+}
+
 @media (max-width: 456px) {
     .flight-actions .btn span {
         display: none;

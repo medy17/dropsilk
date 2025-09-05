@@ -211,21 +211,15 @@ export function updateShareButton(isSharing) {
     const btn = document.getElementById('shareScreenBtn');
     if (!btn) return;
 
-    // Find the text node to update, ignoring the SVG element
-    const textNode = Array.from(btn.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+    btn.classList.remove('hidden'); // Make button visible
 
-    btn.classList.remove('hidden');
+    // Toggle the 'is-sharing' class which controls the icon and color via CSS
     if (isSharing) {
-        btn.classList.add('is-sharing', 'btn-secondary');
-        btn.classList.remove('btn-primary');
-        if (textNode) textNode.nodeValue = ' Stop Sharing';
+        btn.classList.add('is-sharing');
     } else {
-        btn.classList.remove('is-sharing', 'btn-secondary');
-        btn.classList.add('btn-primary');
-        if (textNode) textNode.nodeValue = ' Share Screen';
+        btn.classList.remove('is-sharing');
     }
 }
-
 
 export function updateReceiverActions() {
     const { receivedFiles } = store.getState();
