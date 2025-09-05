@@ -182,6 +182,47 @@ export function enableDropZone() {
     uiElements.dropZoneSecondaryText.textContent = 'or select manually';
 }
 
+export function showScreenShareView(stream) {
+    const panel = document.getElementById('screen-share-panel');
+    const video = document.getElementById('remote-video');
+    if (panel && video) {
+        video.srcObject = stream;
+        panel.style.display = 'block';
+
+        // When the remote user stops sharing, their track will end.
+        stream.getVideoTracks()[0].onended = () => {
+            hideScreenShareView();
+        };
+
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+export function hideScreenShareView() {
+    const panel = document.getElementById('screen-share-panel');
+    const video = document.getElementById('remote-video');
+    if (panel && video) {
+        video.srcObject = null;
+        panel.style.display = 'none';
+    }
+}
+
+export function updateShareButton(isSharing) {
+    const btn = document.getElementById('shareScreenBtn');
+    if (!btn) return;
+    btn.style.display = 'inline-flex'; // Make it visible once a peer connects
+    const span = btn.querySelector('span');
+    if (isSharing) {
+        btn.classList.add('is-sharing', 'btn-secondary');
+        btn.classList.remove('btn-primary');
+        if (span) span.textContent = 'Stop Sharing';
+    } else {
+        btn.classList.remove('is-sharing', 'btn-secondary');
+        btn.classList.add('btn-primary');
+        if (span) span.textContent = 'Share Screen';
+    }
+}
+
 export function updateReceiverActions() {
     const { receivedFiles } = store.getState();
     uiElements.receiverActionsContainer.style.display = receivedFiles.length > 3 ? 'block' : 'none';

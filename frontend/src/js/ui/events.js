@@ -4,6 +4,7 @@
 import { uiElements, folderInputTransfer } from './dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
+import { startScreenShare, stopScreenShare } from '../network/webrtc.js';
 import { handleFileSelection, handleFolderSelection, cancelFileSend } from '../transfer/fileHandler.js';
 import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 import { showToast } from '../utils/toast.js';
@@ -174,6 +175,18 @@ export function initializeEventListeners() {
     });
 
     document.getElementById('shareAppBtn')?.addEventListener('click', () => document.getElementById('inviteBtn').click());
+
+    document.getElementById('shareScreenBtn')?.addEventListener('click', () => {
+        const btn = document.getElementById('shareScreenBtn');
+        const isSharing = btn.classList.contains('is-sharing');
+
+        if (isSharing) {
+            stopScreenShare();
+        } else {
+            startScreenShare();
+        }
+    });
+
 
     setupDragAndDrop();
 }

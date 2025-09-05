@@ -113,6 +113,11 @@
             <div class="flight-info__status" id="dashboard-flight-status">Ready to connect</div>
         </div>
         <div class="flight-actions">
+            <!-- NEW: Screen Share Button -->
+            <button class="btn btn-primary" id="shareScreenBtn" style="display: none;" title="Share your screen with the connected peer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12H4v2h8v-2h2.5A1.5 1.5 0 0 0 16 10.5v-9A1.5 1.5 0 0 0 14.5 0h-13zM15 10.5a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v9z"/></svg>
+                <span>Share Screen</span>
+            </button>
             <button class="btn btn-primary" id="inviteBtn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/></svg>
                 Invite
@@ -122,6 +127,12 @@
                 Leave
             </button>
         </div>
+    </div>
+    <!-- NEW: Screen Share Display Panel -->
+    <div id="screen-share-panel" class="panel grid-col-span-2" style="display: none;">
+        <div class="panel-header"><h3>Screen Share</h3></div>
+        <!-- The 'muted' attribute is important to avoid audio feedback loops if sharing a tab with audio -->
+        <video id="remote-video" autoplay playsinline muted style="width: 100%; border-radius: 8px; background: #000;"></video>
     </div>
     <div class="dashboard-grid">
         <div class="panel drop-zone">
