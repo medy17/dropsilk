@@ -3092,3 +3092,15 @@ input[type=range].volume-slider::-moz-range-thumb {
     width: 18px;
     height: 18px;
 }
+@media (max-width: 456px) {
+    .flight-actions .btn span {
+        display: none;
+    }
+
+    .flight-actions .btn {
+        width: 44px; /* A standard, touch-friendly size */
+        height: 44px;
+        padding: 0;
+        justify-content: center;
+    }
+}
