@@ -113,8 +113,7 @@
             <div class="flight-info__status" id="dashboard-flight-status">Ready to connect</div>
         </div>
         <div class="flight-actions">
-            <!-- NEW: Screen Share Button -->
-            <button class="btn btn-primary" id="shareScreenBtn" style="display: none;" title="Share your screen with the connected peer">
+            <button class="btn btn-primary hidden" id="shareScreenBtn" title="Share your screen with the connected peer">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12H4v2h8v-2h2.5A1.5 1.5 0 0 0 16 10.5v-9A1.5 1.5 0 0 0 14.5 0h-13zM15 10.5a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v9z"/></svg>
                 <span>Share Screen</span>
             </button>
@@ -128,11 +127,10 @@
             </button>
         </div>
     </div>
-    <!-- NEW: Screen Share Display Panel -->
-    <div id="screen-share-panel" class="panel grid-col-span-2" style="display: none;">
+    <div id="screen-share-panel" class="panel grid-col-span-2 hidden">
         <div class="panel-header"><h3>Screen Share</h3></div>
         <!-- The 'muted' attribute is important to avoid audio feedback loops if sharing a tab with audio -->
-        <video id="remote-video" autoplay playsinline muted style="width: 100%; border-radius: 8px; background: #000;"></video>
+        <video id="remote-video" autoplay playsinline muted></video>
     </div>
     <div class="dashboard-grid">
         <div class="panel drop-zone">
@@ -220,7 +218,6 @@
         </div>
     </div>
 </div>
-
 <div class="boarding-overlay" id="boarding-overlay">
     <div class="boarding-content">
         <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>

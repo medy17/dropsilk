@@ -187,7 +187,7 @@ export function showScreenShareView(stream) {
     const video = document.getElementById('remote-video');
     if (panel && video) {
         video.srcObject = stream;
-        panel.style.display = 'block';
+        panel.classList.remove('hidden');
 
         // When the remote user stops sharing, their track will end.
         stream.getVideoTracks()[0].onended = () => {
@@ -203,14 +203,14 @@ export function hideScreenShareView() {
     const video = document.getElementById('remote-video');
     if (panel && video) {
         video.srcObject = null;
-        panel.style.display = 'none';
+        panel.classList.add('hidden');
     }
 }
 
 export function updateShareButton(isSharing) {
     const btn = document.getElementById('shareScreenBtn');
     if (!btn) return;
-    btn.style.display = 'inline-flex'; // Make it visible once a peer connects
+    btn.classList.remove('hidden'); // Make it visible once a peer connects
     const span = btn.querySelector('span');
     if (isSharing) {
         btn.classList.add('is-sharing', 'btn-secondary');
