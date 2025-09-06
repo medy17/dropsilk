@@ -41,11 +41,10 @@ export const previewConfig = {
     pptx: {
         extensions: ['pptx'],
         dependencies: [
-            'https://cdn.jsdelivr.net/npm/pptx2html@0.1.3/dist/pptx2html.bundle.js'
+            // Using the exact, confirmed working URL you found.
+            'https://cdn.jsdelivr.net/npm/pptx2html@0.3.4/dist/pptx2html.min.js'
         ],
-        stylesheets: [
-            'https://cdn.jsdelivr.net/npm/pptx2html@0.1.3/dist/pptx2html.css'
-        ],
+        // The library injects its own styles, so we remove the stylesheet link.
         handler: () => import('./handlers/pptxPreview.js'),
     },
     // handler for XLSX
