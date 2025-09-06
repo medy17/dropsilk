@@ -101,9 +101,11 @@ export async function showPreview(fileName) {
     document.getElementById('openPreviewModal').click(); // Use the hidden trigger
 
     try {
-        // 2. Load dependencies
+        // 2. Load dependencies SEQUENTIALLY to respect order (e.g., jQuery before pptxjs)
         if (config.dependencies) {
-            await Promise.all(config.dependencies.map(loadScript));
+            for (const url of config.dependencies) {
+                await loadScript(url);
+            }
         }
         if (config.stylesheets) {
             config.stylesheets.forEach(loadStylesheet);
