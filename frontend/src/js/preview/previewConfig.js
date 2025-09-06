@@ -41,10 +41,12 @@ export const previewConfig = {
     pptx: {
         extensions: ['pptx'],
         dependencies: [
-            // Using the exact, confirmed working URL you found.
+            // 1. Load jQuery FIRST. This is the crucial step.
+            'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js',
+            // 2. Load the main pptx2html library SECOND.
             'https://cdn.jsdelivr.net/npm/pptx2html@0.3.4/dist/pptx2html.min.js'
         ],
-        // The library injects its own styles, so we remove the stylesheet link.
+        // No stylesheet needed
         handler: () => import('./handlers/pptxPreview.js'),
     },
     // handler for XLSX

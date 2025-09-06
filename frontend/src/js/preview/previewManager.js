@@ -93,30 +93,27 @@ export async function showPreview(fileName) {
         return;
     }
 
-    // 1. Open modal and show loading state
     previewHeader.textContent = file.name;
     previewLoader.style.display = 'flex';
-    previewContent.innerHTML = ''; // Ensure it's clean before loading
+    previewContent.innerHTML = '';
     previewContent.style.display = 'none';
-    document.getElementById('openPreviewModal').click(); // Use the hidden trigger
+    document.getElementById('openPreviewModal').click();
 
     try {
-        // 2. Load dependencies SEQUENTIALLY to respect order (e.g., jQuery before pptxjs)
+        // CRITICAL: Load dependencies SEQUENTIALLY to guarantee jQuery is ready before pptx2html
         if (config.dependencies) {
             for (const url of config.dependencies) {
-                await loadScript(url);
+                await loadScript(url); // Using the sequential loop
             }
         }
         if (config.stylesheets) {
             config.stylesheets.forEach(loadStylesheet);
         }
 
-        // 3. Dynamically import, store, and execute the handler
         const handlerModule = await config.handler();
-        currentHandlerModule = handlerModule; // Store for cleanup
+        currentHandlerModule = handlerModule;
         await handlerModule.default(file.blob, previewContent);
 
-        // 4. Hide loader and show content
         previewLoader.style.display = 'none';
         previewContent.style.display = 'block';
 
@@ -125,6 +122,6 @@ export async function showPreview(fileName) {
         previewContent.innerHTML = `<div class="empty-state">Preview failed: ${error.message}</div>`;
         previewLoader.style.display = 'none';
         previewContent.style.display = 'block';
-        currentHandlerModule = null; // Clear handler on error
+        currentHandlerModule = null;
     }
 }
