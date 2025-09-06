@@ -54,7 +54,7 @@ export function initializePeerConnection(isOfferer) {
             .then(offer => peerConnection.setLocalDescription(offer))
             .then(() => sendMessage({ type: "signal", data: { sdp: peerConnection.localDescription } }));
     } else {
-        peerConnection.ondatachanel = (event) => {
+        peerConnection.ondatachannel = (event) => {
             dataChannel = event.channel;
             setupDataChannel();
         };
