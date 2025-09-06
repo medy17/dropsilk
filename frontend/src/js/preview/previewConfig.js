@@ -37,16 +37,27 @@ export const previewConfig = {
         dependencies: ['https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.7.0/mammoth.browser.min.js'],
         handler: () => import('./handlers/docxPreview.js'),
     },
-    // handler for PPTX
+    // handler for PPTX - FIXED VERSION
     pptx: {
         extensions: ['pptx'],
         dependencies: [
-            // 1. Load jQuery FIRST. This is the crucial step.
-            'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js',
-            // 2. Load the main pptx2html library SECOND.
+            // 1. Load a stable jQuery version that's compatible with pptx2html
+            'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js',
+            // 2. Load the main pptx2html library SECOND
             'https://cdn.jsdelivr.net/npm/pptx2html@0.3.4/dist/pptx2html.min.js'
         ],
-        // No stylesheet needed
+        // Add initialization function to verify jQuery is ready
+        init: async () => {
+            // Wait for jQuery to be fully available
+            let retries = 0;
+            while ((!window.jQuery || !window.$) && retries < 10) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+            if (!window.jQuery || !window.$) {
+                throw new Error('jQuery failed to load properly');
+            }
+        },
         handler: () => import('./handlers/pptxPreview.js'),
     },
     // handler for XLSX

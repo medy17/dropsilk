@@ -20,7 +20,15 @@ function loadScript(url) {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = url;
-        script.onload = () => { loadedResources.add(url); resolve(); };
+        script.onload = () => {
+            loadedResources.add(url);
+            // Add extra wait time for jQuery specifically
+            if (url.includes('jquery')) {
+                setTimeout(resolve, 200); // Give jQuery extra time to initialize
+            } else {
+                resolve();
+            }
+        };
         script.onerror = reject;
         document.body.appendChild(script);
     });
@@ -106,6 +114,12 @@ export async function showPreview(fileName) {
                 await loadScript(url); // Using the sequential loop
             }
         }
+
+        // Run any custom initialization for this config
+        if (config.init && typeof config.init === 'function') {
+            await config.init();
+        }
+
         if (config.stylesheets) {
             config.stylesheets.forEach(loadStylesheet);
         }
