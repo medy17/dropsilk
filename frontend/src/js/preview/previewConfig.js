@@ -41,10 +41,11 @@ export const previewConfig = {
     pptx: {
         extensions: ['pptx'],
         dependencies: [
-            'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js', // pptxjs dependency
-            'https://unpkg.com/pptxjs@3.1.2/dist/pptxjs.min.js'
+            'https://cdn.jsdelivr.net/npm/pptx2html@0.1.3/dist/pptx2html.bundle.js'
         ],
-        stylesheets: ['https://unpkg.com/pptxjs@3.1.2/dist/pptxjs.css'],
+        stylesheets: [
+            'https://cdn.jsdelivr.net/npm/pptx2html@0.1.3/dist/pptx2html.css'
+        ],
         handler: () => import('./handlers/pptxPreview.js'),
     },
     // handler for XLSX
