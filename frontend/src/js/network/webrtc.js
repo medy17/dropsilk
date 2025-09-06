@@ -4,13 +4,25 @@
 import { ICE_SERVERS } from '../config.js';
 import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
-import { enableDropZone, updateDashboardStatus, disableDropZone, renderNetworkUsersView, showScreenShareView, hideScreenShareView, updateShareButton } from '../ui/view.js';
+import { enableDropZone, updateDashboardStatus, disableDropZone, renderNetworkUsersView, showRemoteStreamView, hideRemoteStreamView, showLocalStreamView, hideLocalStreamView, updateShareButton } from '../ui/view.js';
 import { handleDataChannelMessage, ensureQueueIsActive, drainQueue } from '../transfer/fileHandler.js';
 
 let peerConnection;
 let dataChannel;
 let localScreenStream = null;
 let screenTrackSender = null;
+
+/**
+ * Checks if the browser is Safari on a mobile device (iOS).
+ * @returns {boolean} True if it's mobile Safari, false otherwise.
+ */
+function isSafariMobile() {
+    const ua = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+    return isIOS && isSafari;
+}
+
 
 export function initializePeerConnection(isOfferer) {
     if (peerConnection) return;
@@ -35,8 +47,7 @@ export function initializePeerConnection(isOfferer) {
 
     peerConnection.ontrack = (event) => {
         console.log("Received remote track:", event.track.kind);
-        // The first (and only) stream associated with the track is the one we want.
-        showScreenShareView(event.streams[0]);
+        showRemoteStreamView(event.streams[0]);
     };
 
     if (isOfferer) {
@@ -78,8 +89,16 @@ function setupDataChannel() {
     dataChannel.onopen = () => {
         console.log("Data channel opened!");
         enableDropZone();
-        // Also enable the screen share button now that the connection is open
-        updateShareButton(false);
+
+        // Check for screen share capability
+        const shareScreenBtn = document.getElementById('shareScreenBtn');
+        if (!navigator.mediaDevices?.getDisplayMedia || isSafariMobile()) {
+            shareScreenBtn.classList.add('hidden');
+            shareScreenBtn.title = "Screen sharing is not supported on your browser or device.";
+        } else {
+            // Enable the screen share button now that the connection is open
+            updateShareButton(false);
+        }
 
         // When the connection is ready, ensure the queue manager runs.
         ensureQueueIsActive();
@@ -113,7 +132,7 @@ export function resetPeerConnectionState() {
         peerConnection = null;
     }
     stopScreenShare(false); // Stop sharing without notifying peer (connection is already down)
-    hideScreenShareView();
+    hideRemoteStreamView();
     const { metricsInterval } = store.getState();
     if (metricsInterval) clearInterval(metricsInterval);
     dataChannel = null;
@@ -134,13 +153,45 @@ export function getBufferedAmount() {
     return dataChannel ? dataChannel.bufferedAmount : 0;
 }
 
+async function handleQualityChange(preset, track) {
+    if (!track) return;
+    console.log(`Changing stream quality to: ${preset}`);
+
+    let constraints = {};
+    switch (preset) {
+        case 'smoothness':
+            constraints = { frameRate: 30, height: 720 };
+            break;
+        case 'performance':
+            constraints = { frameRate: 15, height: 480 };
+            break;
+        case 'clarity': // Default
+        default:
+            constraints = { frameRate: 15, height: 1080 }; // Higher resolution, lower frame rate
+            break;
+    }
+
+    try {
+        await track.applyConstraints(constraints);
+        // Renegotiation might be triggered automatically by the browser
+    } catch (err) {
+        console.error("Error applying constraints:", err);
+    }
+}
+
+
 export async function startScreenShare() {
     if (localScreenStream) return;
 
     try {
         localScreenStream = await navigator.mediaDevices.getDisplayMedia({
-            video: { cursor: "always" },
-            audio: false // Stick to video-only for simplicity
+            video: {
+                cursor: "always",
+                // Start with a reasonable default
+                height: 1080,
+                frameRate: 15
+            },
+            audio: false
         });
 
         const videoTrack = localScreenStream.getVideoTracks()[0];
@@ -152,12 +203,10 @@ export async function startScreenShare() {
         await peerConnection.setLocalDescription(offer);
         sendMessage({ type: "signal", data: { sdp: peerConnection.localDescription } });
 
-        updateShareButton(true); // Update UI to "Stop Sharing"
+        showLocalStreamView(localScreenStream, (preset) => handleQualityChange(preset, videoTrack));
+        updateShareButton(true);
 
-        // Listen for when the user clicks the browser's native "Stop sharing" button
-        videoTrack.onended = () => {
-            stopScreenShare(true);
-        };
+        videoTrack.onended = () => stopScreenShare(true);
 
     } catch (err) {
         console.error("Error starting screen share:", err);
@@ -170,9 +219,9 @@ export function stopScreenShare(notifyPeer = true) {
         localScreenStream.getTracks().forEach(track => track.stop());
         if (screenTrackSender) {
             peerConnection.removeTrack(screenTrackSender);
-            // Removing a track also requires renegotiation
         }
     }
+    hideLocalStreamView();
     localScreenStream = null;
     screenTrackSender = null;
     updateShareButton(false);

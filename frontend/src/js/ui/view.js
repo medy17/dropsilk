@@ -182,26 +182,85 @@ export function enableDropZone() {
     uiElements.dropZoneSecondaryText.textContent = 'or select manually';
 }
 
-export function showScreenShareView(stream) {
-    const panel = document.getElementById('screen-share-panel');
-    const video = document.getElementById('remote-video');
+// --- NEW/MODIFIED SCREEN SHARE VIEW FUNCTIONS ---
+
+export function showLocalStreamView(stream, qualityChangeCallback) {
+    const panel = document.getElementById('local-stream-panel');
+    const video = document.getElementById('local-video');
+    const settingsMenu = panel.querySelector('.stream-settings-menu');
+    const settingsBtn = panel.querySelector('.stream-settings-btn');
+
     if (panel && video) {
         video.srcObject = stream;
         panel.classList.remove('hidden');
 
-        // When the remote user stops sharing, their track will end.
-        stream.getVideoTracks()[0].onended = () => {
-            hideScreenShareView();
+        // Setup quality settings listeners
+        settingsMenu.onclick = (e) => {
+            const button = e.target.closest('button');
+            if (button && button.dataset.quality) {
+                qualityChangeCallback(button.dataset.quality);
+                settingsMenu.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                settingsMenu.style.display = 'none'; // Close menu
+            }
+        };
+
+        // Toggle menu visibility
+        settingsBtn.onclick = (e) => {
+            e.stopPropagation();
+            const isVisible = settingsMenu.style.display === 'block';
+            settingsMenu.style.display = isVisible ? 'none' : 'block';
+            if (!isVisible) {
+                document.addEventListener('click', () => {
+                    settingsMenu.style.display = 'none';
+                }, { once: true });
+            }
         };
 
         panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
-export function hideScreenShareView() {
+export function hideLocalStreamView() {
+    const panel = document.getElementById('local-stream-panel');
+    const video = document.getElementById('local-video');
+    if (panel && video) {
+        video.srcObject = null;
+        panel.classList.add('hidden');
+    }
+}
+
+export function showRemoteStreamView(stream) {
+    const panel = document.getElementById('screen-share-panel');
+    const video = document.getElementById('remote-video');
+    const fullscreenBtn = document.getElementById('fullscreen-stream-btn');
+
+    if (panel && video) {
+        video.srcObject = stream;
+        panel.classList.remove('hidden');
+
+        fullscreenBtn.onclick = () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                panel.requestFullscreen().catch(err => console.error(err));
+            }
+        };
+        video.ondblclick = () => fullscreenBtn.click();
+
+        stream.getVideoTracks()[0].onended = () => hideRemoteStreamView();
+
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+export function hideRemoteStreamView() {
     const panel = document.getElementById('screen-share-panel');
     const video = document.getElementById('remote-video');
     if (panel && video) {
+        if (document.fullscreenElement === panel) {
+            document.exitFullscreen();
+        }
         video.srcObject = null;
         panel.classList.add('hidden');
     }
@@ -211,15 +270,18 @@ export function updateShareButton(isSharing) {
     const btn = document.getElementById('shareScreenBtn');
     if (!btn) return;
 
-    btn.classList.remove('hidden'); // Make button visible
+    btn.classList.remove('hidden');
 
-    // Toggle the 'is-sharing' class which controls the icon and color via CSS
+    const textSpan = btn.querySelector('span:last-of-type');
     if (isSharing) {
         btn.classList.add('is-sharing');
+        if (textSpan) textSpan.textContent = btn.dataset.textStop;
     } else {
         btn.classList.remove('is-sharing');
+        if (textSpan) textSpan.textContent = btn.dataset.textStart;
     }
 }
+// --- END NEW SCREEN SHARE ---
 
 export function updateReceiverActions() {
     const { receivedFiles } = store.getState();
@@ -246,7 +308,6 @@ export function checkQueueOverflow(queueId) {
     const queueDiv = document.getElementById(queueId);
     if (!queueDiv) return;
 
-    // We count .queue-item specifically, to ignore the expand button if it exists
     const itemCount = queueDiv.querySelectorAll('.queue-item').length;
     const isCollapsible = itemCount > 4;
 
@@ -264,7 +325,7 @@ export function checkQueueOverflow(queueId) {
 
             btn.onclick = () => {
                 queueDiv.classList.remove('queue-collapsible');
-                queueDiv.classList.add('expanded'); // Mark as permanently expanded for this session
+                queueDiv.classList.add('expanded');
                 btn.remove();
             };
             const panel = queueDiv.parentElement;

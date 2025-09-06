@@ -3068,7 +3068,12 @@ input[type=range].volume-slider::-moz-range-thumb {
     display: none !important;
 }
 
-#remote-video {
+/* --- Stream Panel Styles --- */
+.stream-panel {
+    position: relative;
+}
+
+#remote-video, #local-video {
     width: 100%;
     border-radius: 8px;
     background: #000;
@@ -3076,21 +3081,92 @@ input[type=range].volume-slider::-moz-range-thumb {
     object-fit: contain;
 }
 
+.stream-controls {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    display: flex;
+    gap: .5rem;
+}
+
+.stream-controls .btn-icon {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    justify-content: center;
+    background: rgba(24, 24, 27, 0.5);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--brilliant-white);
+}
+
+.stream-controls .btn-icon:hover {
+    background: rgba(24, 24, 27, 0.7);
+    color: var(--c-primary);
+    transform: scale(1.1);
+}
+
+.stream-settings-menu {
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 0;
+    background: var(--c-panel-bg);
+    border-radius: 8px;
+    padding: .5rem;
+    border: 1px solid var(--c-panel-border);
+    box-shadow: var(--c-panel-shadow);
+    display: none;
+    width: 150px;
+    z-index: 20;
+}
+
+.stream-settings-menu button {
+    width: 100%;
+    text-align: left;
+    padding: .5rem .75rem;
+    border-radius: 4px;
+    font-size: .9rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--c-text-primary);
+    display: block;
+}
+
+.stream-settings-menu button:hover {
+    background-color: var(--c-primary);
+    color: var(--brilliant-white);
+}
+
+.stream-settings-menu button.active {
+    background-color: var(--c-secondary);
+    color: var(--brilliant-white);
+    font-weight: 600;
+}
+
+
+/* --- Flight Actions & Share Button --- */
 .flight-actions {
     display: flex;
-    gap: .8rem;
+    gap: .5rem;
+    align-items: center;
 }
 
 .flight-actions .btn {
     padding: .7em 1.2em;
     font-size: .85em;
     flex-shrink: 0;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .flight-actions .btn svg {
     width: 18px;
     height: 18px;
+    flex-shrink: 0; /* Prevents icon from shrinking */
 }
+
 #shareScreenBtn.is-sharing {
     background: var(--c-btn-secondary-bg);
     border-color: var(--c-secondary);
@@ -3103,25 +3179,42 @@ input[type=range].volume-slider::-moz-range-thumb {
     border-color: var(--c-primary);
 }
 
-/* Hide the empty box path when sharing */
-#shareScreenBtn.is-sharing .toggle-icon .unchecked {
+#shareScreenBtn .icon-stop {
     display: none;
 }
 
-/* Show the checked box path when sharing */
-#shareScreenBtn.is-sharing .toggle-icon .checked {
+#shareScreenBtn.is-sharing .icon-start {
+    display: none;
+}
+
+#shareScreenBtn.is-sharing .icon-stop {
     display: block;
 }
 
-@media (max-width: 456px) {
-    .flight-actions .btn span {
-        display: none;
-    }
-
+/* --- Responsive Hover Effect for Flight Actions --- */
+@media (max-width: 550px) {
     .flight-actions .btn {
         width: 44px; /* A standard, touch-friendly size */
         height: 44px;
         padding: 0;
         justify-content: center;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .flight-actions .btn span:last-of-type {
+        max-width: 0;
+        opacity: 0;
+        transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.1s, opacity 0.2s ease 0.1s;
+    }
+
+    /* On desktop, this won't trigger. On mobile, the :hover allows the container to control children */
+    .flight-actions:hover .btn:hover {
+        width: auto; /* Let content define the width */
+        padding: 0 1.2em; /* Restore horizontal padding */
+    }
+
+    .flight-actions:hover .btn:hover span:last-of-type {
+        max-width: 150px; /* An arbitrary large value to allow text to show */
+        opacity: 1;
     }
 }

@@ -113,13 +113,17 @@
             <div class="flight-info__status" id="dashboard-flight-status">Ready to connect</div>
         </div>
         <div class="flight-actions">
-            <button class="btn btn-primary hidden" id="shareScreenBtn" title="Share your screen with the connected peer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12H4v2h8v-2h2.5A1.5 1.5 0 0 0 16 10.5v-9A1.5 1.5 0 0 0 14.5 0h-13zM15 10.5a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v9z"/></svg>
+            <button class="btn btn-primary hidden" id="shareScreenBtn" title="Share your screen with the connected peer" data-text-start="Share Screen" data-text-stop="Stop Sharing">
+                 <span class="icon-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12H4v2h8v-2h2.5A1.5 1.5 0 0 0 16 10.5v-9A1.5 1.5 0 0 0 14.5 0h-13zM15 10.5a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v9z"/></svg>
+                 </span>
+                <span class="icon-stop">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12H4v2h8v-2h2.5A1.5 1.5 0 0 0 16 10.5v-9A1.5 1.5 0 0 0 14.5 0h-13zm13 1.5a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+                 </span>
                 <span>Share Screen</span>
             </button>
             <button class="btn btn-primary" id="inviteBtn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/></svg>
-                <!-- THIS SPAN IS CRITICAL -->
                 <span>Invite</span>
             </button>
             <button class="btn btn-secondary" id="leaveFlightBtnDashboard">
@@ -128,9 +132,36 @@
             </button>
         </div>
     </div>
-    <div id="screen-share-panel" class="panel grid-col-span-2 hidden">
-        <div class="panel-header"><h3>Screen Share</h3></div>
-        <video id="remote-video" autoplay playsinline muted></video>
+    <!-- Local Stream Panel (for the sharer) -->
+    <div id="local-stream-panel" class="panel stream-panel grid-col-span-2 hidden">
+        <div class="panel-header">
+            <h3>Your Stream Preview</h3>
+            <div class="stream-controls">
+                <div class="settings-menu-container">
+                    <button class="btn btn-icon stream-settings-btn" title="Stream Quality">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311a1.464 1.464 0 0 1-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413-1.4-2.397 0-2.81l.34-.1a1.464 1.464 0 0 1 .872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.858 2.929 2.929 0 0 1 0 5.858z"/></svg>
+                    </button>
+                    <div class="stream-settings-menu">
+                        <button data-quality="clarity" class="active">Clarity (Default)</button>
+                        <button data-quality="smoothness">Smoothness</button>
+                        <button data-quality="performance">Performance</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <video id="local-video" autoplay playsinline muted></video>
+    </div>
+    <!-- Remote Stream Panel (for the viewer) -->
+    <div id="screen-share-panel" class="panel stream-panel grid-col-span-2 hidden">
+        <div class="panel-header">
+            <h3>Screen Share</h3>
+            <div class="stream-controls">
+                <button id="fullscreen-stream-btn" class="btn btn-icon" title="Toggle Fullscreen">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/></svg>
+                </button>
+            </div>
+        </div>
+        <video id="remote-video" autoplay playsinline></video>
     </div>
     <div class="dashboard-grid">
         <div class="panel drop-zone">
@@ -139,7 +170,6 @@
             <span class="secondary-text">or select manually</span>
             <div class="drop-zone__buttons">
                 <label for="fileInput_transfer" class="btn btn-primary">
-                    <!-- On-brand SVG -->
                     <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
                         <rect x="4" y="4" width="12" height="12" rx="2" fill="#e3f7fd" stroke="var(--c-primary)"/>
                         <path d="M10 8v4M8 10h4" stroke="var(--c-primary)" stroke-width="1.5" stroke-linecap="round"/>
@@ -147,7 +177,6 @@
                     Select Files
                 </label>
                 <button class="btn btn-secondary">
-                    <!-- On-brand SVG -->
                     <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
                         <rect x="3" y="7" width="14" height="8" rx="2" fill="#fffaf7" stroke="var(--c-secondary)"/>
                         <path d="M3 7V6a2 2 0 0 1 2-2h3l2 2h5a2 2 0 0 1 2 2v1" stroke="var(--c-secondary)" stroke-width="1.5" fill="none"/>
@@ -157,7 +186,6 @@
             </div>
             <input type="file" id="fileInput_transfer" style="display: none;" multiple />
         </div>
-        <!-- MODIFIED: This panel is now dynamic -->
         <div class="panel">
             <div class="panel-header"><h3 id="connection-panel-title">Users on Your Network</h3></div>
             <div id="connection-panel-list">
@@ -184,7 +212,6 @@
             <ul class="metrics-list">
                 <li>
         <span class="icon">
-            <!-- Up Arrow SVG -->
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M10 17V3M10 3L4 9M10 3l6 6"/>
             </svg>
@@ -193,7 +220,6 @@
                 </li>
                 <li>
         <span class="icon">
-            <!-- Down Arrow SVG -->
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M10 3v14M10 17l6-6M10 17l-6-6"/>
             </svg>
@@ -202,7 +228,6 @@
                 </li>
                 <li>
         <span class="icon">
-            <!-- Lightning SVG -->
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
                 <polygon points="10 2 4 12 9 12 8 18 16 8 11 8 12 2"/>
             </svg>
