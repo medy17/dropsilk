@@ -3029,27 +3029,115 @@ input[type=range].volume-slider::-moz-range-thumb {
 }
 
 /* === PPTX Preview Styles === */
-.pptx-render-target { /* <--- Change to a class selector */
+.pptx-render-target {
     width: 100%;
     height: 100%;
+    padding: 20px;
+    overflow-y: auto;
 }
-.pptx-wrapper {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--c-panel-border);
-    margin: 0 auto 1.5rem auto;
-}
-body[data-theme="dark"] .pptx-wrapper {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.15);
-}
+
 .slide {
+    background: white;
+    border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border: 1px solid var(--c-panel-border);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    min-height: 400px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
+
 body[data-theme="dark"] .slide {
+    background: #2d3748;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     border-color: rgba(255, 255, 255, 0.15);
+}
+
+.slide-header {
+    background: #f7fafc;
+    border-bottom: 1px solid var(--c-panel-border);
+    padding: 12px 20px;
+}
+
+body[data-theme="dark"] .slide-header {
+    background: #1a202c;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.slide-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--c-text-primary);
+}
+
+.slide-content {
+    padding: 20px;
+}
+
+.slide-preview {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.slide-preview > p:first-child {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #4a5568;
+}
+
+body[data-theme="dark"] .slide-preview > p:first-child {
+    color: #a0aec0;
+}
+
+.slide-text-content {
+    background: #f9f9f9;
+    border-radius: 6px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+    min-height: 60px;
+}
+
+body[data-theme="dark"] .slide-text-content {
+    background: #374151;
+}
+
+.slide-text-content p {
+    margin: 8px 0;
+    line-height: 1.6;
+    color: var(--c-text-primary);
+}
+
+.slide-text-content:empty::after {
+    content: "No text content found";
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.slide-images {
+    margin-top: 20px;
+}
+
+.slide-images img {
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="dark"] .slide-images img {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Empty state when no slides are found */
+.pptx-render-target:empty::after {
+    content: "No slides found in this presentation";
+    display: block;
+    text-align: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+    font-style: italic;
 }
 
 

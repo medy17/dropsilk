@@ -41,23 +41,9 @@ export const previewConfig = {
     pptx: {
         extensions: ['pptx'],
         dependencies: [
-            // 1. Load a stable jQuery version that's compatible with pptx2html
-            'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js',
-            // 2. Load the main pptx2html library SECOND
-            'https://cdn.jsdelivr.net/npm/pptx2html@0.3.4/dist/pptx2html.min.js'
+            // Use JSZip for PPTX parsing - much more reliable
+            'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'
         ],
-        // Add initialization function to verify jQuery is ready
-        init: async () => {
-            // Wait for jQuery to be fully available
-            let retries = 0;
-            while ((!window.jQuery || !window.$) && retries < 10) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                retries++;
-            }
-            if (!window.jQuery || !window.$) {
-                throw new Error('jQuery failed to load properly');
-            }
-        },
         handler: () => import('./handlers/pptxPreview.js'),
     },
     // handler for XLSX
