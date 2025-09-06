@@ -13,14 +13,11 @@ let localScreenStream = null;
 let screenTrackSender = null;
 
 /**
- * Checks if the browser is Safari on a mobile device (iOS).
- * @returns {boolean} True if it's mobile Safari, false otherwise.
+ * Checks if the current device is a mobile device based on user agent.
+ * @returns {boolean} True if it's a mobile device, false otherwise.
  */
-function isSafariMobile() {
-    const ua = navigator.userAgent;
-    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
-    return isIOS && isSafari;
+function isMobile() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
 
@@ -57,7 +54,7 @@ export function initializePeerConnection(isOfferer) {
             .then(offer => peerConnection.setLocalDescription(offer))
             .then(() => sendMessage({ type: "signal", data: { sdp: peerConnection.localDescription } }));
     } else {
-        peerConnection.ondatachannel = (event) => {
+        peerConnection.ondatachanel = (event) => {
             dataChannel = event.channel;
             setupDataChannel();
         };
@@ -90,10 +87,11 @@ function setupDataChannel() {
         console.log("Data channel opened!");
         enableDropZone();
 
+        // Disable screen sharing entirely on mobile devices
         const shareScreenBtn = document.getElementById('shareScreenBtn');
-        if (!navigator.mediaDevices?.getDisplayMedia || isSafariMobile()) {
+        if (isMobile() || !navigator.mediaDevices?.getDisplayMedia) {
             shareScreenBtn.disabled = true;
-            shareScreenBtn.title = "Screen sharing is not supported on your browser or device.";
+            shareScreenBtn.title = "Screen sharing is not supported on mobile devices.";
         } else {
             updateShareButton(false);
         }
@@ -200,6 +198,7 @@ export function stopScreenShare(notifyPeer = true) {
             peerConnection.removeTrack(screenTrackSender);
         }
         if (notifyPeer) {
+            // Explicitly tell the other peer the stream has ended
             sendData(JSON.stringify({ type: 'stream-ended' }));
         }
     }
