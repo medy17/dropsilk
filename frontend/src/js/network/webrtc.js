@@ -90,17 +90,14 @@ function setupDataChannel() {
         console.log("Data channel opened!");
         enableDropZone();
 
-        // Check for screen share capability
         const shareScreenBtn = document.getElementById('shareScreenBtn');
         if (!navigator.mediaDevices?.getDisplayMedia || isSafariMobile()) {
-            shareScreenBtn.classList.add('hidden');
+            shareScreenBtn.disabled = true;
             shareScreenBtn.title = "Screen sharing is not supported on your browser or device.";
         } else {
-            // Enable the screen share button now that the connection is open
             updateShareButton(false);
         }
 
-        // When the connection is ready, ensure the queue manager runs.
         ensureQueueIsActive();
 
         const { metricsInterval } = store.getState();
@@ -120,9 +117,7 @@ function setupDataChannel() {
     };
 
     dataChannel.onerror = (error) => console.error("Data channel error:", error);
-
     dataChannel.onbufferedamountlow = () => drainQueue();
-
     dataChannel.onmessage = (event) => handleDataChannelMessage(event);
 }
 
@@ -131,7 +126,7 @@ export function resetPeerConnectionState() {
         peerConnection.close();
         peerConnection = null;
     }
-    stopScreenShare(false); // Stop sharing without notifying peer (connection is already down)
+    stopScreenShare(false);
     hideRemoteStreamView();
     const { metricsInterval } = store.getState();
     if (metricsInterval) clearInterval(metricsInterval);
@@ -159,46 +154,30 @@ async function handleQualityChange(preset, track) {
 
     let constraints = {};
     switch (preset) {
-        case 'smoothness':
-            constraints = { frameRate: 30, height: 720 };
-            break;
-        case 'performance':
-            constraints = { frameRate: 15, height: 480 };
-            break;
-        case 'clarity': // Default
-        default:
-            constraints = { frameRate: 15, height: 1080 }; // Higher resolution, lower frame rate
-            break;
+        case 'smoothness': constraints = { frameRate: 30, height: 720 }; break;
+        case 'performance': constraints = { frameRate: 15, height: 480 }; break;
+        case 'clarity': default: constraints = { frameRate: 15, height: 1080 }; break;
     }
 
     try {
         await track.applyConstraints(constraints);
-        // Renegotiation might be triggered automatically by the browser
     } catch (err) {
         console.error("Error applying constraints:", err);
     }
 }
-
 
 export async function startScreenShare() {
     if (localScreenStream) return;
 
     try {
         localScreenStream = await navigator.mediaDevices.getDisplayMedia({
-            video: {
-                cursor: "always",
-                // Start with a reasonable default
-                height: 1080,
-                frameRate: 15
-            },
+            video: { cursor: "always", height: 1080, frameRate: 15 },
             audio: false
         });
 
         const videoTrack = localScreenStream.getVideoTracks()[0];
         screenTrackSender = peerConnection.addTrack(videoTrack, localScreenStream);
 
-        // The 'negotiationneeded' event will fire, and we can send a new offer.
-        // To be more explicit and immediate, we can create an offer here.
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
         sendMessage({ type: "signal", data: { sdp: peerConnection.localDescription } });
@@ -219,6 +198,9 @@ export function stopScreenShare(notifyPeer = true) {
         localScreenStream.getTracks().forEach(track => track.stop());
         if (screenTrackSender) {
             peerConnection.removeTrack(screenTrackSender);
+        }
+        if (notifyPeer) {
+            sendData(JSON.stringify({ type: 'stream-ended' }));
         }
     }
     hideLocalStreamView();

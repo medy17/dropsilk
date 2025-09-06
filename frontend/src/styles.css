@@ -3097,6 +3097,7 @@ input[type=range].volume-slider::-moz-range-thumb {
     justify-content: center;
     background: rgba(24, 24, 27, 0.5);
     backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--brilliant-white);
 }
@@ -3107,18 +3108,28 @@ input[type=range].volume-slider::-moz-range-thumb {
     transform: scale(1.1);
 }
 
+/* Polished Quality Menu */
 .stream-settings-menu {
     position: absolute;
     top: calc(100% + 5px);
     right: 0;
-    background: var(--c-panel-bg);
+    background: rgba(24, 24, 27, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-radius: 8px;
     padding: .5rem;
-    border: 1px solid var(--c-panel-border);
-    box-shadow: var(--c-panel-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     display: none;
-    width: 150px;
+    width: 160px;
     z-index: 20;
+    transform-origin: top right;
+    animation: scale-in 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes scale-in {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
 .stream-settings-menu button {
@@ -3130,8 +3141,11 @@ input[type=range].volume-slider::-moz-range-thumb {
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--c-text-primary);
-    display: block;
+    color: var(--brilliant-white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 .stream-settings-menu button:hover {
@@ -3145,6 +3159,31 @@ input[type=range].volume-slider::-moz-range-thumb {
     font-weight: 600;
 }
 
+.stream-settings-menu button.active::after {
+    content: '✔';
+    font-size: .8em;
+}
+
+
+/* --- Immersive Fullscreen --- */
+#screen-share-panel:fullscreen {
+    background-color: #000;
+    border: none;
+    padding: 0;
+}
+#screen-share-panel:fullscreen #remote-video {
+    border-radius: 0;
+}
+
+#screen-share-panel.is-fullscreen .fullscreen-btn .icon-enter-fs {
+    display: none;
+}
+#screen-share-panel.is-fullscreen .fullscreen-btn .icon-exit-fs {
+    display: block;
+}
+.fullscreen-btn .icon-exit-fs {
+    display: none;
+}
 
 /* --- Flight Actions & Share Button --- */
 .flight-actions {
@@ -3161,10 +3200,24 @@ input[type=range].volume-slider::-moz-range-thumb {
     white-space: nowrap;
 }
 
+.flight-actions .btn:disabled {
+    cursor: not-allowed;
+    opacity: .6;
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-text-secondary);
+    color: var(--c-text-secondary);
+    box-shadow: none;
+    transform: none;
+}
+.flight-actions .btn:disabled:hover {
+    transform: none;
+}
+
+
 .flight-actions .btn svg {
     width: 18px;
     height: 18px;
-    flex-shrink: 0; /* Prevents icon from shrinking */
+    flex-shrink: 0;
 }
 
 #shareScreenBtn.is-sharing {
@@ -3191,10 +3244,10 @@ input[type=range].volume-slider::-moz-range-thumb {
     display: block;
 }
 
-/* --- Responsive Hover Effect for Flight Actions --- */
-@media (max-width: 550px) {
+/* --- Responsive Hover Effect for DESKTOP ONLY --- */
+@media (pointer: fine) and (max-width: 550px) {
     .flight-actions .btn {
-        width: 44px; /* A standard, touch-friendly size */
+        width: 44px;
         height: 44px;
         padding: 0;
         justify-content: center;
@@ -3207,14 +3260,13 @@ input[type=range].volume-slider::-moz-range-thumb {
         transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.1s, opacity 0.2s ease 0.1s;
     }
 
-    /* On desktop, this won't trigger. On mobile, the :hover allows the container to control children */
     .flight-actions:hover .btn:hover {
-        width: auto; /* Let content define the width */
-        padding: 0 1.2em; /* Restore horizontal padding */
+        width: auto;
+        padding: 0 1.2em;
     }
 
     .flight-actions:hover .btn:hover span:last-of-type {
-        max-width: 150px; /* An arbitrary large value to allow text to show */
+        max-width: 150px;
         opacity: 1;
     }
 }

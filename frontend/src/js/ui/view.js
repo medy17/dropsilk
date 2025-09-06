@@ -5,10 +5,8 @@ import { uiElements } from './dom.js';
 import { store } from '../state.js';
 import { getFileIcon, formatBytes } from '../utils/helpers.js';
 
-// --- NEW OVERLAY FUNCTIONS ---
 export function showBoardingOverlay(flightCode) {
     if (uiElements.boardingOverlay) {
-        // Hide the main landing page content to prevent it from flashing
         uiElements.setupContainer.style.display = "none";
         document.getElementById('boarding-flight-code').textContent = flightCode.toUpperCase();
         uiElements.boardingOverlay.classList.add('show');
@@ -24,34 +22,22 @@ export function hideBoardingOverlay() {
 export function failBoarding() {
     if (uiElements.boardingOverlay) {
         uiElements.boardingOverlay.classList.remove('show');
-        // IMPORTANT: Show the main landing page again so the user can take manual action
         uiElements.setupContainer.style.display = "flex";
     }
 }
-// --- END NEW OVERLAY FUNCTIONS ---
 
-// --- HELPER FUNCTIONS for the pulse effect ---
 function addPulseEffect(element) {
-    if (!element || element.querySelector('.pulse-ring')) return; // Prevent duplicates
+    if (!element || element.querySelector('.pulse-ring')) return;
     element.classList.add('pulse-effect');
-    // Add the span elements for the rings
-    element.insertAdjacentHTML('beforeend', `
-        <span class="pulse-ring"></span>
-        <span class="pulse-ring"></span>
-        <span class="pulse-ring"></span>
-    `);
+    element.insertAdjacentHTML('beforeend', `<span class="pulse-ring"></span><span class="pulse-ring"></span><span class="pulse-ring"></span>`);
 }
 
-/**
- * Finds all elements with the pulse effect and removes the animation classes and elements.
- */
 export function clearAllPulseEffects() {
     document.querySelectorAll('.pulse-effect').forEach(element => {
         element.classList.remove('pulse-effect');
         element.querySelectorAll('.pulse-ring').forEach(ring => ring.remove());
     });
 }
-
 
 export function renderUserName() {
     uiElements.userNameDisplay.textContent = store.getState().myName;
@@ -62,8 +48,8 @@ export function enterFlightMode(flightCode) {
     uiElements.setupContainer.style.display = "none";
     uiElements.dashboard.style.display = "flex";
     setDashboardFlightCode(flightCode);
-    disableDropZone(); // Initially disabled
-    renderNetworkUsersView(); // Re-render to enable invite buttons
+    disableDropZone();
+    renderNetworkUsersView();
 }
 
 export function exitFlightMode() {
@@ -106,27 +92,21 @@ export function renderNetworkUsersView() {
     const { lastNetworkUsers, currentFlightCode } = store.getState();
     uiElements.connectionPanelTitle.textContent = "Users on Your Network";
     const list = uiElements.connectionPanelList;
-    list.innerHTML = ''; // Clear previous list
+    list.innerHTML = '';
 
-    // --- CORRECTED LOGIC ---
-    // 1. Handle the main invite button pulse effect. This is now independent of the network user list.
     const hasSeenPulse = localStorage.getItem('hasSeenInvitePulse') === 'true';
     const shouldShowPulse = !hasSeenPulse && currentFlightCode;
 
     if (shouldShowPulse) {
         const mainInviteBtn = document.getElementById('inviteBtn');
-        if (mainInviteBtn) {
-            addPulseEffect(mainInviteBtn);
-        }
+        if (mainInviteBtn) addPulseEffect(mainInviteBtn);
     }
 
-    // 2. Handle the network user list itself.
     if (lastNetworkUsers.length === 0) {
         list.innerHTML = '<div class="empty-state">No other users found on your network.</div>';
-        return; // Nothing more to do for the list.
+        return;
     }
 
-    // 3. If there are users, build the list and apply the pulse effect to their individual buttons.
     lastNetworkUsers.forEach(user => {
         const userEl = document.createElement('div');
         userEl.className = 'network-user-item';
@@ -140,12 +120,9 @@ export function renderNetworkUsersView() {
             </button>`;
         list.appendChild(userEl);
 
-        // Apply pulse to the per-user invite buttons if the conditions are met.
         if (shouldShowPulse) {
             const inviteBtn = userEl.querySelector('.invite-user-btn');
-            if (inviteBtn) {
-                addPulseEffect(inviteBtn);
-            }
+            if (inviteBtn) addPulseEffect(inviteBtn);
         }
     });
 }
@@ -156,16 +133,11 @@ export function renderInFlightView() {
     uiElements.connectionPanelTitle.textContent = "In Flight With";
     uiElements.connectionPanelList.innerHTML = `
         <div class="inflight-user-item">
-            <div class="inflight-user-details">
-                <span class="inflight-user-name">${myName}</span>
-                <span class="user-badge">You</span>
-            </div>
+            <div class="inflight-user-details"><span class="inflight-user-name">${myName}</span><span class="user-badge">You</span></div>
             <span class="inflight-user-id">ID: ${myId}</span>
         </div>
         <div class="inflight-user-item">
-            <div class="inflight-user-details">
-                <span class="inflight-user-name">${peerInfo.name}</span>
-            </div>
+            <div class="inflight-user-details"><span class="inflight-user-name">${peerInfo.name}</span></div>
             <span class="inflight-user-id">ID: ${peerInfo.id}</span>
         </div>`;
 }
@@ -182,43 +154,35 @@ export function enableDropZone() {
     uiElements.dropZoneSecondaryText.textContent = 'or select manually';
 }
 
-// --- NEW/MODIFIED SCREEN SHARE VIEW FUNCTIONS ---
-
 export function showLocalStreamView(stream, qualityChangeCallback) {
     const panel = document.getElementById('local-stream-panel');
     const video = document.getElementById('local-video');
     const settingsMenu = panel.querySelector('.stream-settings-menu');
     const settingsBtn = panel.querySelector('.stream-settings-btn');
 
-    if (panel && video) {
-        video.srcObject = stream;
-        panel.classList.remove('hidden');
+    if (!panel || !video) return;
+    video.srcObject = stream;
+    panel.classList.remove('hidden');
 
-        // Setup quality settings listeners
-        settingsMenu.onclick = (e) => {
-            const button = e.target.closest('button');
-            if (button && button.dataset.quality) {
-                qualityChangeCallback(button.dataset.quality);
-                settingsMenu.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-                button.classList.add('active');
-                settingsMenu.style.display = 'none'; // Close menu
-            }
-        };
+    settingsMenu.onclick = (e) => {
+        const button = e.target.closest('button');
+        if (button && button.dataset.quality) {
+            qualityChangeCallback(button.dataset.quality);
+            settingsMenu.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+            settingsMenu.style.display = 'none';
+        }
+    };
 
-        // Toggle menu visibility
-        settingsBtn.onclick = (e) => {
-            e.stopPropagation();
-            const isVisible = settingsMenu.style.display === 'block';
-            settingsMenu.style.display = isVisible ? 'none' : 'block';
-            if (!isVisible) {
-                document.addEventListener('click', () => {
-                    settingsMenu.style.display = 'none';
-                }, { once: true });
-            }
-        };
-
-        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    settingsBtn.onclick = (e) => {
+        e.stopPropagation();
+        const isVisible = settingsMenu.style.display === 'block';
+        settingsMenu.style.display = isVisible ? 'none' : 'block';
+        if (!isVisible) {
+            document.addEventListener('click', () => { settingsMenu.style.display = 'none'; }, { once: true });
+        }
+    };
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 export function hideLocalStreamView() {
@@ -235,23 +199,42 @@ export function showRemoteStreamView(stream) {
     const video = document.getElementById('remote-video');
     const fullscreenBtn = document.getElementById('fullscreen-stream-btn');
 
-    if (panel && video) {
-        video.srcObject = stream;
-        panel.classList.remove('hidden');
+    if (!panel || !video) return;
+    video.srcObject = stream;
+    panel.classList.remove('hidden');
 
-        fullscreenBtn.onclick = () => {
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
+    const toggleFullscreen = async () => {
+        try {
+            if (!document.fullscreenElement) {
+                await panel.requestFullscreen();
+                if (screen.orientation && typeof screen.orientation.lock === 'function') {
+                    if (video.videoWidth > video.videoHeight) {
+                        await screen.orientation.lock('landscape');
+                    }
+                }
             } else {
-                panel.requestFullscreen().catch(err => console.error(err));
+                await document.exitFullscreen();
             }
-        };
-        video.ondblclick = () => fullscreenBtn.click();
+        } catch (err) {
+            console.error("Fullscreen or orientation lock failed:", err);
+        }
+    };
 
-        stream.getVideoTracks()[0].onended = () => hideRemoteStreamView();
+    fullscreenBtn.onclick = toggleFullscreen;
+    video.ondblclick = toggleFullscreen;
 
-        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    const handleFullscreenChange = () => {
+        panel.classList.toggle('is-fullscreen', !!document.fullscreenElement);
+        if (!document.fullscreenElement && screen.orientation && typeof screen.orientation.unlock === 'function') {
+            screen.orientation.unlock();
+        }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+    stream.getVideoTracks()[0].onended = () => hideRemoteStreamView();
+
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 export function hideRemoteStreamView() {
@@ -263,6 +246,9 @@ export function hideRemoteStreamView() {
         }
         video.srcObject = null;
         panel.classList.add('hidden');
+        if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+            screen.orientation.unlock();
+        }
     }
 }
 
@@ -271,7 +257,6 @@ export function updateShareButton(isSharing) {
     if (!btn) return;
 
     btn.classList.remove('hidden');
-
     const textSpan = btn.querySelector('span:last-of-type');
     if (isSharing) {
         btn.classList.add('is-sharing');
@@ -281,7 +266,6 @@ export function updateShareButton(isSharing) {
         if (textSpan) textSpan.textContent = btn.dataset.textStart;
     }
 }
-// --- END NEW SCREEN SHARE ---
 
 export function updateReceiverActions() {
     const { receivedFiles } = store.getState();
@@ -313,23 +297,17 @@ export function checkQueueOverflow(queueId) {
 
     if (isCollapsible && !queueDiv.classList.contains('expanded')) {
         queueDiv.classList.add('queue-collapsible');
-
         let expandBtn = queueDiv.querySelector('.expand-queue-btn');
         if (!expandBtn) {
             const btn = document.createElement('button');
             btn.className = 'btn btn-primary expand-queue-btn';
-            btn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
-                <span>Expand</span>
-            `;
-
+            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg><span>Expand</span>`;
             btn.onclick = () => {
                 queueDiv.classList.remove('queue-collapsible');
                 queueDiv.classList.add('expanded');
                 btn.remove();
             };
-            const panel = queueDiv.parentElement;
-            panel.appendChild(btn);
+            queueDiv.parentElement.appendChild(btn);
         }
     }
 }

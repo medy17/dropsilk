@@ -200,20 +200,26 @@ export function drainQueue() {
             if (cancelButton) cancelButton.remove();
         }
 
-        // Pass the completed file to the action for full cleanup.
         store.actions.finishCurrentFileSend(file);
-
-        // After a file finishes, ensure the manager runs to start the next one.
         ensureQueueIsActive();
     }
 }
 
-export function handleDataChannelMessage(event) {
+export async function handleDataChannelMessage(event) {
     const data = event.data;
 
     if (typeof data === "string") {
-        if (data.startsWith("{")) { // Metadata
-            incomingFileInfo = JSON.parse(data);
+        if (data.startsWith("{")) {
+            const parsedData = JSON.parse(data);
+
+            if (parsedData.type === 'stream-ended') {
+                const { hideRemoteStreamView } = await import('../ui/view.js');
+                hideRemoteStreamView();
+                return;
+            }
+
+            // Otherwise, it's file metadata
+            incomingFileInfo = parsedData;
             incomingFileData = [];
             incomingFileReceived = 0;
             const isFirstReceivedFile = store.getState().receivedFiles.length === 0;
@@ -244,7 +250,7 @@ export function handleDataChannelMessage(event) {
 
             return;
         }
-        if (data === "EOF") { // End of File
+        if (data === "EOF") {
             const receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
             const finalFileInfo = { ...incomingFileInfo };
 
@@ -264,9 +270,7 @@ export function handleDataChannelMessage(event) {
                 const isVideo = finalFileInfo.type.startsWith('video/') ||
                     (['mkv'].includes(fileExtension) && !finalFileInfo.type.startsWith('text/')) ||
                     (fileExtension === 'ts' && finalFileInfo.type === 'video/mp2t');
-                const isStandardImage = finalFileInfo.type.startsWith('image/');
-                const canPreviewByExt = isPreviewable(finalFileInfo.name);
-                const canPreview = isStandardImage || canPreviewByExt;
+                const canPreview = isPreviewable(finalFileInfo.name);
 
                 let buttonsHTML = '';
                 if (isVideo && window.videoPlayer) {
