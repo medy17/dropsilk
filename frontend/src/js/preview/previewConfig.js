@@ -7,39 +7,52 @@ export const previewConfig = {
         extensions: ['avif', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'],
         handler: () => import('./handlers/imagePreview.js'),
     },
+    // Handler for audio formats
+    audio: {
+        extensions: ['mp3', 'wav', 'ogg', 'm4a', 'flac', 'opus'],
+        dependencies: [
+            'https://unpkg.com/wavesurfer.js@7'
+        ],
+        handler: () => import('./handlers/audioPreview.js'),
+    },
     // Handler for plain text and common code formats
     code: {
         extensions: [
             'txt', 'js', 'jsx', 'ts', 'tsx', 'css', 'html', 'json', 'py', 'java', 'c',
             'cpp', 'cs', 'go', 'rb', 'php', 'sh', 'yml', 'yaml', 'md', 'markdown', 'rtf'
         ],
-        // Dynamically load the highlight.js library when needed
-        dependencies: [
-            'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'
-        ],
-        // We'll also need its stylesheet
-        stylesheets: [
-            'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css'
-        ],
+        dependencies: ['https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'],
+        stylesheets: ['https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css'],
         handler: () => import('./handlers/codePreview.js'),
     },
     // handler for PDFs
     pdf: {
         extensions: ['pdf'],
-        // Load the main PDF.js library. The worker will be configured within the handler.
-        dependencies: [
-            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
-        ],
+        dependencies: ['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'],
         handler: () => import('./handlers/pdfPreview.js'),
     },
     // handler for DOCX
     docx: {
-        extensions: ['docx', 'odt', 'doc', 'odf', 'wpd'],
-        dependencies: [
-            'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.10.0/mammoth.browser.min.js'
-        ],
+        extensions: ['docx'],
+        dependencies: ['https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.7.0/mammoth.browser.min.js'],
         handler: () => import('./handlers/docxPreview.js'),
-    }
+    },
+    // handler for PPTX
+    pptx: {
+        extensions: ['pptx'],
+        dependencies: [
+            'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js', // pptxjs dependency
+            'https://unpkg.com/pptxjs@3.1.2/dist/pptxjs.min.js'
+        ],
+        stylesheets: ['https://unpkg.com/pptxjs@3.1.2/dist/pptxjs.css'],
+        handler: () => import('./handlers/pptxPreview.js'),
+    },
+    // handler for XLSX
+    xlsx: {
+        extensions: ['xlsx', 'xls', 'csv'],
+        dependencies: ['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'],
+        handler: () => import('./handlers/xlsxPreview.js'),
+    },
 };
 
 /**
@@ -53,7 +66,6 @@ export function isPreviewable(filename) {
 
     for (const key in previewConfig) {
         if (previewConfig[key].extensions.includes(extension)) {
-            // Check if the handler is actually implemented (not commented out)
             return !!previewConfig[key].handler;
         }
     }

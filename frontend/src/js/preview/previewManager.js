@@ -9,9 +9,11 @@ const previewModal = document.getElementById('previewModal');
 const previewHeader = document.getElementById('preview-header-title');
 const previewContent = document.getElementById('preview-content');
 const previewLoader = document.getElementById('preview-loader');
+const closePreviewModalBtn = document.getElementById('closePreviewModal');
 
-// --- Resource Loading Utilities ---
+// --- Resource Loading & State ---
 const loadedResources = new Set();
+let currentHandlerModule = null; // Store the currently active handler module
 
 function loadScript(url) {
     if (loadedResources.has(url)) return Promise.resolve();
@@ -32,6 +34,41 @@ function loadStylesheet(url) {
     document.head.appendChild(link);
     loadedResources.add(url);
 }
+
+// --- Cleanup function, attached to modal close events ---
+async function cleanupPreview() {
+    // If the active handler has a specific cleanup function, run it.
+    if (currentHandlerModule && typeof currentHandlerModule.cleanup === 'function') {
+        try {
+            await currentHandlerModule.cleanup();
+        } catch (e) {
+            console.error("Error during custom preview cleanup:", e);
+        }
+    }
+    currentHandlerModule = null;
+
+    // Generic cleanup
+    if (previewContent.dataset.objectUrl) {
+        URL.revokeObjectURL(previewContent.dataset.objectUrl);
+        delete previewContent.dataset.objectUrl;
+    }
+    previewContent.innerHTML = '';
+}
+
+// --- Setup Modal Close Listeners ---
+// This ensures cleanup happens regardless of how the modal is closed.
+closePreviewModalBtn?.addEventListener('click', cleanupPreview);
+previewModal?.addEventListener('click', (e) => {
+    if (e.target === previewModal) {
+        cleanupPreview();
+    }
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && previewModal.classList.contains('show')) {
+        cleanupPreview();
+    }
+});
+
 
 // --- Public Preview Function ---
 
@@ -59,7 +96,7 @@ export async function showPreview(fileName) {
     // 1. Open modal and show loading state
     previewHeader.textContent = file.name;
     previewLoader.style.display = 'flex';
-    previewContent.innerHTML = '';
+    previewContent.innerHTML = ''; // Ensure it's clean before loading
     previewContent.style.display = 'none';
     document.getElementById('openPreviewModal').click(); // Use the hidden trigger
 
@@ -72,9 +109,10 @@ export async function showPreview(fileName) {
             config.stylesheets.forEach(loadStylesheet);
         }
 
-        // 3. Dynamically import and execute the handler
+        // 3. Dynamically import, store, and execute the handler
         const handlerModule = await config.handler();
-        await handlerModule.default(file.blob, previewContent); // Pass blob and content area
+        currentHandlerModule = handlerModule; // Store for cleanup
+        await handlerModule.default(file.blob, previewContent);
 
         // 4. Hide loader and show content
         previewLoader.style.display = 'none';
@@ -82,8 +120,9 @@ export async function showPreview(fileName) {
 
     } catch (error) {
         console.error("Error loading preview:", error);
-        previewContent.innerHTML = `<div class="empty-state">Preview for this file type is not available or the file may be corrupt.</div>`;
+        previewContent.innerHTML = `<div class="empty-state">Preview failed: ${error.message}</div>`;
         previewLoader.style.display = 'none';
         previewContent.style.display = 'block';
+        currentHandlerModule = null; // Clear handler on error
     }
 }
