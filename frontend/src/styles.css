@@ -2691,7 +2691,7 @@ input[type=range].volume-slider::-moz-range-thumb {
 
 .preview-modal-content {
     max-width: 80vw;
-    width: auto;
+    width: 80vw;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
