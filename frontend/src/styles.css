@@ -3055,6 +3055,8 @@ input[type=range].volume-slider::-moz-range-thumb {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     background-color: white;
     border: 1px solid var(--c-panel-border);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 body[data-theme="dark"] .pptx-slide-viewer {
@@ -3076,20 +3078,32 @@ body[data-theme="dark"] .pptx-slide-viewer {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    overflow-wrap: break-word;
-    font-size: 1rem; /* Base font size, can be adjusted */
-    padding: 1%;
+    overflow: hidden;
+    font-size: 1rem;
     box-sizing: border-box;
 }
-.slide-element p {
-    margin: 0.2em 0;
+
+.slide-element .text-content {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding: 2%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.3;
+    word-wrap: break-word;
 }
+
+.slide-element .text-content p {
+    margin: 0.1em 0;
+    font-size: inherit;
+}
+
 .slide-element img {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    border-radius: 4px;
 }
-
 
 .pptx-thumbnail-nav {
     flex-shrink: 0;
@@ -3102,9 +3116,11 @@ body[data-theme="dark"] .pptx-slide-viewer {
     scrollbar-width: thin;
     scrollbar-color: var(--c-primary) transparent;
 }
+
 .pptx-thumbnail-nav::-webkit-scrollbar {
     height: 6px;
 }
+
 .pptx-thumbnail-nav::-webkit-scrollbar-thumb {
     background-color: var(--c-primary);
     border-radius: 6px;
@@ -3113,16 +3129,16 @@ body[data-theme="dark"] .pptx-slide-viewer {
 .thumbnail-item {
     position: relative;
     width: 140px;
-    aspect-ratio: 1.333; /* Default 4:3, will be overwritten by parent's aspect ratio */
     flex-shrink: 0;
     background-color: white;
     border: 2px solid var(--c-panel-border);
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: border-color 0.2s, transform 0.2s;
+    transition: all 0.2s ease;
     overflow: hidden;
     transform: scale(0.98);
 }
+
 body[data-theme="dark"] .thumbnail-item {
     background-color: #374151;
 }
@@ -3131,29 +3147,47 @@ body[data-theme="dark"] .thumbnail-item {
     border-color: var(--c-secondary);
     transform: scale(1);
 }
+
 .thumbnail-item.active {
     border-color: var(--c-primary);
     transform: scale(1.02);
-    box-shadow: 0 0 10px rgba(91, 206, 250, 0.5);
+    box-shadow: 0 0 12px rgba(91, 206, 250, 0.4);
 }
 
 .thumb-number {
     position: absolute;
-    bottom: 2px;
-    right: 5px;
+    bottom: 4px;
+    right: 6px;
     font-size: 0.7rem;
-    font-weight: bold;
-    color: var(--brilliant-white);
-    background-color: rgba(0,0,0,0.4);
-    padding: 1px 5px;
+    font-weight: 600;
+    color: white;
+    background-color: rgba(0,0,0,0.7);
+    padding: 2px 6px;
     border-radius: 4px;
-    z-index: 2;
+    z-index: 10;
+    backdrop-filter: blur(4px);
 }
 
-/* Scale down elements inside thumbnails to make them readable */
+/* Scale down elements inside thumbnails */
 .thumbnail-item .slide-element {
-    font-size: 0.3rem;
-    line-height: 1.2;
+    font-size: 0.25rem !important;
+    line-height: 1.1 !important;
+}
+
+.thumbnail-item .slide-element .text-content {
+    padding: 1% !important;
+}
+
+.thumbnail-item .slide-element .text-content p {
+    margin: 0 !important;
+}
+
+/* Error handling for failed images */
+.slide-element img[style*="display: none"] + .text-content::before {
+    content: "📷 Image not available";
+    color: #666;
+    font-size: 0.8em;
+    font-style: italic;
 }
 /* === PPTX Preview Styles END === */
 
