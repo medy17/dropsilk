@@ -3073,21 +3073,38 @@ body[data-theme="dark"] .pptx-slide-viewer {
 
 .slide-element {
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    overflow-wrap: break-word;
-    font-size: 1rem; /* Base font size, can be adjusted */
-    padding: 1%;
+    overflow: hidden;
     box-sizing: border-box;
 }
-.slide-element p {
-    margin: 0.2em 0;
+
+.slide-element .text-content {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.3;
+    word-wrap: break-word;
 }
+
 .slide-element img {
+    display: block;
+    border-radius: 4px;
+}
+
+.image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    background-color: #f5f5f5;
+    color: #666;
+    font-size: 0.9em;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+}
+
+body[data-theme="dark"] .image-placeholder {
+    background-color: #4a5568;
+    color: #a0aec0;
+    border-color: #4a5568;
 }
 
 .pptx-thumbnail-nav {
@@ -3101,9 +3118,11 @@ body[data-theme="dark"] .pptx-slide-viewer {
     scrollbar-width: thin;
     scrollbar-color: var(--c-primary) transparent;
 }
+
 .pptx-thumbnail-nav::-webkit-scrollbar {
     height: 6px;
 }
+
 .pptx-thumbnail-nav::-webkit-scrollbar-thumb {
     background-color: var(--c-primary);
     border-radius: 6px;
@@ -3121,6 +3140,7 @@ body[data-theme="dark"] .pptx-slide-viewer {
     overflow: hidden;
     transform: scale(0.98);
 }
+
 body[data-theme="dark"] .thumbnail-item {
     background-color: #374151;
 }
@@ -3129,6 +3149,7 @@ body[data-theme="dark"] .thumbnail-item {
     border-color: var(--c-secondary);
     transform: scale(1);
 }
+
 .thumbnail-item.active {
     border-color: var(--c-primary);
     transform: scale(1.02);
@@ -3141,17 +3162,11 @@ body[data-theme="dark"] .thumbnail-item {
     right: 5px;
     font-size: 0.7rem;
     font-weight: bold;
-    color: var(--brilliant-white);
-    background-color: rgba(0,0,0,0.4);
+    color: white;
+    background-color: rgba(0,0,0,0.7);
     padding: 1px 5px;
     border-radius: 4px;
     z-index: 2;
-}
-
-/* Scale down elements inside thumbnails to make them readable */
-.thumbnail-item .slide-element {
-    font-size: 0.3rem;
-    line-height: 1.2;
 }
 /* === PPTX Preview Styles END === */
 
