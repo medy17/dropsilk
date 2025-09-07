@@ -58,27 +58,12 @@ export default async function renderPptxPreview(blob, contentElement) {
                 const slideNumber = i + 1;
 
                 // Create and render the full slide
-                const slideElement = await createSlideElement(
-                    slideXmlDoc,
-                    slideFile.path,
-                    zip,
-                    slideWidthEmu,
-                    slideHeightEmu,
-                    `slide-${slideNumber}`
-                );
+                const slideElement = await createSlideElement(slideXmlDoc, slideFile.path, zip, slideWidthEmu, slideHeightEmu, `slide-${slideNumber}`);
                 if (i > 0) slideElement.style.display = 'none'; // Hide all but the first slide
                 slideViewer.appendChild(slideElement);
 
                 // Create and render the thumbnail
-                const thumbnailElement = await createSlideElement(
-                    slideXmlDoc,
-                    slideFile.path,
-                    zip,
-                    slideWidthEmu,
-                    slideHeightEmu,
-                    `thumb-${slideNumber}`,
-                    true
-                );
+                const thumbnailElement = await createSlideElement(slideXmlDoc, slideFile.path, zip, slideWidthEmu, slideHeightEmu, `thumb-${slideNumber}`, true);
                 thumbnailElement.dataset.targetSlide = `slide-${slideNumber}`;
                 if (i === 0) thumbnailElement.classList.add('active'); // Mark first thumbnail as active
                 thumbnailNav.appendChild(thumbnailElement);
@@ -114,21 +99,22 @@ async function createSlideElement(slideXmlDoc, slidePath, zip, slideWidthEmu, sl
     container.id = id;
     container.className = isThumbnail ? 'thumbnail-item' : 'slide-container';
 
+    // Set aspect ratio for thumbnails
     if (isThumbnail) {
         const slideNum = id.split('-')[1];
         container.innerHTML = `<div class="thumb-number">${slideNum}</div>`;
+        container.style.aspectRatio = `${slideWidthEmu / slideHeightEmu}`;
     }
 
-    // Get all shape elements (includes text boxes and images)
-    const shapes = slideXmlDoc.querySelectorAll('sp');
+    const shapes = slideXmlDoc.querySelectorAll('sp'); // p:sp, but namespace is ignored by querySelector
 
-    for (const shape of shapes) {
+    for(const shape of shapes) {
         const xfrm = shape.querySelector('xfrm');
-        if (!xfrm) continue;
+        if(!xfrm) continue;
 
         const off = xfrm.querySelector('off');
         const ext = xfrm.querySelector('ext');
-        if (!off || !ext) continue;
+        if(!off || !ext) continue;
 
         const x = parseInt(off.getAttribute('x'), 10);
         const y = parseInt(off.getAttribute('y'), 10);
@@ -142,147 +128,92 @@ async function createSlideElement(slideXmlDoc, slidePath, zip, slideWidthEmu, sl
         elementDiv.style.width = `${(w / slideWidthEmu) * 100}%`;
         elementDiv.style.height = `${(h / slideHeightEmu) * 100}%`;
 
-        // Check if it's an image first
-        const blipFill = shape.querySelector('blipFill');
-        if (blipFill) {
-            const blip = blipFill.querySelector('blip');
+        // Check if it's an image
+        const blipFill = shape.querySelector('blipFill'); // a:blipFill
+        if(blipFill) {
+            const blip = blipFill.querySelector('blip'); // a:blip
             const embedId = blip?.getAttribute('r:embed');
-            if (embedId) {
+            if(embedId) {
+                const img = document.createElement('img');
                 try {
-                    const img = document.createElement('img');
                     img.src = await getImageUrl(embedId, slidePath, zip);
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'contain';
-                    img.onerror = () => {
-                        console.warn(`Failed to load image with embed ID: ${embedId}`);
-                        img.style.display = 'none';
-                    };
                     elementDiv.appendChild(img);
                 } catch (error) {
-                    console.warn(`Error loading image: ${error.message}`);
+                    console.warn(`Failed to load image ${embedId}:`, error.message);
                 }
             }
         }
 
-        // Check for text content
-        const txBody = shape.querySelector('txBody');
+        // Check for text
+        const txBody = shape.querySelector('txBody'); // p:txBody
         if (txBody) {
-            const textContainer = document.createElement('div');
-            textContainer.className = 'text-content';
-
-            const paragraphs = txBody.querySelectorAll('p');
+            const paragraphs = txBody.querySelectorAll('p'); // a:p
             paragraphs.forEach(p => {
                 const pElement = document.createElement('p');
-                pElement.style.margin = '0.1em 0';
-
-                const textRuns = p.querySelectorAll('r');
-                if (textRuns.length === 0) {
-                    // Check for direct text content
-                    const directText = p.querySelector('t')?.textContent?.trim();
-                    if (directText) {
-                        pElement.textContent = directText;
+                const textRuns = p.querySelectorAll('r'); // a:r
+                textRuns.forEach(run => {
+                    const text = run.querySelector('t')?.textContent || ''; // a:t
+                    if (text.trim()) {
+                        const span = document.createElement('span');
+                        span.textContent = text;
+                        // Basic styling can be added here by parsing rPr element
+                        pElement.appendChild(span);
                     }
-                } else {
-                    textRuns.forEach(run => {
-                        const text = run.querySelector('t')?.textContent || '';
-                        if (text.trim()) {
-                            const span = document.createElement('span');
-                            span.textContent = text;
-
-                            // Apply basic formatting from run properties
-                            const rPr = run.querySelector('rPr');
-                            if (rPr) {
-                                if (rPr.querySelector('b')) span.style.fontWeight = 'bold';
-                                if (rPr.querySelector('i')) span.style.fontStyle = 'italic';
-                                if (rPr.querySelector('u')) span.style.textDecoration = 'underline';
-
-                                // Font size
-                                const szElement = rPr.querySelector('sz');
-                                if (szElement) {
-                                    const fontSize = parseInt(szElement.getAttribute('val'), 10);
-                                    if (fontSize) {
-                                        span.style.fontSize = `${fontSize / 100}pt`;
-                                    }
-                                }
-                            }
-
-                            pElement.appendChild(span);
-                        }
-                    });
-                }
-
-                if (pElement.hasChildNodes() || pElement.textContent.trim()) {
-                    textContainer.appendChild(pElement);
+                });
+                if (pElement.hasChildNodes()) {
+                    elementDiv.appendChild(pElement);
                 }
             });
-
-            if (textContainer.hasChildNodes()) {
-                elementDiv.appendChild(textContainer);
-            }
         }
-
-        if (elementDiv.hasChildNodes()) {
-            container.appendChild(elementDiv);
-        }
+        container.appendChild(elementDiv);
     }
-
     return container;
 }
 
 async function getImageUrl(embedId, slidePath, zip) {
-    try {
-        // Construct the relationship file path correctly
-        const slideFileName = slidePath.split('/').pop(); // e.g., "slide1.xml"
-        const slideRelsPath = `ppt/slides/_rels/${slideFileName}.rels`;
+    // Get the slide filename from the full path
+    const slideFileName = slidePath.split('/').pop();
+    const slideRelsPath = `ppt/slides/_rels/${slideFileName}.rels`;
 
-        const relsDoc = await getXmlDoc(zip, slideRelsPath, new DOMParser());
-        if (!relsDoc) {
-            throw new Error(`Relationship file not found: ${slideRelsPath}`);
-        }
-
-        const rel = relsDoc.querySelector(`Relationship[Id="${embedId}"]`);
-        if (!rel) {
-            throw new Error(`Relationship not found for ID: ${embedId}`);
-        }
-
-        let imageTarget = rel.getAttribute('Target');
-        if (!imageTarget) {
-            throw new Error(`No target found for relationship: ${embedId}`);
-        }
-
-        // Resolve the image path correctly
-        let imagePath;
-        if (imageTarget.startsWith('../')) {
-            // Relative path going up from slides directory
-            imagePath = imageTarget.replace('../', 'ppt/');
-        } else if (imageTarget.startsWith('./')) {
-            // Relative path in same directory as slides
-            imagePath = `ppt/slides/${imageTarget.replace('./', '')}`;
-        } else if (!imageTarget.startsWith('/')) {
-            // Relative path - assume it's relative to slides directory
-            imagePath = `ppt/slides/${imageTarget}`;
-        } else {
-            // Absolute path (shouldn't happen in PPTX)
-            imagePath = imageTarget.substring(1);
-        }
-
-        console.log(`Loading image: ${embedId} -> ${imageTarget} -> ${imagePath}`);
-
-        const imageFile = zip.file(imagePath);
-        if (!imageFile) {
-            throw new Error(`Image file not found: ${imagePath}`);
-        }
-
-        const imageBlob = await imageFile.async('blob');
-        const imageUrl = URL.createObjectURL(imageBlob);
-        objectUrlsToRevoke.push(imageUrl); // Track for cleanup
-
-        return imageUrl;
-    } catch (error) {
-        console.error(`Error loading image ${embedId}:`, error);
-        throw error;
+    const relsDoc = await getXmlDoc(zip, slideRelsPath, new DOMParser());
+    if(!relsDoc) {
+        throw new Error(`Could not find relationships file: ${slideRelsPath}`);
     }
+
+    const rel = relsDoc.querySelector(`Relationship[Id="${embedId}"]`);
+    if(!rel) {
+        throw new Error(`Could not find relationship for embed ID: ${embedId}`);
+    }
+
+    let imageTarget = rel.getAttribute('Target');
+
+    // Handle different path formats
+    let imagePath;
+    if (imageTarget.startsWith('../media/')) {
+        // Most common case: ../media/image1.png
+        imagePath = imageTarget.replace('../', 'ppt/');
+    } else if (imageTarget.startsWith('media/')) {
+        // Sometimes just media/image1.png
+        imagePath = `ppt/${imageTarget}`;
+    } else if (imageTarget.startsWith('../')) {
+        // Other relative paths
+        imagePath = imageTarget.replace('../', 'ppt/');
+    } else {
+        // Fallback: assume it's in media folder
+        imagePath = `ppt/media/${imageTarget}`;
+    }
+
+    console.log(`Loading image: ${embedId} -> ${imageTarget} -> ${imagePath}`);
+
+    const imageFile = zip.file(imagePath);
+    if (!imageFile) {
+        throw new Error(`Image file not found: ${imagePath}`);
+    }
+
+    const imageBlob = await imageFile.async('blob');
+    const imageUrl = URL.createObjectURL(imageBlob);
+    objectUrlsToRevoke.push(imageUrl); // Track for cleanup
+    return imageUrl;
 }
 
 async function getSlideFiles(presentationXmlDoc, zip, parser) {
@@ -305,15 +236,10 @@ async function getSlideFiles(presentationXmlDoc, zip, parser) {
 }
 
 async function getXmlDoc(zip, path, parser) {
-    try {
-        const file = zip.file(path);
-        if (!file) return null;
-        const content = await file.async("string");
-        return parser.parseFromString(content, "application/xml");
-    } catch (error) {
-        console.error(`Error loading XML document ${path}:`, error);
-        return null;
-    }
+    const file = zip.file(path);
+    if (!file) return null;
+    const content = await file.async("string");
+    return parser.parseFromString(content, "application/xml");
 }
 
 // Centralized cleanup function
