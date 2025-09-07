@@ -25,12 +25,6 @@ export const previewConfig = {
         stylesheets: ['https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css'],
         handler: () => import('./handlers/codePreview.js'),
     },
-    // Handler for ebook or epub files
-    ebook: {
-        extensions: ['epub'],
-        dependencies: ['https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js'],
-        handler: () => import('./handlers/epubPreview.js'),
-    },
     // Handler for Markdown
     markdown: {
         extensions: ['md', 'markdown'],
