@@ -29,7 +29,7 @@ export const previewConfig = {
     ebook: {
         extensions: ['epub'],
         dependencies: ['https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js'],
-        handler: () => import('./handlers/ebookPreview.js'),
+        handler: () => import('./handlers/epubPreview.js'),
     },
     // Handler for Markdown
     markdown: {
