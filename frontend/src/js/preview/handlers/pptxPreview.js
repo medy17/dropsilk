@@ -1,5 +1,5 @@
 // js/preview/handlers/pptxPreview.js
-// Advanced PPTX preview using JSZip, DOMParser, and custom rendering with a slide navigator.
+// Advanced PPTX preview using JSZip, DOMParser, and custom rendering with a slide navigator. (CORRECTED VERSION)
 
 // Array to store all created object URLs for easy cleanup
 let objectUrlsToRevoke = [];
@@ -58,12 +58,12 @@ export default async function renderPptxPreview(blob, contentElement) {
                 const slideNumber = i + 1;
 
                 // Create and render the full slide
-                const slideElement = await createSlideElement(slideXmlDoc, zip, slideWidthEmu, slideHeightEmu, `slide-${slideNumber}`);
+                const slideElement = await createSlideElement(slideXmlDoc, slideFile.path, zip, slideWidthEmu, slideHeightEmu, `slide-${slideNumber}`);
                 if (i > 0) slideElement.style.display = 'none'; // Hide all but the first slide
                 slideViewer.appendChild(slideElement);
 
                 // Create and render the thumbnail
-                const thumbnailElement = await createSlideElement(slideXmlDoc, zip, slideWidthEmu, slideHeightEmu, `thumb-${slideNumber}`, true);
+                const thumbnailElement = await createSlideElement(slideXmlDoc, slideFile.path, zip, slideWidthEmu, slideHeightEmu, `thumb-${slideNumber}`, true);
                 thumbnailElement.dataset.targetSlide = `slide-${slideNumber}`;
                 if (i === 0) thumbnailElement.classList.add('active'); // Mark first thumbnail as active
                 thumbnailNav.appendChild(thumbnailElement);
@@ -94,12 +94,13 @@ export default async function renderPptxPreview(blob, contentElement) {
     }
 }
 
-async function createSlideElement(slideXmlDoc, zip, slideWidthEmu, slideHeightEmu, id, isThumbnail = false) {
+async function createSlideElement(slideXmlDoc, slidePath, zip, slideWidthEmu, slideHeightEmu, id, isThumbnail = false) {
     const container = document.createElement('div');
     container.id = id;
     container.className = isThumbnail ? 'thumbnail-item' : 'slide-container';
     if(isThumbnail) {
-        container.innerHTML = `<div class="thumb-number">${id.split('-')[1]}</div>`;
+        const slideNum = id.split('-')[1];
+        container.innerHTML = `<div class="thumb-number">${slideNum}</div>`;
     }
 
     const shapes = slideXmlDoc.querySelectorAll('sp'); // p:sp, but namespace is ignored by querySelector
@@ -131,7 +132,9 @@ async function createSlideElement(slideXmlDoc, zip, slideWidthEmu, slideHeightEm
             const embedId = blip?.getAttribute('r:embed');
             if(embedId) {
                 const img = document.createElement('img');
-                const slideRelPath = `ppt/slides/_rels/${slideXmlDoc.baseURI.split('/').pop()}.rels`;
+                // *** FIX: Construct the relationship path from the slidePath variable ***
+                const slideFileName = slidePath.split('/').pop();
+                const slideRelPath = `ppt/slides/_rels/${slideFileName}.rels`;
                 img.src = await getImageUrl(embedId, slideRelPath, zip);
                 elementDiv.appendChild(img);
             }
@@ -207,14 +210,13 @@ async function getXmlDoc(zip, path, parser) {
     const file = zip.file(path);
     if (!file) return null;
     const content = await file.async("string");
-    const doc = parser.parseFromString(content, "application/xml");
-    doc.baseURI = `http://dummy.com/${path}`; // Store path for relative lookups
-    return doc;
+    // *** FIX: Removed the line that attempted to set the read-only baseURI property ***
+    return parser.parseFromString(content, "application/xml");
 }
 
 // Centralized cleanup function
 export function cleanup() {
-    console.log(`Revoking ${objectUrlsToRevoke.length} object URLs.`);
+    console.log(`Revoking ${objectUrlsToRevoke.length} object URLs from PPTX preview.`);
     objectUrlsToRevoke.forEach(url => URL.revokeObjectURL(url));
     objectUrlsToRevoke = []; // Reset the array
 }
