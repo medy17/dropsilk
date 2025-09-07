@@ -11,6 +11,7 @@
     "jszip": "^3.10.1",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
-    "sortablejs": "^1.15.6"
+    "sortablejs": "^1.15.6",
+    "uploadthing": "6.0.0"
   }
 }
