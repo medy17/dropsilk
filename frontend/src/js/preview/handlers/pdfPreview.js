@@ -47,7 +47,7 @@ export default async function renderPdfPreview(blob, contentElement) {
         const loadingTask = window.pdfjsLib.getDocument(pdfUrl);
         const pdfDoc = await loadingTask.promise;
 
-        // --- MODIFIED: Setup Intersection Observer ---
+        // --- Setup Intersection Observer ---
         const observerOptions = {
             root: viewerContainer,
             rootMargin: '200px 0px', // Start loading pages 200px before they enter the viewport
@@ -78,23 +78,25 @@ export default async function renderPdfPreview(blob, contentElement) {
 
         activeObserver = pageObserver;
 
-        // Calculate the desired width for the PDF pages based on the container size.
-        // The container has 10px padding on each side.
-        const containerWidth = viewerContainer.clientWidth - 20;
+        // Calculate the desired width based on the modal's known CSS (80vw max-width).
+        // This is reliable and doesn't require the element to be visible.
+        // Subtract padding (10px on each side).
+        const availableWidth = (window.innerWidth * 0.8) - 20;
 
         // Create placeholders instead of rendering directly ---
         for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
             const page = await pdfDoc.getPage(pageNum);
 
-            // Calculate a dynamic scale to fit the page width within the container
+            // Calculate a dynamic scale to fit the page width within the available space.
             const unscaledViewport = page.getViewport({ scale: 1.0 });
-            const scale = containerWidth / unscaledViewport.width;
+            // Cap the scale at a max of 2.5 to prevent extreme zooming on ultra-wide screens.
+            const scale = Math.min(2.5, availableWidth / unscaledViewport.width);
             const viewport = page.getViewport({ scale });
 
             const pageContainer = document.createElement('div');
             pageContainer.className = 'pdf-page-container';
             pageContainer.dataset.pageNumber = pageNum;
-            pageContainer.dataset.scale = scale; // Store the scale for the observer
+            pageContainer.dataset.scale = scale; // Store the correct scale for the observer
             // Set dimensions on the container to prevent layout shifts and ensure correct scrollbar size
             pageContainer.style.width = `${viewport.width}px`;
             pageContainer.style.height = `${viewport.height}px`;
