@@ -1,4 +1,17 @@
-// Loads UploadThing's client from a bundling CDN (esm.sh) so it works in plain browsers.
+// js/utils/uploadHelper.js
+// FINAL VERSION
+
+// 1. Read the backend URL from the environment variable set in Vercel.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+// 2. Add a check to ensure the variable is set, providing a clear error if it's not.
+if (!API_BASE_URL) {
+    const errorMsg = "FATAL: VITE_API_BASE_URL environment variable is not set. The frontend doesn't know where the backend is located.";
+    console.error(errorMsg);
+    // You might want to display this error to the user as well.
+    alert(errorMsg);
+    throw new Error(errorMsg);
+}
 
 let uploaderPromise = null;
 
@@ -6,6 +19,7 @@ async function getUploader() {
     if (uploaderPromise) return uploaderPromise;
 
     uploaderPromise = (async () => {
+        // This part, loading the client from a CDN, is correct and unchanged.
         const candidates = [
             "https://esm.sh/uploadthing@7/client?bundle&target=es2020",
             "https://esm.sh/uploadthing@7/client?bundle",
@@ -18,8 +32,12 @@ async function getUploader() {
                 const mod = await import(/* @vite-ignore */ url);
                 if (mod && typeof mod.genUploader === "function") {
                     const { genUploader } = mod;
-                    // Point to your vanilla Node endpoint
-                    const ut = genUploader({ url: "/api/uploadthing" });
+
+                    // --- THIS IS THE CRITICAL CHANGE ---
+                    // It now points to your absolute Render backend URL.
+                    const ut = genUploader({ url: `${API_BASE_URL}/api/uploadthing` });
+                    // --- END OF CRITICAL CHANGE ---
+
                     return ut;
                 }
             } catch (e) {
@@ -33,6 +51,12 @@ async function getUploader() {
     return uploaderPromise;
 }
 
+/**
+ * Upload a blob and return a public URL. This function is correct and unchanged.
+ * @param {Blob} blob
+ * @param {string} filename
+ * @returns {Promise<string>} public URL
+ */
 export async function uploadBlobForPreview(
     blob,
     filename = "presentation.pptx"
