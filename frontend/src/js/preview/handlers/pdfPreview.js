@@ -8,9 +8,9 @@ const PDF_WORKER_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/p
 // Observer for lazy loading ---
 let activeObserver = null;
 
-async function renderPage(pdfDoc, pageNum, canvas) {
+async function renderPage(pdfDoc, pageNum, canvas, scale) {
     const page = await pdfDoc.getPage(pageNum);
-    const viewport = page.getViewport({ scale: 1.5 });
+    const viewport = page.getViewport({ scale });
     const context = canvas.getContext('2d');
     canvas.height = viewport.height;
     canvas.width = viewport.width;
@@ -58,6 +58,7 @@ export default async function renderPdfPreview(blob, contentElement) {
                 if (entry.isIntersecting) {
                     const pageContainer = entry.target;
                     const pageNum = parseInt(pageContainer.dataset.pageNumber, 10);
+                    const scale = parseFloat(pageContainer.dataset.scale); // Read the stored scale
 
                     // Stop observing this page once it's triggered
                     observer.unobserve(pageContainer);
@@ -65,7 +66,7 @@ export default async function renderPdfPreview(blob, contentElement) {
                     // Render the page
                     const canvas = pageContainer.querySelector('canvas');
                     try {
-                        await renderPage(pdfDoc, pageNum, canvas);
+                        await renderPage(pdfDoc, pageNum, canvas, scale);
                         pageContainer.querySelector('.page-loader')?.remove(); // Remove loader on success
                     } catch (renderError) {
                         console.error(`Failed to render page ${pageNum}`, renderError);
@@ -77,14 +78,23 @@ export default async function renderPdfPreview(blob, contentElement) {
 
         activeObserver = pageObserver;
 
+        // Calculate the desired width for the PDF pages based on the container size.
+        // The container has 10px padding on each side.
+        const containerWidth = viewerContainer.clientWidth - 20;
+
         // Create placeholders instead of rendering directly ---
         for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
             const page = await pdfDoc.getPage(pageNum);
-            const viewport = page.getViewport({ scale: 1.5 });
+
+            // Calculate a dynamic scale to fit the page width within the container
+            const unscaledViewport = page.getViewport({ scale: 1.0 });
+            const scale = containerWidth / unscaledViewport.width;
+            const viewport = page.getViewport({ scale });
 
             const pageContainer = document.createElement('div');
             pageContainer.className = 'pdf-page-container';
             pageContainer.dataset.pageNumber = pageNum;
+            pageContainer.dataset.scale = scale; // Store the scale for the observer
             // Set dimensions on the container to prevent layout shifts and ensure correct scrollbar size
             pageContainer.style.width = `${viewport.width}px`;
             pageContainer.style.height = `${viewport.height}px`;
