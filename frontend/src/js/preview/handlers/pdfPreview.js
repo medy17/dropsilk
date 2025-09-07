@@ -8,9 +8,9 @@ const PDF_WORKER_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/p
 // Observer for lazy loading ---
 let activeObserver = null;
 
-async function renderPage(pdfDoc, pageNum, canvas, scale) {
+async function renderPage(pdfDoc, pageNum, canvas) {
     const page = await pdfDoc.getPage(pageNum);
-    const viewport = page.getViewport({ scale });
+    const viewport = page.getViewport({ scale: 1.5 });
     const context = canvas.getContext('2d');
     canvas.height = viewport.height;
     canvas.width = viewport.width;
@@ -47,26 +47,7 @@ export default async function renderPdfPreview(blob, contentElement) {
         const loadingTask = window.pdfjsLib.getDocument(pdfUrl);
         const pdfDoc = await loadingTask.promise;
 
-        // Wait for container to be properly sized
-        await new Promise(resolve => requestAnimationFrame(resolve));
-
-        // Calculate the desired width for the PDF pages based on the container size.
-        // The container has 10px padding on each side.
-        const containerWidth = viewerContainer.clientWidth - 20;
-        const containerHeight = viewerContainer.clientHeight;
-
-        // Calculate a consistent scale based on the first page or use container dimensions
-        const firstPage = await pdfDoc.getPage(1);
-        const firstPageViewport = firstPage.getViewport({ scale: 1.0 });
-
-        // Calculate scale to fit width, but also consider height to ensure pages fit well
-        const scaleByWidth = containerWidth / firstPageViewport.width;
-        const scaleByHeight = (containerHeight * 0.9) / firstPageViewport.height; // Use 90% of container height
-
-        // Use the smaller scale to ensure pages fit both width and height constraints
-        const scale = Math.min(scaleByWidth, scaleByHeight, 2.0); // Cap at 2.0 for readability
-
-        // --- Setup Intersection Observer ---
+        // --- MODIFIED: Setup Intersection Observer ---
         const observerOptions = {
             root: viewerContainer,
             rootMargin: '200px 0px', // Start loading pages 200px before they enter the viewport
@@ -77,7 +58,6 @@ export default async function renderPdfPreview(blob, contentElement) {
                 if (entry.isIntersecting) {
                     const pageContainer = entry.target;
                     const pageNum = parseInt(pageContainer.dataset.pageNumber, 10);
-                    const pageScale = parseFloat(pageContainer.dataset.scale);
 
                     // Stop observing this page once it's triggered
                     observer.unobserve(pageContainer);
@@ -85,7 +65,7 @@ export default async function renderPdfPreview(blob, contentElement) {
                     // Render the page
                     const canvas = pageContainer.querySelector('canvas');
                     try {
-                        await renderPage(pdfDoc, pageNum, canvas, pageScale);
+                        await renderPage(pdfDoc, pageNum, canvas);
                         pageContainer.querySelector('.page-loader')?.remove(); // Remove loader on success
                     } catch (renderError) {
                         console.error(`Failed to render page ${pageNum}`, renderError);
@@ -97,24 +77,17 @@ export default async function renderPdfPreview(blob, contentElement) {
 
         activeObserver = pageObserver;
 
-        // Create placeholders with consistent dimensions
+        // Create placeholders instead of rendering directly ---
         for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
             const page = await pdfDoc.getPage(pageNum);
-            const viewport = page.getViewport({ scale });
+            const viewport = page.getViewport({ scale: 1.5 });
 
             const pageContainer = document.createElement('div');
             pageContainer.className = 'pdf-page-container';
             pageContainer.dataset.pageNumber = pageNum;
-            pageContainer.dataset.scale = scale; // Use consistent scale for all pages
-
-            // Set consistent dimensions and add margin for scroll-per-page behavior
+            // Set dimensions on the container to prevent layout shifts and ensure correct scrollbar size
             pageContainer.style.width = `${viewport.width}px`;
             pageContainer.style.height = `${viewport.height}px`;
-            pageContainer.style.marginBottom = '20px'; // Add spacing between pages
-            pageContainer.style.display = 'flex';
-            pageContainer.style.flexDirection = 'column';
-            pageContainer.style.alignItems = 'center';
-            pageContainer.style.position = 'relative';
 
             pageContainer.innerHTML = `
                 <canvas class="pdf-page-canvas"></canvas>
@@ -126,9 +99,6 @@ export default async function renderPdfPreview(blob, contentElement) {
             viewerContainer.appendChild(pageContainer);
             pageObserver.observe(pageContainer); // Start observing the placeholder
         }
-
-        // Optional: Add smooth scrolling behavior for better UX
-        viewerContainer.style.scrollBehavior = 'smooth';
 
         // Add self-cleaning event listener for when the modal closes ---
         const modal = document.getElementById('previewModal');
@@ -143,6 +113,7 @@ export default async function renderPdfPreview(blob, contentElement) {
 
         document.getElementById('closePreviewModal').addEventListener('click', cleanup, { once: true });
         modal.addEventListener('click', cleanupOnOverlay, { once: true });
+
 
     } catch (error) {
         console.error('Error rendering PDF:', error);
