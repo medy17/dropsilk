@@ -1,11 +1,17 @@
-// This file is correct. No changes were needed.
 import { uploadBlobForPreview } from "../../utils/uploadHelper.js";
 
+const modalContent = document.querySelector('#previewModal .preview-modal-content');
+
+export function cleanup() {
+    modalContent?.classList.remove('is-widescreen-preview');
+}
 export default async function renderPptxPreview(
     blob,
     contentElement,
     fileName = "presentation.pptx"
 ) {
+    modalContent?.classList.add('is-widescreen-preview');
+
     contentElement.innerHTML = `
     <div class="pptx-upload-loading">
       <div class="loading-spinner"></div>

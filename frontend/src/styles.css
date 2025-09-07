@@ -2691,10 +2691,15 @@ input[type=range].volume-slider::-moz-range-thumb {
 
 .preview-modal-content {
     max-width: 80vw;
-    width: 80vw;
+    width: auto;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
+}
+
+.preview-modal-content.is-widescreen-preview {
+    width: 80vw;
+    max-width: 1400px;
 }
 
 .preview-modal-body {
