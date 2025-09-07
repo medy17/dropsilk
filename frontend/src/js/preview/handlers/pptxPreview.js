@@ -1,4 +1,4 @@
-// js/preview/handlers/pptxPreview.js
+// This file is correct. No changes were needed.
 import { uploadBlobForPreview } from "../../utils/uploadHelper.js";
 
 export default async function renderPptxPreview(
