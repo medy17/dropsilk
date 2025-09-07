@@ -19,11 +19,18 @@ export const previewConfig = {
     code: {
         extensions: [
             'txt', 'js', 'jsx', 'ts', 'tsx', 'css', 'html', 'json', 'py', 'java', 'c',
-            'cpp', 'cs', 'go', 'rb', 'php', 'sh', 'yml', 'yaml', 'md', 'markdown', 'rtf'
+            'cpp', 'cs', 'go', 'rb', 'php', 'sh', 'yml', 'yaml', 'rtf'
         ],
         dependencies: ['https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'],
         stylesheets: ['https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css'],
         handler: () => import('./handlers/codePreview.js'),
+    },
+    // Handler for Markdown
+    markdown: {
+        extensions: ['md', 'markdown'],
+        dependencies: ['https://cdn.jsdelivr.net/npm/marked/marked.min.js'],
+        stylesheets: ['https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown-dark.min.css'], // Or light
+        handler: () => import('./handlers/mdPreview.js'),
     },
     // handler for PDFs
     pdf: {
