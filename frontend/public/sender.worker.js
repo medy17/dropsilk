@@ -2,7 +2,7 @@
 
 // --- CONFIGURATION ---
 // Set a default chunk size, but allow it to be overridden from the main thread.
-const DEFAULT_CHUNK_SIZE = 262144; // 256 KB. A good balance for speed and stability
+const DEFAULT_CHUNK_SIZE = 262144; // 256 KB. A good balance for speed and stability overall
 let chunkSize = DEFAULT_CHUNK_SIZE;
 
 // --- CORE LOGIC ---
