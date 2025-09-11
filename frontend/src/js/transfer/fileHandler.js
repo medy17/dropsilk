@@ -68,11 +68,14 @@ export function handleFileSelection(files) {
         uiElements.sendingQueueDiv.innerHTML = '';
     }
 
+    const fragment = document.createDocumentFragment();
+
     Array.from(files).forEach(file => {
         const fileId = `send-${Date.now()}-${Math.random()}`;
         store.actions.addFileIdMapping(file, fileId);
 
-        uiElements.sendingQueueDiv.insertAdjacentHTML('beforeend', `
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = `
             <div class="queue-item" id="${fileId}" draggable="true">
                 <div class="drag-handle" title="Drag to reorder">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
@@ -89,9 +92,11 @@ export function handleFileSelection(files) {
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
                     </button>
                 </div>
-            </div>`);
+            </div>`;
+        fragment.appendChild(tempDiv.firstElementChild);
     });
 
+    uiElements.sendingQueueDiv.appendChild(fragment);
 
     if (isFirstSend && !store.getState().hasScrolledForSend) {
         uiElements.sendingQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
