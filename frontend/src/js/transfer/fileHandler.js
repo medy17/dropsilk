@@ -14,10 +14,12 @@ let worker;
 let chunkQueue = [];
 let fileReadingDone = false;
 let sentOffset = 0;
+let lastSendProgressUpdate = 0; // For throttling UI updates
 
 let incomingFileInfo = null;
 let incomingFileData = [];
 let incomingFileReceived = 0;
+let lastReceiveProgressUpdate = 0; // For throttling UI updates
 
 export function ensureQueueIsActive() {
     const state = store.getState();
@@ -46,6 +48,7 @@ export function cancelFileSend(fileId) {
         chunkQueue = [];
         fileReadingDone = false;
         sentOffset = 0;
+        lastSendProgressUpdate = 0; // Reset throttle timer on cancel
         store.actions.finishCurrentFileSend(currentlySendingFile);
     } else {
         store.actions.removeFileFromQueue(fileId);
@@ -183,10 +186,14 @@ export function drainQueue() {
         store.actions.updateMetricsOnSend(chunkSize);
 
         sentOffset += chunkSize;
-        if (fileElement) {
-            const progressValue = sentOffset / file.size;
-            fileElement.querySelector('progress').value = progressValue;
-            fileElement.querySelector('.percent').textContent = `${Math.round(progressValue * 100)}%`;
+        const now = Date.now();
+        if (now - lastSendProgressUpdate > 100) { // Update every 100ms
+            if (fileElement) {
+                const progressValue = sentOffset / file.size;
+                fileElement.querySelector('progress').value = progressValue;
+                fileElement.querySelector('.percent').textContent = `${Math.round(progressValue * 100)}%`;
+            }
+            lastSendProgressUpdate = now;
         }
     }
 
@@ -194,6 +201,7 @@ export function drainQueue() {
         sendData("EOF");
         if (fileElement) {
             fileElement.classList.remove('is-sending');
+            fileElement.querySelector('progress').value = 1; // Final update
             fileElement.querySelector('.status-text').textContent = 'Sent!';
             fileElement.querySelector('.percent').textContent = `100%`;
             const cancelButton = fileElement.querySelector('.cancel-file-btn');
@@ -201,6 +209,7 @@ export function drainQueue() {
         }
 
         store.actions.finishCurrentFileSend(file);
+        lastSendProgressUpdate = 0; // Reset for next file
         ensureQueueIsActive();
     }
 }
@@ -261,6 +270,7 @@ export async function handleDataChannelMessage(event) {
             const fileElement = document.getElementById(fileId);
 
             if (fileElement) {
+                fileElement.querySelector('progress').value = 1; // Final update
                 const actionContainer = fileElement.querySelector('.file-action');
 
                 const downloadIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>`;
@@ -294,6 +304,7 @@ export async function handleDataChannelMessage(event) {
                 fileElement.querySelector('.percent').textContent = 'Complete!';
             }
             incomingFileInfo = null;
+            lastReceiveProgressUpdate = 0; // Reset for next file
             return;
         }
     }
@@ -303,12 +314,16 @@ export async function handleDataChannelMessage(event) {
     incomingFileData.push(data);
     incomingFileReceived += chunkSize;
     if (incomingFileInfo?.size) {
-        const progressValue = incomingFileReceived / incomingFileInfo.size;
-        const fileId = store.actions.getFileId(incomingFileInfo.name);
-        const fileElement = document.getElementById(fileId);
-        if (fileElement) {
-            fileElement.querySelector('progress').value = progressValue;
-            fileElement.querySelector('.percent').textContent = `${Math.round(progressValue * 100)}%`;
+        const now = Date.now();
+        if (now - lastReceiveProgressUpdate > 100) { // Update every 100ms
+            const progressValue = incomingFileReceived / incomingFileInfo.size;
+            const fileId = store.actions.getFileId(incomingFileInfo.name);
+            const fileElement = document.getElementById(fileId);
+            if (fileElement) {
+                fileElement.querySelector('progress').value = progressValue;
+                fileElement.querySelector('.percent').textContent = `${Math.round(progressValue * 100)}%`;
+            }
+            lastReceiveProgressUpdate = now;
         }
     }
 }
@@ -319,8 +334,10 @@ export function resetTransferState() {
     chunkQueue = [];
     fileReadingDone = false;
     sentOffset = 0;
+    lastSendProgressUpdate = 0;
     incomingFileInfo = null;
     incomingFileData = [];
     incomingFileReceived = 0;
+    lastReceiveProgressUpdate = 0;
     store.actions.setCurrentlySendingFile(null);
 }
