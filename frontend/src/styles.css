@@ -3533,12 +3533,19 @@ body[data-theme="dark"] .thumbnail-item {
     width: 100%;
     height: 100%;
     z-index: 9000;
+    background: rgba(0, 0, 0, 0.4); /* Added this line */
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
     pointer-events: none;
     display: none;
+}
+
+.onboarding-highlight-parent {
+    position: relative;
+    z-index: 9001; /* This must be higher than the overlay's z-index */
+    transition: z-index 0.1s;
 }
 
 .onboarding-overlay.show {
@@ -3551,14 +3558,6 @@ body[data-theme="dark"] .thumbnail-item {
     transform: translateY(0);
 }
 
-.onboarding-spotlight {
-    position: fixed;
-    border-radius: 22px;
-    pointer-events: none;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    /* Add a subtle glow effect */
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
-}
 
 .onboarding-tooltip {
     position: fixed;

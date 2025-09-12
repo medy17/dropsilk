@@ -94,26 +94,6 @@ function positionTooltipDesktop(tooltip, targetRect, viewport) {
     tooltip.style.top = `${top}px`;
 }
 
-function positionElements(spotlight, tooltip, targetRect) {
-    const viewport = getViewportInfo();
-    const isMobile = isMobileDevice();
-
-    // Position spotlight
-    const spotlightPadding = isMobile ? 8 : 10;
-    spotlight.style.position = 'fixed';
-    spotlight.style.top = `${targetRect.top - spotlightPadding}px`;
-    spotlight.style.left = `${targetRect.left - spotlightPadding}px`;
-    spotlight.style.width = `${targetRect.width + (spotlightPadding * 2)}px`;
-    spotlight.style.height = `${targetRect.height + (spotlightPadding * 2)}px`;
-
-    // Position tooltip based on device type
-    if (isMobile) {
-        positionTooltipMobile(tooltip, targetRect, viewport);
-    } else {
-        positionTooltipDesktop(tooltip, targetRect, viewport);
-    }
-}
-
 function scrollIntoViewIfNeeded(element, options = {}) {
     const rect = element.getBoundingClientRect();
     const viewport = getViewportInfo();
@@ -171,10 +151,18 @@ export function showWelcomeOnboarding() {
 
     const showOnboarding = () => {
         const rect = target.getBoundingClientRect();
-        const spotlight = welcomeOnboarding.querySelector('.onboarding-spotlight');
         const tooltip = welcomeOnboarding.querySelector('.onboarding-tooltip');
+        const viewport = getViewportInfo();
 
-        positionElements(spotlight, tooltip, rect);
+        // Position tooltip
+        if (isMobileDevice()) {
+            positionTooltipMobile(tooltip, rect, viewport);
+        } else {
+            positionTooltipDesktop(tooltip, rect, viewport);
+        }
+
+        // Highlight the target's parent container
+        target.classList.add('onboarding-highlight-parent');
 
         welcomeOnboarding.style.display = 'block';
         // Force reflow before adding show class
@@ -201,9 +189,13 @@ export function showWelcomeOnboarding() {
         resizeTimeout = setTimeout(() => {
             if (welcomeOnboarding.classList.contains('show')) {
                 const rect = target.getBoundingClientRect();
-                const spotlight = welcomeOnboarding.querySelector('.onboarding-spotlight');
                 const tooltip = welcomeOnboarding.querySelector('.onboarding-tooltip');
-                positionElements(spotlight, tooltip, rect);
+                const viewport = getViewportInfo();
+                if (isMobileDevice()) {
+                    positionTooltipMobile(tooltip, rect, viewport);
+                } else {
+                    positionTooltipDesktop(tooltip, rect, viewport);
+                }
             }
         }, 100);
     };
@@ -222,6 +214,9 @@ export function showWelcomeOnboarding() {
         store.actions.updateOnboardingState('welcome');
         document.body.style.overflow = '';
 
+        // Revert the z-index change
+        target.classList.remove('onboarding-highlight-parent');
+
         // Cleanup
         window.removeEventListener('resize', handleResize);
         window.removeEventListener('orientationchange', handleResize);
@@ -235,35 +230,18 @@ export function showWelcomeOnboarding() {
 export function showInviteOnboarding() {
     const { onboardingState } = store.getState();
     const { inviteOnboarding, dashboardFlightCodeBtn, inviteBtn } = uiElements;
+    const parentElement = document.getElementById('dashboard-header');
 
-    if (onboardingState.invite || !inviteOnboarding || !dashboardFlightCodeBtn || !inviteBtn) return;
+    if (onboardingState.invite || !inviteOnboarding || !dashboardFlightCodeBtn || !inviteBtn || !parentElement) return;
 
     const showOnboarding = () => {
-        const rect1 = dashboardFlightCodeBtn.getBoundingClientRect();
         const rect2 = inviteBtn.getBoundingClientRect();
-
-        const spotlight1 = inviteOnboarding.querySelector('.invite-spotlight-1');
-        const spotlight2 = inviteOnboarding.querySelector('.invite-spotlight-2');
         const tooltip = inviteOnboarding.querySelector('.onboarding-tooltip');
 
-        // Position spotlights
-        const spotlightPadding = isMobileDevice() ? 6 : 8;
+        // Highlight the parent container
+        parentElement.classList.add('onboarding-highlight-parent');
 
-        spotlight1.style.position = 'fixed';
-        spotlight1.style.top = `${rect1.top - spotlightPadding}px`;
-        spotlight1.style.left = `${rect1.left - spotlightPadding}px`;
-        spotlight1.style.width = `${rect1.width + (spotlightPadding * 2)}px`;
-        spotlight1.style.height = `${rect1.height + (spotlightPadding * 2)}px`;
-        spotlight1.style.borderRadius = '12px';
-
-        spotlight2.style.position = 'fixed';
-        spotlight2.style.top = `${rect2.top - spotlightPadding}px`;
-        spotlight2.style.left = `${rect2.left - spotlightPadding}px`;
-        spotlight2.style.width = `${rect2.width + (spotlightPadding * 2)}px`;
-        spotlight2.style.height = `${rect2.height + (spotlightPadding * 2)}px`;
-        spotlight2.style.borderRadius = '14px';
-
-        // Position tooltip relative to invite button (more prominent)
+        // Position tooltip relative to invite button
         const viewport = getViewportInfo();
         if (isMobileDevice()) {
             positionTooltipMobile(tooltip, rect2, viewport);
@@ -310,6 +288,9 @@ export function showInviteOnboarding() {
         }, 300);
         store.actions.updateOnboardingState('invite');
         document.body.style.overflow = '';
+
+        // Revert the z-index change
+        parentElement.classList.remove('onboarding-highlight-parent');
 
         // Cleanup
         window.removeEventListener('resize', handleResize);
