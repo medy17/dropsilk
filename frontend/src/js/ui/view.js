@@ -89,17 +89,18 @@ export function updateDashboardStatus(text, type) {
 }
 
 export function renderNetworkUsersView() {
-    const { lastNetworkUsers, currentFlightCode } = store.getState();
+    const { lastNetworkUsers, currentFlightCode, isFlightCreator } = store.getState();
     uiElements.connectionPanelTitle.textContent = "Users on Your Network";
     const list = uiElements.connectionPanelList;
     list.innerHTML = '';
 
     const hasSeenPulse = localStorage.getItem('hasSeenInvitePulse') === 'true';
-    const shouldShowPulse = !hasSeenPulse && currentFlightCode;
+    const shouldShowCreatorPulse = !hasSeenPulse && currentFlightCode && isFlightCreator;
 
-    if (shouldShowPulse) {
+    if (shouldShowCreatorPulse) {
         const mainInviteBtn = document.getElementById('inviteBtn');
         if (mainInviteBtn) addPulseEffect(mainInviteBtn);
+        if (uiElements.dashboardFlightCodeBtn) addPulseEffect(uiElements.dashboardFlightCodeBtn);
     }
 
     if (lastNetworkUsers.length === 0) {
@@ -120,7 +121,7 @@ export function renderNetworkUsersView() {
             </button>`;
         list.appendChild(userEl);
 
-        if (shouldShowPulse) {
+        if (shouldShowCreatorPulse) {
             const inviteBtn = userEl.querySelector('.invite-user-btn');
             if (inviteBtn) addPulseEffect(inviteBtn);
         }
