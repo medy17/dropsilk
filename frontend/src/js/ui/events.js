@@ -13,6 +13,22 @@ import Sortable from 'sortablejs';
 
 
 /**
+ * Reusable function to handle the logic for joining a flight.
+ */
+function attemptToJoinFlight() {
+    const code = uiElements.flightCodeInput.value.trim().toUpperCase();
+    if (code) {
+        store.actions.setIsFlightCreator(false);
+        sendMessage({ type: "join-flight", flightCode: code });
+    } else {
+        uiElements.flightCodeInputWrapper.classList.add('input-error');
+        setTimeout(() => uiElements.flightCodeInputWrapper.classList.remove('input-error'), 1500);
+        showToast({ type: 'danger', title: 'Empty Code', body: 'Please enter a 6-character flight code to join.', duration: 5000 });
+    }
+}
+
+
+/**
  * Initializes the SortableJS library on the sending queue for smooth drag-and-drop reordering.
  */
 function initializeSortableQueue() {
@@ -41,15 +57,14 @@ export function initializeEventListeners() {
         sendMessage({ type: "create-flight" });
     });
 
-    uiElements.joinFlightBtn?.addEventListener('click', () => {
-        const code = uiElements.flightCodeInput.value.trim().toUpperCase();
-        if (code) {
-            store.actions.setIsFlightCreator(false);
-            sendMessage({ type: "join-flight", flightCode: code });
-        } else {
-            uiElements.flightCodeInputWrapper.classList.add('input-error');
-            setTimeout(() => uiElements.flightCodeInputWrapper.classList.remove('input-error'), 1500);
-            showToast({ type: 'danger', title: 'Empty Code', body: 'Please enter a 6-character flight code to join.', duration: 5000 });
+    // MODIFIED: Use the reusable function for the click event
+    uiElements.joinFlightBtn?.addEventListener('click', attemptToJoinFlight);
+
+    // NEW: Add keydown event listener for the input field
+    uiElements.flightCodeInput?.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent any default form submission behavior
+            attemptToJoinFlight();
         }
     });
 
