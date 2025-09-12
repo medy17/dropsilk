@@ -133,12 +133,14 @@ export function handlePeerLeft() {
     renderNetworkUsersView();
 }
 
+// js/network/websocket.js -> handleServerError function
+
 async function handleServerError(message) {
     console.error("Server error:", message);
     if (message.includes("Flight not found")) {
-        const { flightCodeInputWrapper } = await import('../ui/dom.js');
-        flightCodeInputWrapper.classList.add('input-error');
-        setTimeout(() => flightCodeInputWrapper.classList.remove('input-error'), 1500);
+        const { uiElements } = await import('../ui/dom.js'); // Import uiElements object
+        uiElements.flightCodeInputWrapper.classList.add('input-error'); // Access the property
+        setTimeout(() => uiElements.flightCodeInputWrapper.classList.remove('input-error'), 1500);
 
         showToast({
             type: 'danger',
