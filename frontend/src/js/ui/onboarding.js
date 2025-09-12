@@ -5,24 +5,37 @@ import { uiElements } from './dom.js';
 function positionTooltip(tooltip, targetRect) {
     const tooltipRect = tooltip.getBoundingClientRect();
     const spaceBelow = window.innerHeight - targetRect.bottom;
+    const spaceAbove = targetRect.top;
 
     let top, left;
 
+    // Prefer to position below if there's enough space.
     if (spaceBelow > tooltipRect.height + 20) {
-        // Position below the target element if there's enough space
         top = targetRect.bottom + 15;
-    } else {
-        // Otherwise, position above
+    }
+    // Otherwise, prefer above if there's enough space.
+    else if (spaceAbove > tooltipRect.height + 20) {
         top = targetRect.top - tooltipRect.height - 15;
+    }
+    // If neither has enough space, just put it below and let it be clamped.
+    else {
+        top = targetRect.bottom + 15;
     }
 
     left = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
 
-    // Clamp to the viewport edges to prevent it from going off-screen
+    // Clamp horizontally to the viewport edges
     if (left < 10) left = 10;
     if (left + tooltipRect.width > window.innerWidth - 10) {
         left = window.innerWidth - tooltipRect.width - 10;
     }
+
+    // Clamp vertically to the viewport edges
+    if (top < 10) top = 10;
+    if (top + tooltipRect.height > window.innerHeight - 10) {
+        top = window.innerHeight - tooltipRect.height - 10;
+    }
+
 
     tooltip.style.top = `${top}px`;
     tooltip.style.left = `${left}px`;
@@ -38,6 +51,10 @@ export function showWelcomeOnboarding() {
     const target = document.querySelector('.flight-ticket-panel-wrapper');
     if (!target) return;
 
+    // --- FIX: Bring target element above the overlay shadow ---
+    target.style.position = 'relative';
+    target.style.zIndex = '9001';
+
     const rect = target.getBoundingClientRect();
     const spotlight = welcomeOnboarding.querySelector('.onboarding-spotlight');
     const tooltip = welcomeOnboarding.querySelector('.onboarding-tooltip');
@@ -52,10 +69,18 @@ export function showWelcomeOnboarding() {
     welcomeOnboarding.style.display = 'block';
     setTimeout(() => welcomeOnboarding.classList.add('show'), 10);
 
+    // --- FIX: Lock body scroll ---
+    document.body.style.overflow = 'hidden';
+
     uiElements.dismissWelcomeBtn.onclick = () => {
         welcomeOnboarding.classList.remove('show');
         setTimeout(() => welcomeOnboarding.style.display = 'none', 300);
         store.actions.updateOnboardingState('welcome');
+
+        // --- FIX: Unlock body scroll and reset styles ---
+        document.body.style.overflow = '';
+        target.style.position = '';
+        target.style.zIndex = '';
     };
 }
 
@@ -64,6 +89,12 @@ export function showInviteOnboarding() {
     const { inviteOnboarding, dashboardFlightCodeBtn, inviteBtn } = uiElements;
 
     if (onboardingState.invite || !inviteOnboarding || !dashboardFlightCodeBtn || !inviteBtn) return;
+
+    // --- FIX: Bring target elements above the overlay shadow ---
+    dashboardFlightCodeBtn.style.position = 'relative';
+    dashboardFlightCodeBtn.style.zIndex = '9001';
+    inviteBtn.style.position = 'relative';
+    inviteBtn.style.zIndex = '9001';
 
     const rect1 = dashboardFlightCodeBtn.getBoundingClientRect();
     const rect2 = inviteBtn.getBoundingClientRect();
@@ -89,9 +120,19 @@ export function showInviteOnboarding() {
     inviteOnboarding.style.display = 'block';
     setTimeout(() => inviteOnboarding.classList.add('show'), 10);
 
+    // --- FIX: Lock body scroll ---
+    document.body.style.overflow = 'hidden';
+
     uiElements.dismissInviteBtn.onclick = () => {
         inviteOnboarding.classList.remove('show');
         setTimeout(() => inviteOnboarding.style.display = 'none', 300);
         store.actions.updateOnboardingState('invite');
+
+        // --- FIX: Unlock body scroll and reset styles ---
+        document.body.style.overflow = '';
+        dashboardFlightCodeBtn.style.position = '';
+        dashboardFlightCodeBtn.style.zIndex = '';
+        inviteBtn.style.position = '';
+        inviteBtn.style.zIndex = '';
     };
 }
