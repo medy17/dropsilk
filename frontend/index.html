@@ -280,6 +280,7 @@
             © 2025 DropSilk. A peer-to-peer passion project. v1.3
         </div>
         <nav class="footer-nav">
+            <a href="https://ko-fi.com/medy17"></a><button id="ko-fiBtn" class="footer-nav-link">Donate</button>
             <button id="termsBtn" class="footer-nav-link">Terms</button>
             <button id="privacyBtn" class="footer-nav-link" aria-label="Privacy Policy for DropSilk free, unlimited file sharing peer to peer">Privacy</button>
             <button id="securityBtn" class="footer-nav-link" aria-label="Security for DropSilk free, unlimited file sharing peer to peer">Security</button>
@@ -316,7 +317,6 @@
     </div>
 </div>
 
-<!-- NEW: About Me Modal -->
 <div class="modal-overlay" id="aboutModal">
     <div class="invite-modal">
         <div class="modal-header">
@@ -411,11 +411,6 @@
 
             <!-- State 2: CAPTCHA Challenge -->
             <div id="email-view-captcha-state" style="display: none;">
-                <!--
-                   NOTE: Using Google's v2 test site key.
-                   For a real production site, you would generate your own key at:
-                   https://www.google.com/recaptcha/admin
-                -->
                 <div id="recaptcha-container">
                 </div>
             </div>
@@ -436,7 +431,7 @@
     </div>
 </div>
 
-<!-- NEW: Terms Modal -->
+<!-- NEW: Terms Modal (Expanded) -->
 <div class="modal-overlay" id="termsModal">
     <div class="invite-modal">
         <div class="modal-header">
@@ -446,29 +441,40 @@
             </button>
         </div>
         <div class="modal-body">
-            <p><strong>Last Updated: 27th of June 2025</strong></p>
-            <p>Welcome to DropSilk! By using this website and service, you agree to the following terms. Please read them carefully.</p>
+            <p><strong>Last Updated: September 13, 2025 UTC 2100 hrs</strong></p>
+            <p>Welcome to DropSilk! These Terms of Service ("Terms") govern your access to and use of the DropSilk website and services ("Service"). By using the Service, you agree to be bound by these Terms.</p>
 
-            <p><strong>1. Use of Service:</strong> DropSilk is a free, experimental service for peer-to-peer file transfer between devices. You agree to use DropSilk only for lawful purposes. You must not use the service to send, receive, or share any files that are illegal, infringe on the rights of others, or violate any applicable laws or regulations. You are solely responsible for the content of the files you transfer. You must have the legal right to share any files you send using DropSilk.</p>
+            <p><strong>1. Use of the Service</strong></p>
+            <p>You agree to use DropSilk only for lawful purposes. You are solely responsible for the files you transfer ("Content") and for your compliance with all applicable laws. You must have the legal right to share any Content you send. You agree not to use the Service to transfer any Content that:</p>
+            <ul>
+                <li>Is illegal, fraudulent, or malicious.</li>
+                <li>Infringes on any third party's intellectual property rights (e.g., copyright, trademark).</li>
+                <li>Contains viruses, malware, or other harmful code.</li>
+                <li>Is harassing, defamatory, or obscene.</li>
+            </ul>
 
-            <p><strong>2. No Warranty:</strong> DropSilk is provided “as is” and "as available", without any warranties of any kind, either express or implied. We do not guarantee that the service will be secure, uninterrupted, error-free, or free from viruses or other harmful components. We may modify, suspend, or discontinue the service at any time without notice.</p>
+            <p><strong>2. No Warranty & Disclaimer</strong></p>
+            <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis, without any warranties of any kind, express or implied. We do not guarantee that the Service will be secure, uninterrupted, error-free, or that file transfers will be successful or free from data corruption. You use DropSilk at your own risk.</p>
 
-            <p><strong>3. Limitation of Liability:</strong> To the fullest extent permitted by law, DropSilk and its creator(s) are not liable for any direct, indirect, incidental, special, consequential, or exemplary damages, including but not to-do loss of data, loss of profits, or other losses resulting from your use of (or inability to use) the service. You use DropSilk at your own risk.</p>
+            <p><strong>3. Limitation of Liability</strong></p>
+            <p>To the fullest extent permitted by law, DropSilk and its creator(s) shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not to-do loss of data, profits, or other intangible losses, resulting from (i) your access to or use of or inability to access or use the Service; (ii) any conduct or content of any third party on the Service; or (iii) unauthorized access, use, or alteration of your transmissions.</p>
 
-            <p><strong>4. Privacy:</strong> DropSilk is designed to transfer files directly between users (peer-to-peer) using WebRTC technology. Files are <strong>not</strong> stored on our servers. We do not access, view, or retain the files you transfer. Some minimal information (such as your device’s IP prefix) may be used temporarily to facilitate connections, but is not stored or shared. For more details, please see our Privacy Policy.</p>
+            <p><strong>4. Privacy</strong></p>
+            <p>Your privacy is important to us. Our Privacy Policy explains how we handle the limited data required to operate the Service. By using DropSilk, you agree to the collection and use of information in accordance with our Privacy Policy. You acknowledge that files are transferred directly between users and are not stored on our servers.</p>
 
-            <p><strong>5. User Conduct:</strong> You agree not to attempt to disrupt, hack, or interfere with the operation of DropSilk or its users. You must not use DropSilk to harass, abuse, or harm others.</p>
+            <p><strong>5. User Conduct and Termination</strong></p>
+            <p>You agree not to disrupt, interfere with, or attempt to gain unauthorized access to the Service or its related systems. We reserve the right to suspend or terminate your access to the Service at any time, without notice, for any reason, including for violation of these Terms.</p>
 
-            <p><strong>6. Changes to These Terms:</strong> We may update these Terms of Service from time to time. If we make significant changes, we will post a notice on the website. Your continued use of DropSilk after changes are posted means you accept the new terms.</p>
+            <p><strong>6. Changes to Terms</strong></p>
+            <p>We may modify these Terms from time to time. We will post the most current version on our site. By continuing to use the Service after changes become effective, you agree to be bound by the revised Terms.</p>
 
-            <p><strong>7. Contact:</strong> If you have any questions or concerns about these terms, please contact us at <a href="mailto:ahmed@dropsilk.xyz">ahmed@dropsilk.xyz</a>.</p>
-
-            <p><em>These Terms of Service are provided for informational purposes and do not constitute legal advice. For a production or commercial service, please consult a qualified legal professional.</em></p>
+            <p><strong>7. Contact</strong></p>
+            <p>If you have any questions about these Terms, please contact us via the method provided on the Contact page.</p>
         </div>
     </div>
 </div>
 
-<!-- NEW: Privacy Policy Modal -->
+<!-- NEW: Privacy Policy Modal (Expanded) -->
 <div class="modal-overlay" id="privacyModal">
     <div class="invite-modal">
         <div class="modal-header">
@@ -478,35 +484,56 @@
             </button>
         </div>
         <div class="modal-body">
-            <p><strong>Your privacy is paramount.</strong> DropSilk is designed to be as private as possible.</p>
-            <p><strong>File Transfers:</strong> Your files are never uploaded to or stored on our servers. They are sent directly from your device to the recipient's device using an encrypted, peer-to-peer (P2P) connection via WebRTC.</p>
-            <p><strong>Signalling Server:</strong> To establish a P2P connection, your device and the recipient's device need to exchange connection information (like IP addresses and network capabilities). This exchange is facilitated by our signalling server. The server only sees this temporary metadata and your randomly generated username; it does not see the content of your files. This connection data is discarded after you leave the session.</p>
-            <p><strong>Analytics:</strong> We do not use third-party analytics or tracking cookies. All metrics displayed, such as transfer speed and data volume, are calculated locally on your device and are not sent to our servers.</p>
-            <p><em>This is a simplified privacy statement. A full-fledged service would require a more detailed policy.</em></p>
+            <p><strong>Last Updated: July 2, 2024</strong></p>
+            <p>Your privacy is paramount. DropSilk is architected from the ground up to be as private as possible.</p>
+
+            <p><strong>What Information We Collect</strong></p>
+            <ul>
+                <li><strong>Signaling Data:</strong> To establish a direct peer-to-peer connection, our server temporarily handles metadata such as your IP address, browser user-agent, and a randomly generated ID. This information is essential for connecting you with your peer and is discarded as soon as your session ends. It is never logged permanently or shared.</li>
+                <li><strong>File &amp; Screen Share Data:</strong> We do not collect, store, or have access to the files you transfer or the content of your screen shares. All such data is sent directly from your device to your peer's device using an encrypted WebRTC connection.</li>
+                <li><strong>Preview Uploads:</strong> For certain file types (e.g., .pptx), a preview may be generated by temporarily uploading the file to our secure third-party service, UploadThing. This file is used solely for generating the preview and is deleted according to their retention policies. This process is optional and only occurs if you click the preview button for a supported file type.</li>
+                <li><strong>Analytics Data:</strong> We use Google Analytics to collect anonymous, aggregated usage data, such as page visits and feature usage. This helps us understand how the service is used and where to make improvements. This data is not tied to your personal identity.</li>
+                <li><strong>Contact Information:</strong> If you contact us via email, we will have a record of your email address and correspondence to provide support.</li>
+            </ul>
+
+            <p><strong>How We Use Information</strong></p>
+            <p>We use the limited information we collect solely to operate, maintain, and improve the DropSilk service, and to prevent abuse (e.g., using Google reCAPTCHA on our contact form).</p>
+
+            <p><strong>Data Security</strong></p>
+            <p>We take security seriously. All data in transit, including files and screen shares, is encrypted end-to-end using DTLS. Our website is served over HTTPS to protect your connection to our server. Since we do not store your files, the risk of a server-side file breach is eliminated.</p>
+
+            <p><strong>Third Parties</strong></p>
+            <p>We use a few trusted third-party services to provide functionality: Google Analytics (for anonymous statistics on the Google Ad campaigns we run), Google reCAPTCHA (for spam protection), and UploadThing (for optional file previews). We encourage you to review their respective privacy policies.</p>
         </div>
     </div>
 </div>
 
-<!-- NEW: Security Modal -->
+<!-- NEW: Security Modal (Expanded) -->
 <div class="modal-overlay" id="securityModal">
     <div class="invite-modal">
         <div class="modal-header">
-            <h3>Security</h3>
+            <h3>Security by Design</h3>
             <button class="modal-close" id="closeSecurityModal" aria-label="Close modal">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
             </button>
         </div>
         <div class="modal-body">
-            <p>Security is a core feature of DropSilk's design.</p>
-            <p><strong>End-to-End Encryption:</strong> All data transferred via WebRTC, including your files, is encrypted end-to-end using DTLS (Datagram Transport Layer Security). This means only you and the recipient can decrypt the data. Our signalling server, or any other intermediary, cannot access the contents of your files.</p>
-            <p><strong>No Cloud Storage:</strong> Since your files are never stored on a central server, there is no risk of a cloud data breach exposing your files. The transfer happens directly between the peers in a "flight".</p>
-            <p><strong>Flight Codes:</strong> Each transfer session ("flight") is protected by a unique, randomly generated 6-character code. Only users with this code can join the session and receive files.</p>
-            <p><strong>Best Practices:</strong> While we implement these security measures, always be sure you are sharing files with a person you know and trust. Verify the flight code with them through a separate, secure channel.</p>
+            <p><strong>End-to-End Encryption</strong></p>
+            <p>All data transferred between you and your peer, including files and screen shares, is encrypted end-to-end using industry-standard WebRTC protocols (DTLS and SRTP). This means the data is encrypted on the sender's device and can only be decrypted by the recipient's device. No one in between—not even the DropSilk server—can access the contents of your transfer.</p>
+
+            <p><strong>No Cloud Storage Risk</strong></p>
+            <p>Your files are never uploaded to or stored on a central server. The transfer happens directly between the browsers of the connected peers. This eliminates the risk of a traditional cloud data breach exposing your files, as there is no central repository to attack.</p>
+
+            <p><strong>Ephemeral Sessions</strong></p>
+            <p>Each "flight" is a temporary, private session. The connection information is held by our server only for the duration of the session. Once you or your peer disconnects, the session is terminated and the connection data is discarded.</p>
+
+            <p><strong>Your Responsibility</strong></p>
+            <p>While we provide a secure channel, your security also depends on you. Always ensure you are sharing files with a person you know and trust. We recommend verifying the flight code with them through a separate, secure channel (like a private message) before initiating a transfer.</p>
         </div>
     </div>
 </div>
 
-<!-- NEW: FAQ Modal -->
+<!-- NEW: FAQ Modal (Expanded) -->
 <div class="modal-overlay" id="faqModal">
     <div class="invite-modal">
         <div class="modal-header">
@@ -517,16 +544,22 @@
         </div>
         <div class="modal-body">
             <p><strong>Is there a file size limit?</strong></p>
-            <p>Theoretically, no. DropSilk is designed to handle large files. However, performance may depend on your browser, device memory, and network conditions. Some browsers have internal limits on how much data can be buffered.</p>
+            <p>Theoretically, no. DropSilk is designed to handle large files by streaming them directly. However, performance for extremely large files (many gigabytes) can be affected by your device's memory capacity and the stability of your network connection.</p>
 
-            <p><strong>Why is the transfer slow?</strong></p>
-            <p>Transfer speed depends entirely on the network connection between you and the recipient. For best results, ensure both devices are connected to the same high-speed Wi-Fi network. Transfers over the internet or through cellular data will be slower.</p>
+            <p><strong>Why is my transfer speed slow?</strong></p>
+            <p>Transfer speed is determined by the direct network path between you and your peer. For the fastest speeds, ensure both devices are on the same local Wi-Fi network (LAN). When transferring over the internet (WAN), the speed is limited by the slowest of the two users' internet connections (specifically, the sender's upload speed and the receiver's download speed).</p>
 
-            <p><strong>Are my files stored anywhere?</strong></p>
-            <p>No. Your files are sent directly from your browser to the recipient's browser. They are never stored on any server.</p>
+            <p><strong>Is DropSilk free to use?</strong></p>
+            <p>Yes, DropSilk is completely free. It was created as a passion project to offer a simple and private file sharing solution.</p>
 
-            <p><strong>What is a "Flight"?</strong></p>
-            <p>A "flight" is our term for a temporary, private file transfer session between two or more devices. You can create a flight to send files or join an existing flight with a code to receive them.</p>
+            <p><strong>What browsers are supported?</strong></p>
+            <p>DropSilk works on all modern, up-to-date desktop browsers that fully support WebRTC, such as Google Chrome, Mozilla Firefox, Microsoft Edge, and Safari. DropSilk may look slightly different on some browsers due to the way they choose to interpret certain parts of the CSS spec. This does not affect functionality and is purely aesthetic.</p>
+
+            <p><strong>What happens if I get disconnected?</strong></p>
+            <p>If your network connection is interrupted, the file transfer will stop. You will need to reconnect to the flight and restart the transfer for any incomplete files. There is currently no functionality to resume a failed transfer. Fully received files will remain accessible and downloadable until you close the tab.</p>
+
+            <p><strong>How does screen sharing work?</strong></p>
+            <p>Screen sharing uses the same secure, peer-to-peer WebRTC technology as file transfers. Your screen is encrypted and streamed directly to your peer, and is never visible to our servers.</p>
         </div>
     </div>
 </div>
