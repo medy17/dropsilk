@@ -744,7 +744,7 @@ body.sortable-drag * {
     overflow: hidden;
     border: 1.5px solid var(--c-primary);
     box-shadow: 0 1px 4px rgb(91 206 250 / .04);
-    transition: border-color 0.2s, background 0.3s ease, transform 0.2s ease-in-out;
+    transition: border-color 0.2s, background 0.3s ease;
 }
 
 .flight-code-input-wrapper:focus-within {
@@ -754,21 +754,6 @@ body.sortable-drag * {
 .flight-code-input-wrapper.input-error {
     border-color: var(--c-danger);
     animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
-}
-
-@keyframes shake {
-    10%, 90% {
-        transform: translateX(-1px);
-    }
-    20%, 80% {
-        transform: translateX(2px);
-    }
-    30%, 50%, 70% {
-        transform: translateX(-4px);
-    }
-    40%, 60% {
-        transform: translateX(4px);
-    }
 }
 
 
