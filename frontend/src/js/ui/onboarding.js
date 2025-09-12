@@ -114,7 +114,7 @@ function positionElements(spotlight, tooltip, targetRect) {
     }
 }
 
-function scrollIntoViewIfNeeded(element) {
+function scrollIntoViewIfNeeded(element, options = {}) {
     const rect = element.getBoundingClientRect();
     const viewport = getViewportInfo();
 
@@ -127,10 +127,35 @@ function scrollIntoViewIfNeeded(element) {
     if (!isVisible) {
         element.scrollIntoView({
             behavior: 'smooth',
-            block: 'center',
-            inline: 'center'
+            block: options.block || 'center',
+            inline: options.inline || 'center'
         });
         return true; // Indicates we scrolled
+    }
+    return false;
+}
+
+// Add a more aggressive scroll function for dashboard
+function scrollDashboardIntoView() {
+    const dashboardHeader = document.getElementById('dashboard-header');
+    const dashboard = document.getElementById('dashboard');
+
+    if (dashboardHeader) {
+        // Scroll to show the dashboard header clearly at the top
+        dashboardHeader.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest'
+        });
+        return true;
+    } else if (dashboard) {
+        // Fallback to dashboard with more aggressive positioning
+        dashboard.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest'
+        });
+        return true;
     }
     return false;
 }
@@ -253,12 +278,10 @@ export function showInviteOnboarding() {
         document.body.style.overflow = 'hidden';
     };
 
-    // Check if both elements are visible, scroll dashboard into view if needed
-    const dashboard = document.getElementById('dashboard');
-    const didScroll = dashboard ? scrollIntoViewIfNeeded(dashboard) : false;
+    const didScroll = scrollDashboardIntoView();
 
     if (didScroll) {
-        setTimeout(showOnboarding, 600);
+        setTimeout(showOnboarding, 900);
     } else {
         requestAnimationFrame(showOnboarding);
     }
