@@ -257,7 +257,7 @@ export function updateShareButton(isSharing) {
     if (!btn) return;
 
     btn.classList.remove('hidden');
-    const textSpan = btn.querySelector('span:last-of-type');
+    const textSpan = btn.querySelector('span:not([class])');
     if (isSharing) {
         btn.classList.add('is-sharing');
         if (textSpan) textSpan.textContent = btn.dataset.textStop;

@@ -3514,7 +3514,7 @@ body[data-theme="dark"] .thumbnail-item {
 
 /* Standard responsive behavior for small viewports */
 @media (max-width: 550px) {
-    .flight-actions .btn span:last-of-type {
+    .flight-actions .btn span:not([class]) {
         display: none;
     }
 
