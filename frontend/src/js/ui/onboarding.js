@@ -4,36 +4,40 @@ import { uiElements } from './dom.js';
 
 function positionTooltip(tooltip, targetRect) {
     const tooltipRect = tooltip.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - targetRect.bottom;
-    const spaceAbove = targetRect.top;
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const margin = 15; // Space from target and viewport edge
 
     let top, left;
 
-    // Prefer to position below if there's enough space.
-    if (spaceBelow > tooltipRect.height + 20) {
-        top = targetRect.bottom + 15;
+    const spaceBelow = viewportHeight - targetRect.bottom;
+    const spaceAbove = targetRect.top;
+
+    // Try to position below first
+    if (spaceBelow >= tooltipRect.height + margin) {
+        top = targetRect.bottom + margin;
     }
-    // Otherwise, prefer above if there's enough space.
-    else if (spaceAbove > tooltipRect.height + 20) {
-        top = targetRect.top - tooltipRect.height - 15;
+    // If not enough space below, try above
+    else if (spaceAbove >= tooltipRect.height + margin) {
+        top = targetRect.top - tooltipRect.height - margin;
     }
-    // If neither has enough space, just put it below and let it be clamped.
+        // FALLBACK: If neither above nor below has space, center it.
+    // This is the crucial fix for small mobile screens.
     else {
-        top = targetRect.bottom + 15;
+        top = (viewportHeight - tooltipRect.height) / 2;
     }
 
+    // Horizontal positioning (clamped to viewport)
     left = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
-
-    // Clamp horizontally to the viewport edges
-    if (left < 10) left = 10;
-    if (left + tooltipRect.width > window.innerWidth - 10) {
-        left = window.innerWidth - tooltipRect.width - 10;
+    if (left < margin) left = margin;
+    if (left + tooltipRect.width > viewportWidth - margin) {
+        left = viewportWidth - tooltipRect.width - margin;
     }
 
-    // Clamp vertically to the viewport edges
-    if (top < 10) top = 10;
-    if (top + tooltipRect.height > window.innerHeight - 10) {
-        top = window.innerHeight - tooltipRect.height - 10;
+    // Final vertical clamping
+    if (top < margin) top = margin;
+    if (top + tooltipRect.height > viewportHeight - margin) {
+        top = viewportHeight - tooltipRect.height - margin;
     }
 
     tooltip.style.top = `${top}px`;
@@ -63,14 +67,12 @@ export function showWelcomeOnboarding() {
     welcomeOnboarding.style.display = 'block';
     setTimeout(() => welcomeOnboarding.classList.add('show'), 10);
 
-    // FIX: Lock body scroll
     document.body.style.overflow = 'hidden';
 
     uiElements.dismissWelcomeBtn.onclick = () => {
         welcomeOnboarding.classList.remove('show');
         setTimeout(() => welcomeOnboarding.style.display = 'none', 300);
         store.actions.updateOnboardingState('welcome');
-        // FIX: Unlock body scroll
         document.body.style.overflow = '';
     };
 }
@@ -104,14 +106,12 @@ export function showInviteOnboarding() {
     inviteOnboarding.style.display = 'block';
     setTimeout(() => inviteOnboarding.classList.add('show'), 10);
 
-    // FIX: Lock body scroll
     document.body.style.overflow = 'hidden';
 
     uiElements.dismissInviteBtn.onclick = () => {
         inviteOnboarding.classList.remove('show');
         setTimeout(() => inviteOnboarding.style.display = 'none', 300);
         store.actions.updateOnboardingState('invite');
-        // FIX: Unlock body scroll
         document.body.style.overflow = '';
     };
 }
