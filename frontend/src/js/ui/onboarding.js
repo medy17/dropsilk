@@ -234,15 +234,6 @@ export function showInviteOnboarding() {
 
     if (onboardingState.invite || !inviteOnboarding || !dashboardFlightCodeBtn || !inviteBtn || !parentElement) return;
 
-    // Get the dashboard element
-    const dashboard = document.getElementById('dashboard');
-
-    // Save the original z-index value
-    const originalZIndex = dashboard.style.zIndex;
-
-    // Set dashboard z-index higher than the onboarding overlay
-    dashboard.style.zIndex = '9002';
-
     const showOnboarding = () => {
         const rect2 = inviteBtn.getBoundingClientRect();
         const tooltip = inviteOnboarding.querySelector('.onboarding-tooltip');
@@ -298,8 +289,7 @@ export function showInviteOnboarding() {
         store.actions.updateOnboardingState('invite');
         document.body.style.overflow = '';
 
-        dashboard.style.zIndex = originalZIndex || '1';
-
+        // Revert the z-index change
         parentElement.classList.remove('onboarding-highlight-parent');
 
         // Cleanup
