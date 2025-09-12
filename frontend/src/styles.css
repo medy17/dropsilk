@@ -2089,6 +2089,10 @@ body.sortable-drag * {
     display: block;
 }
 
+#video-player-container.cursor-hidden {
+    cursor: none;
+}
+
 #video-player-container.controls-visible #close-video-btn {
     opacity: 1;
 }

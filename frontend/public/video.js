@@ -40,7 +40,13 @@ window.videoPlayer = (() => {
         video.addEventListener('click', togglePlay);
         video.addEventListener('dblclick', toggleFullscreen);
         video.addEventListener('play', () => playerContainer.classList.remove('paused'));
-        video.addEventListener('pause', () => playerContainer.classList.add('paused'));
+
+        // --- MODIFICATION 1: Update pause event listener ---
+        video.addEventListener('pause', () => {
+            playerContainer.classList.add('paused');
+            playerContainer.classList.remove('cursor-hidden');
+        });
+
         video.addEventListener('loadedmetadata', handleMetadataLoaded);
         video.addEventListener('timeupdate', handleTimeUpdate);
         video.addEventListener('progress', handleBufferUpdate);
@@ -55,7 +61,10 @@ window.videoPlayer = (() => {
         audioBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(audioMenu); });
         captionsBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(captionsMenu); });
         playerContainer.addEventListener('mousemove', showControlsTemporarily);
-        playerContainer.addEventListener('mouseleave', () => clearTimeout(controlsTimeout));
+
+        // --- MODIFICATION 2: Remove the mouseleave event listener ---
+        // This was causing a bug where controls could get stuck on. The timeout is sufficient.
+        // playerContainer.addEventListener('mouseleave', () => clearTimeout(controlsTimeout));
     }
 
     function handleMetadataLoaded() {
@@ -198,9 +207,13 @@ window.videoPlayer = (() => {
 
     function showControlsTemporarily() {
         playerContainer.classList.add('controls-visible');
+        playerContainer.classList.remove('cursor-hidden');
         clearTimeout(controlsTimeout);
         controlsTimeout = setTimeout(() => {
-            if (!video.paused) playerContainer.classList.remove('controls-visible');
+            if (!video.paused) {
+                playerContainer.classList.remove('controls-visible');
+                playerContainer.classList.add('cursor-hidden');
+            }
         }, 3000);
     }
 
