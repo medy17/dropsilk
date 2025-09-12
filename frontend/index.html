@@ -607,6 +607,27 @@
     </div>
 </div>
 <button id="openPreviewModal" data-modal-trigger="preview" style="display: none;"></button>
+
+<!-- ONBOARDING ELEMENTS -->
+<div class="onboarding-overlay" id="welcomeOnboarding">
+    <div class="onboarding-spotlight"></div>
+    <div class="onboarding-tooltip">
+        <h3>Welcome to DropSilk!</h3>
+        <p>This is a peer-to-peer file transfer app. To start, create a "flight" to connect with another device.</p>
+        <button class="btn btn-primary" id="dismissWelcome">Got It!</button>
+    </div>
+</div>
+<div class="onboarding-overlay" id="inviteOnboarding">
+    <div class="onboarding-spotlight invite-spotlight-1"></div>
+    <div class="onboarding-spotlight invite-spotlight-2"></div>
+    <div class="onboarding-tooltip">
+        <h3>Your Flight is Ready!</h3>
+        <p>Now, share your unique flight code with the other device or use the invite button to connect them.</p>
+        <button class="btn btn-primary" id="dismissInvite">Start Sharing</button>
+    </div>
+</div>
+
+
 <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoadCallback&render=explicit" async defer></script>
 <script src="/video.js" defer></script>
 <script type="module" src="src/js/app.js"></script>

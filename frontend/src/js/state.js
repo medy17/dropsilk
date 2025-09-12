@@ -30,6 +30,10 @@ const initialState = {
     // UI State
     hasScrolledForSend: false,
     hasScrolledForReceive: false,
+    onboardingState: {
+        welcome: false, // Has the user seen the initial welcome message?
+        invite: false,  // Has the user seen the "now invite someone" message?
+    },
 };
 
 let state = { ...initialState };
@@ -40,10 +44,23 @@ export const store = {
     actions: {
         initializeUser: () => {
             state.myName = generateRandomName();
+            // Load onboarding state from localStorage
+            const savedOnboardingState = localStorage.getItem('dropsilk-onboarding');
+            if (savedOnboardingState) {
+                try {
+                    // Merge saved state with initial state to handle new properties
+                    const parsedState = JSON.parse(savedOnboardingState);
+                    state.onboardingState = { ...initialState.onboardingState, ...parsedState };
+                } catch (e) {
+                    console.error("Could not parse saved onboarding state.");
+                }
+            }
         },
         resetState: () => {
             if (state.metricsInterval) clearInterval(state.metricsInterval);
+            const savedOnboardingState = state.onboardingState; // Preserve onboarding state on reset
             Object.assign(state, initialState);
+            state.onboardingState = savedOnboardingState;
             state.fileIdMap = new Map();
             store.actions.initializeUser();
         },
@@ -120,6 +137,12 @@ export const store = {
             state.receivedInInterval = 0;
         },
         setHasScrolledForSend: (value) => { state.hasScrolledForSend = value; },
-        setHasScrolledForReceive: (value) => { state.hasScrolledForReceive = value; }
+        setHasScrolledForReceive: (value) => { state.hasScrolledForReceive = value; },
+        updateOnboardingState: (step) => {
+            if (state.onboardingState.hasOwnProperty(step)) {
+                state.onboardingState[step] = true;
+                localStorage.setItem('dropsilk-onboarding', JSON.stringify(state.onboardingState));
+            }
+        },
     }
 };

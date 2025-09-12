@@ -26,6 +26,7 @@ export const uiElements = {
     dashboardFlightCodeBtn: document.getElementById("dashboard-flight-code"),
     dashboardFlightStatus: document.getElementById("dashboard-flight-status"),
     leaveFlightBtnDashboard: document.getElementById("leaveFlightBtnDashboard"),
+    inviteBtn: document.getElementById('inviteBtn'),
 
     // File Transfer
     fileInputTransfer: document.getElementById("fileInput_transfer"),
@@ -61,6 +62,12 @@ export const uiElements = {
     // Connection Panel
     connectionPanelTitle: document.getElementById("connection-panel-title"),
     connectionPanelList: document.getElementById("connection-panel-list"),
+
+    // Onboarding
+    welcomeOnboarding: document.getElementById('welcomeOnboarding'),
+    inviteOnboarding: document.getElementById('inviteOnboarding'),
+    dismissWelcomeBtn: document.getElementById('dismissWelcome'),
+    dismissInviteBtn: document.getElementById('dismissInvite'),
 };
 
 // Create the folder input element dynamically

@@ -6,6 +6,7 @@ import { store } from '../state.js';
 import { showInvitationToast, showToast } from '../utils/toast.js';
 import { initializePeerConnection, handleSignal, resetPeerConnectionState } from './webrtc.js';
 import { enterFlightMode, updateDashboardStatus, renderInFlightView, renderNetworkUsersView, disableDropZone, hideBoardingOverlay, failBoarding, clearAllPulseEffects } from '../ui/view.js';
+import { showInviteOnboarding } from '../ui/onboarding.js';
 
 let ws;
 
@@ -65,6 +66,8 @@ async function onMessage(event) {
             break;
         case "flight-created":
             enterFlightMode(msg.flightCode);
+            // Show the "invite" onboarding step with a small delay for the UI transition
+            setTimeout(showInviteOnboarding, 300);
             break;
         case "peer-joined":
             showToast({
