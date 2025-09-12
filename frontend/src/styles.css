@@ -2105,6 +2105,13 @@ body.sortable-drag * {
     display: none;
 }
 
+#video-player-container.fullscreen {
+    border: none;
+    border-radius: 0;
+    max-width: none;
+    max-height: none;
+}
+
 #videoModal.show #video-player-container {
     transform: scale(1) translateY(0);
 }
@@ -2253,7 +2260,8 @@ body.sortable-drag * {
 .time-container {
     font-size: .9rem;
     font-family: 'IBM Plex Mono', monospace;
-    width: 100px;
+    min-width: 100px;
+    white-space: nowrap;
 }
 
 .timeline-container {
@@ -2280,7 +2288,7 @@ body.sortable-drag * {
 .timeline .progress-bar {
     height: 100%;
     width: 0%;
-    background-color: var(--c-primary);
+    background: linear-gradient(90deg, var(--c-primary), var(--c-secondary));
     border-radius: 3px;
     position: relative;
     transition: width 0.1s linear;
