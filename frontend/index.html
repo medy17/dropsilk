@@ -277,14 +277,10 @@
 <footer class="site-footer">
     <div class="footer-content">
         <div class="footer-copyright">
-            © 2025 DropSilk. A peer-to-peer passion project. v1.3
+            © 2025 DropSilk. A peer-to-peer passion project. v2.2
         </div>
         <nav class="footer-nav">
-            <a href="https://ko-fi.com/medy17"
-               target="_blank"
-               rel="noopener noreferrer">
-                <button id="ko-fiBtn" class="footer-nav-link">Donate</button>
-            </a>
+            <button id="ko-fiBtn" class="footer-nav-link">Donate</button>
             <button id="termsBtn" class="footer-nav-link">Terms</button>
             <button id="privacyBtn" class="footer-nav-link" aria-label="Privacy Policy for DropSilk free, unlimited file sharing peer to peer">Privacy</button>
             <button id="securityBtn" class="footer-nav-link" aria-label="Security for DropSilk free, unlimited file sharing peer to peer">Security</button>
@@ -624,6 +620,21 @@
         </div>
     </div>
 </div>
+<!-- NEW: Donate Modal -->
+<div class="modal-overlay" id="donateModal">
+    <div class="invite-modal kofi-modal">
+        <div class="modal-header">
+            <h3>Support DropSilk</h3>
+            <button class="modal-close" id="closeDonateModal" aria-label="Close modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708-.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <iframe id='kofiframe' src='https://ko-fi.com/medy17/?hidefeed=true&widget=true&embed=true&preview=true' style='border:none;width:100%;padding:4px;background:#f9f9f9;' height='712' title='medy17'></iframe>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="previewModal">
     <div class="invite-modal preview-modal-content">
         <div class="modal-header">

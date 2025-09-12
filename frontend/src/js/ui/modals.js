@@ -137,6 +137,7 @@ export function initializeModals() {
     const modals = {
         invite: { trigger: 'inviteBtn', close: 'closeInviteModal', overlay: 'inviteModal' },
         zip: { trigger: 'downloadAllBtn', close: 'closeZipModal', overlay: 'zipModal' },
+        donate: { trigger: 'ko-fiBtn', close: 'closeDonateModal', overlay: 'donateModal' },
         about: { trigger: 'aboutBtn', close: 'closeAboutModal', overlay: 'aboutModal' },
         contact: { trigger: 'contactBtn', close: 'closeContactModal', overlay: 'contactModal' },
         terms: { trigger: 'termsBtn', close: 'closeTermsModal', overlay: 'termsModal' },

@@ -3627,3 +3627,7 @@ body[data-theme="dark"] .thumbnail-item {
         min-width: auto;
     }
 }
+.kofi-modal {
+    width: 420px;
+    max-width: 95vw;
+}
