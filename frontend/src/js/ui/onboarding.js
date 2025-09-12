@@ -36,7 +36,6 @@ function positionTooltip(tooltip, targetRect) {
         top = window.innerHeight - tooltipRect.height - 10;
     }
 
-
     tooltip.style.top = `${top}px`;
     tooltip.style.left = `${left}px`;
 }
@@ -45,15 +44,10 @@ export function showWelcomeOnboarding() {
     const { onboardingState, invitationPending } = store.getState();
     const { welcomeOnboarding } = uiElements;
 
-    // MODIFIED: Don't show if already completed, an invitation is active, or element is missing.
     if (onboardingState.welcome || invitationPending || !welcomeOnboarding) return;
 
     const target = document.querySelector('.flight-ticket-panel-wrapper');
     if (!target) return;
-
-    // --- FIX: Bring target element above the overlay shadow ---
-    target.style.position = 'relative';
-    target.style.zIndex = '9001';
 
     const rect = target.getBoundingClientRect();
     const spotlight = welcomeOnboarding.querySelector('.onboarding-spotlight');
@@ -69,18 +63,15 @@ export function showWelcomeOnboarding() {
     welcomeOnboarding.style.display = 'block';
     setTimeout(() => welcomeOnboarding.classList.add('show'), 10);
 
-    // --- FIX: Lock body scroll ---
+    // FIX: Lock body scroll
     document.body.style.overflow = 'hidden';
 
     uiElements.dismissWelcomeBtn.onclick = () => {
         welcomeOnboarding.classList.remove('show');
         setTimeout(() => welcomeOnboarding.style.display = 'none', 300);
         store.actions.updateOnboardingState('welcome');
-
-        // --- FIX: Unlock body scroll and reset styles ---
+        // FIX: Unlock body scroll
         document.body.style.overflow = '';
-        target.style.position = '';
-        target.style.zIndex = '';
     };
 }
 
@@ -89,12 +80,6 @@ export function showInviteOnboarding() {
     const { inviteOnboarding, dashboardFlightCodeBtn, inviteBtn } = uiElements;
 
     if (onboardingState.invite || !inviteOnboarding || !dashboardFlightCodeBtn || !inviteBtn) return;
-
-    // --- FIX: Bring target elements above the overlay shadow ---
-    dashboardFlightCodeBtn.style.position = 'relative';
-    dashboardFlightCodeBtn.style.zIndex = '9001';
-    inviteBtn.style.position = 'relative';
-    inviteBtn.style.zIndex = '9001';
 
     const rect1 = dashboardFlightCodeBtn.getBoundingClientRect();
     const rect2 = inviteBtn.getBoundingClientRect();
@@ -113,26 +98,20 @@ export function showInviteOnboarding() {
     spotlight2.style.height = `${rect2.height + 10}px`;
     spotlight2.style.borderRadius = '14px';
 
-    // Position the tooltip relative to the main invite button
     const tooltip = inviteOnboarding.querySelector('.onboarding-tooltip');
     positionTooltip(tooltip, rect2);
 
     inviteOnboarding.style.display = 'block';
     setTimeout(() => inviteOnboarding.classList.add('show'), 10);
 
-    // --- FIX: Lock body scroll ---
+    // FIX: Lock body scroll
     document.body.style.overflow = 'hidden';
 
     uiElements.dismissInviteBtn.onclick = () => {
         inviteOnboarding.classList.remove('show');
         setTimeout(() => inviteOnboarding.style.display = 'none', 300);
         store.actions.updateOnboardingState('invite');
-
-        // --- FIX: Unlock body scroll and reset styles ---
+        // FIX: Unlock body scroll
         document.body.style.overflow = '';
-        dashboardFlightCodeBtn.style.position = '';
-        dashboardFlightCodeBtn.style.zIndex = '';
-        inviteBtn.style.position = '';
-        inviteBtn.style.zIndex = '';
     };
 }
