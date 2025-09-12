@@ -3525,77 +3525,6 @@ body[data-theme="dark"] .thumbnail-item {
         justify-content: center;
     }
 }
-/* Add to your existing CSS */
-.onboarding-tooltip {
-    position: fixed; /* Changed from absolute to fixed for better mobile control */
-    background: var(--c-panel-bg);
-    border: 2px solid var(--c-primary);
-    border-radius: 16px;
-    padding: 1.5rem;
-    max-width: 320px;
-    box-shadow: var(--c-panel-shadow);
-    color: var(--c-text-primary);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.3s ease-out 0.2s, transform 0.3s ease-out 0.2s;
-    z-index: 9001;
-    /* Ensure it doesn't exceed viewport on small screens */
-    box-sizing: border-box;
-}
-
-/* Mobile-specific improvements */
-@media (max-width: 768px) {
-    .onboarding-tooltip {
-        max-width: calc(100vw - 32px); /* Full width minus safe padding */
-        min-width: 280px;
-        margin: 0 16px; /* Fallback margin */
-        font-size: 0.95rem; /* Slightly smaller text for mobile */
-    }
-
-    .onboarding-tooltip h3 {
-        font-size: 1.1rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .onboarding-tooltip p {
-        font-size: 0.9rem;
-        line-height: 1.5;
-        margin-bottom: 1rem;
-    }
-
-    .onboarding-tooltip .btn {
-        padding: 0.75rem 1rem;
-        font-size: 0.9rem;
-    }
-}
-
-/* Handle very small screens */
-@media (max-width: 480px) {
-    .onboarding-tooltip {
-        padding: 1.25rem;
-        max-width: calc(100vw - 24px);
-        min-width: auto;
-    }
-}
-
-/* Handle landscape orientation on mobile */
-@media (max-height: 500px) and (orientation: landscape) {
-    .onboarding-tooltip {
-        max-height: 80vh;
-        overflow-y: auto;
-        padding: 1rem;
-    }
-
-    .onboarding-tooltip h3 {
-        margin-bottom: 0.25rem;
-        font-size: 1rem;
-    }
-
-    .onboarding-tooltip p {
-        margin-bottom: 0.75rem;
-        font-size: 0.85rem;
-    }
-}
 /* --- Onboarding Styles --- */
 .onboarding-overlay {
     position: fixed;
@@ -3617,31 +3546,35 @@ body[data-theme="dark"] .thumbnail-item {
     pointer-events: all;
 }
 
+.onboarding-overlay.show .onboarding-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .onboarding-spotlight {
-    position: absolute;
+    position: fixed;
     border-radius: 22px;
     pointer-events: none;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Add a subtle glow effect */
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
 }
 
 .onboarding-tooltip {
-    position: absolute;
+    position: fixed;
     background: var(--c-panel-bg);
     border: 2px solid var(--c-primary);
     border-radius: 16px;
     padding: 1.5rem;
     max-width: 320px;
+    width: auto;
     box-shadow: var(--c-panel-shadow);
     color: var(--c-text-primary);
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.3s ease-out 0.2s, transform 0.3s ease-out 0.2s;
-    z-index: 9001; /* Ensure tooltip is above the spotlight shadow */
-}
-
-.onboarding-overlay.show .onboarding-tooltip {
-    opacity: 1;
-    transform: translateY(0);
+    z-index: 9001;
+    box-sizing: border-box;
 }
 
 .onboarding-tooltip h3 {
@@ -3658,4 +3591,38 @@ body[data-theme="dark"] .thumbnail-item {
 
 .onboarding-tooltip .btn {
     width: 100%;
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+    .onboarding-tooltip {
+        max-width: calc(100vw - 32px);
+        min-width: 280px;
+        padding: 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .onboarding-tooltip h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .onboarding-tooltip p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+
+    .onboarding-tooltip .btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .onboarding-tooltip {
+        padding: 1rem;
+        max-width: calc(100vw - 24px);
+        min-width: auto;
+    }
 }
