@@ -34,6 +34,7 @@ const initialState = {
         welcome: false, // Has the user seen the initial welcome message?
         invite: false,  // Has the user seen the "now invite someone" message?
     },
+    invitationPending: false, // Is there currently an invitation toast visible?
 };
 
 let state = { ...initialState };
@@ -144,5 +145,6 @@ export const store = {
                 localStorage.setItem('dropsilk-onboarding', JSON.stringify(state.onboardingState));
             }
         },
+        setInvitationPending: (isPending) => { state.invitationPending = isPending; },
     }
 };

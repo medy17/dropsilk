@@ -5,7 +5,7 @@ import { uiElements } from '../ui/dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
 
-export function showToast({ type = 'info', title, body, duration = 10000, actions = [] }) {
+export function showToast({ type = 'info', title, body, duration = 10000, actions = [], onRemove = null }) {
     const toastId = `toast-${Date.now()}`;
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -35,6 +35,7 @@ export function showToast({ type = 'info', title, body, duration = 10000, action
     const removeToast = () => {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 500);
+        if (onRemove) onRemove(); // Execute the callback on removal
     };
 
     let autoDismiss;
@@ -58,6 +59,8 @@ export function showToast({ type = 'info', title, body, duration = 10000, action
 }
 
 export function showInvitationToast(fromName, flightCode) {
+    store.actions.setInvitationPending(true); // Set the flag when the invitation appears
+
     showToast({
         type: 'info',
         title: 'Flight Invitation',
@@ -77,6 +80,8 @@ export function showInvitationToast(fromName, flightCode) {
                     sendMessage({ type: "join-flight", flightCode });
                 }
             }
-        ]
+        ],
+        // Reset the flag when the toast is removed for any reason
+        onRemove: () => store.actions.setInvitationPending(false)
     });
 }

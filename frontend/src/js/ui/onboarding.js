@@ -29,10 +29,11 @@ function positionTooltip(tooltip, targetRect) {
 }
 
 export function showWelcomeOnboarding() {
-    const { onboardingState } = store.getState();
+    const { onboardingState, invitationPending } = store.getState();
     const { welcomeOnboarding } = uiElements;
 
-    if (onboardingState.welcome || !welcomeOnboarding) return;
+    // MODIFIED: Don't show if already completed, an invitation is active, or element is missing.
+    if (onboardingState.welcome || invitationPending || !welcomeOnboarding) return;
 
     const target = document.querySelector('.flight-ticket-panel-wrapper');
     if (!target) return;

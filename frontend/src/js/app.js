@@ -13,7 +13,8 @@ function initializeGlobalUI() {
     initializeModals();
 }
 
-function initializeAppCore() {
+// MODIFIED: Function now accepts a parameter to know if the user was invited
+function initializeAppCore(isInvitedUser = false) {
     console.log("Initializing App Core Logic...");
 
     // Attach all event listeners specific to the app.
@@ -28,9 +29,11 @@ function initializeAppCore() {
     // Connect to the signaling server.
     connectWebSocket();
 
-    // Show the welcome guide if it's the user's first time.
-    // Use a small delay to allow the main layout to settle.
-    setTimeout(showWelcomeOnboarding, 500);
+    // MODIFIED: Only show the welcome guide if it's a new, non-invited user.
+    if (!isInvitedUser) {
+        // Use a small delay to allow the main layout to settle.
+        setTimeout(showWelcomeOnboarding, 500);
+    }
 }
 
 
@@ -46,11 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const flightCodeFromUrl = urlParams.get('code');
 
     if (isAppPage) {
+        const isInvited = flightCodeFromUrl && flightCodeFromUrl.length === 6;
         // If there's a valid code in the URL, show the boarding screen immediately.
-        if (flightCodeFromUrl && flightCodeFromUrl.length === 6) {
+        if (isInvited) {
             showBoardingOverlay(flightCodeFromUrl);
         }
-        initializeAppCore();
+        // MODIFIED: Pass the invited status to the core initializer
+        initializeAppCore(isInvited);
     } else {
         console.log("On a non-app page (e.g., 404). Core logic will not be initialized.");
     }
