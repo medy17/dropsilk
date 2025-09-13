@@ -63,13 +63,13 @@ window.videoPlayer = (() => {
         </div>
     `;
 
-    // --- NEW: Create and inject the player into the DOM ---
+    // --- Create and inject the player into the DOM ---
     const tempContainer = document.createElement('div');
     tempContainer.innerHTML = playerTemplate.trim();
     document.body.appendChild(tempContainer.firstChild);
 
 
-    // --- MOVED & UPDATED: Variables are now selected from the newly created DOM ---
+    // --- Variables are selected from the newly created DOM ---
     const videoModalOverlay = document.getElementById('videoModal');
     const playerContainer = document.getElementById('video-player-container');
     const video = document.getElementById('video-element');
@@ -97,7 +97,7 @@ window.videoPlayer = (() => {
     let controlsTimeout;
     let lastVolume = 1;
 
-    // --- PRIVATE FUNCTIONS (No changes below this line) ---
+    // --- PRIVATE FUNCTIONS
     function bindEvents() {
         closeBtn.addEventListener('click', close);
         videoModalOverlay.addEventListener('click', (e) => {
