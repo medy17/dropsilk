@@ -9,6 +9,7 @@ import { getFileIcon } from '../utils/helpers.js';
 import { updateReceiverActions, checkQueueOverflow } from '../ui/view.js';
 import { isPreviewable } from '../preview/previewConfig.js';
 import { showPreview } from '../preview/previewManager.js';
+import { audioManager } from '../utils/audioManager.js';
 
 let worker;
 let chunkQueue = [];
@@ -20,6 +21,10 @@ let incomingFileInfo = null;
 let incomingFileData = [];
 let incomingFileReceived = 0;
 let lastReceiveProgressUpdate = 0; // For throttling UI updates
+
+// --- MODIFIED: State variables for audio cues ---
+let isNewBatch = true;
+let receiveCompletionTimer = null;
 
 export function ensureQueueIsActive() {
     const state = store.getState();
@@ -127,6 +132,12 @@ export function handleFolderSelection(files) {
 }
 
 function startFileSend(file) {
+    // --- MODIFIED: Play queue_start sound only for the first file in a new batch ---
+    if (isNewBatch) {
+        audioManager.play('queue_start');
+        isNewBatch = false;
+    }
+
     store.actions.setCurrentlySendingFile(file);
     const fileId = store.actions.getFileId(file);
     const fileElement = document.getElementById(fileId);
@@ -215,6 +226,13 @@ export function drainQueue() {
 
         store.actions.finishCurrentFileSend(file);
         lastSendProgressUpdate = 0; // Reset for next file
+
+        // --- MODIFIED: Play send_complete sound only when the entire queue is finished ---
+        if (store.getState().fileToSendQueue.length === 0) {
+            audioManager.play('send_complete');
+            isNewBatch = true; // Ready the flag for the next batch
+        }
+
         ensureQueueIsActive();
     }
 }
@@ -224,6 +242,12 @@ export async function handleDataChannelMessage(event) {
 
     if (typeof data === "string") {
         if (data.startsWith("{")) {
+            // --- MODIFIED: A new file is starting, so cancel any pending "complete" sound ---
+            if (receiveCompletionTimer) {
+                clearTimeout(receiveCompletionTimer);
+                receiveCompletionTimer = null;
+            }
+
             const parsedData = JSON.parse(data);
 
             if (parsedData.type === 'stream-ended') {
@@ -310,6 +334,14 @@ export async function handleDataChannelMessage(event) {
             }
             incomingFileInfo = null;
             lastReceiveProgressUpdate = 0; // Reset for next file
+
+            // --- MODIFIED: Use a timer to play the sound if no new file arrives shortly ---
+            if (receiveCompletionTimer) clearTimeout(receiveCompletionTimer);
+            receiveCompletionTimer = setTimeout(() => {
+                audioManager.play('receive_complete');
+                receiveCompletionTimer = null;
+            }, 1500); // 1.5-second delay to wait for a potential next file
+
             return;
         }
     }
@@ -345,4 +377,10 @@ export function resetTransferState() {
     incomingFileReceived = 0;
     lastReceiveProgressUpdate = 0;
     store.actions.setCurrentlySendingFile(null);
+
+    isNewBatch = true;
+    if (receiveCompletionTimer) {
+        clearTimeout(receiveCompletionTimer);
+        receiveCompletionTimer = null;
+    }
 }
