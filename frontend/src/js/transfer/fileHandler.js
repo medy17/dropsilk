@@ -9,6 +9,7 @@ import { getFileIcon } from '../utils/helpers.js';
 import { updateReceiverActions, checkQueueOverflow } from '../ui/view.js';
 import { isPreviewable } from '../preview/previewConfig.js';
 import { showPreview } from '../preview/previewManager.js';
+import { audioManager } from '../utils/audioManager.js';
 
 let worker;
 let chunkQueue = [];
@@ -61,8 +62,12 @@ export function cancelFileSend(fileId) {
 
 export function handleFileSelection(files) {
     if (files.length === 0) return;
-    const isFirstSend = store.getState().fileToSendQueue.length === 0;
+    const queueWasEmpty = store.getState().fileToSendQueue.length === 0;
     store.actions.addFilesToQueue(files);
+
+    if (queueWasEmpty) {
+        audioManager.play('queue_start');
+    }
 
     if (uiElements.sendingQueueDiv.querySelector('.empty-state')) {
         uiElements.sendingQueueDiv.innerHTML = '';
@@ -175,7 +180,8 @@ function startFileSend(file) {
 }
 
 export function drainQueue() {
-    const file = store.getState().currentlySendingFile;
+    const state = store.getState();
+    const file = state.currentlySendingFile;
     if (!file) return;
 
     const fileId = store.actions.getFileId(file);
@@ -203,7 +209,10 @@ export function drainQueue() {
     }
 
     if (fileReadingDone && chunkQueue.length === 0) {
-        sendData("EOF");
+        const isLastFile = state.fileToSendQueue.length === 1;
+        const eofMessage = JSON.stringify({ type: "eof", isLastInQueue: isLastFile });
+        sendData(eofMessage);
+
         if (fileElement) {
             fileElement.classList.remove('is-sending');
             fileElement.querySelector('progress').value = 1; // Final update
@@ -222,49 +231,16 @@ export function drainQueue() {
 export async function handleDataChannelMessage(event) {
     const data = event.data;
 
-    if (typeof data === "string") {
-        if (data.startsWith("{")) {
-            const parsedData = JSON.parse(data);
+    if (typeof data === "string" && data.startsWith("{")) {
+        const parsedData = JSON.parse(data);
 
-            if (parsedData.type === 'stream-ended') {
-                const { hideRemoteStreamView } = await import('../ui/view.js');
-                hideRemoteStreamView();
-                return;
-            }
-
-            // Otherwise, it's file metadata
-            incomingFileInfo = parsedData;
-            incomingFileData = [];
-            incomingFileReceived = 0;
-            const isFirstReceivedFile = store.getState().receivedFiles.length === 0;
-
-            if (uiElements.receiverQueueDiv.querySelector('.empty-state')) {
-                uiElements.receiverQueueDiv.innerHTML = '';
-            }
-
-            const fileId = `file-recv-${Date.now()}`;
-            store.actions.addFileIdMapping(incomingFileInfo.name, fileId);
-
-            uiElements.receiverQueueDiv.insertAdjacentHTML('beforeend', `
-                <div class="queue-item" id="${fileId}">
-                    <div class="file-icon">${getFileIcon(incomingFileInfo.name)}</div>
-                    <div class="file-details">
-                        <div class="file-details__name" title="${incomingFileInfo.name}"><span>${incomingFileInfo.name}</span></div>
-                        <progress class="file-details__progress-bar" value="0" max="1"></progress>
-                        <div class="file-details__status"><span class="percent">0%</span></div>
-                    </div>
-                    <div class="file-action"></div>
-                </div>`);
-
-            if (isFirstReceivedFile && !store.getState().hasScrolledForReceive) {
-                uiElements.receiverQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                store.actions.setHasScrolledForReceive(true);
-            }
-            checkQueueOverflow('receiver-queue');
-
+        if (parsedData.type === 'stream-ended') {
+            const { hideRemoteStreamView } = await import('../ui/view.js');
+            hideRemoteStreamView();
             return;
         }
-        if (data === "EOF") {
+
+        if (parsedData.type === 'eof') {
             const receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
             const finalFileInfo = { ...incomingFileInfo };
 
@@ -308,10 +284,47 @@ export async function handleDataChannelMessage(event) {
 
                 fileElement.querySelector('.percent').textContent = 'Complete!';
             }
+
+            if (parsedData.isLastInQueue) {
+                audioManager.play('receive_complete');
+            }
+
             incomingFileInfo = null;
-            lastReceiveProgressUpdate = 0; // Reset for next file
+            lastReceiveProgressUpdate = 0;
             return;
         }
+
+        // It must be file metadata
+        incomingFileInfo = parsedData;
+        incomingFileData = [];
+        incomingFileReceived = 0;
+        const isFirstReceivedFile = store.getState().receivedFiles.length === 0;
+
+        if (uiElements.receiverQueueDiv.querySelector('.empty-state')) {
+            uiElements.receiverQueueDiv.innerHTML = '';
+        }
+
+        const fileId = `file-recv-${Date.now()}`;
+        store.actions.addFileIdMapping(incomingFileInfo.name, fileId);
+
+        uiElements.receiverQueueDiv.insertAdjacentHTML('beforeend', `
+            <div class="queue-item" id="${fileId}">
+                <div class="file-icon">${getFileIcon(incomingFileInfo.name)}</div>
+                <div class="file-details">
+                    <div class="file-details__name" title="${incomingFileInfo.name}"><span>${incomingFileInfo.name}</span></div>
+                    <progress class="file-details__progress-bar" value="0" max="1"></progress>
+                    <div class="file-details__status"><span class="percent">0%</span></div>
+                </div>
+                <div class="file-action"></div>
+            </div>`);
+
+        if (isFirstReceivedFile && !store.getState().hasScrolledForReceive) {
+            uiElements.receiverQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            store.actions.setHasScrolledForReceive(true);
+        }
+        checkQueueOverflow('receiver-queue');
+
+        return;
     }
 
     const chunkSize = data.byteLength || data.size || 0;

@@ -7,6 +7,7 @@ import { showInvitationToast, showToast } from '../utils/toast.js';
 import { initializePeerConnection, handleSignal, resetPeerConnectionState } from './webrtc.js';
 import { enterFlightMode, updateDashboardStatus, renderInFlightView, renderNetworkUsersView, disableDropZone, hideBoardingOverlay, failBoarding, clearAllPulseEffects } from '../ui/view.js';
 import { showInviteOnboarding } from '../ui/onboarding.js';
+import { audioManager } from '../utils/audioManager.js';
 
 let ws;
 
@@ -62,6 +63,7 @@ async function onMessage(event) {
             }
             break;
         case "flight-invitation":
+            audioManager.play('invite');
             showInvitationToast(msg.fromName, msg.flightCode);
             break;
         case "flight-created":
@@ -70,6 +72,7 @@ async function onMessage(event) {
             setTimeout(showInviteOnboarding, 300);
             break;
         case "peer-joined":
+            audioManager.play('connect');
             showToast({
                 type: 'success', // A new type, but will default gracefully
                 title: 'Peer Connected!',
@@ -123,6 +126,7 @@ function onError(error) {
 
 export function handlePeerLeft() {
     if (!store.getState().peerInfo) return;
+    audioManager.play('disconnect');
     console.log("Peer has left the flight.");
     store.actions.clearPeerInfo();
     store.actions.setHasScrolledForSend(false);
@@ -138,6 +142,7 @@ export function handlePeerLeft() {
 async function handleServerError(message) {
     console.error("Server error:", message);
     if (message.includes("Flight not found")) {
+        audioManager.play('error');
         const { uiElements } = await import('../ui/dom.js'); // Import uiElements object
         uiElements.flightCodeInputWrapper.classList.add('input-error'); // Access the property
         setTimeout(() => uiElements.flightCodeInputWrapper.classList.remove('input-error'), 1500);

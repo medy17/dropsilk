@@ -9,6 +9,7 @@ import { uiElements } from './dom.js';
 import { formatBytes } from '../utils/helpers.js';
 import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 import QRCode from 'qrcode';
+import { audioManager } from '../utils/audioManager.js';
 
 let captchaWidgetId = null;
 
@@ -87,6 +88,9 @@ function generateQRCode() {
 
 async function copyToClipboard(text, button, successText = 'Copied!') {
     await navigator.clipboard.writeText(text);
+    // This provides haptic feedback on supported devices and does nothing on others. Audio for copy to come later
+    audioManager.vibrate(50);
+
     const originalText = button.innerHTML;
     button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>${successText}`;
     button.classList.add('success');
