@@ -2,7 +2,6 @@
 // Manages the application's global state.
 
 import { generateRandomName } from './utils/helpers.js';
-import { audioManager } from './utils/audioManager.js';
 
 const initialState = {
     // Core state
@@ -86,10 +85,6 @@ export const store = {
                 state.fileToSendQueue.shift();
             }
             state.fileIdMap.delete(completedFile);
-
-            if (state.fileToSendQueue.length === 0) {
-                audioManager.play('send_complete');
-            }
         },
 
         removeFileFromQueue: (fileId) => {

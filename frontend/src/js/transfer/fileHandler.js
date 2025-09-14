@@ -222,6 +222,10 @@ export function drainQueue() {
             if (cancelButton) cancelButton.remove();
         }
 
+        if (isLastFile) {
+            audioManager.play('send_complete');
+        }
+
         store.actions.finishCurrentFileSend(file);
         lastSendProgressUpdate = 0; // Reset for next file
         ensureQueueIsActive();
