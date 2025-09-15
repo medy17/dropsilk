@@ -4,13 +4,28 @@
 import { ICE_SERVERS } from '../config.js';
 import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
-import { enableDropZone, updateDashboardStatus, disableDropZone, renderNetworkUsersView, showRemoteStreamView, hideRemoteStreamView, showLocalStreamView, hideLocalStreamView, updateShareButton } from '../ui/view.js';
-import { handleDataChannelMessage, ensureQueueIsActive, drainQueue } from '../transfer/fileHandler.js';
+import {
+    enableDropZone,
+    updateDashboardStatus,
+    disableDropZone,
+    renderNetworkUsersView,
+    showRemoteStreamView,
+    hideRemoteStreamView,
+    showLocalStreamView,
+    hideLocalStreamView,
+    updateShareButton,
+} from '../ui/view.js';
+import {
+    handleDataChannelMessage,
+    ensureQueueIsActive,
+    drainQueue,
+} from '../transfer/fileHandler.js';
 
 let peerConnection;
 let dataChannel;
 let localScreenStream = null;
 let screenTrackSender = null;
+let systemAudioTrackSender = null;
 
 /**
  * Checks if the current device is a mobile device based on user agent.
@@ -20,39 +35,167 @@ function isMobile() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
+/**
+ * Detect browser/OS info for pragmatic fallback logic.
+ */
+function getBrowserInfo() {
+    const ua = navigator.userAgent || '';
+    const plat = navigator.userAgentData?.platform || navigator.platform || '';
+
+    const isiOSUA = /iP(hone|ad|od)/i.test(ua);
+    const isiPadOS =
+        /Mac/i.test(plat) && navigator.maxTouchPoints > 1 && !/Chrome/i.test(ua);
+
+    let os = 'unknown';
+    if (isiOSUA || isiPadOS) os = 'ios';
+    else if (/Windows/i.test(plat)) os = 'windows';
+    else if (/Mac/i.test(plat)) os = 'macos';
+    else if (/Linux|X11/i.test(plat)) os = 'linux';
+    else if (/Android/i.test(ua)) os = 'android';
+
+    const versionOf = (re) => {
+        const m = ua.match(re);
+        return m ? parseInt(m[1], 10) : 0;
+    };
+
+    let browser = 'unknown';
+    let version = 0;
+    if (/Edg\//.test(ua)) {
+        browser = 'edge';
+        version = versionOf(/Edg\/(\d+)/);
+    } else if (/OPR\//.test(ua)) {
+        browser = 'opera';
+        version = versionOf(/OPR\/(\d+)/);
+    } else if (/Chrome\//.test(ua)) {
+        browser = 'chrome';
+        version = versionOf(/Chrome\/(\d+)/);
+    } else if (/Firefox\//.test(ua)) {
+        browser = 'firefox';
+        version = versionOf(/Firefox\/(\d+)/);
+    } else if (/Safari\//.test(ua) && !/Chrome|Chromium/i.test(ua)) {
+        browser = 'safari';
+        version = versionOf(/Version\/(\d+)/);
+    }
+    return { browser, version, os };
+}
+
+/**
+ * Decide whether to request display audio depending on the UA.
+ */
+function chooseDisplayAudioByUA(wantAudio = true) {
+    const info = getBrowserInfo();
+    const supports = navigator.mediaDevices?.getSupportedConstraints?.() || {};
+
+    if (!wantAudio) {
+        return {
+            audio: false,
+            hint: 'Screen will be shared without audio (option disabled).',
+        };
+    }
+
+    if (isMobile() || info.os === 'ios' || info.os === 'android') {
+        return {
+            audio: false,
+            hint: 'Screen audio is not supported on mobile devices.',
+        };
+    }
+
+    switch (info.browser) {
+        case 'chrome':
+        case 'edge':
+        case 'opera': {
+            const audio = {
+                echoCancellation: false,
+                noiseSuppression: false,
+            };
+            if (supports.suppressLocalAudioPlayback) {
+                audio.suppressLocalAudioPlayback = true;
+            }
+            let hint =
+                'For best results, use "Share tab audio". Full system audio works on Windows.';
+            if (info.os === 'macos') {
+                hint =
+                    'Tab audio works. Full system audio may not be available on macOS.';
+            }
+            return { audio, hint };
+        }
+        case 'firefox':
+            return {
+                audio: true,
+                hint: 'Firefox supports *tab audio only*. Full window/screen may be silent.',
+            };
+        case 'safari':
+        default:
+            return {
+                audio: false,
+                hint: 'This browser does not reliably support audio in screen share.',
+            };
+    }
+}
+
+function getDisplayMediaOptions(withSystemAudio = true) {
+    const { audio, hint } = chooseDisplayAudioByUA(withSystemAudio);
+    const video = { cursor: 'always', height: 1080, frameRate: 15 };
+    return { constraints: { video, audio }, hint };
+}
+
+async function renegotiate() {
+    if (!peerConnection) return;
+    try {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        sendMessage({
+            type: 'signal',
+            data: { sdp: peerConnection.localDescription },
+        });
+    } catch (err) {
+        console.error('Renegotiation error:', err);
+    }
+}
 
 export function initializePeerConnection(isOfferer) {
     if (peerConnection) return;
 
     const { connectionType } = store.getState();
-    const pcConfig = connectionType === 'lan' ? { iceServers: [] } : { iceServers: ICE_SERVERS };
+    const pcConfig =
+        connectionType === 'lan' ? { iceServers: [] } : { iceServers: ICE_SERVERS };
 
     peerConnection = new RTCPeerConnection(pcConfig);
 
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-            sendMessage({ type: "signal", data: { candidate: event.candidate } });
+            sendMessage({ type: 'signal', data: { candidate: event.candidate } });
         }
     };
 
     peerConnection.onconnectionstatechange = () => {
-        console.log("Peer connection state:", peerConnection.connectionState);
-        if (["disconnected", "failed", "closed"].includes(peerConnection.connectionState)) {
+        console.log('Peer connection state:', peerConnection.connectionState);
+        if (
+            ['disconnected', 'failed', 'closed'].includes(
+                peerConnection.connectionState
+            )
+        ) {
             handlePeerLeft();
         }
     };
 
     peerConnection.ontrack = (event) => {
-        console.log("Received remote track:", event.track.kind);
+        console.log('Received remote track:', event.track.kind);
         showRemoteStreamView(event.streams[0]);
     };
 
     if (isOfferer) {
-        dataChannel = peerConnection.createDataChannel("fileTransfer");
+        dataChannel = peerConnection.createDataChannel('fileTransfer');
         setupDataChannel();
-        peerConnection.createOffer()
-            .then(offer => peerConnection.setLocalDescription(offer))
-            .then(() => sendMessage({ type: "signal", data: { sdp: peerConnection.localDescription } }));
+        peerConnection
+            .createOffer()
+            .then((offer) => peerConnection.setLocalDescription(offer))
+            .then(() =>
+                sendMessage({
+                    type: 'signal',
+                    data: { sdp: peerConnection.localDescription },
+                })
+            );
     } else {
         peerConnection.ondatachannel = (event) => {
             dataChannel = event.channel;
@@ -63,37 +206,45 @@ export function initializePeerConnection(isOfferer) {
 
 export async function handleSignal(data) {
     if (!peerConnection) {
-        console.warn("Received signal before peerConnection initialized. Initializing now.");
+        console.warn(
+            'Received signal before peerConnection initialized. Initializing now.'
+        );
         initializePeerConnection(store.getState().isFlightCreator);
     }
     try {
         if (data.sdp) {
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp));
-            if (data.sdp.type === "offer") {
+            await peerConnection.setRemoteDescription(
+                new RTCSessionDescription(data.sdp)
+            );
+            if (data.sdp.type === 'offer') {
                 const answer = await peerConnection.createAnswer();
                 await peerConnection.setLocalDescription(answer);
-                sendMessage({ type: "signal", data: { sdp: peerConnection.localDescription } });
+                sendMessage({
+                    type: 'signal',
+                    data: { sdp: peerConnection.localDescription },
+                });
             }
         } else if (data.candidate) {
             await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
         }
     } catch (error) {
-        console.error("Error handling signal:", error);
+        console.error('Error handling signal:', error);
     }
 }
 
 function setupDataChannel() {
     dataChannel.onopen = () => {
-        console.log("Data channel opened!");
+        console.log('Data channel opened!');
         enableDropZone();
 
-        // Disable screen sharing entirely on mobile devices
         const shareScreenBtn = document.getElementById('shareScreenBtn');
         if (isMobile() || !navigator.mediaDevices?.getDisplayMedia) {
             shareScreenBtn.disabled = true;
-            shareScreenBtn.title = "Screen sharing is not supported on mobile devices.";
+            shareScreenBtn.title = 'Screen sharing is not supported on mobile devices.';
         } else {
             updateShareButton(false);
+            const { hint } = getDisplayMediaOptions(true);
+            if (shareScreenBtn) shareScreenBtn.title = hint;
         }
 
         ensureQueueIsActive();
@@ -108,13 +259,13 @@ function setupDataChannel() {
     };
 
     dataChannel.onclose = () => {
-        console.log("Data channel closed.");
+        console.log('Data channel closed.');
         handlePeerLeft();
         const { metricsInterval } = store.getState();
         if (metricsInterval) clearInterval(metricsInterval);
     };
 
-    dataChannel.onerror = (error) => console.error("Data channel error:", error);
+    dataChannel.onerror = (error) => console.error('Data channel error:', error);
     dataChannel.onbufferedamountlow = () => drainQueue();
     dataChannel.onmessage = (event) => handleDataChannelMessage(event);
 }
@@ -133,7 +284,7 @@ export function resetPeerConnectionState() {
         .then(({ resetTransferState }) => {
             if (resetTransferState) resetTransferState();
         })
-        .catch(err => console.error("Error resetting transfer state:", err));
+        .catch((err) => console.error('Error resetting transfer state:', err));
 }
 
 export function sendData(data) {
@@ -152,53 +303,73 @@ async function handleQualityChange(preset, track) {
 
     let constraints = {};
     switch (preset) {
-        case 'smoothness': constraints = { frameRate: 30, height: 720 }; break;
-        case 'performance': constraints = { frameRate: 15, height: 480 }; break;
-        case 'clarity': default: constraints = { frameRate: 15, height: 1080 }; break;
+        case 'smoothness':
+            constraints = { frameRate: 30, height: 720 };
+            break;
+        case 'performance':
+            constraints = { frameRate: 15, height: 480 };
+            break;
+        case 'clarity':
+        default:
+            constraints = { frameRate: 15, height: 1080 };
+            break;
     }
 
     try {
         await track.applyConstraints(constraints);
     } catch (err) {
-        console.error("Error applying constraints:", err);
+        console.error('Error applying constraints:', err);
     }
 }
 
-export async function startScreenShare() {
+export async function startScreenShare({ withSystemAudio = true } = {}) {
     if (localScreenStream) return;
 
     try {
-        localScreenStream = await navigator.mediaDevices.getDisplayMedia({
-            video: { cursor: "always", height: 1080, frameRate: 15 },
-            audio: false
-        });
+        const { constraints } = getDisplayMediaOptions(withSystemAudio);
+        localScreenStream = await navigator.mediaDevices.getDisplayMedia(
+            constraints
+        );
 
         const videoTrack = localScreenStream.getVideoTracks()[0];
         screenTrackSender = peerConnection.addTrack(videoTrack, localScreenStream);
 
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        sendMessage({ type: "signal", data: { sdp: peerConnection.localDescription } });
+        const audioTrack = localScreenStream.getAudioTracks()[0];
+        if (audioTrack) {
+            try {
+                audioTrack.contentHint = 'music'; // hint for better quality
+            } catch (_) {}
+            systemAudioTrackSender = peerConnection.addTrack(
+                audioTrack,
+                localScreenStream
+            );
+        }
 
-        showLocalStreamView(localScreenStream, (preset) => handleQualityChange(preset, videoTrack));
+        await renegotiate();
+
+        showLocalStreamView(localScreenStream, (preset) =>
+            handleQualityChange(preset, videoTrack)
+        );
         updateShareButton(true);
 
         videoTrack.onended = () => stopScreenShare(true);
-
     } catch (err) {
-        console.error("Error starting screen share:", err);
+        console.error('Error starting screen share:', err);
         localScreenStream = null;
     }
 }
 
 export function stopScreenShare(notifyPeer = true) {
     if (localScreenStream) {
-        localScreenStream.getTracks().forEach(track => track.stop());
+        localScreenStream.getTracks().forEach((track) => track.stop());
         if (screenTrackSender) {
             peerConnection.removeTrack(screenTrackSender);
         }
+        if (systemAudioTrackSender) {
+            peerConnection.removeTrack(systemAudioTrackSender);
+            systemAudioTrackSender = null;
+        }
         if (notifyPeer) {
-            // Explicitly tell the other peer the stream has ended
             sendData(JSON.stringify({ type: 'stream-ended' }));
         }
     }
@@ -206,4 +377,5 @@ export function stopScreenShare(notifyPeer = true) {
     localScreenStream = null;
     screenTrackSender = null;
     updateShareButton(false);
+    renegotiate().catch((e) => console.error('Renegotiate on stop failed:', e));
 }
