@@ -143,6 +143,7 @@ async function handleServerError(message) {
     console.error("Server error:", message);
     if (message.includes("Flight not found")) {
         audioManager.play('error');
+        if (navigator.vibrate) navigator.vibrate([75, 50, 75, 50, 75]);
         const { uiElements } = await import('../ui/dom.js'); // Import uiElements object
         uiElements.flightCodeInputWrapper.classList.add('input-error'); // Access the property
         setTimeout(() => uiElements.flightCodeInputWrapper.classList.remove('input-error'), 1500);

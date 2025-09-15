@@ -201,7 +201,7 @@ function setupInviteModal() {
     document.getElementById('copyLinkBtn')?.addEventListener('click', (e) => {
         // --- THE FIX: Call navigator.vibrate directly and synchronously ---
         if (navigator.vibrate) {
-            navigator.vibrate(50);
+            navigator.vibrate([50, 40, 15]);
         }
         copyToClipboard(`https://dropsilk.xyz/?code=${store.getState().currentFlightCode}`, e.currentTarget, 'Link Copied!');
     });
@@ -209,7 +209,7 @@ function setupInviteModal() {
     document.getElementById('copyCodeBtn')?.addEventListener('click', (e) => {
         // --- THE FIX: Call navigator.vibrate directly and synchronously ---
         if (navigator.vibrate) {
-            navigator.vibrate(50);
+            navigator.vibrate([50, 40, 15]);
         }
         copyToClipboard(store.getState().currentFlightCode, e.currentTarget, 'Code Copied!');
     });
@@ -239,7 +239,7 @@ function setupContactModal() {
     copyEmailBtn?.addEventListener('click', (e) => {
         // --- THE FIX: Call navigator.vibrate directly and synchronously ---
         if (navigator.vibrate) {
-            navigator.vibrate(50);
+            navigator.vibrate([50, 40, 15]);
         }
         copyToClipboard('ahmed@dropsilk.xyz', e.currentTarget, 'Email Copied!');
     });

@@ -181,9 +181,16 @@ export function initializeEventListeners() {
         }
     });
 
+    // --- MODIFIED BLOCK ---
     uiElements.dashboardFlightCodeBtn?.addEventListener('click', async () => {
         const code = uiElements.dashboardFlightCodeBtn.getAttribute('data-code');
         if (!code) return;
+
+        // Apply the same direct, synchronous vibration call here
+        if (navigator.vibrate) {
+            navigator.vibrate([50, 40, 15]);
+        }
+
         await navigator.clipboard.writeText(code);
         uiElements.dashboardFlightCodeBtn.classList.add('copied');
         setTimeout(() => uiElements.dashboardFlightCodeBtn.classList.remove('copied'), 1200);
