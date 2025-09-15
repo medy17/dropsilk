@@ -76,7 +76,6 @@ function generateQRCode() {
         return;
     }
 
-    // --- MODIFIED LINE ---
     const url = `https://dropsilk.xyz/?code=${currentFlightCode}`;
     const qrDotColor = getComputedStyle(document.documentElement).getPropertyValue('--c-primary').trim();
     const qrColors = { dark: qrDotColor, light: '#00000000' };
@@ -86,13 +85,9 @@ function generateQRCode() {
     });
 }
 
-// --- MODIFIED FUNCTION ---
+// --- STEP 1: REMOVE VIBRATION FROM THE HELPER FUNCTION ---
 async function copyToClipboard(text, button, successText = 'Copied!') {
-    // Vibrate IMMEDIATELY upon function call, before any async operation.
-    // This ensures it runs inside the browser's "trusted event" context.
-    audioManager.vibrate(50);
-
-    // Now, perform the asynchronous clipboard operation.
+    // The vibration logic is now handled by the event listener itself.
     await navigator.clipboard.writeText(text);
 
     const originalText = button.innerHTML;
@@ -193,6 +188,7 @@ export function initializeModals() {
     setupZipModal();
 }
 
+// --- STEP 2: CALL VIBRATION DIRECTLY IN THE EVENT LISTENER ---
 function setupInviteModal() {
     document.getElementById('inviteBtn')?.addEventListener('click', () => {
         const { currentFlightCode } = store.getState();
@@ -204,14 +200,23 @@ function setupInviteModal() {
     const shareNativeBtn = document.getElementById('shareNativeBtn');
     if (shareNativeBtn && navigator.share) shareNativeBtn.style.display = 'flex';
 
-    document.getElementById('copyLinkBtn')?.addEventListener('click', (e) => copyToClipboard(`https://dropsilk.xyz/?code=${store.getState().currentFlightCode}`, e.currentTarget, 'Link Copied!'));
-    document.getElementById('copyCodeBtn')?.addEventListener('click', (e) => copyToClipboard(store.getState().currentFlightCode, e.currentTarget, 'Code Copied!'));
+    document.getElementById('copyLinkBtn')?.addEventListener('click', (e) => {
+        audioManager.vibrate(50); // VIBRATE HERE
+        copyToClipboard(`https://dropsilk.xyz/?code=${store.getState().currentFlightCode}`, e.currentTarget, 'Link Copied!');
+    });
+
+    document.getElementById('copyCodeBtn')?.addEventListener('click', (e) => {
+        audioManager.vibrate(50); // VIBRATE HERE
+        copyToClipboard(store.getState().currentFlightCode, e.currentTarget, 'Code Copied!');
+    });
+
     shareNativeBtn?.addEventListener('click', async () => {
         const { currentFlightCode } = store.getState();
         if (navigator.share) await navigator.share({ title: 'Join my DropSilk flight!', text: `Join my file transfer session with code: ${currentFlightCode}`, url: `https://dropsilk.xyz/?code=${currentFlightCode}` });
     });
 }
 
+// --- STEP 2 (cont.): REPEAT FOR THE CONTACT MODAL ---
 function setupContactModal() {
     const viewEmailBtn = document.getElementById('viewEmailBtn');
     const copyEmailBtn = document.getElementById('copyEmailBtn');
@@ -228,7 +233,10 @@ function setupContactModal() {
         }
     });
 
-    copyEmailBtn?.addEventListener('click', (e) => copyToClipboard('ahmed@dropsilk.xyz', e.currentTarget, 'Email Copied!'));
+    copyEmailBtn?.addEventListener('click', (e) => {
+        audioManager.vibrate(50); // VIBRATE HERE
+        copyToClipboard('ahmed@dropsilk.xyz', e.currentTarget, 'Email Copied!');
+    });
 }
 
 function resetContactModal() {
