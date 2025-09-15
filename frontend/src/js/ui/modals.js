@@ -9,6 +9,7 @@ import { uiElements } from './dom.js';
 import { formatBytes } from '../utils/helpers.js';
 import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 import QRCode from 'qrcode';
+// We still need audioManager for other things, so the import stays.
 import { audioManager } from '../utils/audioManager.js';
 
 let captchaWidgetId = null;
@@ -85,9 +86,7 @@ function generateQRCode() {
     });
 }
 
-// --- STEP 1: REMOVE VIBRATION FROM THE HELPER FUNCTION ---
 async function copyToClipboard(text, button, successText = 'Copied!') {
-    // The vibration logic is now handled by the event listener itself.
     await navigator.clipboard.writeText(text);
 
     const originalText = button.innerHTML;
@@ -188,7 +187,6 @@ export function initializeModals() {
     setupZipModal();
 }
 
-// --- STEP 2: CALL VIBRATION DIRECTLY IN THE EVENT LISTENER ---
 function setupInviteModal() {
     document.getElementById('inviteBtn')?.addEventListener('click', () => {
         const { currentFlightCode } = store.getState();
@@ -201,12 +199,18 @@ function setupInviteModal() {
     if (shareNativeBtn && navigator.share) shareNativeBtn.style.display = 'flex';
 
     document.getElementById('copyLinkBtn')?.addEventListener('click', (e) => {
-        audioManager.vibrate(50); // VIBRATE HERE
+        // --- THE FIX: Call navigator.vibrate directly and synchronously ---
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
         copyToClipboard(`https://dropsilk.xyz/?code=${store.getState().currentFlightCode}`, e.currentTarget, 'Link Copied!');
     });
 
     document.getElementById('copyCodeBtn')?.addEventListener('click', (e) => {
-        audioManager.vibrate(50); // VIBRATE HERE
+        // --- THE FIX: Call navigator.vibrate directly and synchronously ---
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
         copyToClipboard(store.getState().currentFlightCode, e.currentTarget, 'Code Copied!');
     });
 
@@ -216,7 +220,6 @@ function setupInviteModal() {
     });
 }
 
-// --- STEP 2 (cont.): REPEAT FOR THE CONTACT MODAL ---
 function setupContactModal() {
     const viewEmailBtn = document.getElementById('viewEmailBtn');
     const copyEmailBtn = document.getElementById('copyEmailBtn');
@@ -234,7 +237,10 @@ function setupContactModal() {
     });
 
     copyEmailBtn?.addEventListener('click', (e) => {
-        audioManager.vibrate(50); // VIBRATE HERE
+        // --- THE FIX: Call navigator.vibrate directly and synchronously ---
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
         copyToClipboard('ahmed@dropsilk.xyz', e.currentTarget, 'Email Copied!');
     });
 }
