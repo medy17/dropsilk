@@ -22,9 +22,10 @@ let incomingFileData = [];
 let incomingFileReceived = 0;
 let lastReceiveProgressUpdate = 0; // For throttling UI updates
 
-// --- MODIFIED: State variables for audio cues ---
+// State variables for audio cues
 let isNewBatch = true;
 let receiveCompletionTimer = null;
+let queueStartSoundTimeout = null; // To manage the "start" sound timing
 
 export function ensureQueueIsActive() {
     const state = store.getState();
@@ -132,9 +133,18 @@ export function handleFolderSelection(files) {
 }
 
 function startFileSend(file) {
-    // --- MODIFIED: Play queue_start sound only for the first file in a new batch ---
+    // Schedule the queue_start sound instead of playing it immediately
     if (isNewBatch) {
-        audioManager.play('queue_start');
+        // Clear any previously lingering timeout to be safe
+        if (queueStartSoundTimeout) clearTimeout(queueStartSoundTimeout);
+
+        // Schedule the sound to play after a short delay. If the transfer finishes
+        // before this, we will cancel it. 300ms is a good delay.
+        queueStartSoundTimeout = setTimeout(() => {
+            audioManager.play('queue_start');
+            queueStartSoundTimeout = null; // Clear the handle once it has run
+        }, 300);
+
         isNewBatch = false;
     }
 
@@ -227,8 +237,19 @@ export function drainQueue() {
         store.actions.finishCurrentFileSend(file);
         lastSendProgressUpdate = 0; // Reset for next file
 
-        // --- MODIFIED: Play send_complete sound only when the entire queue is finished ---
+        // Add logic to handle sound overlap
         if (store.getState().fileToSendQueue.length === 0) {
+            // This is the last file in the batch.
+
+            // If the queue_start sound is still scheduled to play (meaning the
+            // transfer was very fast), cancel it so it doesn't overlap.
+            if (queueStartSoundTimeout) {
+                clearTimeout(queueStartSoundTimeout);
+                queueStartSoundTimeout = null;
+            }
+
+            // Now, play the completion sound. This is the only sound the user
+            // will hear for very fast transfers.
             audioManager.play('send_complete');
             isNewBatch = true; // Ready the flag for the next batch
         }
@@ -242,7 +263,7 @@ export async function handleDataChannelMessage(event) {
 
     if (typeof data === "string") {
         if (data.startsWith("{")) {
-            // --- MODIFIED: A new file is starting, so cancel any pending "complete" sound ---
+            // A new file is starting, so cancel any pending "complete" sound
             if (receiveCompletionTimer) {
                 clearTimeout(receiveCompletionTimer);
                 receiveCompletionTimer = null;
@@ -335,7 +356,7 @@ export async function handleDataChannelMessage(event) {
             incomingFileInfo = null;
             lastReceiveProgressUpdate = 0; // Reset for next file
 
-            // --- MODIFIED: Use a timer to play the sound if no new file arrives shortly ---
+            // Use a timer to play the sound if no new file arrives shortly
             if (receiveCompletionTimer) clearTimeout(receiveCompletionTimer);
             receiveCompletionTimer = setTimeout(() => {
                 audioManager.play('receive_complete');
@@ -378,9 +399,14 @@ export function resetTransferState() {
     lastReceiveProgressUpdate = 0;
     store.actions.setCurrentlySendingFile(null);
 
+    // Reset all audio cue state variables
     isNewBatch = true;
     if (receiveCompletionTimer) {
         clearTimeout(receiveCompletionTimer);
         receiveCompletionTimer = null;
+    }
+    if (queueStartSoundTimeout) {
+        clearTimeout(queueStartSoundTimeout);
+        queueStartSoundTimeout = null;
     }
 }
