@@ -170,52 +170,57 @@ export async function startScreenShare() {
     try {
         localScreenStream = await navigator.mediaDevices.getDisplayMedia({
             video: { cursor: "always", height: 1080, frameRate: 15 },
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                sampleRate: 44100
-            }
+            audio: true
         });
 
         localScreenStream.getTracks().forEach(track => {
-            if (track.kind === 'video') {
-                screenTrackSender = peerConnection.addTrack(track, localScreenStream);
-            } else {
-                peerConnection.addTrack(track, localScreenStream);
-            }
+            screenTrackSenders.push(peerConnection.addTrack(track, localScreenStream));
         });
-
-        const videoTrack = localScreenStream.getVideoTracks()[0];
-        screenTrackSender = peerConnection.addTrack(videoTrack, localScreenStream);
 
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
         sendMessage({ type: "signal", data: { sdp: peerConnection.localDescription } });
 
+        const videoTrack = localScreenStream.getVideoTracks()[0];
         showLocalStreamView(localScreenStream, (preset) => handleQualityChange(preset, videoTrack));
         updateShareButton(true);
 
-        videoTrack.onended = () => stopScreenShare(true);
+        if (videoTrack) {
+            videoTrack.onended = () => stopScreenShare(true);
+        }
 
     } catch (err) {
         console.error("Error starting screen share:", err);
+        if (err.name === 'NotAllowedError') {
+            alert("Screen share permission was denied. Please try again and grant permission.");
+        } else {
+            alert("Could not start screen share. Your browser may not support audio capture, or another error occurred.");
+        }
         localScreenStream = null;
+        screenTrackSenders = []; // Reset on error
     }
 }
 
 export function stopScreenShare(notifyPeer = true) {
     if (localScreenStream) {
         localScreenStream.getTracks().forEach(track => track.stop());
-        if (screenTrackSender) {
-            peerConnection.removeTrack(screenTrackSender);
-        }
-        if (notifyPeer) {
-            // Explicitly tell the other peer the stream has ended
-            sendData(JSON.stringify({ type: 'stream-ended' }));
-        }
     }
+
+    if (screenTrackSenders.length > 0) {
+        screenTrackSenders.forEach(sender => {
+            peerConnection.removeTrack(sender);
+        });
+    }
+
+    if (notifyPeer) {
+        sendData(JSON.stringify({ type: 'stream-ended' }));
+        peerConnection.createOffer()
+            .then(offer => peerConnection.setLocalDescription(offer))
+            .then(() => sendMessage({ type: "signal", data: { sdp: peerConnection.localDescription } }));
+    }
+
     hideLocalStreamView();
     localScreenStream = null;
-    screenTrackSender = null;
+    screenTrackSenders = [];
     updateShareButton(false);
 }
