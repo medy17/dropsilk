@@ -170,7 +170,19 @@ export async function startScreenShare() {
     try {
         localScreenStream = await navigator.mediaDevices.getDisplayMedia({
             video: { cursor: "always", height: 1080, frameRate: 15 },
-            audio: false
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                sampleRate: 44100
+            }
+        });
+
+        localScreenStream.getTracks().forEach(track => {
+            if (track.kind === 'video') {
+                screenTrackSender = peerConnection.addTrack(track, localScreenStream);
+            } else {
+                peerConnection.addTrack(track, localScreenStream);
+            }
         });
 
         const videoTrack = localScreenStream.getVideoTracks()[0];
