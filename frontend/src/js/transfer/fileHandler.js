@@ -139,11 +139,11 @@ function startFileSend(file) {
         if (queueStartSoundTimeout) clearTimeout(queueStartSoundTimeout);
 
         // Schedule the sound to play after a short delay. If the transfer finishes
-        // before this, we will cancel it. 2s is a good delay.
+        // before this, we will cancel it. 0.5-2s is a good delay.
         queueStartSoundTimeout = setTimeout(() => {
             audioManager.play('queue_start');
             queueStartSoundTimeout = null; // Clear the handle once it has run
-        }, 2000);
+        }, 800);
 
         isNewBatch = false;
     }
