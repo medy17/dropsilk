@@ -2740,6 +2740,10 @@ input[type=range].volume-slider::-moz-range-thumb {
     height: 100%;
 }
 
+#screen-share-panel:fullscreen .panel-header {
+    display: none;
+}
+
 #preview-content pre {
     margin: 0;
     width: 100%;

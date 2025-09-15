@@ -135,7 +135,7 @@ function chooseDisplayAudioByUA(wantAudio = true) {
 
 function getDisplayMediaOptions(withSystemAudio = true) {
     const { audio, hint } = chooseDisplayAudioByUA(withSystemAudio);
-    const video = { cursor: 'always', height: 1080, frameRate: 15 };
+    const video = { cursor: 'always', height: 720, frameRate: 30 };
     return { constraints: { video, audio }, hint };
 }
 
@@ -303,15 +303,18 @@ async function handleQualityChange(preset, track) {
 
     let constraints = {};
     switch (preset) {
-        case 'smoothness':
-            constraints = { frameRate: 30, height: 720 };
+        case 'quality':
+            constraints = { frameRate: 60, height: 1080 };
             break;
         case 'performance':
             constraints = { frameRate: 15, height: 480 };
             break;
         case 'clarity':
-        default:
             constraints = { frameRate: 15, height: 1080 };
+            break;
+        case 'smoothness':
+        default:
+            constraints = { frameRate: 30, height: 720 };
             break;
     }
 
