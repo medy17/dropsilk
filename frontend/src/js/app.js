@@ -23,6 +23,10 @@ function initializeAppCore(isInvitedUser = false) {
     // Initialize the user's state (including onboarding state).
     store.actions.initializeUser();
 
+    // --- MOVED HERE ---
+    // Now that the user's state is loaded, we can safely check their consent/onboarding status.
+    initializePrivacyConsent();
+
     // Render the initial user name on the ticket.
     renderUserName();
 
@@ -36,7 +40,7 @@ function initializeAppCore(isInvitedUser = false) {
     }
 }
 
-// --- MODIFIED: Privacy Consent Logic ---
+// Privacy Consent Logic (no changes to the function itself)
 function initializePrivacyConsent() {
     const consentToast = document.getElementById('privacy-consent-toast');
     const acceptBtn = document.getElementById('accept-privacy-btn');
@@ -83,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("DropSilk Initializing...");
 
     initializeGlobalUI();
-    initializePrivacyConsent(); // <-- This now contains the smarter logic
+    // initializePrivacyConsent(); // <-- REMOVED FROM HERE
 
     const isAppPage = document.querySelector(".main-content");
 
