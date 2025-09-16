@@ -2146,7 +2146,7 @@ body[data-theme="dark"].video-modal-active .aurora-blob {
     max-width: 90vw;
     opacity: 0;
     transform: translateX(100%);
-    transition: all 0.4s cubic-bezier(.215, .61, .355, 1);
+    transition: opacity 0.4s cubic-bezier(.215, .61, .355, 1), transform 0.4s cubic-bezier(.215, .61, .355, 1);
 }
 
 .toast.show {
