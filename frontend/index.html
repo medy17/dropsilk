@@ -120,7 +120,11 @@
     <nav class="header-nav">
         <button id="aboutBtn" class="header-nav-link">About</button>
         <button id="contactBtn" class="header-nav-link">Contact</button>
-        <!-- Theme Toggle Button -->
+        <button id="donateBtnHeader" class="header-nav-link icon-only" aria-label="Donate">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="ko-fi" width = "22" height="22" fill="currentColor">
+                <path d="M2.608,19.5c0,0,8.267-0.023,11.966-0.048c2.438-0.418,2.683-2.517,2.658-3.663c4.352,0.235,7.422-2.777,6.649-6.784C23.108,4.998,19.022,4.5,19.022,4.5H0.723c-0.604,0-0.679,0.783-0.679,0.783s-0.082,7.184-0.022,11.596C0.186,19.257,2.608,19.5,2.608,19.5z M17.31,7.373h1.77c0,0,1.971,0.541,1.971,2.588c0,1.877-0.985,2.616-2.059,2.958c-0.928,0.114-1.682,0.027-1.682,0.027V7.373z M4.265,8.766C5.216,7.775,7.27,7.701,8.628,9.165c0,0,1.565-1.748,3.468-0.945c1.904,0.804,1.832,2.953,0.723,4.229c-1.246,1.425-4.011,3.9-4.011,3.9s-0.121,0.117-0.31,0.023c-0.076-0.056-0.108-0.088-0.108-0.088c-0.443-0.432-3.368-2.991-4.034-3.878C3.647,11.459,3.315,9.757,4.265,8.766z"></path>
+            </svg>
+        </button>
         <button
                 id="theme-toggle"
                 class="header-nav-link"
@@ -151,7 +155,7 @@
                 href="https://github.com/medy17"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="header-nav-link"
+                class="header-nav-link icon-only"
                 aria-label="GitHub Profile"
                 alt="my GitHub profile where I share more free apps and file transfer code"
         >
@@ -167,6 +171,11 @@
                 />
             </svg>
         </a>
+        <button id="drawer-toggle" class="header-nav-link icon-only drawer-toggle-btn" aria-label="Open menu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+            </svg>
+        </button>
     </nav>
 </div>
 <div class="main-content">
@@ -383,27 +392,11 @@
                         title="Toggle Fullscreen"
                 >
               <span class="icon-enter-fs">
-                <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                ><path
-                        d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"
-                /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5M.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5"/></svg>
               </span>
                     <span class="icon-exit-fs">
-                <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                ><path
-                        d="M5.5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4A.5.5 0 0 1 5.5 0zM10 .5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5zM.5 5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4zm10 0a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4zM5.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5zM.5 11a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4zm10 0a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4z"
-                /></svg>
-              </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-fullscreen-exit" viewBox="0 0 16 16"><path d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5m5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5M0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5m10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0z"/></svg>
+                    </span>
                 </button>
             </div>
         </div>
@@ -1317,7 +1310,7 @@
             <p><strong>How does screen sharing work?</strong></p>
             <p>
                 Screen sharing uses the same secure, peer-to-peer WebRTC technology
-                as file transfers. Your screen is encrypted and streamed directly to
+                as file transfers. Your screen is streamed directly to
                 your peer, and is never visible to our servers.
             </p>
         </div>
@@ -1443,6 +1436,27 @@
         <button id="accept-privacy-btn" class="btn btn-primary">Accept</button>
     </div>
 </div>
+
+<!-- Drawer Structure -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="drawer">
+    <div class="drawer-header">
+        <h3>Menu</h3>
+        <button class="modal-close" id="drawer-close" aria-label="Close menu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+        </button>
+    </div>
+    <nav class="drawer-nav" id="drawer-nav">
+        <button id="drawer-aboutBtn" class="drawer-nav-link">About</button>
+        <button id="drawer-contactBtn" class="drawer-nav-link">Contact</button>
+        <hr class="drawer-divider">
+        <button id="drawer-settingsBtn" class="drawer-nav-link">Settings</button>
+        <button id="drawer-termsBtn" class="drawer-nav-link">Terms</button>
+        <button id="drawer-privacyBtn" class="drawer-nav-link">Privacy</button>
+        <button id="drawer-securityBtn" class="drawer-nav-link">Security</button>
+        <button id="drawer-faqBtn" class="drawer-nav-link">FAQ</button>
+    </nav>
+</aside>
 
 <!-- reCAPTCHA - Deferred until needed -->
 <script

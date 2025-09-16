@@ -41,6 +41,7 @@ body {
     display: flex;
     flex-direction: column;
     transition: background 0.3s ease, color 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
 button,
@@ -401,6 +402,11 @@ body[data-theme="dark"].video-modal-active .aurora-blob {
     align-items: center;
     gap: .75rem;
 }
+
+#donateBtnHeader {
+    display: none;
+}
+
 
 @media (min-width: 768px) {
     .header {
@@ -1112,6 +1118,16 @@ body[data-theme="dark"].video-modal-active .aurora-blob {
     transition: transform 0.3s cubic-bezier(.4, 0, .2, 1), opacity 0.3s cubic-bezier(.4, 0, .2, 1), background 0.3s ease;
     scrollbar-width: thin;
     scrollbar-color: var(--c-primary) #fff0;
+}
+
+.modal-overlay .invite-modal {
+    max-height: 85vh;
+    overflow-y: auto;               /* make content scrollable */
+    -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+
+    border-radius: 16px;            /* keep rounded corners */
+    background-color: var(--c-panel-bg);
+    clip-path: inset(0 round 16px); /* ensure scrollbars respect border radius */
 }
 
 .invite-modal::-webkit-scrollbar {
@@ -3473,17 +3489,6 @@ body[data-theme="dark"] .thumbnail-item {
     display: none !important;
 }
 
-#scanQrBtn {
-    display: none;
-    margin-top: 0.5rem;
-}
-
-@media (max-width: 768px) {
-    #scanQrBtn {
-        display: inline-flex;
-    }
-}
-
 #qr-scanner-overlay {
     position: fixed;
     top: 0;
@@ -3658,11 +3663,6 @@ body[data-theme="dark"] .thumbnail-item {
 }
 
 /* --- Flight Actions & Share Button --- */
-.flight-actions {
-    display: flex;
-    gap: .8rem;
-}
-
 .flight-actions .btn {
     padding: .7em 1.2em;
     font-size: .85em;
@@ -3791,39 +3791,6 @@ body[data-theme="dark"] .thumbnail-item {
     width: 100%;
 }
 
-/* Mobile-specific improvements */
-@media (max-width: 768px) {
-    .onboarding-tooltip {
-        max-width: calc(100vw - 32px);
-        min-width: 280px;
-        padding: 1.25rem;
-        font-size: 0.95rem;
-    }
-
-    .onboarding-tooltip h3 {
-        font-size: 1.1rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .onboarding-tooltip p {
-        font-size: 0.9rem;
-        line-height: 1.5;
-        margin-bottom: 1rem;
-    }
-
-    .onboarding-tooltip .btn {
-        padding: 0.75rem 1rem;
-        font-size: 0.9rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .onboarding-tooltip {
-        padding: 1rem;
-        max-width: calc(100vw - 24px);
-        min-width: auto;
-    }
-}
 .kofi-modal {
     width: 420px;
     max-width: 95vw;
@@ -3869,6 +3836,261 @@ body[data-theme="dark"] .thumbnail-item {
     padding: 0.75rem 1.25rem;
 }
 
+.drawer-toggle-btn {
+    display: none; /* Hidden by default, shown on mobile */
+}
+
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(24, 24, 27, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+}
+
+.drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 300px;
+    max-width: 80vw;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    background: var(--c-panel-bg);
+    border-radius: 20px 0 0 20px;
+    border-left: 2px solid var(--c-panel-border);
+    box-shadow: -10px 0 30px rgba(91, 206, 250, 0.07);
+    --drawer-translate-x: 100%;
+    --drawer-scale: 1;
+    transform: translateX(var(--drawer-translate-x)) scale(var(--drawer-scale));
+}
+
+.drawer.drawer-tapped {
+    /* This now only changes the scale variable, preserving the translate position */
+    --drawer-scale: 0.985;
+    transition: transform 1s ease-out;
+}
+
+.drawer.drawer-ready {
+    transition: transform 1s cubic-bezier(.4, 0, 0.2, 1);
+}
+
+.drawer.drawer-exiting {
+    transform: scale(0.95) translateX(30px); /* Recede and move slightly right */
+    opacity: 0;
+    transition: transform 1s ease-in, opacity 0.2s ease-in;
+}
+
+
+body[data-theme="dark"] .drawer {
+    box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+    border-left-color: rgba(245, 169, 184, 0.4);
+}
+
+body.drawer-open {
+    overflow: hidden;
+}
+
+body.drawer-open .drawer-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+body.drawer-open .drawer {
+    --drawer-translate-x: 0;
+}
+
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid var(--c-primary);
+    flex-shrink: 0;
+}
+
+.drawer-header h3 {
+    margin: 0;
+    color: var(--c-primary);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.drawer-nav {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem 0.75rem;
+}
+
+.drawer-nav-link {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.9rem 1rem;
+    background: none;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--c-text-secondary);
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, transform 0.1s ease-out;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.drawer-nav-link:hover {
+    background-color: rgba(91, 206, 250, 0.1);
+    color: var(--c-primary);
+}
+
+.drawer-divider {
+    border: 0;
+    height: 1px;
+    background-color: var(--c-panel-border);
+    margin: 0.75rem 1.5rem;
+}
+
+/* === Responsive Navigation Logic === */
+@media (max-width: 991px) {
+    /* Show the hamburger button */
+    .drawer-toggle-btn {
+        display: flex;
+    }
+
+    #scanQrBtn {
+        /* Moved from 768px breakpoint */
+        display: inline-flex;
+        margin-top: 0.5rem;
+    }
+
+    .drawer-nav-link:active {
+        /* Make the background slightly darker than hover for a clear press effect */
+        background-color: rgba(91, 206, 250, 0.15);
+        color: var(--c-primary);
+        /* Add a subtle "push in" effect on tap */
+        transform: scale(0.97);
+    }
+
+    #donateBtnHeader {
+        display: flex;
+    }
+
+    #donateBtnHeader svg {
+        width: 22px;
+        height: 22px;
+        display: block;
+    }
+
+    /* Hide the text-based header links */
+    .header-nav #aboutBtn,
+    .header-nav #contactBtn {
+        display: none;
+    }
+    /* Make all header SVGs render consistently */
+    .header-nav-link svg {
+        width: var(--header-icon-size, 22px);
+        height: var(--header-icon-size, 22px);
+        display: block; /* avoids inline baseline gaps */
+    }
+
+    /* Ko‑fi has more internal padding → bump it slightly */
+    .header-nav-link svg#ko-fi {
+        transform: scale(1.3);
+        transform-origin: 50% 50%;
+        transform-box: fill-box; /* centre the scale on the path, not the box */
+    }
+
+    #drawer-toggle svg.bi-list {
+        transform: scale(1.3);
+        transform-origin: 50% 50%;
+        transform-box: fill-box;
+    }
+
+    /* Hide the entire footer navigation */
+    .footer-nav {
+        display: none;
+    }
+
+    /* Center the copyright text in the footer on mobile */
+    .footer-content {
+        justify-content: center;
+    }
+
+    /* --- Mobile Modal Animation Overrides --- */
+    .modal-overlay {
+        /* Use a consistent padding for modals on mobile */
+        padding: 1rem;
+    }
+
+    .modal-overlay .invite-modal {
+        /* 1. Override desktop animation: set initial state to be off-screen RIGHT */
+        transform: translateX(100%);
+        opacity: 0.8; /* Start slightly transparent for a smoother entry */
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+        will-change: transform;
+
+        /* Consolidate other styles from 768px breakpoint */
+        max-width: 95vw;
+        max-height: 85vh;
+        border-radius: 16px;
+    }
+
+    .modal-overlay.show .invite-modal {
+        /* 2. Animate TO this state: on-screen and fully opaque */
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    /* 3. Override child element animations to match */
+    .modal-overlay .modal-header,
+    .modal-overlay .modal-body,
+    .modal-overlay .flight-code-display,
+    .modal-overlay .qr-section,
+    .modal-overlay .share-actions {
+        /* Initial state: slightly offset to the right */
+        transform: translateX(20px);
+    }
+
+    .modal-overlay.show .modal-header,
+    .modal-overlay.show .modal-body,
+    .modal-overlay.show .flight-code-display,
+    .modal-overlay.show .qr-section,
+    .modal-overlay.show .share-actions {
+        /* Animate TO this state: in the final position */
+        transform: translateX(0);
+    }
+
+    /* Consolidating .onboarding-tooltip styles from 768px breakpoint */
+    .onboarding-tooltip {
+        max-width: calc(100vw - 32px);
+        min-width: 280px;
+        padding: 1.25rem;
+        font-size: 0.95rem;
+    }
+    .onboarding-tooltip h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    .onboarding-tooltip p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+    .onboarding-tooltip .btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
 /* Responsive adjustments for the privacy toast */
 @media (max-width: 600px) {
     #privacy-consent-toast {
@@ -3890,8 +4112,48 @@ body[data-theme="dark"] .thumbnail-item {
     }
 }
 
-.toast-body .checkbox-label {
-    margin-top: 1rem;
-    font-size: 0.9em;
-    font-weight: 500;
+@media (max-width: 768px) {
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 1rem;
+    }
+
+    .modal-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .modal-overlay .invite-modal {
+        max-width: 95vw;
+        max-height: 85vh;
+        border-radius: 16px;
+        transform: translateX(100%);
+        transition:
+                transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.3s ease;
+        will-change: transform;
+    }
+
+    .modal-overlay.show .invite-modal {
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+    .modal-overlay,
+    .modal-overlay .invite-modal {
+        transition: none !important;
+    }
 }

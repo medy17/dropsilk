@@ -1,5 +1,5 @@
 // js/ui/modals.js
-// Handles all modal interactions, including theme toggling.
+// Handles all modal interactions, including theme toggling and the side drawer.
 
 import { showPreview, updatePptxPreviewButtonsDisabled } from '../preview/previewManager.js';
 import { isPreviewable } from '../preview/previewConfig.js';
@@ -202,6 +202,56 @@ function resetPreviewModal() {
     contentElement.innerHTML = '';
 }
 
+function initializeDrawer() {
+    const drawer = document.getElementById('drawer');
+    const overlay = document.getElementById('drawer-overlay');
+    const toggleBtn = document.getElementById('drawer-toggle');
+    const closeBtn = document.getElementById('drawer-close');
+    const drawerNav = document.getElementById('drawer-nav');
+
+    if (!drawer || !overlay || !toggleBtn || !closeBtn || !drawerNav) return;
+
+    // Prevents the drawer from animating on page load.
+    setTimeout(() => {
+        drawer.classList.add('drawer-ready');
+    }, 0);
+
+    const openDrawer = () => document.body.classList.add('drawer-open');
+    const closeDrawer = () => document.body.classList.remove('drawer-open');
+
+    toggleBtn.addEventListener('click', openDrawer);
+    closeBtn.addEventListener('click', closeDrawer);
+    overlay.addEventListener('click', closeDrawer);
+
+    drawerNav.addEventListener('click', (e) => {
+        if (e.target.matches('.drawer-nav-link')) {
+            // ** NEW: Add tap feedback to the drawer itself **
+            drawer.classList.add('drawer-tapped');
+            setTimeout(() => {
+                drawer.classList.remove('drawer-tapped');
+            }, 200); // Duration of the "tapped" state
+
+            // Find the original button and click it to trigger the modal
+            const originalId = e.target.id.replace('drawer-', '');
+            const originalButton = document.getElementById(originalId);
+            if (originalButton) {
+                originalButton.click();
+            }
+            closeDrawer();
+        }
+    });
+
+    // Special handling for the header Donate button
+    const donateBtnHeader = document.getElementById('donateBtnHeader');
+    const kofiBtn = document.getElementById('ko-fiBtn');
+    if (donateBtnHeader && kofiBtn) {
+        donateBtnHeader.addEventListener('click', () => {
+            kofiBtn.click();
+        });
+    }
+}
+
+
 export function initializeModals() {
     initializeTheme();
 
@@ -245,6 +295,10 @@ export function initializeModals() {
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
+            if (document.body.classList.contains('drawer-open')) {
+                document.body.classList.remove('drawer-open');
+                return;
+            }
             document.querySelectorAll('.modal-overlay.show').forEach(m => {
                 if (m.id === 'zipModal' && m.classList.contains('zipping-in-progress')) return;
                 const modalName = Object.keys(modals).find(key => modals[key].overlay === m.id);
@@ -256,8 +310,10 @@ export function initializeModals() {
     setupInviteModal();
     setupContactModal();
     setupZipModal();
+    initializeDrawer();
 }
 
+// ... (rest of the file is unchanged) ...
 function setupInviteModal() {
     document.getElementById('inviteBtn')?.addEventListener('click', () => {
         const { currentFlightCode } = store.getState();
