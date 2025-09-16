@@ -57,10 +57,10 @@ export function initializeEventListeners() {
         sendMessage({ type: "create-flight" });
     });
 
-    // MODIFIED: Use the reusable function for the click event
+    // Use the reusable function for the click event
     uiElements.joinFlightBtn?.addEventListener('click', attemptToJoinFlight);
 
-    // NEW: Add keydown event listener for the input field
+    // Add keydown event listener for the input field
     uiElements.flightCodeInput?.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             event.preventDefault(); // Prevent any default form submission behavior
@@ -181,7 +181,6 @@ export function initializeEventListeners() {
         }
     });
 
-    // --- MODIFIED BLOCK ---
     uiElements.dashboardFlightCodeBtn?.addEventListener('click', async () => {
         const code = uiElements.dashboardFlightCodeBtn.getAttribute('data-code');
         if (!code) return;

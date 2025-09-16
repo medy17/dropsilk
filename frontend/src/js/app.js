@@ -122,6 +122,12 @@ function activateSpeedInsights() {
         });
 }
 
+// Expose activators so Settings UI can enable them after consent
+// (Disabling/removal requires a reload; we’ll prompt the user.)
+window.dsActivateAnalytics = function () {
+    try { activateAnalytics(); activateSpeedInsights(); } catch (e) { console.warn(e); }
+};
+
 /**
  * reCAPTCHA lazy-load and first-click render.
  */

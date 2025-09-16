@@ -332,11 +332,31 @@ export async function handleDataChannelMessage(event) {
                     (fileExtension === 'ts' && finalFileInfo.type === 'video/mp2t');
                 const canPreview = isPreviewable(finalFileInfo.name);
 
+                // Read persisted preview consent map
+                let previewConsent = {};
+                try {
+                    previewConsent = JSON.parse(
+                        localStorage.getItem('dropsilk-preview-consent') || '{}'
+                    );
+                } catch (_) {}
+
                 let buttonsHTML = '';
                 if (isVideo && window.videoPlayer) {
                     buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="video" title="Preview Video">${previewIconSVG}</button>`;
                 } else if (canPreview) {
-                    buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="generic" title="Preview File">${previewIconSVG}</button>`;
+                    const isPptx = fileExtension === 'pptx';
+                    const pptxDenied = previewConsent?.pptx === 'deny';
+                    if (isPptx) {
+                        const titleText = pptxDenied
+                            ? 'PPTX preview disabled by your privacy choice'
+                            : 'Preview File';
+                        const disabledAttr = pptxDenied
+                            ? 'disabled aria-disabled="true"'
+                            : '';
+                        buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="generic" data-ext="pptx" ${disabledAttr} title="${titleText}">${previewIconSVG}</button>`;
+                    } else {
+                        buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="generic" title="Preview File">${previewIconSVG}</button>`;
+                    }
                 }
                 buttonsHTML += `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>`;
                 actionContainer.innerHTML = `<div class="file-action-group">${buttonsHTML}</div>`;

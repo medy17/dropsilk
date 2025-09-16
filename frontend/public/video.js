@@ -1,8 +1,7 @@
-// --- NEW FILE: video.js ---
+// --- video.js ---
 // This is a self-contained video player component.
 
 window.videoPlayer = (() => {
-    // --- NEW: HTML structure is now defined inside the component ---
     const playerTemplate = `
         <div class="modal-overlay" id="videoModal" style="display: none;">
             <div id="video-player-container">
@@ -306,6 +305,7 @@ window.videoPlayer = (() => {
         setTimeout(() => videoModalOverlay.classList.add('show'), 10);
 
         document.body.style.overflow = 'hidden';
+        document.body.classList.add('video-modal-active'); // Add class when modal opens
         document.addEventListener('keydown', handleKeyboardShortcuts);
     }
 
@@ -328,6 +328,7 @@ window.videoPlayer = (() => {
         }, 300); // Match CSS transition duration
 
         document.body.style.overflow = '';
+        document.body.classList.remove('video-modal-active'); // Remove class when modal closes
         document.removeEventListener('keydown', handleKeyboardShortcuts);
     }
 

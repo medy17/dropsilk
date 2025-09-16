@@ -44,7 +44,7 @@ export const previewConfig = {
         dependencies: ['https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.7.0/mammoth.browser.min.js'],
         handler: () => import('./handlers/docxPreview.js'),
     },
-    // handler for PPTX - FIXED VERSION
+    // handler for PPTX
     pptx: {
         extensions: ['pptx'],
         dependencies: [
@@ -52,6 +52,7 @@ export const previewConfig = {
             'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'
         ],
         handler: () => import('./handlers/pptxPreview.js'),
+        requiresUploadConsent: true,
     },
     // handler for XLSX
     xlsx: {

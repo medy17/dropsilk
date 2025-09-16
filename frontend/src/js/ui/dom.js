@@ -53,6 +53,7 @@ export const uiElements = {
 
     // Modals & Nav
     toastContainer: document.getElementById("toast-container"),
+    settingsBtn: document.getElementById("settingsBtn"),
 
     // Metrics
     metricsSentEl: document.getElementById('metrics-sent'),

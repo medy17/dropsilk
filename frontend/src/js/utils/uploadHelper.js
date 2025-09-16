@@ -33,10 +33,7 @@ async function getUploader() {
                 if (mod && typeof mod.genUploader === "function") {
                     const { genUploader } = mod;
 
-                    // --- THIS IS THE CRITICAL CHANGE ---
-                    // It now points to your absolute Render backend URL.
                     const ut = genUploader({ url: `${API_BASE_URL}/api/uploadthing` });
-                    // --- END OF CRITICAL CHANGE ---
 
                     return ut;
                 }

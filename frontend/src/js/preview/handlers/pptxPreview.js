@@ -3,7 +3,9 @@ import { uploadBlobForPreview } from "../../utils/uploadHelper.js";
 const modalContent = document.querySelector('#previewModal .preview-modal-content');
 
 export function cleanup() {
-    modalContent?.classList.remove('is-widescreen-preview');
+  if (modalContent) {
+    modalContent.classList.remove('is-widescreen-preview');
+  }
 }
 export default async function renderPptxPreview(
     blob,

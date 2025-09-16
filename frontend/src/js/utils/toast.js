@@ -5,7 +5,14 @@ import { uiElements } from '../ui/dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
 
-export function showToast({ type = 'info', title, body, duration = 10000, actions = [], onRemove = null }) {
+export function showToast({
+                              type = 'info',
+                              title,
+                              body,
+                              duration = 10000,
+                              actions = [],
+                              onRemove = null,
+                          }) {
     const toastId = `toast-${Date.now()}`;
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -21,13 +28,13 @@ export function showToast({ type = 'info', title, body, duration = 10000, action
     }
 
     toast.innerHTML = `
-        <div class="toast-header">
-            <strong>${title}</strong>
-            <button class="toast-close">×</button>
-        </div>
-        <div class="toast-body">${body}</div>
-        ${actionsHTML}
-    `;
+      <div class="toast-header">
+          <strong>${title}</strong>
+          <button class="toast-close">×</button>
+      </div>
+      <div class="toast-body">${body}</div>
+      ${actionsHTML}
+  `;
 
     uiElements.toastContainer.appendChild(toast);
     setTimeout(() => toast.classList.add('show'), 100);
@@ -56,6 +63,9 @@ export function showToast({ type = 'info', title, body, duration = 10000, action
             }
         });
     });
+
+    // Return a handle so callers can access the DOM (e.g., to read a checkbox)
+    return { id: toastId, element: toast, remove: removeToast };
 }
 
 export function showInvitationToast(fromName, flightCode) {

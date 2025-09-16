@@ -47,7 +47,7 @@ export default async function renderPdfPreview(blob, contentElement) {
         const loadingTask = window.pdfjsLib.getDocument(pdfUrl);
         const pdfDoc = await loadingTask.promise;
 
-        // --- MODIFIED: Setup Intersection Observer ---
+        // --- Setup Intersection Observer ---
         const observerOptions = {
             root: viewerContainer,
             rootMargin: '200px 0px', // Start loading pages 200px before they enter the viewport

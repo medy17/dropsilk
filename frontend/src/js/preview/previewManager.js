@@ -3,6 +3,7 @@
 
 import { previewConfig } from './previewConfig.js';
 import { store } from '../state.js';
+import { showToast } from '../utils/toast.js';
 
 // --- DOM elements for the preview modal ---
 const previewModal = document.getElementById('previewModal');
@@ -14,6 +15,13 @@ const closePreviewModalBtn = document.getElementById('closePreviewModal');
 // --- Resource Loading & State ---
 const loadedResources = new Set();
 let currentHandlerModule = null; // Store the currently active handler module
+const PREVIEW_CONSENT_KEY = 'dropsilk-preview-consent';
+
+function getConsentMap() {
+  try {
+    return JSON.parse(localStorage.getItem(PREVIEW_CONSENT_KEY) || '{}');
+  } catch { return {}; }
+}
 
 function loadScript(url) {
     if (loadedResources.has(url)) return Promise.resolve();
@@ -77,6 +85,88 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+function setConsent(ext, value) {
+  const map = getConsentMap();
+  map[ext] = value; // 'allow' | 'deny'
+  localStorage.setItem(PREVIEW_CONSENT_KEY, JSON.stringify(map));
+}
+
+export function updatePptxPreviewButtonsDisabled(isDisabled) {
+  // Disable/enable any PPTX preview buttons currently in the UI
+  const buttons = document.querySelectorAll(
+    '.preview-btn[data-ext="pptx"]'
+  );
+  buttons.forEach((btn) => {
+    if (!(btn instanceof HTMLButtonElement)) return;
+    btn.disabled = !!isDisabled;
+    btn.title = isDisabled
+      ? 'PPTX preview disabled by your privacy choice'
+      : 'Preview File';
+  });
+}
+
+/**
+ * Show consent if required and not previously decided.
+ * Returns true if allowed, false if declined.
+ */
+function ensureUploadConsent(ext) {
+  const map = getConsentMap();
+  const decided = map[ext];
+  if (decided === 'allow') return Promise.resolve(true);
+  if (decided === 'deny') return Promise.resolve(false);
+
+  const rememberId = `remember-consent-${ext}-${Date.now()}`;
+  return new Promise((resolve) => {
+    const toast = showToast({
+      type: 'info',
+      title: 'PPTX Preview Consent',
+      duration: 0,
+      body: `
+        Previewing PPTX requires a temporary upload to a secure third-party
+        service (UploadThing) to generate a preview. The file is used only for
+        this preview and is automatically deleted by our backend shortly after.
+        <br/><br/>
+        <label class="checkbox-label">
+          <input type="checkbox"
+                 id="${rememberId}"
+                 class="custom-checkbox-input" />
+          <span class="custom-checkbox"></span>
+          <span>Remember my decision</span>
+        </label>
+      `,
+      actions: [
+        {
+          text: 'Decline',
+          class: 'btn-secondary',
+          callback: () => {
+            const remember = !!toast.element.querySelector(
+              `#${rememberId}`
+            )?.checked;
+            if (remember) {
+              setConsent(ext, 'deny');
+              if (ext === 'pptx') updatePptxPreviewButtonsDisabled(true);
+            }
+            resolve(false);
+          },
+        },
+        {
+          text: 'Continue',
+          class: 'btn-primary',
+          callback: () => {
+            const remember = !!toast.element.querySelector(
+              `#${rememberId}`
+            )?.checked;
+            if (remember) {
+              setConsent(ext, 'allow');
+              if (ext === 'pptx') updatePptxPreviewButtonsDisabled(false);
+            }
+            resolve(true);
+          },
+        },
+      ],
+    });
+  });
+}
 
 // --- Public Preview Function ---
 
@@ -101,6 +191,16 @@ export async function showPreview(fileName) {
         return;
     }
 
+    // If this preview requires upload consent (e.g., PPTX), handle that first.
+    if (config.requiresUploadConsent) {
+        const allowed = await ensureUploadConsent(extension);
+        if (!allowed) {
+            // User declined; cancel the pending operation silently.
+            return;
+        }
+    }
+
+    // Proceed with preview (open modal only after consent is granted)
     previewHeader.textContent = file.name;
     previewLoader.style.display = 'flex';
     previewContent.innerHTML = '';

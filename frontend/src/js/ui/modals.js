@@ -1,40 +1,38 @@
 // js/ui/modals.js
 // Handles all modal interactions, including theme toggling.
 
-import { showPreview } from '../preview/previewManager.js';
+import { showPreview, updatePptxPreviewButtonsDisabled } from '../preview/previewManager.js';
 import { isPreviewable } from '../preview/previewConfig.js';
 import { RECAPTCHA_SITE_KEY } from '../config.js';
 import { store } from '../state.js';
 import { uiElements } from './dom.js';
 import { formatBytes } from '../utils/helpers.js';
 import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
+import { showToast } from '../utils/toast.js';
 import QRCode from 'qrcode';
-// We still need audioManager for other things, so the import stays.
 import { audioManager } from '../utils/audioManager.js';
 
 let captchaWidgetId = null;
+let zipModalMode = 'zip'; // 'zip' | 'settings'
 
 function onRecaptchaLoadCallback() {
     const recaptchaContainer = document.getElementById('recaptcha-container');
-    // We only render the widget if the container exists and is empty.
     if (recaptchaContainer && recaptchaContainer.innerHTML.trim() === '') {
         captchaWidgetId = grecaptcha.render('recaptcha-container', {
             'sitekey': RECAPTCHA_SITE_KEY,
-            'callback': 'onCaptchaSuccessCallback', // We provide the *name* of the success function as a string.
+            'callback': 'onCaptchaSuccessCallback',
             'theme': uiElements.body.getAttribute('data-theme') || 'light'
         });
     }
 }
-window.onRecaptchaLoad = onRecaptchaLoadCallback; // Attach it to the window.
-
+window.onRecaptchaLoad = onRecaptchaLoadCallback;
 
 function onCaptchaSuccessCallback() {
     document.getElementById('email-view-captcha-state').style.display = 'none';
     document.getElementById('email-view-revealed-state').style.display = 'block';
     document.getElementById('captcha-pretext').style.display = 'none';
 }
-window.onCaptchaSuccessCallback = onCaptchaSuccessCallback; // Attach it to the window.
-
+window.onCaptchaSuccessCallback = onCaptchaSuccessCallback;
 
 // --- MODULE LOGIC ---
 
@@ -98,39 +96,110 @@ async function copyToClipboard(text, button, successText = 'Copied!') {
     }, 2000);
 }
 
-// Helper function to reset the Zip Modal to its default state
+function populateZipModal() {
+    const { receivedFiles } = store.getState();
+    uiElements.zipFileList.innerHTML = '';
+
+    if (receivedFiles.length === 0) {
+        uiElements.zipFileList.innerHTML =
+            '<div class="empty-state">No files to download.</div>';
+        // Also reset header info
+        uiElements.zipSelectionInfo.textContent = '0 files selected (0 Bytes)';
+        uiElements.downloadSelectedBtn.disabled = true;
+        uiElements.selectAllZipCheckbox.checked = false;
+        return;
+    }
+
+    receivedFiles.forEach((file, index) => {
+        uiElements.zipFileList.insertAdjacentHTML(
+            'beforeend',
+            `
+      <label class="zip-file-item checkbox-label">
+        <input
+          type="checkbox"
+          class="zip-file-checkbox custom-checkbox-input"
+          data-index="${index}"
+        />
+        <span class="custom-checkbox"></span>
+        <div class="zip-file-details">
+          <span class="zip-file-name" title="${file.name}">${file.name}</span>
+          <span class="zip-file-size">${formatBytes(file.blob.size)}</span>
+        </div>
+      </label>
+    `
+        );
+    });
+
+    // Initialise summary
+    updateZipSelection();
+}
+
+function updateZipSelection() {
+    const { receivedFiles } = store.getState();
+    const selected = Array.from(
+        uiElements.zipFileList.querySelectorAll('.zip-file-checkbox:checked')
+    ).map((cb) => parseInt(cb.dataset.index, 10));
+
+    const totalSelected = selected.length;
+    const totalSize = selected.reduce(
+        (sum, idx) => sum + (receivedFiles[idx]?.blob?.size || 0),
+        0
+    );
+
+    uiElements.zipSelectionInfo.textContent = `${totalSelected} files selected (${formatBytes(
+        totalSize
+    )})`;
+    uiElements.downloadSelectedBtn.disabled = totalSelected === 0;
+
+    const all = uiElements.zipFileList.querySelectorAll('.zip-file-checkbox');
+    uiElements.selectAllZipCheckbox.checked =
+        all.length > 0 && totalSelected === all.length;
+}
+
 function resetZipModal() {
+    zipModalMode = 'zip';
     const modal = document.getElementById('zipModal');
-    if (modal) modal.classList.remove('zipping-in-progress');
+    if(modal) {
+        modal.classList.remove('settings-mode');
+        modal.classList.remove('zipping-in-progress');
+    }
+
+    // --- Reset title ---
+    const header = document.querySelector('#zipModal .modal-header h3');
+    if (header) header.textContent = 'Download Files as Zip';
 
     uiElements.selectAllZipCheckbox.checked = false;
     updateZipSelection();
 
-    if (uiElements.zipModalDefaultFooter) {
-        uiElements.zipModalDefaultFooter.style.display = 'block';
-    }
-    if (uiElements.zipModalWarningFooter) {
-        uiElements.zipModalWarningFooter.style.display = 'none';
-    }
+    if (uiElements.zipModalDefaultFooter) uiElements.zipModalDefaultFooter.style.display = 'block';
+    if (uiElements.zipModalWarningFooter) uiElements.zipModalWarningFooter.style.display = 'none';
+
+    const selectAllLabel = uiElements.selectAllZipCheckbox
+        ?.closest('.checkbox-label')
+        ?.querySelector('span:last-of-type');
+    if (selectAllLabel) selectAllLabel.textContent = 'Select All';
+    uiElements.zipSelectionInfo.textContent = '0 files selected (0 Bytes)';
 
     const btn = uiElements.downloadSelectedBtn;
     const btnSpan = btn.querySelector('span');
     const downloadIcon = btn.querySelector('.download-icon');
+    const saveIcon = btn.querySelector('.save-icon');
     const spinnerIcon = btn.querySelector('.spinner-icon');
 
+    // --- Reset button text and icons to default state ---
     if (btnSpan) btnSpan.textContent = 'Download Selected as Zip';
     if (downloadIcon) downloadIcon.style.display = 'inline-block';
+    if (saveIcon) saveIcon.style.display = 'none';
     if (spinnerIcon) spinnerIcon.style.display = 'none';
 }
 
 function resetPreviewModal() {
     const contentElement = document.getElementById('preview-content');
-    // Revoke object URL to prevent memory leaks, crucial for large image previews
     if (contentElement.dataset.objectUrl) {
         URL.revokeObjectURL(contentElement.dataset.objectUrl);
         delete contentElement.dataset.objectUrl;
     }
-    contentElement.innerHTML = ''; // Clear the content
+    contentElement.innerHTML = '';
 }
 
 export function initializeModals() {
@@ -138,7 +207,8 @@ export function initializeModals() {
 
     const modals = {
         invite: { trigger: 'inviteBtn', close: 'closeInviteModal', overlay: 'inviteModal' },
-        zip: { trigger: 'downloadAllBtn', close: 'closeZipModal', overlay: 'zipModal' },
+        zip: { trigger: 'downloadAllBtn', close: 'closeZipModal', overlay: 'zipModal', onShow: populateZipModal },
+        settings: { trigger: 'settingsBtn', close: 'closeZipModal', overlay: 'zipModal', onShow: openSettingsModal },
         donate: { trigger: 'ko-fiBtn', close: 'closeDonateModal', overlay: 'donateModal' },
         about: { trigger: 'aboutBtn', close: 'closeAboutModal', overlay: 'aboutModal' },
         contact: { trigger: 'contactBtn', close: 'closeContactModal', overlay: 'contactModal' },
@@ -155,12 +225,16 @@ export function initializeModals() {
         const close = document.getElementById(config.close);
         if (!overlay || !trigger || !close) return;
 
-        const show = () => { overlay.classList.add('show'); uiElements.body.style.overflow = 'hidden'; };
+        const show = () => {
+            if (typeof config.onShow === 'function') config.onShow();
+            overlay.classList.add('show');
+            uiElements.body.style.overflow = 'hidden';
+        };
         const hide = () => {
             overlay.classList.remove('show');
             uiElements.body.style.overflow = '';
             if (name === 'contact') resetContactModal();
-            if (name === 'zip') resetZipModal();
+            if (name === 'zip' || name === 'settings') resetZipModal();
             if (name === 'preview') resetPreviewModal();
         };
 
@@ -172,10 +246,7 @@ export function initializeModals() {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             document.querySelectorAll('.modal-overlay.show').forEach(m => {
-                // Prevent closing the zip modal while it's busy
-                if (m.id === 'zipModal' && m.classList.contains('zipping-in-progress')) {
-                    return;
-                }
+                if (m.id === 'zipModal' && m.classList.contains('zipping-in-progress')) return;
                 const modalName = Object.keys(modals).find(key => modals[key].overlay === m.id);
                 if (modalName) document.getElementById(modals[modalName].close)?.click();
             });
@@ -199,7 +270,6 @@ function setupInviteModal() {
     if (shareNativeBtn && navigator.share) shareNativeBtn.style.display = 'flex';
 
     document.getElementById('copyLinkBtn')?.addEventListener('click', (e) => {
-        // --- THE FIX: Call navigator.vibrate directly and synchronously ---
         if (navigator.vibrate) {
             navigator.vibrate([50, 40, 15]);
         }
@@ -207,7 +277,6 @@ function setupInviteModal() {
     });
 
     document.getElementById('copyCodeBtn')?.addEventListener('click', (e) => {
-        // --- THE FIX: Call navigator.vibrate directly and synchronously ---
         if (navigator.vibrate) {
             navigator.vibrate([50, 40, 15]);
         }
@@ -230,14 +299,12 @@ function setupContactModal() {
         initialState.style.display = 'none';
         captchaState.style.display = 'block';
 
-        // This handles cases where the modal is opened *after* the google script has already loaded.
         if (window.grecaptcha && captchaWidgetId === null) {
             onRecaptchaLoadCallback();
         }
     });
 
     copyEmailBtn?.addEventListener('click', (e) => {
-        // --- THE FIX: Call navigator.vibrate directly and synchronously ---
         if (navigator.vibrate) {
             navigator.vibrate([50, 40, 15]);
         }
@@ -263,69 +330,223 @@ function resetContactModal() {
     }
 }
 
-function populateZipModal() {
-    const { receivedFiles } = store.getState();
-    uiElements.zipFileList.innerHTML = '';
-
-    if (receivedFiles.length === 0) {
-        uiElements.zipFileList.innerHTML = '<div class="empty-state">No files to download.</div>';
-        return;
-    }
-
-    receivedFiles.forEach((file, index) => {
-        uiElements.zipFileList.insertAdjacentHTML('beforeend', `
-            <label class="zip-file-item checkbox-label">
-                <input type="checkbox" class="zip-file-checkbox custom-checkbox-input" data-index="${index}">
-                <span class="custom-checkbox"></span>
-                <div class="zip-file-details">
-                    <span class="zip-file-name" title="${file.name}">${file.name}</span>
-                    <span class="zip-file-size">${formatBytes(file.blob.size)}</span>
-                </div>
-            </label>
-        `);
-    });
-}
-
-function updateZipSelection() {
-    const { receivedFiles } = store.getState();
-    const checkboxes = uiElements.zipFileList.querySelectorAll('.zip-file-checkbox:checked');
-    const selectedIndexes = Array.from(checkboxes).map(cb => parseInt(cb.dataset.index, 10));
-
-    const totalSelected = selectedIndexes.length;
-    const totalSize = selectedIndexes.reduce((sum, index) => sum + receivedFiles[index].blob.size, 0);
-
-    uiElements.zipSelectionInfo.textContent = `${totalSelected} files selected (${formatBytes(totalSize)})`;
-    uiElements.downloadSelectedBtn.disabled = totalSelected === 0;
-
-    const allCheckboxes = uiElements.zipFileList.querySelectorAll('.zip-file-checkbox');
-    uiElements.selectAllZipCheckbox.checked = allCheckboxes.length > 0 && totalSelected === allCheckboxes.length;
-}
+// --- ZIP & Settings Modal Logic ---
 
 function setupZipModal() {
-    const trigger = document.getElementById('downloadAllBtn');
-    if (!trigger) return;
-
-    trigger.addEventListener('click', populateZipModal);
-
     uiElements.zipFileList.addEventListener('change', (e) => {
-        if (e.target.classList.contains('zip-file-checkbox')) {
+        if (e.target.classList.contains('zip-file-checkbox')) updateZipSelection();
+    });
+
+    uiElements.selectAllZipCheckbox.addEventListener('change', () => {
+        if (zipModalMode === 'settings') {
+            const isOn = uiElements.selectAllZipCheckbox.checked;
+            toggleAllSettings(isOn);
+            updateSettingsSummary();
+        } else {
+            const isChecked = uiElements.selectAllZipCheckbox.checked;
+            uiElements.zipFileList.querySelectorAll('.zip-file-checkbox').forEach(cb => cb.checked = isChecked);
             updateZipSelection();
         }
     });
 
-    uiElements.selectAllZipCheckbox.addEventListener('change', () => {
-        const isChecked = uiElements.selectAllZipCheckbox.checked;
-        uiElements.zipFileList.querySelectorAll('.zip-file-checkbox').forEach(cb => { cb.checked = isChecked; });
-        updateZipSelection();
-    });
-
     uiElements.downloadSelectedBtn.addEventListener('click', () => {
+        if (zipModalMode === 'settings') {
+            saveSettingsPreferences();
+            return;
+        }
         const { receivedFiles } = store.getState();
         const checkboxes = uiElements.zipFileList.querySelectorAll('.zip-file-checkbox:checked');
         const selectedFiles = Array.from(checkboxes).map(cb => receivedFiles[parseInt(cb.dataset.index, 10)]);
-
-        if (selectedFiles.length > 0) {
-            downloadAllFilesAsZip(selectedFiles);
-        }
+        if (selectedFiles.length > 0) downloadAllFilesAsZip(selectedFiles);
     });
+}
+
+// --- Settings Modal helpers (reused from ZIP) ---
+
+function getPreviewConsentMap() {
+    try { return JSON.parse(localStorage.getItem('dropsilk-preview-consent') || '{}'); }
+    catch { return {}; }
+}
+
+function setPreviewConsent(ext, value) {
+    const map = getPreviewConsentMap();
+    if (value === 'ask') delete map[ext];
+    else map[ext] = value;
+    localStorage.setItem('dropsilk-preview-consent', JSON.stringify(map));
+}
+
+function openSettingsModal() {
+    document.getElementById('zipModal')?.classList.add('settings-mode');
+    zipModalMode = 'settings';
+
+    const header = document.querySelector('#zipModal .modal-header h3');
+    if (header) header.textContent = 'Settings';
+
+    const btn = uiElements.downloadSelectedBtn;
+
+    btn.disabled = false;
+
+    const btnSpan = btn.querySelector('span');
+    const downloadIcon = btn.querySelector('.download-icon');
+    const saveIcon = btn.querySelector('.save-icon');
+    const spinnerIcon = btn.querySelector('.spinner-icon');
+
+    if (btnSpan) btnSpan.textContent = 'Save Preferences';
+    if (downloadIcon) downloadIcon.style.display = 'none';
+    if (saveIcon) saveIcon.style.display = 'inline-block';
+    if (spinnerIcon) spinnerIcon.style.display = 'none';
+
+    const selectAllLabel = uiElements.selectAllZipCheckbox?.closest('.checkbox-label')?.querySelector('span:last-of-type');
+    if (selectAllLabel) selectAllLabel.textContent = 'Enable All';
+
+    populateSettingsModal();
+    updateSettingsSummary();
+}
+
+function populateSettingsModal() {
+    const consentMap = getPreviewConsentMap();
+    const pptxConsent = consentMap.pptx || 'ask';
+    const soundsEnabled = audioManager.isEnabled();
+    const analyticsConsented = localStorage.getItem('dropsilk-privacy-consent') === 'true';
+    const theme = localStorage.getItem('dropsilk-theme') || 'light';
+
+    uiElements.zipFileList.innerHTML = `
+      <div class="settings-list">
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">Sounds</div>
+            <div class="settings-item-desc">Play sounds for connects, invites, and transfers.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" class="switch-input" id="settings-sounds" ${soundsEnabled ? 'checked' : ''}/>
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">Analytics</div>
+            <div class="settings-item-desc">Anonymous usage analytics (with your consent).</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" class="switch-input" id="settings-analytics" ${analyticsConsented ? 'checked' : ''}/>
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">Dark Mode</div>
+            <div class="settings-item-desc">Prefer darker colours throughout the app.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" class="switch-input" id="settings-theme" ${theme === 'dark' ? 'checked' : ''}/>
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">PPTX Preview</div>
+            <div class="settings-item-desc">Control consent for PPTX preview uploads.</div>
+          </div>
+          <div class="segmented" id="settings-pptx-consent">
+            <button type="button" class="seg-btn ${pptxConsent === 'ask' ? 'active' : ''}" data-value="ask">Ask</button>
+            <button type="button" class="seg-btn ${pptxConsent === 'allow' ? 'active' : ''}" data-value="allow">Allow</button>
+            <button type="button" class="seg-btn ${pptxConsent === 'deny' ? 'active' : ''}" data-value="deny">Deny</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const seg = document.getElementById('settings-pptx-consent');
+    if (seg) {
+        seg.addEventListener('click', (e) => {
+            const btn = e.target.closest('.seg-btn');
+            if (!btn) return;
+            seg.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateSettingsSummary();
+        });
+    }
+
+    const settingsList = uiElements.zipFileList.querySelector('.settings-list');
+    if (settingsList) {
+        settingsList.addEventListener('change', (e) => {
+            if (e.target.classList.contains('switch-input')) {
+                updateSettingsSummary();
+            }
+        });
+    }
+
+    uiElements.selectAllZipCheckbox.checked = areAllSettingsEnabled();
+}
+
+function getSettingsSnapshot() {
+    const sounds = document.getElementById('settings-sounds')?.checked ?? true;
+    const analytics = document.getElementById('settings-analytics')?.checked ?? false;
+    const darkMode = document.getElementById('settings-theme')?.checked ?? false;
+    const seg = document.getElementById('settings-pptx-consent');
+    const pptx = seg?.querySelector('.seg-btn.active')?.dataset.value || 'ask';
+    return { sounds, analytics, darkMode, pptx };
+}
+
+function areAllSettingsEnabled() {
+    const s = getSettingsSnapshot();
+    return s.sounds && s.analytics && s.darkMode && s.pptx === 'allow';
+}
+
+function toggleAllSettings(isOn) {
+    const soundsEl = document.getElementById('settings-sounds');
+    const analyticsEl = document.getElementById('settings-analytics');
+    const themeEl = document.getElementById('settings-theme');
+    if (soundsEl) soundsEl.checked = isOn;
+    if (analyticsEl) analyticsEl.checked = isOn;
+    if (themeEl) themeEl.checked = isOn;
+    const seg = document.getElementById('settings-pptx-consent');
+    if (seg) {
+        seg.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+        const target = seg.querySelector(`.seg-btn[data-value="${isOn ? 'allow' : 'ask'}"]`);
+        target?.classList.add('active');
+    }
+}
+
+function updateSettingsSummary() {
+    const s = getSettingsSnapshot();
+    const summary = `Sounds: <strong>${s.sounds ? 'On' : 'Off'}</strong> • Analytics: <strong>${s.analytics ? 'On' : 'Off'}</strong> • Theme: <strong>${s.darkMode ? 'Dark' : 'Light'}</strong> • PPTX: <strong>${s.pptx[0].toUpperCase() + s.pptx.slice(1)}</strong>`;
+    uiElements.zipSelectionInfo.innerHTML = summary;
+    uiElements.selectAllZipCheckbox.checked = areAllSettingsEnabled();
+}
+
+function saveSettingsPreferences() {
+    const btn = uiElements.downloadSelectedBtn;
+    const btnSpan = btn.querySelector('span');
+    const saveIcon = btn.querySelector('.save-icon');
+    const spinnerIcon = btn.querySelector('.spinner-icon');
+
+    btn.disabled = true;
+
+    if (saveIcon) saveIcon.style.display = 'none';
+    if (spinnerIcon) spinnerIcon.style.display = 'inline-block';
+    if (btnSpan) btnSpan.textContent = 'Saving...';
+
+    const s = getSettingsSnapshot();
+    applyTheme(s.darkMode ? 'dark' : 'light');
+    if (s.sounds) audioManager.enable(); else audioManager.disable();
+    const wasConsented = localStorage.getItem('dropsilk-privacy-consent') === 'true';
+    localStorage.setItem('dropsilk-privacy-consent', s.analytics ? 'true' : 'false');
+    if (s.analytics && !wasConsented) window.dsActivateAnalytics?.();
+    else if (!s.analytics && wasConsented) {
+        showToast({
+            type: 'info',
+            title: 'Analytics disabled',
+            body: 'Your preference will fully apply after a reload.',
+            duration: 7000,
+            actions: [{ text: 'Reload now', class: 'btn-primary', callback: () => location.reload() }]
+        });
+    }
+    setPreviewConsent('pptx', s.pptx);
+    updatePptxPreviewButtonsDisabled(s.pptx === 'deny');
+
+    setTimeout(() => {
+        document.getElementById('closeZipModal')?.click();
+        showToast({ type: 'success', title: 'Preferences saved', body: 'Your settings have been updated.', duration: 4000 });
+    }, 500);
 }

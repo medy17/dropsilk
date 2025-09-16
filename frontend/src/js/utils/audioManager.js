@@ -1,4 +1,4 @@
-// --- MODIFIED: js/utils/audioManager.js ---
+// --- js/utils/audioManager.js ---
 
 /**
  * Manages all audio and haptic feedback for the application.

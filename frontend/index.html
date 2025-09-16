@@ -629,7 +629,7 @@
             © 2025 DropSilk. A peer-to-peer passion project. v2.2
         </div>
         <nav class="footer-nav">
-            <button id="ko-fiBtn" class="footer-nav-link">Donate</button>
+            <button id="settingsBtn" class="footer-nav-link">Settings</button>
             <button id="termsBtn" class="footer-nav-link">Terms</button>
             <button
                     id="privacyBtn"
@@ -652,6 +652,7 @@
             >
                 FAQ
             </button>
+            <button id="ko-fiBtn" class="footer-nav-link">Donate</button>
         </nav>
     </div>
 </footer>
@@ -859,6 +860,12 @@
                     /><path
                             d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"
                     /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="save-icon bi bi-floppy" viewBox="0 0 16 16" style="display: none;">
+                        <path
+                                d="M11 2H9v3h2z"/>
+                        <path
+                                d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v4.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V1H1.5a.5.5 0 0 0-.5.5m3 4a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V1H4zM3 15h10v-4.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5z"/>
+                    </svg>
                     <svg
                             class="spinner spinner-icon"
                             style="display: none"
@@ -1184,9 +1191,15 @@
             <p>We use trusted third parties for specific functions:</p>
             <ul>
                 <li><strong>Google Analytics:</strong> For anonymous statistics (if you consent).</li>
-                <li><strong>Google reCAPTCHA:</strong> For spam protection on our contact form.</li>
+                <li><strong>Google STUN Servers:</strong> For facilitating P2P connections. A client queries a STUN server to learn its own public IP Address.</li>
+                <li><strong>Google reCAPTCHA:</strong> For spam protection on our contact details.</li>
                 <li><strong>Render & Vercel:</strong> For hosting our backend and frontend, respectively.</li>
-                <li><strong>UploadThing:</strong> For optional file previews.</li>
+                <li><strong>UploadThing:</strong> For hosting optional file previews.
+                    You will be asked to reaffirm consent for this before we upload your file.
+                    Your file will be deleted from our UploadThing account by our server's automatic
+                    cleanup service within 24 hours of its upload. You may reach out to us via our contact page
+                    if you require immediate deletion.</li>
+                <li><strong>Microsoft:</strong> For rendering complex formats and specifically PPTX previews via the Online Office Document Previewer.</li>
             </ul>
             <p>We encourage you to review their respective privacy policies.</p>
         </div>
@@ -1253,7 +1266,7 @@
     </div>
 </div>
 
-<!-- NEW: FAQ Modal (Expanded) -->
+<!-- FAQ Modal -->
 <div class="modal-overlay" id="faqModal">
     <div class="invite-modal">
         <div class="modal-header">

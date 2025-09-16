@@ -38,7 +38,7 @@ function log(level, message, meta = {}) {
 const server = http.createServer((req, res) => {
     try {
         const url = new URL(req.url, `http://${req.headers.host}`);
-        const clientIp = getClientIp(req); // <-- **FIX 1**: Use the correct IP helper function
+        const clientIp = getClientIp(req); // <-- Use the correct IP helper function
 
         // --- HONEYPOT: Routing for fake WordPress endpoints ---
         if (req.method === 'GET' && (
@@ -120,15 +120,15 @@ const server = http.createServer((req, res) => {
             res.end('Server is alive and waiting for WebSocket connections.');
             log('info', 'Health check accessed', { ip: clientIp });
         } 
-        // --- NEW KEEP-ALIVE ENDPOINT ---
+        // --- KEEP-ALIVE ENDPOINT ---
         // This endpoint is for external services (like Render's own health checks or UptimeRobot)
         // to ping the server and prevent it from going to sleep on free hosting tiers.
         else if (req.method === 'GET' && req.url === '/keep-alive') {
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('OK');
             log('info', 'Keep-alive ping received', { ip: clientIp });
-        } 
-        // --- END OF NEW KEEP-ALIVE ENDPOINT ---
+        }
+
         else if (req.method === 'GET' && req.url === '/stats') {
             const stats = {
                 activeConnections: clients.size,
@@ -163,7 +163,7 @@ server.on('error', (error) => {
 
 // --- IP Helper Functions ---
 function getClientIp(req) {
-    // **NEW FUNCTION**: Get IP from the X-Forwarded-For header (if behind a proxy)
+    // Get IP from the X-Forwarded-For header (if behind a proxy)
     // or fall back to the direct connection IP. This is crucial for deployed apps.
     const rawIp = req.headers['x-forwarded-for']?.split(',').shift() || req.socket.remoteAddress;
     return getCleanIPv4(rawIp);

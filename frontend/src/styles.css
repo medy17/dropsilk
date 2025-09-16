@@ -356,6 +356,11 @@ body.sortable-drag * {
     }
 }
 
+body[data-theme="dark"].video-modal-active .aurora-background,
+body[data-theme="dark"].video-modal-active .aurora-blob {
+    animation-play-state: paused;
+}
+
 .header {
     width: 100%;
     padding: 1.5em 1.5em;
@@ -1713,6 +1718,125 @@ body.sortable-drag * {
     padding-right: 2rem;
 }
 
+/* Settings list reused inside Zip modal body */
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .75rem;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+    font-weight: 500;
+}
+.settings-item:hover {
+    background-color: rgb(91 206 250 / .08);
+}
+.settings-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+.settings-item-title {
+    color: var(--c-text-primary);
+    font-weight: 600;
+}
+.settings-item-desc {
+    color: var(--c-text-secondary);
+    font-size: .9em;
+    white-space: normal;
+}
+
+/* Switch slider */
+.switch {
+    --sw-w: 52px;        /* total width */
+    --sw-h: 28px;        /* total height */
+    --sw-pad: 3px;       /* inner padding */
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    width: var(--sw-w);
+    height: var(--sw-h);
+}
+
+.switch-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-track {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--c-progress-track);
+    border: 1.5px solid var(--c-panel-border);
+    box-sizing: border-box;
+    overflow: hidden; /* keeps the thumb inside */
+    transition: background 0.2s, border-color 0.2s;
+    padding: var(--sw-pad);
+}
+
+.switch-thumb {
+    position: absolute;
+    top: 50%;
+    left: var(--sw-pad);
+    transform: translateY(-50%); /* only move vertically */
+    box-sizing: border-box;      /* include border in width/height */
+    width: calc(var(--sw-h) - var(--sw-pad) * 2);
+    height: calc(var(--sw-h) - var(--sw-pad) * 2);
+    border-radius: 50%;
+    background: var(--c-panel-bg);
+    border: 2px solid var(--c-text-secondary);
+    transition: left 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.switch-input:checked + .switch-track {
+    background: linear-gradient(135deg, rgba(91, 206, 250, 0.35), rgba(245, 169, 184, 0.25));
+    border-color: var(--c-primary);
+}
+
+
+.switch-input:checked + .switch-track .switch-thumb {
+    left: auto;
+    right: var(--sw-pad);
+    transform: translateY(-50%);
+    background: var(--c-primary);
+    border-color: var(--c-primary);
+}
+/* Tri-state segmented control */
+.segmented {
+    display: inline-flex;
+    background: var(--c-panel-bg);
+    border: 1.5px solid var(--c-panel-border);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.segmented .seg-btn {
+    padding: 0.4rem 0.8rem;
+    font-weight: 600;
+    border: none;
+    background: none;
+    color: var(--c-text-secondary);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.segmented .seg-btn:hover {
+    background: rgb(91 206 250 / .12);
+}
+.segmented .seg-btn.active {
+    background: var(--c-primary);
+    color: var(--brilliant-white);
+}
 .file-details__name:hover span {
     animation: marquee-scroll 8s linear infinite alternate;
 }
@@ -1806,6 +1930,17 @@ body.sortable-drag * {
     color: var(--brilliant-white);
     transform: scale(1.1);
     box-shadow: 0 4px 12px rgb(91 206 250 / .25);
+}
+
+.file-action-btn:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-text-secondary);
+    color: var(--c-text-secondary);
+    box-shadow: none;
+    transform: none;
+    pointer-events: none;
 }
 
 .file-action-btn svg {
@@ -2563,6 +2698,25 @@ input[type=range].volume-slider::-moz-range-thumb {
     font-size: .9em;
 }
 
+/* More comfortable footer layout in Settings mode */
+#zipModal.settings-mode .modal-footer {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--c-panel-border);
+}
+
+#zipModal.settings-mode .zip-actions-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: .5rem;
+}
+
+#zipModal.settings-mode #zipSelectionInfo {
+    white-space: normal;
+    line-height: 1.5;
+    color: var(--c-text-secondary);
+}
+
 #downloadSelectedBtn:disabled {
     cursor: not-allowed;
     opacity: .5;
@@ -3202,9 +3356,6 @@ body[data-theme="dark"] .thumbnail-item {
     border-radius: 4px;
     z-index: 2;
 }
-/* === PPTX Preview Styles END === */
-
-
 
 .cancel-file-btn {
     background: var(--c-btn-secondary-bg);
@@ -3707,4 +3858,10 @@ body[data-theme="dark"] .thumbnail-item {
         gap: 1rem;
         text-align: center;
     }
+}
+
+.toast-body .checkbox-label {
+    margin-top: 1rem;
+    font-size: 0.9em;
+    font-weight: 500;
 }
