@@ -1186,6 +1186,36 @@ body[data-theme="dark"].video-modal-active .aurora-blob {
     color: var(--c-text-secondary);
 }
 
+.modal-body ul {
+    padding-left: 1.5em;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.modal-body ul li {
+    margin-bottom: .75rem;
+    line-height: 1.6;
+    color: var(--c-text-secondary);
+}
+
+.modal-body a,
+.modal-body a:visited { /* Target both unvisited and visited links */
+    color: var(--c-secondary);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: rgba(245, 169, 184, 0.5); /* Softer underline color */
+    text-underline-offset: 3px; /* Gives the underline some breathing room */
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.modal-body a:hover,
+.modal-body a:focus {
+    color: var(--c-primary);
+    text-decoration-color: rgba(91, 206, 250, 0.9); /* Make underline stronger on hover */
+    outline: none;
+}
+
+
 .modal-body p {
     line-height: 1.6;
     margin-bottom: 1rem;
