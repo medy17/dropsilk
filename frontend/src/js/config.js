@@ -1,12 +1,17 @@
-// js/config.js
-// This file contains all the static configuration for the application.
+// js/config.js (Updated)
 
 function getWebSocketUrl() {
-    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        return "ws://localhost:8080"; // Connect to your local backend server
+    // If the page is not served over HTTPS, assume it's a local dev environment.
+    if (window.location.protocol !== "https:") {
+        // Connect to the backend using the *same hostname* but on the backend port (8080).
+        // This works for localhost, 127.0.0.1, and any LAN IP like 192.168.1.105.
+        return `ws://${window.location.hostname}:8080`;
     }
+
+    // Otherwise, connect to the production backend.
     return "wss://dropsilk-backend.onrender.com";
 }
+
 export const WEBSOCKET_URL = getWebSocketUrl();
 export const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 export const HIGH_WATER_MARK = 1024 * 1024; // buffer size for data channel

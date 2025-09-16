@@ -5,3 +5,5 @@ frontend/script.js
 frontend/dist
 frontend/node_modules
 .idea
+.env
+/frontend/vite.config.js

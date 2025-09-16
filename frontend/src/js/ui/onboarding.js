@@ -224,6 +224,9 @@ export function showWelcomeOnboarding() {
             window.visualViewport.removeEventListener('resize', handleResize);
         }
         clearTimeout(resizeTimeout);
+
+        // --- MODIFICATION: Signal that the welcome onboarding is complete ---
+        document.dispatchEvent(new CustomEvent('onboardingWelcomeDismissed'));
     };
 }
 

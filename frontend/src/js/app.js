@@ -36,12 +36,54 @@ function initializeAppCore(isInvitedUser = false) {
     }
 }
 
+// --- MODIFIED: Privacy Consent Logic ---
+function initializePrivacyConsent() {
+    const consentToast = document.getElementById('privacy-consent-toast');
+    const acceptBtn = document.getElementById('accept-privacy-btn');
+
+    if (!consentToast || !acceptBtn) return;
+
+    const showPrivacyToast = () => {
+        // Make sure it's not already shown or accepted
+        if (localStorage.getItem('dropsilk-privacy-consent')) return;
+
+        setTimeout(() => {
+            consentToast.style.display = 'block';
+            consentToast.offsetHeight; // Force reflow
+            consentToast.classList.add('show');
+        }, 500); // A small delay after onboarding closes
+    };
+
+    const hasConsented = localStorage.getItem('dropsilk-privacy-consent');
+    if (!hasConsented) {
+        const hasSeenWelcome = store.getState().onboardingState.welcome;
+
+        if (hasSeenWelcome) {
+            // User has seen onboarding before, but not the new privacy toast. Show it now.
+            showPrivacyToast();
+        } else {
+            // User is brand new. Wait for the welcome tutorial to be dismissed.
+            document.addEventListener('onboardingWelcomeDismissed', showPrivacyToast, { once: true });
+        }
+    }
+
+
+    acceptBtn.addEventListener('click', () => {
+        localStorage.setItem('dropsilk-privacy-consent', 'true');
+        consentToast.classList.remove('show');
+        setTimeout(() => {
+            consentToast.style.display = 'none';
+        }, 500);
+    });
+}
+
 
 // --- Main Execution ---
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DropSilk Initializing...");
 
     initializeGlobalUI();
+    initializePrivacyConsent(); // <-- This now contains the smarter logic
 
     const isAppPage = document.querySelector(".main-content");
 
