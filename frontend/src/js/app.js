@@ -13,7 +13,7 @@ function initializeGlobalUI() {
     initializeModals();
 }
 
-// MODIFIED: Function now accepts a parameter to know if the user was invited
+// Function now accepts a parameter to know if the user was invited
 function initializeAppCore(isInvitedUser = false) {
     console.log("Initializing App Core Logic...");
 
@@ -23,7 +23,6 @@ function initializeAppCore(isInvitedUser = false) {
     // Initialize the user's state (including onboarding state).
     store.actions.initializeUser();
 
-    // --- MOVED HERE ---
     // Now that the user's state is loaded, we can safely check their consent/onboarding status.
     initializePrivacyConsent();
 
@@ -33,7 +32,7 @@ function initializeAppCore(isInvitedUser = false) {
     // Connect to the signaling server.
     connectWebSocket();
 
-    // MODIFIED: Only show the welcome guide if it's a new, non-invited user.
+    // Only show the welcome guide if it's a new, non-invited user.
     if (!isInvitedUser) {
         // Use a small delay to allow the main layout to settle.
         setTimeout(showWelcomeOnboarding, 500);
@@ -87,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("DropSilk Initializing...");
 
     initializeGlobalUI();
-    // initializePrivacyConsent(); // <-- REMOVED FROM HERE
 
     const isAppPage = document.querySelector(".main-content");
 
@@ -100,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isInvited) {
             showBoardingOverlay(flightCodeFromUrl);
         }
-        // MODIFIED: Pass the invited status to the core initializer
+        // Pass the invited status to the core initializer
         initializeAppCore(isInvited);
     } else {
         console.log("On a non-app page (e.g., 404). Core logic will not be initialized.");
