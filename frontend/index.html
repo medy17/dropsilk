@@ -2,54 +2,103 @@
 <!--suppress HtmlDeprecatedAttribute -->
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17553503582"></script>
-    <script>
+    <!-- Google tag (gtag.js) - Deferred until consent -->
+    <script
+            id="gtag-script-loader"
+            type="text/plain"
+            data-consent="analytics"
+            data-src="https://www.googletagmanager.com/gtag/js?id=AW-17553503582"
+            data-vite-ignore
+    ></script>
+    <script
+            id="gtag-script-init"
+            type="text/plain"
+            data-consent="analytics"
+            data-vite-ignore
+    >
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
-        gtag('config', 'AW-17553503582');
+        gtag('config', 'AW-17553503582', { anonymize_ip: true });
     </script>
-    <meta charset="UTF-8" />
-    <meta name="description" content="Instantly share files device-to-device with DropSilk. Fast, private, and secure peer-to-peer transfers with no file size limits and no cloud storage.">
-    <meta property="og:title" content="DropSilk | Fast, Private File Sharing">
-    <meta property="og:description" content="Instantly share files device-to-device with no limits, no cloud storage, and end-to-end encryption.">
 
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://dropsilk.xyz/">
-    <meta property="og:image" content="https://dropsilk.xyz/SSIV2.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="DropSilk">
+    <meta charset="UTF-8" />
+    <meta
+            name="description"
+            content="Instantly share files device-to-device with DropSilk. Fast, private, and secure peer-to-peer transfers with no file size limits and no cloud storage."
+    />
+    <meta property="og:title" content="DropSilk | Fast, Private File Sharing" />
+    <meta
+            property="og:description"
+            content="Instantly share files device-to-device with no limits, no cloud storage, and end-to-end encryption."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dropsilk.xyz/" />
+    <meta property="og:image" content="https://dropsilk.xyz/SSIV2.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="DropSilk" />
 
     <!-- Twitter Card Tags (for Twitter/X) -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="DropSilk | Fast, Private File Sharing">
-    <meta name="twitter:description" content="Instantly share files device-to-device with no limits, no cloud storage, and end-to-end encryption.">
-    <meta name="twitter:image" content="https://dropsilk.xyz/SSIV2.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="DropSilk">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DropSilk | Fast, Private File Sharing" />
+    <meta
+            name="twitter:description"
+            content="Instantly share files device-to-device with no limits, no cloud storage, and end-to-end encryption."
+    />
+    <meta name="twitter:image" content="https://dropsilk.xyz/SSIV2.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="DropSilk" />
 
     <title>DropSilk | Fast, Private, Peer-to-Peer File Sharing</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#ffffff" />
 
     <!-- Favicon and Manifest Links -->
-    <link rel="icon" type="image/png" sizes="32x32" href="public/favicons/favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="public/favicons/favicon-16x16.png">
-    <link rel="icon" type="image/x-icon" href="public/favicons/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="public/favicons/favicon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="public/favicons/favicon-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="public/favicons/favicon-512x512.png">
-    <link rel="manifest" href="public/site.webmanifest">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-
+    <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="public/favicons/favicon.ico"
+    />
+    <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="public/favicons/favicon-16x16.png"
+    />
+    <link rel="icon" type="image/x-icon" href="public/favicons/favicon.ico" />
+    <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="public/favicons/favicon-180x180.png"
+    />
+    <link
+            rel="icon"
+            type="image/png"
+            sizes="192x192"
+            href="public/favicons/favicon-192x192.png"
+    />
+    <link
+            rel="icon"
+            type="image/png"
+            sizes="512x512"
+            href="public/favicons/favicon-512x512.png"
+    />
+    <link rel="manifest" href="public/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&display=swap"
+            rel="stylesheet"
+    />
+    <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap"
+            rel="stylesheet"
+    />
 </head>
 <body>
 <!-- AURORA BACKGROUND -->
@@ -62,24 +111,60 @@
 
 <div class="header">
     <a href="#" class="logo" onclick="location.reload()">
-        <img src="/logo.webp" alt="DropSilk Logo - unlimited private sharing - no sign up">
-        <span class="brand-text">Drop<wbr>Silk</span>
+        <img
+                src="/logo.webp"
+                alt="DropSilk Logo - unlimited private sharing - no sign up"
+        />
+        <span class="brand-text">Drop<wbr />Silk</span>
     </a>
     <nav class="header-nav">
         <button id="aboutBtn" class="header-nav-link">About</button>
         <button id="contactBtn" class="header-nav-link">Contact</button>
         <!-- Theme Toggle Button -->
-        <button id="theme-toggle" class="header-nav-link" aria-label="Toggle theme">
-            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707z"/>
+        <button
+                id="theme-toggle"
+                class="header-nav-link"
+                aria-label="Toggle theme"
+        >
+            <svg
+                    class="sun-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+            >
+                <path
+                        d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707z"
+                />
             </svg>
-            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+            <svg
+                    class="moon-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+            >
+                <path
+                        d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"
+                />
             </svg>
         </button>
-        <a href="https://github.com/medy17" target="_blank" rel="noopener noreferrer" class="header-nav-link" aria-label="GitHub Profile" alt="my GitHub profile where I share more free apps and file transfer code">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+        <a
+                href="https://github.com/medy17"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="header-nav-link"
+                aria-label="GitHub Profile"
+                alt="my GitHub profile where I share more free apps and file transfer code"
+        >
+            <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+            >
+                <path
+                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+                />
             </svg>
         </a>
     </nav>
@@ -87,8 +172,14 @@
 <div class="main-content">
     <div class="tagline-section">
         <h1>UNLIMITED.<br />SECURE.<br />SWIFT.</h1>
-        <p>Instantly share files, device to device. No cloud. No server. Just like a dance: it takes two to tango.</p>
-        <p><strong>To get started, create a flight and invite another user :)</strong></p>
+        <p>
+            Instantly share files, device to device. No cloud. No server. Just
+            like a dance: it takes two to tango.
+        </p>
+        <p>
+            <strong>To get started, create a flight and invite another user
+                :)</strong>
+        </p>
     </div>
     <div class="flight-ticket-panel-wrapper">
         <div class="flight-ticket">
@@ -97,20 +188,74 @@
             <div class="ticket-actions">
                 <button id="createFlightBtn">Create a Flight</button>
                 <button id="scanQrBtn" class="btn btn-secondary">
-                    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M4 8V4h4m8 4V4h-4m-8 8v4h4m8-4v4h-4" stroke-linecap="round" stroke-linejoin="round"/>
-                        <rect x="8" y="8" width="4" height="4" rx="1" fill="currentColor" stroke="none"/>
-                    </svg>Scan QR Code Invite<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M4 8V4h4m8 4V4h-4m-8 8v4h4m8-4v4h-4" stroke-linecap="round" stroke-linejoin="round"/>
-                    <rect x="8" y="8" width="4" height="4" rx="1" fill="currentColor" stroke="none"/>
+                    <svg
+                            viewBox="0 0 20 20"
+                            width="20"
+                            height="20"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                    >
+                        <path
+                                d="M4 8V4h4m8 4V4h-4m-8 8v4h4m8-4v4h-4"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                        />
+                        <rect
+                                x="8"
+                                y="8"
+                                width="4"
+                                height="4"
+                                rx="1"
+                                fill="currentColor"
+                                stroke="none"
+                        />
+                    </svg
+                    >Scan QR Code Invite<svg
+                        viewBox="0 0 20 20"
+                        width="20"
+                        height="20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                >
+                    <path
+                            d="M4 8V4h4m8 4V4h-4m-8 8v4h4m8-4v4h-4"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                    />
+                    <rect
+                            x="8"
+                            y="8"
+                            width="4"
+                            height="4"
+                            rx="1"
+                            fill="currentColor"
+                            stroke="none"
+                    />
                 </svg>
                 </button>
                 <div class="or-separator">OR</div>
                 <div class="flight-code-input-wrapper">
-                    <input id="flightCodeInput" type="text" placeholder="TRJXØD" value="" maxlength="6" pattern="[A-Za-z0-9]{6}" />
+                    <input
+                            id="flightCodeInput"
+                            type="text"
+                            placeholder="TRJXØD"
+                            value=""
+                            maxlength="6"
+                            pattern="[A-Za-z0-9]{6}"
+                    />
                     <button id="joinFlightBtn" aria-label="Join Flight">➤</button>
                 </div>
-                <p style="font-size: 0.8em; opacity: 0.9; margin-top: 0.5em;">ENTER FLIGHT CODE TO JOIN</p>
+                <p
+                        style="
+                font-size: 0.8em;
+                opacity: 0.9;
+                margin-top: 0.5em;
+              "
+                >
+                    ENTER FLIGHT CODE TO JOIN
+                </p>
             </div>
         </div>
     </div>
@@ -118,44 +263,114 @@
 <div id="dashboard">
     <div id="dashboard-header" class="panel">
         <div class="flight-info">
-            <div class="flight-info__code">FLIGHT <button id="dashboard-flight-code" type="button" title="Copy code to clipboard"></button></div>
-            <div class="flight-info__status" id="dashboard-flight-status">Ready to connect</div>
+            <div class="flight-info__code">
+                FLIGHT
+                <button
+                        id="dashboard-flight-code"
+                        type="button"
+                        title="Copy code to clipboard"
+                ></button>
+            </div>
+            <div class="flight-info__status" id="dashboard-flight-status">
+                Ready to connect
+            </div>
         </div>
         <div class="flight-actions">
-            <button class="btn btn-primary" id="shareScreenBtn" title="Share your screen with the connected peer" data-text-start="Share Screen" data-text-stop="Stop Sharing">
-                 <span class="icon-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12H4v2h8v-2h2.5A1.5 1.5 0 0 0 16 10.5v-9A1.5 1.5 0 0 0 14.5 0h-13zM15 10.5a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v9z"/></svg>
-                 </span>
+            <button
+                    class="btn btn-primary"
+                    id="shareScreenBtn"
+                    title="Share your screen with the connected peer"
+                    data-text-start="Share Screen"
+                    data-text-stop="Stop Sharing"
+            >
+            <span class="icon-start">
+              <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      viewBox="0 0 16 16"
+              ><path
+                      d="M1.5 0A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12H4v2h8v-2h2.5A1.5 1.5 0 0 0 16 10.5v-9A1.5 1.5 0 0 0 14.5 0h-13zM15 10.5a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v9z"
+              /></svg>
+            </span>
                 <span class="icon-stop">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12H4v2h8v-2h2.5A1.5 1.5 0 0 0 16 10.5v-9A1.5 1.5 0 0 0 14.5 0h-13zm13 1.5a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13z"/><path d="M4.646 3.146a.5.5 0 0 1 .708 0L8 5.793l2.646-2.647a.5.5 0 0 1 .708.708L8.707 6.501l2.647 2.646a.5.5 0 1 1-.708.708L8 7.209l-2.646 2.646a.5.5 0 1 1-.708-.708l2.647-2.646-2.647-2.647a.5.5 0 0 1 0-.708z"/></svg>
-                 </span>
+              <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      viewBox="0 0 16 16"
+              ><path
+                      d="M1.5 0A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12H4v2h8v-2h2.5A1.5 1.5 0 0 0 16 10.5v-9A1.5 1.5 0 0 0 14.5 0h-13zm13 1.5a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13z"
+              /><path
+                      d="M4.646 3.146a.5.5 0 0 1 .708 0L8 5.793l2.646-2.647a.5.5 0 0 1 .708.708L8.707 6.501l2.647 2.646a.5.5 0 1 1-.708.708L8 7.209l-2.646 2.646a.5.5 0 1 1-.708-.708l2.647-2.646-2.647-2.647a.5.5 0 0 1 0-.708z"
+              /></svg>
+            </span>
                 <span>Share Screen</span>
             </button>
             <button class="btn btn-primary" id="inviteBtn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/></svg>
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"
+                /></svg>
                 <span>Invite</span>
             </button>
             <button class="btn btn-secondary" id="leaveFlightBtnDashboard">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></svg>
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        fill-rule="evenodd"
+                        d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"
+                /><path
+                        fill-rule="evenodd"
+                        d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"
+                /></svg>
                 <span>Leave</span>
             </button>
         </div>
     </div>
     <!-- Local Stream Panel (for the sharer) -->
-    <div id="local-stream-panel" class="panel stream-panel grid-col-span-2 hidden">
+    <div
+            id="local-stream-panel"
+            class="panel stream-panel grid-col-span-2 hidden"
+    >
         <div class="panel-header">
             <h3>Your Stream Preview</h3>
             <div class="stream-controls">
                 <div class="settings-menu-container">
-                    <button class="btn btn-icon stream-settings-btn" title="Stream Quality">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
-                            <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.17.31c.446.82.023 1.845-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1c.895.26 1.318 1.285.872 2.105l-.17.31c-.699 1.283.704 2.686 1.987 1.987l.31-.17c.82-.446 1.845-.023 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.699 2.686-.704 1.987-1.987l-.17-.31a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0 2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.699-1.283-.704-2.686-1.987-1.987l-.31.17a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.93 2.93 0 1 1 0-5.86 2.93 2.93 0 0 1 0 5.86"/>
+                    <button
+                            class="btn btn-icon stream-settings-btn"
+                            title="Stream Quality"
+                    >
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-gear-fill"
+                                viewBox="0 0 16 16"
+                        >
+                            <path
+                                    d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.17.31c.446.82.023 1.845-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1c.895.26 1.318 1.285.872 2.105l-.17.31c-.699 1.283.704 2.686 1.987 1.987l.31-.17c.82-.446 1.845-.023 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.699 2.686-.704 1.987-1.987l-.17-.31a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413-1.4-2.397 0 2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.699-1.283-.704-2.686-1.987-1.987l-.31.17a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.93 2.93 0 1 1 0-5.86 2.93 2.93 0 0 1 0 5.86"
+                            />
                         </svg>
                     </button>
                     <div class="stream-settings-menu">
                         <button data-quality="quality">Quality</button>
                         <button data-quality="clarity">Clarity</button>
-                        <button data-quality="smoothness" class="active">Smoothness (Default)</button>
+                        <button data-quality="smoothness" class="active">
+                            Smoothness (Default)
+                        </button>
                         <button data-quality="performance">Performance</button>
                     </div>
                 </div>
@@ -164,17 +379,40 @@
         <video id="local-video" autoplay playsinline muted></video>
     </div>
     <!-- Remote Stream Panel (for the viewer) -->
-    <div id="screen-share-panel" class="panel stream-panel grid-col-span-2 hidden">
+    <div
+            id="screen-share-panel"
+            class="panel stream-panel grid-col-span-2 hidden"
+    >
         <div class="panel-header">
             <h3>Screen Share</h3>
             <div class="stream-controls">
-                <button id="fullscreen-stream-btn" class="btn btn-icon fullscreen-btn" title="Toggle Fullscreen">
-                    <span class="icon-enter-fs">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/></svg>
-                    </span>
+                <button
+                        id="fullscreen-stream-btn"
+                        class="btn btn-icon fullscreen-btn"
+                        title="Toggle Fullscreen"
+                >
+              <span class="icon-enter-fs">
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"
+                /></svg>
+              </span>
                     <span class="icon-exit-fs">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4A.5.5 0 0 1 5.5 0zM10 .5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5zM.5 5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4zm10 0a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4zM5.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5zM.5 11a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4zm10 0a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4z"/></svg>
-                    </span>
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M5.5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4A.5.5 0 0 1 5.5 0zM10 .5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5zM.5 5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4zm10 0a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4zM5.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5zM.5 11a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4zm10 0a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1h-4z"
+                /></svg>
+              </span>
                 </button>
             </div>
         </div>
@@ -182,45 +420,110 @@
     </div>
     <div class="dashboard-grid">
         <div class="panel drop-zone">
-            <div class="drop-zone__icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16"><path d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z"/><path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 1.5v3A1.5 1.5 0 0 0 11 6h3v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v.5z"/></svg></div>
+            <div class="drop-zone__icon">
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="48"
+                        height="48"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z"
+                /><path
+                        d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 1.5v3A1.5 1.5 0 0 0 11 6h3v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v.5z"
+                /></svg>
+            </div>
             <p>Drag & Drop files or folders</p>
             <span class="secondary-text">or select manually</span>
             <div class="drop-zone__buttons">
                 <label for="fileInput_transfer" class="btn btn-primary">
-                    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <rect x="4" y="4" width="12" height="12" rx="2" fill="#e3f7fd" stroke="var(--c-primary)"/>
-                        <path d="M10 8v4M8 10h4" stroke="var(--c-primary)" stroke-width="1.5" stroke-linecap="round"/>
+                    <svg
+                            viewBox="0 0 20 20"
+                            width="20"
+                            height="20"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                    >
+                        <rect
+                                x="4"
+                                y="4"
+                                width="12"
+                                height="12"
+                                rx="2"
+                                fill="#e3f7fd"
+                                stroke="var(--c-primary)"
+                        />
+                        <path
+                                d="M10 8v4M8 10h4"
+                                stroke="var(--c-primary)"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                        />
                     </svg>
                     Select Files
                 </label>
                 <button class="btn btn-secondary">
-                    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <rect x="3" y="7" width="14" height="8" rx="2" fill="#fffaf7" stroke="var(--c-secondary)"/>
-                        <path d="M3 7V6a2 2 0 0 1 2-2h3l2 2h5a2 2 0 0 1 2 2v1" stroke="var(--c-secondary)" stroke-width="1.5" fill="none"/>
+                    <svg
+                            viewBox="0 0 20 20"
+                            width="20"
+                            height="20"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                    >
+                        <rect
+                                x="3"
+                                y="7"
+                                width="14"
+                                height="8"
+                                rx="2"
+                                fill="#fffaf7"
+                                stroke="var(--c-secondary)"
+                        />
+                        <path
+                                d="M3 7V6a2 2 0 0 1 2-2h3l2 2h5a2 2 0 0 1 2 2v1"
+                                stroke="var(--c-secondary)"
+                                stroke-width="1.5"
+                                fill="none"
+                        />
                     </svg>
                     Select Folder
                 </button>
             </div>
-            <input type="file" id="fileInput_transfer" style="display: none;" multiple />
+            <input
+                    type="file"
+                    id="fileInput_transfer"
+                    style="display: none"
+                    multiple
+            />
         </div>
         <div class="panel">
-            <div class="panel-header"><h3 id="connection-panel-title">Users on Your Network</h3></div>
+            <div class="panel-header">
+                <h3 id="connection-panel-title">Users on Your Network</h3>
+            </div>
             <div id="connection-panel-list">
                 <div class="empty-state">No other users found.</div>
             </div>
         </div>
         <div class="panel grid-col-span-2">
             <div class="panel-header"><h3>Sending Queue</h3></div>
-            <div id="sending-queue"><div class="empty-state">Select files to send</div></div>
+            <div id="sending-queue">
+                <div class="empty-state">Select files to send</div>
+            </div>
         </div>
         <div class="panel grid-col-span-2">
             <div class="panel-header">
                 <h3>Receiver Queue</h3>
-                <div id="receiver-actions" style="display: none;">
-                    <button id="downloadAllBtn" class="btn btn-primary">Download All as Zip</button>
+                <div id="receiver-actions" style="display: none">
+                    <button id="downloadAllBtn" class="btn btn-primary">
+                        Download All as Zip
+                    </button>
                 </div>
             </div>
-            <div id="receiver-queue"><div class="empty-state">Waiting for incoming files</div></div>
+            <div id="receiver-queue">
+                <div class="empty-state">Waiting for incoming files</div>
+            </div>
         </div>
     </div>
     <div class="dashboard-footer-grid">
@@ -228,50 +531,95 @@
             <div class="panel-header"><h3>Overall Metrics</h3></div>
             <ul class="metrics-list">
                 <li>
-        <span class="icon">
-            <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10 17V3M10 3L4 9M10 3l6 6"/>
-            </svg>
-        </span>
+              <span class="icon">
+                <svg
+                        viewBox="0 0 20 20"
+                        width="20"
+                        height="20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                >
+                  <path d="M10 17V3M10 3L4 9M10 3l6 6" />
+                </svg>
+              </span>
                     <div>Sent: <span id="metrics-sent">0.00 GB</span></div>
                 </li>
                 <li>
-        <span class="icon">
-            <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10 3v14M10 17l6-6M10 17l-6-6"/>
-            </svg>
-        </span>
+              <span class="icon">
+                <svg
+                        viewBox="0 0 20 20"
+                        width="20"
+                        height="20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                >
+                  <path d="M10 3v14M10 17l6-6M10 17l-6-6" />
+                </svg>
+              </span>
                     <div>Received: <span id="metrics-received">0.00 GB</span></div>
                 </li>
                 <li>
-        <span class="icon">
-            <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="10 2 4 12 9 12 8 18 16 8 11 8 12 2"/>
-            </svg>
-        </span>
+              <span class="icon">
+                <svg
+                        viewBox="0 0 20 20"
+                        width="20"
+                        height="20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                >
+                  <polygon
+                          points="10 2 4 12 9 12 8 18 16 8 11 8 12 2"
+                  />
+                </svg>
+              </span>
                     <div>Speed: <span id="metrics-speed">0 KB/s</span></div>
                 </li>
             </ul>
         </div>
         <div class="panel promo-panel">
             <div class="panel-header"><h3>Love DropSilk?</h3></div>
-            <p>If you enjoy DropSilk, help us spread the word :). Remember to connect both devices to Wi-Fi for the best speeds.</p>
+            <p>
+                If you enjoy DropSilk, help us spread the word :). Remember to
+                connect both devices to Wi-Fi for the best speeds.
+            </p>
             <button class="btn btn-secondary" id="shareAppBtn">Share App</button>
         </div>
     </div>
 </div>
 <div class="boarding-overlay" id="boarding-overlay">
     <div class="boarding-content">
-        <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
+        <svg class="spinner" viewBox="0 0 50 50"
+        ><circle
+                class="path"
+                cx="25"
+                cy="25"
+                r="20"
+                fill="none"
+                stroke-width="5"
+        ></circle
+        ></svg>
         <h2>Boarding Flight...</h2>
-        <p>Connecting to flight <span id="boarding-flight-code"></span></p>
+        <p>
+            Connecting to flight <span id="boarding-flight-code"></span>
+        </p>
     </div>
 </div>
 
 <div id="qr-scanner-overlay">
     <video id="qr-video"></video>
     <button id="closeQrScannerBtn" aria-label="Close QR Scanner">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+        <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+        ><path
+                d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
+        /></svg>
     </button>
 </div>
 
@@ -283,9 +631,27 @@
         <nav class="footer-nav">
             <button id="ko-fiBtn" class="footer-nav-link">Donate</button>
             <button id="termsBtn" class="footer-nav-link">Terms</button>
-            <button id="privacyBtn" class="footer-nav-link" aria-label="Privacy Policy for DropSilk free, unlimited file sharing peer to peer">Privacy</button>
-            <button id="securityBtn" class="footer-nav-link" aria-label="Security for DropSilk free, unlimited file sharing peer to peer">Security</button>
-            <button id="faqBtn" class="footer-nav-link" aria-label="Learn more about private file sharing">FAQ</button>
+            <button
+                    id="privacyBtn"
+                    class="footer-nav-link"
+                    aria-label="Privacy Policy for DropSilk free, unlimited file sharing peer to peer"
+            >
+                Privacy
+            </button>
+            <button
+                    id="securityBtn"
+                    class="footer-nav-link"
+                    aria-label="Security for DropSilk free, unlimited file sharing peer to peer"
+            >
+                Security
+            </button>
+            <button
+                    id="faqBtn"
+                    class="footer-nav-link"
+                    aria-label="Learn more about private file sharing"
+            >
+                FAQ
+            </button>
         </nav>
     </div>
 </footer>
@@ -298,8 +664,20 @@
     <div class="invite-modal">
         <div class="modal-header">
             <h3>Invite Others</h3>
-            <button class="modal-close" id="closeInviteModal" aria-label="Close modal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+            <button
+                    class="modal-close"
+                    id="closeInviteModal"
+                    aria-label="Close modal"
+            >
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
+                /></svg>
             </button>
         </div>
         <div class="flight-code-display">
@@ -308,12 +686,56 @@
         </div>
         <div class="qr-section">
             <div class="qr-container"><canvas id="qrCanvas"></canvas></div>
-            <p class="qr-description">Scan this QR code to visit DropSilk and join with the flight code above</p>
+            <p class="qr-description">
+                Scan this QR code to visit DropSilk and join with the flight code
+                above
+            </p>
         </div>
         <div class="share-actions">
-            <button class="share-btn" id="copyLinkBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>Copy Link</button>
-            <button class="share-btn secondary" id="shareNativeBtn" style="display: none;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>Share</button>
-            <button class="share-btn secondary" id="copyCodeBtn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 0 0-2H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2.5a1 1 0 0 0 2 0V2a2 2 0 0 0-2-2H2z"/><path d="M4.5 4A1.5 1.5 0 0 0 3 5.5V13a1.5 1.5 0 0 0 1.5 1.5H12A1.5 1.5 0 0 0 13.5 13V7.5A1.5 1.5 0 0 0 12 6H7.5A1.5 1.5 0 0 0 6 7.5V13a.5.5 0 0 1-.5.5H4.5A.5.5 0 0 1 4 13V5.5a.5.5 0 0 1 .5-.5z"/></svg>Copy Code Only</button>
+            <button class="share-btn" id="copyLinkBtn">
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0  0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"
+                /><path
+                        d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"
+                /></svg>
+                Copy Link
+            </button>
+            <button
+                    class="share-btn secondary"
+                    id="shareNativeBtn"
+                    style="display: none"
+            >
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"
+                /></svg>
+                Share
+            </button>
+            <button class="share-btn secondary" id="copyCodeBtn">
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 0 0-2H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2.5a1 1 0 0 0 2 0V2a2 2 0 0 0-2-2H2z"
+                /><path
+                        d="M4.5 4A1.5 1.5 0 0 0 3 5.5V13a1.5 1.5 0 0 0 1.5 1.5H12A1.5 1.5 0 0 0 13.5 13V7.5A1.5 1.5 0 0 0 12 6H7.5A1.5 1.5 0 0 0 6 7.5V13a.5.5 0 0 1-.5.5H4.5A.5.5 0 0 1 4 13V5.5a.5.5 0 0 1 .5-.5z"
+                /></svg>
+                Copy Code Only
+            </button>
         </div>
     </div>
 </div>
@@ -322,26 +744,62 @@
     <div class="invite-modal">
         <div class="modal-header">
             <h3>About Me</h3>
-            <button class="modal-close" id="closeAboutModal" aria-label="Close modal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+            <button
+                    class="modal-close"
+                    id="closeAboutModal"
+                    aria-label="Close modal"
+            >
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
+                /></svg>
             </button>
         </div>
         <div class="modal-body">
-            <p><strong>DropSilk</strong> is a project born from the desire to have a simple, private, and fast way to transfer files between devices.</p>
+            <p>
+                <strong>DropSilk</strong> is a project born from the desire to have
+                a simple, private, and fast way to transfer files between devices.
+            </p>
 
-            <p>I'm a developer passionate about creating useful and beautiful applications. Hence, the implementation of WebRTC that you see before you.</p>
+            <p>
+                I'm a developer passionate about creating useful and beautiful
+                applications. Hence, the implementation of WebRTC that you see
+                before you.
+            </p>
 
-            <p>I'm a passionate techy with an unfortunate affinity for tackling the most niche problems using wildly overengineered code.</p>
+            <p>
+                I'm a passionate techy with an unfortunate affinity for tackling the
+                most niche problems using wildly overengineered code.
+            </p>
 
-            <p>This very website is proof of that. Click on my GitHub if my brand of masochism appeals to you.</p>
+            <p>
+                This very website is proof of that. Click on my GitHub if my brand
+                of masochism appeals to you.
+            </p>
 
-            <p>I'm currently in my second year of university in Malaysia, pursuing a Computer Science degree with a Data Science specialisation.</p>
+            <p>
+                I'm currently in my second year of university in Malaysia, pursuing
+                a Computer Science degree with a Data Science specialisation.
+            </p>
 
-            <p>I really wasn’t kidding about the masochism, in case that wasn’t obvious.</p>
+            <p>
+                I really wasn’t kidding about the masochism, in case that wasn’t
+                obvious.
+            </p>
 
-            <p>Always open to new and interesting opportunities—so feel free to reach out.</p>
+            <p>
+                Always open to new and interesting opportunities—so feel free to
+                reach out.
+            </p>
 
-            <p>I’m only as busy as any other Comp Sci student (read: constantly).</p>
+            <p>
+                I’m only as busy as any other Comp Sci student (read: constantly).
+            </p>
             <!-- TODO: Add more content here -->
         </div>
     </div>
@@ -352,8 +810,20 @@
     <div class="invite-modal">
         <div class="modal-header">
             <h3>Download Files as Zip</h3>
-            <button class="modal-close" id="closeZipModal" aria-label="Close modal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+            <button
+                    class="modal-close"
+                    id="closeZipModal"
+                    aria-label="Close modal"
+            >
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
+                /></svg>
             </button>
         </div>
         <div class="modal-body">
@@ -366,24 +836,55 @@
             <div id="zip-modal-default-footer">
                 <div class="zip-actions-header">
                     <label class="checkbox-label">
-                        <input type="checkbox" id="selectAllZipCheckbox" class="custom-checkbox-input">
+                        <input
+                                type="checkbox"
+                                id="selectAllZipCheckbox"
+                                class="custom-checkbox-input"
+                        />
                         <span class="custom-checkbox"></span>
                         <span>Select All</span>
                     </label>
                     <span id="zipSelectionInfo">0 files selected (0 Bytes)</span>
                 </div>
                 <button id="downloadSelectedBtn" class="share-btn">
-                    <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
-                    <svg class="spinner spinner-icon" style="display: none;" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
+                    <svg
+                            class="download-icon"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            fill="currentColor"
+                            viewBox="0 0 16 16"
+                    ><path
+                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"
+                    /><path
+                            d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"
+                    /></svg>
+                    <svg
+                            class="spinner spinner-icon"
+                            style="display: none"
+                            viewBox="0 0 50 50"
+                    ><circle
+                            class="path"
+                            cx="25"
+                            cy="25"
+                            r="20"
+                            fill="none"
+                            stroke-width="5"
+                    ></circle
+                    ></svg>
                     <span>Download Selected as Zip</span>
                 </button>
             </div>
             <!-- State 2: Warning Footer -->
-            <div id="zip-modal-warning-footer" style="display: none;">
+            <div id="zip-modal-warning-footer" style="display: none">
                 <p id="zipWarningText" class="zip-warning-text"></p>
                 <div class="zip-warning-actions">
-                    <button id="cancelZipBtn" class="btn btn-secondary">Cancel</button>
-                    <button id="proceedZipBtn" class="btn btn-primary">Proceed Anyway</button>
+                    <button id="cancelZipBtn" class="btn btn-secondary">
+                        Cancel
+                    </button>
+                    <button id="proceedZipBtn" class="btn btn-primary">
+                        Proceed Anyway
+                    </button>
                 </div>
             </div>
         </div>
@@ -395,35 +896,79 @@
     <div class="invite-modal">
         <div class="modal-header">
             <h3>Contact</h3>
-            <button class="modal-close" id="closeContactModal" aria-label="Close modal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+            <button
+                    class="modal-close"
+                    id="closeContactModal"
+                    aria-label="Close modal"
+            >
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
+                /></svg>
             </button>
         </div>
         <div class="modal-body">
-            <p id="captcha-pretext">To prevent spam, please verify you're human to view my email address.</p>
+            <p id="captcha-pretext">
+                To prevent spam, please verify you're human to view my email
+                address.
+            </p>
 
             <!-- State 1: Initial View -->
             <div id="email-view-initial-state" class="share-actions">
                 <button class="share-btn" id="viewEmailBtn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.558Z"/></svg>
+                    <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            fill="currentColor"
+                            viewBox="0 0 16 16"
+                    ><path
+                            d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.558Z"
+                    /></svg>
                     View Email
                 </button>
             </div>
 
             <!-- State 2: CAPTCHA Challenge -->
-            <div id="email-view-captcha-state" style="display: none;">
-                <div id="recaptcha-container">
-                </div>
+            <div id="email-view-captcha-state" style="display: none">
+                <div id="recaptcha-container"></div>
             </div>
 
             <!-- State 3: Revealed Email -->
-            <div id="email-view-revealed-state" style="display: none;">
-                <div class="flight-code-display" style="margin-top: 1rem; margin-bottom: 2rem;">
-                    <a href="mailto:ahmed@dropsilk.xyz" class="code" style="letter-spacing: normal; text-transform: none; font-size: 1.2rem;">ahmed@dropsilk.xyz</a>
+            <div id="email-view-revealed-state" style="display: none">
+                <div
+                        class="flight-code-display"
+                        style="margin-top: 1rem; margin-bottom: 2rem"
+                >
+                    <a
+                            href="mailto:ahmed@dropsilk.xyz"
+                            class="code"
+                            style="
+                  letter-spacing: normal;
+                  text-transform: none;
+                  font-size: 1.2rem;
+                "
+                    >ahmed@dropsilk.xyz</a
+                    >
                 </div>
                 <div class="share-actions">
                     <button class="share-btn" id="copyEmailBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                fill="currentColor"
+                                viewBox="0 0 16 16"
+                        ><path
+                                d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"
+                        /><path
+                                d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"
+                        /></svg>
                         Copy Email
                     </button>
                 </div>
@@ -437,40 +982,100 @@
     <div class="invite-modal">
         <div class="modal-header">
             <h3>Terms of Service</h3>
-            <button class="modal-close" id="closeTermsModal" aria-label="Close modal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+            <button
+                    class="modal-close"
+                    id="closeTermsModal"
+                    aria-label="Close modal"
+            >
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
+                /></svg>
             </button>
         </div>
         <div class="modal-body">
             <p><strong>Last Updated: September 13, 2025 UTC 2100 hrs</strong></p>
-            <p>Welcome to DropSilk! These Terms of Service ("Terms") govern your access to and use of the DropSilk website and services ("Service"). By using the Service, you agree to be bound by these Terms.</p>
+            <p>
+                Welcome to DropSilk! These Terms of Service ("Terms") govern your
+                access to and use of the DropSilk website and services ("Service").
+                By using the Service, you agree to be bound by these Terms.
+            </p>
 
             <p><strong>1. Use of the Service</strong></p>
-            <p>You agree to use DropSilk only for lawful purposes. You are solely responsible for the files you transfer ("Content") and for your compliance with all applicable laws. You must have the legal right to share any Content you send. You agree not to use the Service to transfer any Content that:</p>
+            <p>
+                You agree to use DropSilk only for lawful purposes. You are solely
+                responsible for the files you transfer ("Content") and for your
+                compliance with all applicable laws. You must have the legal right
+                to share any Content you send. You agree not to use the Service to
+                transfer any Content that:
+            </p>
             <ul>
                 <li>Is illegal, fraudulent, or malicious.</li>
-                <li>Infringes on any third party's intellectual property rights (e.g., copyright, trademark).</li>
+                <li>
+                    Infringes on any third party's intellectual property rights (e.g.,
+                    copyright, trademark).
+                </li>
                 <li>Contains viruses, malware, or other harmful code.</li>
                 <li>Is harassing, defamatory, or obscene.</li>
             </ul>
 
             <p><strong>2. No Warranty & Disclaimer</strong></p>
-            <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis, without any warranties of any kind, express or implied. We do not guarantee that the Service will be secure, uninterrupted, error-free, or that file transfers will be successful or free from data corruption. You use DropSilk at your own risk.</p>
+            <p>
+                The Service is provided on an "AS IS" and "AS AVAILABLE" basis,
+                without any warranties of any kind, express or implied. We do not
+                guarantee that the Service will be secure, uninterrupted, error-free,
+                or that file transfers will be successful or free from data
+                corruption. You use DropSilk at your own risk.
+            </p>
 
             <p><strong>3. Limitation of Liability</strong></p>
-            <p>To the fullest extent permitted by law, DropSilk and its creator(s) shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not to-do loss of data, profits, or other intangible losses, resulting from (i) your access to or use of or inability to access or use the Service; (ii) any conduct or content of any third party on the Service; or (iii) unauthorized access, use, or alteration of your transmissions.</p>
+            <p>
+                To the fullest extent permitted by law, DropSilk and its creator(s)
+                shall not be liable for any indirect, incidental, special,
+                consequential, or punitive damages, including but not to-do loss of
+                data, profits, or other intangible losses, resulting from (i) your
+                access to or use of or inability to access or use the Service; (ii)
+                any conduct or content of any third party on the Service; or (iii)
+                unauthorized access, use, or alteration of your transmissions.
+            </p>
 
             <p><strong>4. Privacy</strong></p>
-            <p>Your privacy is important to us. Our Privacy Policy explains how we handle the limited data required to operate the Service. By using DropSilk, you agree to the collection and use of information in accordance with our Privacy Policy. You acknowledge that files are transferred directly between users and are not stored on our servers.</p>
+            <p>
+                Your privacy is important to us. Our Privacy Policy explains how we
+                handle the limited data required to operate the Service. By using
+                DropSilk, you agree to the collection and use of information in
+                accordance with our Privacy Policy. You acknowledge that files are
+                transferred directly between users and are not stored on our
+                servers.
+            </p>
 
             <p><strong>5. User Conduct and Termination</strong></p>
-            <p>You agree not to disrupt, interfere with, or attempt to gain unauthorized access to the Service or its related systems. We reserve the right to suspend or terminate your access to the Service at any time, without notice, for any reason, including for violation of these Terms.</p>
+            <p>
+                You agree not to disrupt, interfere with, or attempt to gain
+                unauthorized access to the Service or its related systems. We
+                reserve the right to suspend or terminate your access to the Service
+                at any time, without notice, for any reason, including for violation
+                of these Terms.
+            </p>
 
             <p><strong>6. Changes to Terms</strong></p>
-            <p>We may modify these Terms from time to time. We will post the most current version on our site. By continuing to use the Service after changes become effective, you agree to be bound by the revised Terms.</p>
+            <p>
+                We may modify these Terms from time to time. We will post the most
+                current version on our site. By continuing to use the Service after
+                changes become effective, you agree to be bound by the revised
+                Terms.
+            </p>
 
             <p><strong>7. Contact</strong></p>
-            <p>If you have any questions about these Terms, please contact us via the method provided on the Contact page.</p>
+            <p>
+                If you have any questions about these Terms, please contact us via
+                the method provided on the Contact page.
+            </p>
         </div>
     </div>
 </div>
@@ -479,32 +1084,111 @@
 <div class="modal-overlay" id="privacyModal">
     <div class="invite-modal">
         <div class="modal-header">
-            <h3>Privacy Policy</h3>
-            <button class="modal-close" id="closePrivacyModal" aria-label="Close modal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+            <h3>Privacy & Cookie Policy</h3>
+            <button
+                    class="modal-close"
+                    id="closePrivacyModal"
+                    aria-label="Close modal"
+            >
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
+                /></svg>
             </button>
         </div>
         <div class="modal-body">
-            <p><strong>Last Updated: July 2, 2024</strong></p>
-            <p>Your privacy is paramount. DropSilk is architected from the ground up to be as private as possible.</p>
+            <p><strong>Last Updated: September 16, 2025</strong></p>
+            <p>
+                Your privacy is paramount. DropSilk is architected to be as private
+                as possible. This policy explains what data we process and why.
+            </p>
 
-            <p><strong>What Information We Collect</strong></p>
+            <p><strong>1. Data We Do NOT Collect</strong></p>
+            <p>
+                We do not collect, store, or have access to the files you transfer
+                or the content of your screen shares. All such data is sent directly
+                from your device to your peer's device using an encrypted,
+                peer-to-peer (P2P) connection.
+            </p>
+
+            <p><strong>2. Data We Process to Provide the Service</strong></p>
             <ul>
-                <li><strong>Signaling Data:</strong> To establish a direct peer-to-peer connection, our server temporarily handles metadata such as your IP address, browser user-agent, and a randomly generated ID. This information is essential for connecting you with your peer and is discarded as soon as your session ends. It is never logged permanently or shared.</li>
-                <li><strong>File &amp; Screen Share Data:</strong> We do not collect, store, or have access to the files you transfer or the content of your screen shares. All such data is sent directly from your device to your peer's device using an encrypted WebRTC connection.</li>
-                <li><strong>Preview Uploads:</strong> For certain file types (e.g., .pptx), a preview may be generated by temporarily uploading the file to our secure third-party service, UploadThing. This file is used solely for generating the preview and is deleted according to their retention policies. This process is optional and only occurs if you click the preview button for a supported file type.</li>
-                <li><strong>Analytics Data:</strong> We use Google Analytics to collect anonymous, aggregated usage data, such as page visits and feature usage. This helps us understand how the service is used and where to make improvements. This data is not tied to your personal identity.</li>
-                <li><strong>Contact Information:</strong> If you contact us via email, we will have a record of your email address and correspondence to provide support.</li>
+                <li>
+                    <strong>Signaling Data:</strong> To establish a P2P connection,
+                    our server temporarily handles technical metadata (like IP
+                    addresses and session descriptions). This is essential for
+                    connecting you with your peer and is discarded as soon as your
+                    session ends. It is never logged or stored.
+                </li>
+                <li>
+                    <strong>Preview Uploads:</strong> For certain file types (e.g.,
+                    .pptx), a preview may be generated by temporarily uploading the
+                    file to our secure third-party service, UploadThing. This file is
+                    used solely for generating the preview and is automatically
+                    deleted. This is optional and only occurs if you click the preview
+                    button.
+                </li>
             </ul>
 
-            <p><strong>How We Use Information</strong></p>
-            <p>We use the limited information we collect solely to operate, maintain, and improve the DropSilk service, and to prevent abuse (e.g., using Google reCAPTCHA on our contact form).</p>
+            <p><strong>3. Cookies & Local Storage</strong></p>
+            <p>
+                We use your browser's `localStorage` for essential functionality
+                and, with your consent, for analytics.
+            </p>
+            <ul>
+                <li>
+                    <strong>Essential Storage:</strong> We store your theme preference
+                    (e.g., `dropsilk-theme`), onboarding status, and your privacy
+                    consent choice. These are necessary for the site to function as
+                    you expect.
+                </li>
+                <li>
+                    <strong>Analytics (with Consent):</strong> If you accept, we use
+                    Google Analytics to collect anonymous, aggregated usage data (like
+                    page visits and feature usage). This helps us understand how the
+                    service is used and improve it. This data is not tied to your
+                    personal identity.
+                </li>
+            </ul>
 
-            <p><strong>Data Security</strong></p>
-            <p>We take security seriously. All data in transit, including files and screen shares, is encrypted end-to-end using DTLS. Our website is served over HTTPS to protect your connection to our server. Since we do not store your files, the risk of a server-side file breach is eliminated.</p>
+            <p><strong>4. Your Rights (GDPR, CCPA, PDPA)</strong></p>
+            <p>
+                You have rights over your data. Since we don't store personal data
+                on our servers, these rights apply to the data on your own device
+                and with our third-party providers.
+            </p>
+            <ul>
+                <li>
+                    <strong>Right to Access & Erase:</strong> You can view and delete
+                    all data DropSilk stores on your device by clearing your browser's
+                    cache and site data.
+                </li>
+                <li>
+                    <strong>Right to Withdraw Consent:</strong> You can withdraw your
+                    consent for analytics at any time by clearing your browser's site
+                    data for dropsilk.xyz. The consent banner will reappear on your
+                    next visit.
+                </li>
+                <li>
+                    <strong>Right to "Do Not Sell" (CCPA):</strong> We do not sell
+                    your personal information.
+                </li>
+            </ul>
 
-            <p><strong>Third Parties</strong></p>
-            <p>We use a few trusted third-party services to provide functionality: Google Analytics (for anonymous statistics on the Google Ad campaigns we run), Google reCAPTCHA (for spam protection), and UploadThing (for optional file previews). We encourage you to review their respective privacy policies.</p>
+            <p><strong>5. Third-Party Services</strong></p>
+            <p>We use trusted third parties for specific functions:</p>
+            <ul>
+                <li><strong>Google Analytics:</strong> For anonymous statistics (if you consent).</li>
+                <li><strong>Google reCAPTCHA:</strong> For spam protection on our contact form.</li>
+                <li><strong>Render & Vercel:</strong> For hosting our backend and frontend, respectively.</li>
+                <li><strong>UploadThing:</strong> For optional file previews.</li>
+            </ul>
+            <p>We encourage you to review their respective privacy policies.</p>
         </div>
     </div>
 </div>
@@ -514,22 +1198,57 @@
     <div class="invite-modal">
         <div class="modal-header">
             <h3>Security by Design</h3>
-            <button class="modal-close" id="closeSecurityModal" aria-label="Close modal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+            <button
+                    class="modal-close"
+                    id="closeSecurityModal"
+                    aria-label="Close modal"
+            >
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
+                /></svg>
             </button>
         </div>
         <div class="modal-body">
             <p><strong>End-to-End Encryption</strong></p>
-            <p>All data transferred between you and your peer, including files and screen shares, is encrypted end-to-end using industry-standard WebRTC protocols (DTLS and SRTP). This means the data is encrypted on the sender's device and can only be decrypted by the recipient's device. No one in between—not even the DropSilk server—can access the contents of your transfer.</p>
+            <p>
+                All data transferred between you and your peer, including files and
+                screen shares, is encrypted end-to-end using industry-standard
+                WebRTC protocols (DTLS and SRTP). This means the data is encrypted
+                on the sender's device and can only be decrypted by the recipient's
+                device. No one in between—not even the DropSilk server—can access
+                the contents of your transfer.
+            </p>
 
             <p><strong>No Cloud Storage Risk</strong></p>
-            <p>Your files are never uploaded to or stored on a central server. The transfer happens directly between the browsers of the connected peers. This eliminates the risk of a traditional cloud data breach exposing your files, as there is no central repository to attack.</p>
+            <p>
+                Your files are never uploaded to or stored on a central server. The
+                transfer happens directly between the browsers of the connected
+                peers. This eliminates the risk of a traditional cloud data breach
+                exposing your files, as there is no central repository to attack.
+            </p>
 
             <p><strong>Ephemeral Sessions</strong></p>
-            <p>Each "flight" is a temporary, private session. The connection information is held by our server only for the duration of the session. Once you or your peer disconnects, the session is terminated and the connection data is discarded.</p>
+            <p>
+                Each "flight" is a temporary, private session. The connection
+                information is held by our server only for the duration of the
+                session. Once you or your peer disconnects, the session is
+                terminated and the connection data is discarded.
+            </p>
 
             <p><strong>Your Responsibility</strong></p>
-            <p>While we provide a secure channel, your security also depends on you. Always ensure you are sharing files with a person you know and trust. We recommend verifying the flight code with them through a separate, secure channel (like a private message) before initiating a transfer.</p>
+            <p>
+                While we provide a secure channel, your security also depends on
+                you. Always ensure you are sharing files with a person you know and
+                trust. We recommend verifying the flight code with them through a
+                separate, secure channel (like a private message) before initiating
+                a transfer.
+            </p>
         </div>
     </div>
 </div>
@@ -540,27 +1259,63 @@
         <div class="modal-header">
             <h3>Frequently Asked Questions</h3>
             <button class="modal-close" id="closeFaqModal" aria-label="Close modal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                     fill="currentColor" viewBox="0 0 16 16"><path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1
+                .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146
+                5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
             </button>
         </div>
         <div class="modal-body">
             <p><strong>Is there a file size limit?</strong></p>
-            <p>Theoretically, no. DropSilk is designed to handle large files by streaming them directly. However, performance for extremely large files (many gigabytes) can be affected by your device's memory capacity and the stability of your network connection.</p>
+            <p>
+                Theoretically, no. DropSilk is designed to handle large files by
+                streaming them directly. However, performance for extremely large
+                files (many gigabytes) can be affected by your device's memory
+                capacity and the stability of your network connection.
+            </p>
 
             <p><strong>Why is my transfer speed slow?</strong></p>
-            <p>Transfer speed is determined by the direct network path between you and your peer. For the fastest speeds, ensure both devices are on the same local Wi-Fi network (LAN). When transferring over the internet (WAN), the speed is limited by the slowest of the two users' internet connections (specifically, the sender's upload speed and the receiver's download speed).</p>
+            <p>
+                Transfer speed is determined by the direct network path between you
+                and your peer. For the fastest speeds, ensure both devices are on
+                the same local Wi-Fi network (LAN). When transferring over the
+                internet (WAN), the speed is limited by the slowest of the two
+                users' internet connections (specifically, the sender's upload
+                speed and the receiver's download speed).
+            </p>
 
             <p><strong>Is DropSilk free to use?</strong></p>
-            <p>Yes, DropSilk is completely free. It was created as a passion project to offer a simple and private file sharing solution.</p>
+            <p>
+                Yes, DropSilk is completely free. It was created as a passion
+                project to offer a simple and private file sharing solution.
+            </p>
 
             <p><strong>What browsers are supported?</strong></p>
-            <p>DropSilk works on all modern, up-to-date desktop browsers that fully support WebRTC, such as Google Chrome, Mozilla Firefox, Microsoft Edge, and Safari. DropSilk may look slightly different on some browsers due to the way they choose to interpret certain parts of the CSS spec. This does not affect functionality and is purely aesthetic.</p>
+            <p>
+                DropSilk works on all modern, up-to-date desktop browsers that
+                fully support WebRTC, such as Google Chrome, Mozilla Firefox,
+                Microsoft Edge, and Safari. DropSilk may look slightly different on
+                some browsers due to the way they choose to interpret certain parts
+                of the CSS spec. This does not affect functionality and is purely
+                aesthetic.
+            </p>
 
             <p><strong>What happens if I get disconnected?</strong></p>
-            <p>If your network connection is interrupted, the file transfer will stop. You will need to reconnect to the flight and restart the transfer for any incomplete files. There is currently no functionality to resume a failed transfer. Fully received files will remain accessible and downloadable until you close the tab.</p>
+            <p>
+                If your network connection is interrupted, the file transfer will
+                stop. You will need to reconnect to the flight and restart the
+                transfer for any incomplete files. There is currently no
+                functionality to resume a failed transfer. Fully received files will
+                remain accessible and downloadable until you close the tab.
+            </p>
 
             <p><strong>How does screen sharing work?</strong></p>
-            <p>Screen sharing uses the same secure, peer-to-peer WebRTC technology as file transfers. Your screen is encrypted and streamed directly to your peer, and is never visible to our servers.</p>
+            <p>
+                Screen sharing uses the same secure, peer-to-peer WebRTC technology
+                as file transfers. Your screen is encrypted and streamed directly to
+                your peer, and is never visible to our servers.
+            </p>
         </div>
     </div>
 </div>
@@ -568,12 +1323,31 @@
     <div class="invite-modal kofi-modal">
         <div class="modal-header">
             <h3>Support DropSilk</h3>
-            <button class="modal-close" id="closeDonateModal" aria-label="Close modal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+            <button
+                    class="modal-close"
+                    id="closeDonateModal"
+                    aria-label="Close modal"
+            >
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
+                /></svg>
             </button>
         </div>
         <div class="modal-body">
-            <iframe id='kofiframe' src='https://ko-fi.com/medy17/?hidefeed=true&widget=true&embed=true&preview=true' style='border:none;width:100%;padding:4px;background:#f9f9f9;' height='712' title='medy17'></iframe>
+            <iframe
+                    id="kofiframe"
+                    src="https://ko-fi.com/medy17/?hidefeed=true&widget=true&embed=true&preview=true"
+                    style="border: none; width: 100%; padding: 4px; background: #f9f9f9"
+                    height="712"
+                    title="medy17"
+                    loading="lazy"
+            ></iframe>
         </div>
     </div>
 </div>
@@ -582,14 +1356,35 @@
     <div class="invite-modal preview-modal-content">
         <div class="modal-header">
             <h3 id="preview-header-title">File Preview</h3>
-            <button class="modal-close" id="closePreviewModal" aria-label="Close modal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
+            <button
+                    class="modal-close"
+                    id="closePreviewModal"
+                    aria-label="Close modal"
+            >
+                <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                ><path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
+                /></svg>
             </button>
         </div>
         <div class="modal-body preview-modal-body">
             <!-- Loading State -->
             <div id="preview-loader" class="preview-loader">
-                <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
+                <svg class="spinner" viewBox="0 0 50 50"
+                ><circle
+                        class="path"
+                        cx="25"
+                        cy="25"
+                        r="20"
+                        fill="none"
+                        stroke-width="5"
+                ></circle
+                ></svg>
                 <span>Preparing preview...</span>
             </div>
             <!-- Content will be injected here -->
@@ -597,38 +1392,81 @@
         </div>
     </div>
 </div>
-<button id="openPreviewModal" data-modal-trigger="preview" style="display: none;"></button>
+<button id="openPreviewModal" data-modal-trigger="preview" style="display: none"></button>
 
 <!-- ONBOARDING ELEMENTS -->
 <div class="onboarding-overlay" id="welcomeOnboarding">
     <div class="onboarding-tooltip">
         <h3>Welcome to DropSilk!</h3>
-        <p>This is a peer-to-peer file transfer app. To start, create a "flight" to connect with another device.</p>
+        <p>
+            This is a peer-to-peer file transfer app. To start, create a "flight"
+            to connect with another device.
+        </p>
         <button class="btn btn-primary" id="dismissWelcome">Got It!</button>
     </div>
 </div>
 <div class="onboarding-overlay" id="inviteOnboarding">
     <div class="onboarding-tooltip">
         <h3>Your Flight is Ready!</h3>
-        <p>Now, share your unique flight code with the other device or use the invite button to connect them.</p>
+        <p>
+            Now, share your unique flight code with the other device or use the
+            invite button to connect them.
+        </p>
         <button class="btn btn-primary" id="dismissInvite">Start Sharing</button>
     </div>
 </div>
 
 <div id="privacy-consent-toast">
     <div class="privacy-toast-content">
-        <p>This website uses cookies and similar technologies to remember your preferences (like dark mode) and analyze traffic for our ad campaigns. We never track your personal data or the files you transfer. By continuing, you agree to this.</p>
-        <button id="accept-privacy-btn" class="btn btn-primary">Okay, got it!</button>
+        <p>
+            We use essential local storage for site functionality and analytics to
+            improve your experience. By clicking "Accept", you consent to our use
+            of these technologies. See our
+            <button
+                    id="privacy-link-in-toast"
+                    class="footer-nav-link"
+                    style="
+              padding: 0;
+              display: inline;
+              vertical-align: baseline;
+              font-weight: 600;
+            "
+            >
+                Privacy Policy
+            </button>
+            for details.
+        </p>
+        <button id="accept-privacy-btn" class="btn btn-primary">Accept</button>
     </div>
 </div>
 
+<!-- reCAPTCHA - Deferred until needed -->
+<script
+        id="recaptcha-script"
+        type="text/plain"
+        data-consent="functional"
+        data-src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoadCallback&render=explicit"
+        data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+></script>
 
-<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoadCallback&render=explicit" async defer></script>
+<!-- Vercel Speed Insights - Deferred until consent -->
+<script
+        id="vercel-speed-insights"
+        type="text/plain"
+        data-consent="analytics"
+        data-src="/_vercel/speed-insights/script.js"
+></script>
+
+<!-- Local stub for Vercel Speed Insights queue (safe, no network) -->
+<script>
+    window.si =
+        window.si ||
+        function () {
+            (window.siq = window.siq || []).push(arguments);
+        };
+</script>
+
 <script src="/video.js" defer></script>
 <script type="module" src="src/js/app.js"></script>
-<script>
-    window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
-</script>
-<script defer src="/_vercel/speed-insights/script.js"></script>
 </body>
 </html>
