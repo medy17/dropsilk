@@ -15,6 +15,40 @@ import { audioManager } from '../utils/audioManager.js';
 let captchaWidgetId = null;
 let zipModalMode = 'zip'; // 'zip' | 'settings'
 
+// --- PERFORMANCE MODE ---
+function applyPerformanceMode(enabled) {
+    const body = uiElements.body || document.body;
+    body.classList.toggle('reduced-effects', !!enabled);
+    localStorage.setItem(
+        'dropsilk-performance-mode',
+        enabled ? 'true' : 'false'
+    );
+}
+
+function initializePerformanceMode() {
+    const isDarkMode = localStorage.getItem('dropsilk-theme') === 'dark';
+    const perfModeSettingExists = localStorage.getItem('dropsilk-performance-mode') !== null;
+    const hasBeenNotified = localStorage.getItem('dropsilk-perf-mode-notified') === 'true';
+
+    // One-time migration for existing dark mode users
+    if (isDarkMode && !perfModeSettingExists && !hasBeenNotified) {
+        localStorage.setItem('dropsilk-performance-mode', 'true'); // Force ON
+        showToast({
+            type: 'info',
+            title: 'UI Update: Performance Mode',
+            body: 'For a smoother experience, animated backgrounds are now off by default in Dark Mode. You can re-enable them in Settings.',
+            duration: 15000,
+        });
+        localStorage.setItem('dropsilk-perf-mode-notified', 'true');
+    }
+
+    // Default to performance mode ON for all new users or after migration
+    const savedPerfMode = localStorage.getItem('dropsilk-performance-mode');
+    const isPerfModeEnabled =
+        savedPerfMode === null ? true : savedPerfMode === 'true';
+    applyPerformanceMode(isPerfModeEnabled);
+}
+
 function onRecaptchaLoadCallback() {
     const recaptchaContainer = document.getElementById('recaptcha-container');
     if (recaptchaContainer && recaptchaContainer.innerHTML.trim() === '') {
@@ -254,6 +288,7 @@ function initializeDrawer() {
 
 export function initializeModals() {
     initializeTheme();
+    initializePerformanceMode();
 
     const modals = {
         invite: { trigger: 'inviteBtn', close: 'closeInviteModal', overlay: 'inviteModal' },
@@ -465,6 +500,8 @@ function populateSettingsModal() {
     const soundsEnabled = audioManager.isEnabled();
     const analyticsConsented = localStorage.getItem('dropsilk-privacy-consent') === 'true';
     const theme = localStorage.getItem('dropsilk-theme') || 'light';
+    const performanceMode =
+        localStorage.getItem('dropsilk-performance-mode') !== 'false'; // Default true
 
     uiElements.zipFileList.innerHTML = `
       <div class="settings-list">
@@ -495,6 +532,16 @@ function populateSettingsModal() {
           </div>
           <label class="switch">
             <input type="checkbox" class="switch-input" id="settings-theme" ${theme === 'dark' ? 'checked' : ''}/>
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">Performance Mode</div>
+            <div class="settings-item-desc">Disable animated background effects to improve performance.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" class="switch-input" id="settings-performance" ${performanceMode ? 'checked' : ''}/>
             <span class="switch-track"><span class="switch-thumb"></span></span>
           </label>
         </div>
@@ -539,23 +586,26 @@ function getSettingsSnapshot() {
     const sounds = document.getElementById('settings-sounds')?.checked ?? true;
     const analytics = document.getElementById('settings-analytics')?.checked ?? false;
     const darkMode = document.getElementById('settings-theme')?.checked ?? false;
+    const performance = document.getElementById('settings-performance')?.checked ?? false;
     const seg = document.getElementById('settings-pptx-consent');
     const pptx = seg?.querySelector('.seg-btn.active')?.dataset.value || 'ask';
-    return { sounds, analytics, darkMode, pptx };
+    return { sounds, analytics, darkMode, performance, pptx };
 }
 
 function areAllSettingsEnabled() {
     const s = getSettingsSnapshot();
-    return s.sounds && s.analytics && s.darkMode && s.pptx === 'allow';
+    return s.sounds && s.analytics && s.darkMode && !s.performance && s.pptx === 'allow';
 }
 
 function toggleAllSettings(isOn) {
     const soundsEl = document.getElementById('settings-sounds');
     const analyticsEl = document.getElementById('settings-analytics');
     const themeEl = document.getElementById('settings-theme');
+    const perfEl = document.getElementById('settings-performance');
     if (soundsEl) soundsEl.checked = isOn;
     if (analyticsEl) analyticsEl.checked = isOn;
     if (themeEl) themeEl.checked = isOn;
+    if (perfEl) perfEl.checked = !isOn; // Inverted for "Enable All"
     const seg = document.getElementById('settings-pptx-consent');
     if (seg) {
         seg.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
@@ -566,7 +616,13 @@ function toggleAllSettings(isOn) {
 
 function updateSettingsSummary() {
     const s = getSettingsSnapshot();
-    const summary = `Sounds: <strong>${s.sounds ? 'On' : 'Off'}</strong> • Analytics: <strong>${s.analytics ? 'On' : 'Off'}</strong> • Theme: <strong>${s.darkMode ? 'Dark' : 'Light'}</strong> • PPTX: <strong>${s.pptx[0].toUpperCase() + s.pptx.slice(1)}</strong>`;
+    const summary = [
+        `Sounds: <strong>${s.sounds ? 'On' : 'Off'}</strong>`,
+        `Analytics: <strong>${s.analytics ? 'On' : 'Off'}</strong>`,
+        `Theme: <strong>${s.darkMode ? 'Dark' : 'Light'}</strong>`,
+        `Effects: <strong>${s.performance ? 'Reduced' : 'Full'}</strong>`,
+        `PPTX: <strong>${s.pptx[0].toUpperCase() + s.pptx.slice(1)}</strong>`
+    ].join(' • ');
     uiElements.zipSelectionInfo.innerHTML = summary;
     uiElements.selectAllZipCheckbox.checked = areAllSettingsEnabled();
 }
@@ -586,6 +642,7 @@ function saveSettingsPreferences() {
     const s = getSettingsSnapshot();
     applyTheme(s.darkMode ? 'dark' : 'light');
     if (s.sounds) audioManager.enable(); else audioManager.disable();
+    applyPerformanceMode(s.performance);
     const wasConsented = localStorage.getItem('dropsilk-privacy-consent') === 'true';
     localStorage.setItem('dropsilk-privacy-consent', s.analytics ? 'true' : 'false');
     if (s.analytics && !wasConsented) window.dsActivateAnalytics?.();
