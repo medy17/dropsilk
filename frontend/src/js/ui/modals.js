@@ -227,6 +227,15 @@ function resetZipModal() {
     if (spinnerIcon) spinnerIcon.style.display = 'none';
 }
 
+function applySystemFont(enabled) {
+    uiElements.body.classList.toggle('use-system-font', !!enabled);
+}
+
+function initializeSystemFont() {
+    const useSystem = localStorage.getItem('dropsilk-system-font') === 'true';
+    applySystemFont(useSystem);
+}
+
 function resetPreviewModal() {
     const contentElement = document.getElementById('preview-content');
     if (contentElement.dataset.objectUrl) {
@@ -288,6 +297,7 @@ function initializeDrawer() {
 
 export function initializeModals() {
     initializeTheme();
+    initializeSystemFont();
     initializePerformanceMode();
 
     const modals = {
@@ -502,6 +512,7 @@ function populateSettingsModal() {
     const theme = localStorage.getItem('dropsilk-theme') || 'light';
     const performanceMode =
         localStorage.getItem('dropsilk-performance-mode') !== 'false'; // Default true
+    const useSystemFont = localStorage.getItem('dropsilk-system-font') === 'true';
 
     uiElements.zipFileList.innerHTML = `
       <div class="settings-list">
@@ -547,6 +558,16 @@ function populateSettingsModal() {
         </div>
         <div class="settings-item">
           <div class="settings-item-info">
+            <div class="settings-item-title">Prefer System Font</div>
+            <div class="settings-item-desc">Use your device's default font for a native feel.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" class="switch-input" id="settings-system-font" ${useSystemFont ? 'checked' : ''}/>
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-info">
             <div class="settings-item-title">PPTX Preview</div>
             <div class="settings-item-desc">Control consent for PPTX preview uploads.</div>
           </div>
@@ -587,14 +608,15 @@ function getSettingsSnapshot() {
     const analytics = document.getElementById('settings-analytics')?.checked ?? false;
     const darkMode = document.getElementById('settings-theme')?.checked ?? false;
     const performance = document.getElementById('settings-performance')?.checked ?? false;
+    const systemFont = document.getElementById('settings-system-font')?.checked ?? false;
     const seg = document.getElementById('settings-pptx-consent');
     const pptx = seg?.querySelector('.seg-btn.active')?.dataset.value || 'ask';
-    return { sounds, analytics, darkMode, performance, pptx };
+    return { sounds, analytics, darkMode, performance, systemFont, pptx };
 }
 
 function areAllSettingsEnabled() {
     const s = getSettingsSnapshot();
-    return s.sounds && s.analytics && s.darkMode && !s.performance && s.pptx === 'allow';
+    return s.sounds && s.analytics && s.darkMode && !s.performance && !s.systemFont && s.pptx === 'allow';
 }
 
 function toggleAllSettings(isOn) {
@@ -602,10 +624,12 @@ function toggleAllSettings(isOn) {
     const analyticsEl = document.getElementById('settings-analytics');
     const themeEl = document.getElementById('settings-theme');
     const perfEl = document.getElementById('settings-performance');
+    const systemFontEl = document.getElementById('settings-system-font');
     if (soundsEl) soundsEl.checked = isOn;
     if (analyticsEl) analyticsEl.checked = isOn;
     if (themeEl) themeEl.checked = isOn;
     if (perfEl) perfEl.checked = !isOn; // Inverted for "Enable All"
+    if (systemFontEl) systemFontEl.checked = !isOn;
     const seg = document.getElementById('settings-pptx-consent');
     if (seg) {
         seg.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
@@ -619,8 +643,9 @@ function updateSettingsSummary() {
     const summary = [
         `Sounds: <strong>${s.sounds ? 'On' : 'Off'}</strong>`,
         `Analytics: <strong>${s.analytics ? 'On' : 'Off'}</strong>`,
-        `Theme: <strong>${s.darkMode ? 'Dark' : 'Light'}</strong>`,
+        `Theme: <strong>${s.darkMode ? 'Dark' : 'Light'}</strong>`,        
         `Effects: <strong>${s.performance ? 'Reduced' : 'Full'}</strong>`,
+        `Font: <strong>${s.systemFont ? 'System' : 'Default'}</strong>`,
         `PPTX: <strong>${s.pptx[0].toUpperCase() + s.pptx.slice(1)}</strong>`
     ].join(' • ');
     uiElements.zipSelectionInfo.innerHTML = summary;
@@ -643,6 +668,8 @@ function saveSettingsPreferences() {
     applyTheme(s.darkMode ? 'dark' : 'light');
     if (s.sounds) audioManager.enable(); else audioManager.disable();
     applyPerformanceMode(s.performance);
+    applySystemFont(s.systemFont);
+    localStorage.setItem('dropsilk-system-font', s.systemFont ? 'true' : 'false');
     const wasConsented = localStorage.getItem('dropsilk-privacy-consent') === 'true';
     localStorage.setItem('dropsilk-privacy-consent', s.analytics ? 'true' : 'false');
     if (s.analytics && !wasConsented) window.dsActivateAnalytics?.();
