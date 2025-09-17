@@ -9,7 +9,7 @@ function getWebSocketUrl() {
     }
 
     // Otherwise, connect to the production backend.
-    return "wss://dropsilk-backend.onrender.com";
+    return "wss://dropsilk-backend.fly.dev";
 }
 
 export const WEBSOCKET_URL = getWebSocketUrl();

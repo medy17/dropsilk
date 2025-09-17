@@ -44,6 +44,37 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
+body.use-system-font {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body.use-system-font {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Force elements with specific fonts to inherit from the body when system font is active */
+body.use-system-font .header-nav-link,
+body.use-system-font .footer-nav-link,
+body.use-system-font .ticket-actions,
+body.use-system-font #video-player-container {
+    font-family: inherit;
+}
+
+/* Protect elements that MUST remain monospace */
+body.use-system-font .not-found-title,
+body.use-system-font .flight-ticket h2,
+body.use-system-font .flight-code-input-wrapper input,
+body.use-system-font #dashboard-flight-code,
+body.use-system-font .network-user-id,
+body.use-system-font .inflight-user-id,
+body.use-system-font .time-container,
+body.use-system-font .flight-code-display .code,
+body.use-system-font #boarding-flight-code,
+body.use-system-font #zipSelectionInfo,
+body.use-system-font .audio-time {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
 button,
 input,
 select,
