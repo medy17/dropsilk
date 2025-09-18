@@ -192,7 +192,8 @@ function startFileSend(file) {
             drainQueue();
         }
     };
-    worker.postMessage({ file: file });
+    const customChunkSize = parseInt(localStorage.getItem('dropsilk-chunk-size'), 10) || null;
+    worker.postMessage({ file: file, config: { chunkSize: customChunkSize } });
 }
 
 export function drainQueue() {
@@ -258,6 +259,8 @@ export function drainQueue() {
     }
 }
 
+// js/transfer/fileHandler.js
+
 export async function handleDataChannelMessage(event) {
     const data = event.data;
 
@@ -311,6 +314,34 @@ export async function handleDataChannelMessage(event) {
         }
         if (data === "EOF") {
             const receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
+
+            const autoDownloadEnabled = localStorage.getItem('dropsilk-auto-download') === 'true';
+            if (autoDownloadEnabled) {
+                const maxSizeMB = parseFloat(localStorage.getItem('dropsilk-auto-download-max-size') || '100');
+                const maxSizeBytes = maxSizeMB * 1024 * 1024;
+
+                if (receivedBlob.size > 0 && receivedBlob.size <= maxSizeBytes) {
+                    try {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(receivedBlob);
+                        link.download = incomingFileInfo.name;
+                        document.body.appendChild(link); // Required for Firefox
+                        link.click();
+                        document.body.removeChild(link);
+                        // We do not call URL.revokeObjectURL here because the object URL is
+                        // still needed for the manual "Save" button in the UI.
+                    } catch (e) {
+                        console.error("Auto-download failed:", e);
+                        showToast({
+                            type: 'danger',
+                            title: 'Auto-Download Failed',
+                            body: 'Could not automatically save the file. Please download it manually.',
+                            duration: 8000
+                        });
+                    }
+                }
+            }
+
             const finalFileInfo = { ...incomingFileInfo };
 
             store.actions.addReceivedFile({ name: finalFileInfo.name, blob: receivedBlob });
@@ -320,16 +351,14 @@ export async function handleDataChannelMessage(event) {
             const fileElement = document.getElementById(fileId);
 
             if (fileElement) {
-                fileElement.querySelector('progress').value = 1; // Final update
+                // Final UI update for the progress bar and status text
+                fileElement.querySelector('progress').value = 1;
+                fileElement.querySelector('.percent').textContent = 'Complete!';
+
                 const actionContainer = fileElement.querySelector('.file-action');
 
-                const downloadIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>`;
-                const previewIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>`;
-
                 const fileExtension = finalFileInfo.name.toLowerCase().split('.').pop();
-                const isVideo = finalFileInfo.type.startsWith('video/') ||
-                    (['mkv'].includes(fileExtension) && !finalFileInfo.type.startsWith('text/')) ||
-                    (fileExtension === 'ts' && finalFileInfo.type === 'video/mp2t');
+                const isVideo = finalFileInfo.type.startsWith('video/') || ['mkv', 'ts'].includes(fileExtension);
                 const canPreview = isPreviewable(finalFileInfo.name);
 
                 // Read persisted preview consent map
@@ -340,39 +369,48 @@ export async function handleDataChannelMessage(event) {
                     );
                 } catch (_) {}
 
-                let buttonsHTML = '';
-                if (isVideo && window.videoPlayer) {
-                    buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="video" title="Preview Video">${previewIconSVG}</button>`;
-                } else if (canPreview) {
-                    const isPptx = fileExtension === 'pptx';
-                    const pptxDenied = previewConsent?.pptx === 'deny';
-                    if (isPptx) {
-                        const titleText = pptxDenied
-                            ? 'PPTX preview disabled by your privacy choice'
-                            : 'Preview File';
-                        const disabledAttr = pptxDenied
-                            ? 'disabled aria-disabled="true"'
-                            : '';
-                        buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="generic" data-ext="pptx" ${disabledAttr} title="${titleText}">${previewIconSVG}</button>`;
-                    } else {
-                        buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="generic" title="Preview File">${previewIconSVG}</button>`;
-                    }
-                }
-                buttonsHTML += `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>`;
-                actionContainer.innerHTML = `<div class="file-action-group">${buttonsHTML}</div>`;
+                // Step 1: Show the animated checkmark
+                const checkmarkIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>`;
+                actionContainer.innerHTML = `<button class="file-action-btn file-action-btn--complete is-entering" disabled>${checkmarkIconSVG}</button>`;
 
-                const previewBtn = actionContainer.querySelector('.preview-btn');
-                if (previewBtn) {
-                    const previewType = previewBtn.dataset.previewType;
-                    if (previewType === 'video') {
-                        previewBtn.onclick = () => window.videoPlayer.open(receivedBlob, finalFileInfo.name);
-                    } else if (previewType === 'generic') {
-                        previewBtn.onclick = () => showPreview(finalFileInfo.name);
-                    }
-                }
+                // Step 2: After a delay, replace the checkmark with the final action buttons
+                setTimeout(() => {
+                    // Ensure the file element still exists in the DOM before proceeding
+                    if (!document.body.contains(fileElement)) return;
 
-                fileElement.querySelector('.percent').textContent = 'Complete!';
+                    const downloadIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>`;
+                    const previewIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>`;
+
+                    let buttonsHTML = '';
+                    if (isVideo && window.videoPlayer) {
+                        buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="video" title="Preview Video">${previewIconSVG}</button>`;
+                    } else if (canPreview) {
+                        const isPptx = fileExtension === 'pptx';
+                        const pptxDenied = previewConsent?.pptx === 'deny';
+                        const titleText = pptxDenied ? 'PPTX preview disabled by your privacy choice' : 'Preview File';
+                        const disabledAttr = pptxDenied ? 'disabled aria-disabled="true"' : '';
+                        buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="generic" data-ext="${fileExtension}" ${disabledAttr} title="${titleText}">${previewIconSVG}</button>`;
+                    }
+                    buttonsHTML += `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>`;
+
+                    // Add the 'is-entering' class to the group for the pop-in animation
+                    actionContainer.innerHTML = `<div class="file-action-group is-entering">${buttonsHTML}</div>`;
+
+                    // Re-attach event listeners to the newly created buttons
+                    const previewBtn = actionContainer.querySelector('.preview-btn');
+                    if (previewBtn) {
+                        previewBtn.onclick = () => {
+                            const previewType = previewBtn.dataset.previewType;
+                            if (previewType === 'video') {
+                                window.videoPlayer.open(receivedBlob, finalFileInfo.name);
+                            } else if (previewType === 'generic') {
+                                showPreview(finalFileInfo.name);
+                            }
+                        };
+                    }
+                }, 1200); // 1.2-second delay for the checkmark to be visible
             }
+
             incomingFileInfo = null;
             lastReceiveProgressUpdate = 0; // Reset for next file
 

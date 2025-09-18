@@ -15,38 +15,38 @@ import { audioManager } from '../utils/audioManager.js';
 let captchaWidgetId = null;
 let zipModalMode = 'zip'; // 'zip' | 'settings'
 
-// --- PERFORMANCE MODE ---
-function applyPerformanceMode(enabled) {
+// --- ANIMATION QUALITY ---
+function applyAnimationQuality(level) {
     const body = uiElements.body || document.body;
-    body.classList.toggle('reduced-effects', !!enabled);
-    localStorage.setItem(
-        'dropsilk-performance-mode',
-        enabled ? 'true' : 'false'
-    );
+    body.classList.remove('reduced-effects', 'no-effects');
+    if (level === 'performance') {
+        body.classList.add('reduced-effects');
+    } else if (level === 'off') {
+        body.classList.add('reduced-effects', 'no-effects');
+    }
+    localStorage.setItem('dropsilk-animation-quality', level);
 }
 
-function initializePerformanceMode() {
-    const isDarkMode = localStorage.getItem('dropsilk-theme') === 'dark';
-    const perfModeSettingExists = localStorage.getItem('dropsilk-performance-mode') !== null;
-    const hasBeenNotified = localStorage.getItem('dropsilk-perf-mode-notified') === 'true';
+function initializeAnimationQuality() {
+    const newKey = 'dropsilk-animation-quality';
+    const oldKey = 'dropsilk-performance-mode';
+    let quality = localStorage.getItem(newKey);
 
-    // One-time migration for existing dark mode users
-    if (isDarkMode && !perfModeSettingExists && !hasBeenNotified) {
-        localStorage.setItem('dropsilk-performance-mode', 'true'); // Force ON
-        showToast({
-            type: 'info',
-            title: 'UI Update: Performance Mode',
-            body: 'For a smoother experience, animated backgrounds are now off by default in Dark Mode. You can re-enable them in Settings.',
-            duration: 15000,
-        });
-        localStorage.setItem('dropsilk-perf-mode-notified', 'true');
+    if (!quality) {
+        const oldSetting = localStorage.getItem(oldKey);
+        if (oldSetting === 'true') {
+            quality = 'performance';
+        } else if (oldSetting === 'false') {
+            quality = 'quality';
+        } else {
+            // Default for new users
+            quality = 'performance';
+        }
+        localStorage.setItem(newKey, quality);
+        // localStorage.removeItem(oldKey); // Optional: clean up old key
     }
 
-    // Default to performance mode ON for all new users or after migration
-    const savedPerfMode = localStorage.getItem('dropsilk-performance-mode');
-    const isPerfModeEnabled =
-        savedPerfMode === null ? true : savedPerfMode === 'true';
-    applyPerformanceMode(isPerfModeEnabled);
+    applyAnimationQuality(quality);
 }
 
 function onRecaptchaLoadCallback() {
@@ -298,7 +298,7 @@ function initializeDrawer() {
 export function initializeModals() {
     initializeTheme();
     initializeSystemFont();
-    initializePerformanceMode();
+    initializeAnimationQuality();
 
     const modals = {
         invite: { trigger: 'inviteBtn', close: 'closeInviteModal', overlay: 'inviteModal' },
@@ -510,9 +510,11 @@ function populateSettingsModal() {
     const soundsEnabled = audioManager.isEnabled();
     const analyticsConsented = localStorage.getItem('dropsilk-privacy-consent') === 'true';
     const theme = localStorage.getItem('dropsilk-theme') || 'light';
-    const performanceMode =
-        localStorage.getItem('dropsilk-performance-mode') !== 'false'; // Default true
+    const animationQuality = localStorage.getItem('dropsilk-animation-quality') || 'performance';
     const useSystemFont = localStorage.getItem('dropsilk-system-font') === 'true';
+    const autoDownloadEnabled = localStorage.getItem('dropsilk-auto-download') === 'true';
+    const autoDownloadMaxSize = localStorage.getItem('dropsilk-auto-download-max-size') || 100;
+    const chunkSize = parseInt(localStorage.getItem('dropsilk-chunk-size') || '262144', 10);
 
     uiElements.zipFileList.innerHTML = `
       <div class="settings-list">
@@ -548,13 +550,14 @@ function populateSettingsModal() {
         </div>
         <div class="settings-item">
           <div class="settings-item-info">
-            <div class="settings-item-title">Performance Mode</div>
-            <div class="settings-item-desc">Disable animated background effects to improve performance.</div>
+            <div class="settings-item-title">Animation Quality</div>
+            <div class="settings-item-desc">Control background animations to improve performance.</div>
           </div>
-          <label class="switch">
-            <input type="checkbox" class="switch-input" id="settings-performance" ${performanceMode ? 'checked' : ''}/>
-            <span class="switch-track"><span class="switch-thumb"></span></span>
-          </label>
+          <div class="segmented" id="settings-animation-quality">
+            <button type="button" class="seg-btn ${animationQuality === 'quality' ? 'active' : ''}" data-value="quality">Best</button>
+            <button type="button" class="seg-btn ${animationQuality === 'performance' ? 'active' : ''}" data-value="performance">Basic</button>
+            <button type="button" class="seg-btn ${animationQuality === 'off' ? 'active' : ''}" data-value="off">Off</button>
+          </div>
         </div>
         <div class="settings-item">
           <div class="settings-item-info">
@@ -568,6 +571,23 @@ function populateSettingsModal() {
         </div>
         <div class="settings-item">
           <div class="settings-item-info">
+            <div class="settings-item-title">Auto-Download</div>
+            <div class="settings-item-desc">Automatically download completed files under a certain size.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" class="switch-input" id="settings-auto-download" ${autoDownloadEnabled ? 'checked' : ''}/>
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+        <div class="settings-item" id="auto-download-size-container" style="${autoDownloadEnabled ? '' : 'display: none;'}">
+            <div class="settings-item-info">
+                <div class="settings-item-title">Auto-Download Max Size (MB)</div>
+                <div class="settings-item-desc">Range: 0.001MB to 3000MB. Limits prevent browser crashes and spam.</div>
+            </div>
+            <input type="number" class="settings-number-input" id="settings-auto-download-max-size" value="${autoDownloadMaxSize}" min="0.001" max="3000" step="any" />
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-info">
             <div class="settings-item-title">PPTX Preview</div>
             <div class="settings-item-desc">Control consent for PPTX preview uploads.</div>
           </div>
@@ -577,11 +597,26 @@ function populateSettingsModal() {
             <button type="button" class="seg-btn ${pptxConsent === 'deny' ? 'active' : ''}" data-value="deny">Deny</button>
           </div>
         </div>
+
+        <div class="settings-item-full-width" style="margin-top: 1rem; margin-bottom: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--c-panel-border);">
+            <h4 style="margin: 0; color: var(--c-text-secondary); font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.05em;">Advanced</h4>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-title">Transfer Chunk Size (Bytes)</div>
+            <div class="settings-item-desc">Adjust for network conditions. Default: 262144 (256KB). Larger for LAN, smaller for unstable Wi-Fi. Be conservative here as too large or too small will cause disconnects and throttle downloads respectively. ;)</div>
+          </div>
+          <input type="number" class="settings-number-input" id="settings-chunk-size" value="${chunkSize}" min="16384" max="1048576" step="16384" />
+        </div>
+
+        <div class="settings-item-full-width">
+            <button class="btn btn-danger" id="reset-preferences-btn">Reset All Preferences</button>
+        </div>
       </div>
     `;
 
-    const seg = document.getElementById('settings-pptx-consent');
-    if (seg) {
+    const segControls = document.querySelectorAll('.segmented');
+    segControls.forEach(seg => {
         seg.addEventListener('click', (e) => {
             const btn = e.target.closest('.seg-btn');
             if (!btn) return;
@@ -589,14 +624,43 @@ function populateSettingsModal() {
             btn.classList.add('active');
             updateSettingsSummary();
         });
-    }
+    });
 
     const settingsList = uiElements.zipFileList.querySelector('.settings-list');
     if (settingsList) {
         settingsList.addEventListener('change', (e) => {
             if (e.target.classList.contains('switch-input')) {
+                if (e.target.id === 'settings-auto-download') {
+                    const container = document.getElementById('auto-download-size-container');
+                    if (container) {
+                        container.style.display = e.target.checked ? '' : 'none';
+                    }
+                }
                 updateSettingsSummary();
             }
+        });
+    }
+
+    const resetBtn = document.getElementById('reset-preferences-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            showToast({
+                type: 'danger',
+                title: 'Confirm Reset',
+                body: 'Are you sure? This will reset all your preferences and disconnect you from your current session.',
+                duration: 0, // Persist until user action
+                actions: [
+                    { text: 'Cancel', class: 'btn-secondary', callback: () => {} },
+                    { text: 'Reset', class: 'btn-danger', callback: () => {
+                            Object.keys(localStorage).forEach(key => {
+                                if (key.startsWith('dropsilk-')) {
+                                    localStorage.removeItem(key);
+                                }
+                            });
+                            location.reload();
+                        }}
+                ]
+            });
         });
     }
 
@@ -607,33 +671,51 @@ function getSettingsSnapshot() {
     const sounds = document.getElementById('settings-sounds')?.checked ?? true;
     const analytics = document.getElementById('settings-analytics')?.checked ?? false;
     const darkMode = document.getElementById('settings-theme')?.checked ?? false;
-    const performance = document.getElementById('settings-performance')?.checked ?? false;
     const systemFont = document.getElementById('settings-system-font')?.checked ?? false;
-    const seg = document.getElementById('settings-pptx-consent');
-    const pptx = seg?.querySelector('.seg-btn.active')?.dataset.value || 'ask';
-    return { sounds, analytics, darkMode, performance, systemFont, pptx };
+    const autoDownload = document.getElementById('settings-auto-download')?.checked ?? false;
+    const autoDownloadMaxSize = document.getElementById('settings-auto-download-max-size')?.value || 100;
+    const animationQualitySeg = document.getElementById('settings-animation-quality');
+    const animationQuality = animationQualitySeg?.querySelector('.seg-btn.active')?.dataset.value || 'performance';
+    const pptxSeg = document.getElementById('settings-pptx-consent');
+    const pptx = pptxSeg?.querySelector('.seg-btn.active')?.dataset.value || 'ask';
+    const chunkSize = document.getElementById('settings-chunk-size')?.value || 262144;
+    return { sounds, analytics, darkMode, systemFont, autoDownload, autoDownloadMaxSize, animationQuality, pptx, chunkSize };
 }
 
 function areAllSettingsEnabled() {
     const s = getSettingsSnapshot();
-    return s.sounds && s.analytics && s.darkMode && !s.performance && !s.systemFont && s.pptx === 'allow';
+    return s.sounds && s.analytics && s.darkMode && s.animationQuality === 'quality' && !s.systemFont && s.autoDownload && s.pptx === 'allow';
 }
 
 function toggleAllSettings(isOn) {
     const soundsEl = document.getElementById('settings-sounds');
     const analyticsEl = document.getElementById('settings-analytics');
     const themeEl = document.getElementById('settings-theme');
-    const perfEl = document.getElementById('settings-performance');
     const systemFontEl = document.getElementById('settings-system-font');
+    const autoDownloadEl = document.getElementById('settings-auto-download');
     if (soundsEl) soundsEl.checked = isOn;
     if (analyticsEl) analyticsEl.checked = isOn;
     if (themeEl) themeEl.checked = isOn;
-    if (perfEl) perfEl.checked = !isOn; // Inverted for "Enable All"
     if (systemFontEl) systemFontEl.checked = !isOn;
-    const seg = document.getElementById('settings-pptx-consent');
-    if (seg) {
-        seg.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-        const target = seg.querySelector(`.seg-btn[data-value="${isOn ? 'allow' : 'ask'}"]`);
+    if (autoDownloadEl) autoDownloadEl.checked = isOn;
+
+    const chunkSizeEl = document.getElementById('settings-chunk-size');
+    if (chunkSizeEl) {
+        chunkSizeEl.value = '262144'; // Always reset to default on toggle all
+    }
+
+    const animationSeg = document.getElementById('settings-animation-quality');
+    if (animationSeg) {
+        animationSeg.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+        const targetValue = isOn ? 'quality' : 'performance';
+        const target = animationSeg.querySelector(`.seg-btn[data-value="${targetValue}"]`);
+        target?.classList.add('active');
+    }
+
+    const pptxSeg = document.getElementById('settings-pptx-consent');
+    if (pptxSeg) {
+        pptxSeg.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+        const target = pptxSeg.querySelector(`.seg-btn[data-value="${isOn ? 'allow' : 'ask'}"]`);
         target?.classList.add('active');
     }
 }
@@ -643,9 +725,10 @@ function updateSettingsSummary() {
     const summary = [
         `Sounds: <strong>${s.sounds ? 'On' : 'Off'}</strong>`,
         `Analytics: <strong>${s.analytics ? 'On' : 'Off'}</strong>`,
-        `Theme: <strong>${s.darkMode ? 'Dark' : 'Light'}</strong>`,        
-        `Effects: <strong>${s.performance ? 'Reduced' : 'Full'}</strong>`,
+        `Theme: <strong>${s.darkMode ? 'Dark' : 'Light'}</strong>`,
+        `Animation: <strong>${s.animationQuality.charAt(0).toUpperCase() + s.animationQuality.slice(1)}</strong>`,
         `Font: <strong>${s.systemFont ? 'System' : 'Default'}</strong>`,
+        `Auto-Download: <strong>${s.autoDownload ? `On (${s.autoDownloadMaxSize} MB)` : 'Off'}</strong>`,
         `PPTX: <strong>${s.pptx[0].toUpperCase() + s.pptx.slice(1)}</strong>`
     ].join(' • ');
     uiElements.zipSelectionInfo.innerHTML = summary;
@@ -667,9 +750,43 @@ function saveSettingsPreferences() {
     const s = getSettingsSnapshot();
     applyTheme(s.darkMode ? 'dark' : 'light');
     if (s.sounds) audioManager.enable(); else audioManager.disable();
-    applyPerformanceMode(s.performance);
+    applyAnimationQuality(s.animationQuality);
     applySystemFont(s.systemFont);
     localStorage.setItem('dropsilk-system-font', s.systemFont ? 'true' : 'false');
+    localStorage.setItem('dropsilk-auto-download', s.autoDownload ? 'true' : 'false');
+
+    // Validate and clamp the max size
+    let maxSize = parseFloat(s.autoDownloadMaxSize) || 100;
+    const minSize = 0.001;
+    const maxAllowedSize = 3000;
+    let clampedSize = Math.max(minSize, Math.min(maxSize, maxAllowedSize));
+
+    if (maxSize !== clampedSize) {
+        showToast({
+            type: 'info',
+            title: 'Auto-Download Size Adjusted',
+            body: `The value was adjusted to fit the allowed range (0.001MB - 3000MB).`,
+            duration: 7000
+        });
+    }
+    localStorage.setItem('dropsilk-auto-download-max-size', clampedSize);
+
+    // Validate and clamp chunk size
+    let chunkSize = parseInt(s.chunkSize, 10) || 262144;
+    const minChunk = 16384; // 16 KB
+    const maxChunk = 1048576; // 1 MB
+    let clampedChunkSize = Math.max(minChunk, Math.min(chunkSize, maxChunk));
+
+    if (chunkSize !== clampedChunkSize) {
+        showToast({
+            type: 'info',
+            title: 'Chunk Size Adjusted',
+            body: `Value was adjusted to fit the allowed range (${formatBytes(minChunk)} - ${formatBytes(maxChunk)}).`,
+            duration: 7000
+        });
+    }
+    localStorage.setItem('dropsilk-chunk-size', clampedChunkSize);
+
     const wasConsented = localStorage.getItem('dropsilk-privacy-consent') === 'true';
     localStorage.setItem('dropsilk-privacy-consent', s.analytics ? 'true' : 'false');
     if (s.analytics && !wasConsented) window.dsActivateAnalytics?.();
