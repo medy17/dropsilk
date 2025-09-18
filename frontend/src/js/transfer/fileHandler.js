@@ -385,10 +385,13 @@ export async function handleDataChannelMessage(event) {
                     if (isVideo && window.videoPlayer) {
                         buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="video" title="Preview Video">${previewIconSVG}</button>`;
                     } else if (canPreview) {
-                        const isPptx = fileExtension === 'pptx';
-                        const pptxDenied = previewConsent?.pptx === 'deny';
-                        const titleText = pptxDenied ? 'PPTX preview disabled by your privacy choice' : 'Preview File';
-                        const disabledAttr = pptxDenied ? 'disabled aria-disabled="true"' : '';
+                        let titleText = 'Preview File';
+                        let disabledAttr = '';
+                        // Only apply disabled state if the file is a PPTX and consent is denied.
+                        if (fileExtension === 'pptx' && previewConsent?.pptx === 'deny') {
+                            titleText = 'PPTX preview disabled by your privacy choice';
+                            disabledAttr = 'disabled aria-disabled="true"';
+                        }
                         buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="generic" data-ext="${fileExtension}" ${disabledAttr} title="${titleText}">${previewIconSVG}</button>`;
                     }
                     buttonsHTML += `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>`;
