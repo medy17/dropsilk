@@ -60,6 +60,12 @@ export function initializeEventListeners() {
     // Use the reusable function for the click event
     uiElements.joinFlightBtn?.addEventListener('click', attemptToJoinFlight);
 
+    uiElements.flightCodeInput?.addEventListener('input', () => {
+        if (uiElements.flightCodeInput.value.length > 6) {
+            uiElements.flightCodeInput.value = uiElements.flightCodeInput.value.slice(0, 6);
+        }
+    });
+
     // Add keydown event listener for the input field
     uiElements.flightCodeInput?.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
