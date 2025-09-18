@@ -515,6 +515,9 @@ function populateSettingsModal() {
     const autoDownloadEnabled = localStorage.getItem('dropsilk-auto-download') === 'true';
     const autoDownloadMaxSize = localStorage.getItem('dropsilk-auto-download-max-size') || 100;
     const chunkSize = parseInt(localStorage.getItem('dropsilk-chunk-size') || '262144', 10);
+    const opfsEnabled = localStorage.getItem('dropsilk-use-opfs-buffer') === 'true';
+    const opfsSupported = !!navigator.storage?.getDirectory;
+
 
     uiElements.zipFileList.innerHTML = `
       <div class="settings-list">
@@ -602,9 +605,19 @@ function populateSettingsModal() {
             <h4 style="margin: 0; color: var(--c-text-secondary); font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.05em;">Advanced</h4>
         </div>
         <div class="settings-item">
+            <div class="settings-item-info">
+                <div class="settings-item-title">Safe Mode (OPFS)</div>
+                <div class="settings-item-desc">Write directly to local storage instead of RAM to prevent browser crashes. May cause slower transfers on especially large files or slow storage devices. Requires refresh to apply.</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" class="switch-input" id="settings-opfs-buffer" ${opfsEnabled ? 'checked' : ''} ${!opfsSupported ? 'disabled' : ''}/>
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+            </label>
+        </div>
+        <div class="settings-item">
           <div class="settings-item-info">
             <div class="settings-item-title">Transfer Chunk Size (Bytes)</div>
-            <div class="settings-item-desc">Adjust for network conditions. Default: 262144 (256KB). Larger for LAN, smaller for unstable Wi-Fi. Be conservative here as too large or too small will cause disconnects and throttle downloads respectively. ;)</div>
+            <div class="settings-item-desc">Adjust for network conditions. Default: 262144 (256KB). Larger for LAN, smaller for Wi-Fi and Mobile Data. <br>Warning: too large or too small will cause disconnects and throttle downloads respectively.</div>
           </div>
           <input type="number" class="settings-number-input" id="settings-chunk-size" value="${chunkSize}" min="16384" max="1048576" step="16384" />
         </div>
@@ -679,7 +692,8 @@ function getSettingsSnapshot() {
     const pptxSeg = document.getElementById('settings-pptx-consent');
     const pptx = pptxSeg?.querySelector('.seg-btn.active')?.dataset.value || 'ask';
     const chunkSize = document.getElementById('settings-chunk-size')?.value || 262144;
-    return { sounds, analytics, darkMode, systemFont, autoDownload, autoDownloadMaxSize, animationQuality, pptx, chunkSize };
+    const opfs = document.getElementById('settings-opfs-buffer')?.checked ?? false;
+    return { sounds, analytics, darkMode, systemFont, autoDownload, autoDownloadMaxSize, animationQuality, pptx, chunkSize, opfs };
 }
 
 function areAllSettingsEnabled() {
@@ -729,7 +743,8 @@ function updateSettingsSummary() {
         `Animation: <strong>${s.animationQuality.charAt(0).toUpperCase() + s.animationQuality.slice(1)}</strong>`,
         `Font: <strong>${s.systemFont ? 'System' : 'Default'}</strong>`,
         `Auto-Download: <strong>${s.autoDownload ? `On (${s.autoDownloadMaxSize} MB)` : 'Off'}</strong>`,
-        `PPTX: <strong>${s.pptx[0].toUpperCase() + s.pptx.slice(1)}</strong>`
+        `PPTX: <strong>${s.pptx[0].toUpperCase() + s.pptx.slice(1)}</strong>`,
+        `Safe Mode: <strong>${s.opfs ? 'On' : 'Off'}</strong>`
     ].join(' • ');
     uiElements.zipSelectionInfo.innerHTML = summary;
     uiElements.selectAllZipCheckbox.checked = areAllSettingsEnabled();
@@ -770,6 +785,7 @@ function saveSettingsPreferences() {
         });
     }
     localStorage.setItem('dropsilk-auto-download-max-size', clampedSize);
+    localStorage.setItem('dropsilk-use-opfs-buffer', s.opfs ? 'true' : 'false');
 
     // Validate and clamp chunk size
     let chunkSize = parseInt(s.chunkSize, 10) || 262144;

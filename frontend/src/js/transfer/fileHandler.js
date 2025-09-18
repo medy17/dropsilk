@@ -3,7 +3,7 @@
 import { store } from '../state.js';
 import { showToast } from '../utils/toast.js';
 import { sendData, getBufferedAmount } from '../network/webrtc.js';
-import { HIGH_WATER_MARK } from '../config.js';
+import { HIGH_WATER_MARK, OPFS_THRESHOLD } from '../config.js';
 import { uiElements } from '../ui/dom.js';
 import { getFileIcon } from '../utils/helpers.js';
 import { updateReceiverActions, checkQueueOverflow } from '../ui/view.js';
@@ -12,6 +12,8 @@ import { showPreview } from '../preview/previewManager.js';
 import { audioManager } from '../utils/audioManager.js';
 
 let worker;
+// OPFS-specific state
+const opfsState = new Map();
 let chunkQueue = [];
 let fileReadingDone = false;
 let sentOffset = 0;
@@ -284,6 +286,34 @@ export async function handleDataChannelMessage(event) {
             incomingFileInfo = parsedData;
             incomingFileData = [];
             incomingFileReceived = 0;
+
+            const useOpfs =
+                localStorage.getItem('dropsilk-use-opfs-buffer') === 'true' &&
+                incomingFileInfo.size > OPFS_THRESHOLD &&
+                !!navigator.storage?.getDirectory;
+
+            if (useOpfs) {
+                try {
+                    const root = await navigator.storage.getDirectory();
+                    // Clear old files before starting a new one.
+                    for await (const key of root.keys()) {
+                        await root.removeEntry(key);
+                    }
+                    const fileHandle = await root.getFileHandle(incomingFileInfo.name, { create: true });
+                    const writer = await fileHandle.createWritable();
+                    opfsState.set(incomingFileInfo.name, { writer, fileHandle });
+                } catch (error) {
+                    console.error("OPFS setup failed, falling back to memory.", error);
+                    showToast({
+                        type: 'danger',
+                        title: 'Safe Mode Error',
+                        body: 'Could not write to disk. Falling back to in-memory transfer.',
+                        duration: 8000
+                    });
+                    opfsState.delete(incomingFileInfo.name); // Clean up partial state
+                }
+            }
+
             const isFirstReceivedFile = store.getState().receivedFiles.length === 0;
 
             if (uiElements.receiverQueueDiv.querySelector('.empty-state')) {
@@ -313,7 +343,29 @@ export async function handleDataChannelMessage(event) {
             return;
         }
         if (data === "EOF") {
-            const receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
+            let receivedBlob;
+            const opfsFile = opfsState.get(incomingFileInfo.name);
+
+            if (opfsFile) {
+                try {
+                    await opfsFile.writer.close();
+                    receivedBlob = await opfsFile.fileHandle.getFile();
+                } catch (e) {
+                    console.error("Failed to finalize OPFS file:", e);
+                    showToast({
+                        type: 'danger',
+                        title: 'File Save Error',
+                        body: 'Could not save the file from disk. Please try again.',
+                        duration: 8000
+                    });
+                    opfsState.delete(incomingFileInfo.name);
+                    return; // Abort further processing
+                }
+                opfsState.delete(incomingFileInfo.name);
+            } else {
+                receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
+            }
+
 
             const autoDownloadEnabled = localStorage.getItem('dropsilk-auto-download') === 'true';
             if (autoDownloadEnabled) {
@@ -428,9 +480,36 @@ export async function handleDataChannelMessage(event) {
         }
     }
 
+    const opfsFile = incomingFileInfo ? opfsState.get(incomingFileInfo.name) : undefined;
+
+    if (opfsFile) {
+        try {
+            await opfsFile.writer.write(data);
+        } catch (error) {
+            console.error("OPFS write failed:", error);
+            opfsState.delete(incomingFileInfo.name); // Stop trying to write to OPFS
+
+            // It's too late to switch to memory for this file, so we show an error.
+            // Future files will not use OPFS if the error persists.
+            showToast({
+                type: 'danger',
+                title: 'Out of Disk Space',
+                body: 'Safe Mode failed. The transfer for this file has been aborted.',
+                duration: 10000
+            });
+
+            // We need to signal a failure state for the current file.
+            // For now, we'll just stop processing. A more robust solution
+            // might involve sending a "cancel" message to the sender.
+            incomingFileInfo = null; // Stop processing further chunks for this file.
+            return;
+        }
+    } else {
+        incomingFileData.push(data);
+    }
+
     const chunkSize = data.byteLength || data.size || 0;
     store.actions.updateMetricsOnReceive(chunkSize);
-    incomingFileData.push(data);
     incomingFileReceived += chunkSize;
     if (incomingFileInfo?.size) {
         const now = Date.now();
@@ -469,5 +548,26 @@ export function resetTransferState() {
     if (queueStartSoundTimeout) {
         clearTimeout(queueStartSoundTimeout);
         queueStartSoundTimeout = null;
+    }
+
+    // Clear OPFS storage on reset
+    if (!!navigator.storage?.getDirectory) {
+        (async () => {
+            try {
+                const root = await navigator.storage.getDirectory();
+                for await (const key of root.keys()) {
+                    await root.removeEntry(key);
+                }
+                // Also clear any in-memory writer states
+                for (const [key, value] of opfsState.entries()) {
+                    if (value.writer) {
+                       await value.writer.close().catch(e => console.error("Error closing writer on reset:", e));
+                    }
+                    opfsState.delete(key);
+                }
+            } catch (e) {
+                console.error("Could not clear OPFS on reset:", e);
+            }
+        })();
     }
 }

@@ -219,7 +219,7 @@
     padding: 0.5rem 0.75rem;
     font-weight: 600;
     text-align: right;
-    width: 80px; /* Adjust width as needed */
+    width: 85px; /* Adjust width as needed */
     transition: border-color 0.2s, box-shadow 0.2s;
     outline: none;
     -moz-appearance: textfield; /* Firefox */

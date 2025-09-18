@@ -30,6 +30,7 @@
     color: var(--c-text-secondary);
     font-size: .9em;
     white-space: normal;
+    font-weight: 400;
 }
 
 .settings-item-full-width {

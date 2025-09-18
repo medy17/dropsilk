@@ -16,3 +16,4 @@ export const WEBSOCKET_URL = getWebSocketUrl();
 export const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 export const HIGH_WATER_MARK = 1024 * 1024; // buffer size for data channel
 export const RECAPTCHA_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
+export const OPFS_THRESHOLD = 256 * 1024 * 1024; // 256 MB

@@ -50,6 +50,7 @@
     font-size: .95em;
     padding: 0 .25rem;
     transition: opacity 0.3s;
+    margin-bottom: 1rem;
 }
 
 .zip-actions-header .checkbox-label {
