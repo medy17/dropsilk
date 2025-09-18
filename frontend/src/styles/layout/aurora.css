@@ -1,0 +1,62 @@
+.aurora-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background-image: radial-gradient(1px 1px at 20px 30px, #eee, transparent), radial-gradient(1px 1px at 40px 70px, #fff, transparent), radial-gradient(1px 1px at 50px 160px, #ddd, transparent), radial-gradient(1.5px 1.5px at 90px 40px, #fff, transparent), radial-gradient(1px 1px at 130px 80px, #fff, transparent), radial-gradient(1.2px 1.2px at 160px 120px, #ddd, transparent);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    animation: star-drift 600s linear infinite;
+}
+
+.aurora-blob {
+    position: absolute;
+    mix-blend-mode: overlay;
+}
+
+/* Performance mode: keep star field, enable quality mode aurora blobs */
+body.reduced-effects .aurora-blob {
+  display: none !important;
+}
+
+body.no-effects .aurora-background {
+    display: none !important;
+}
+
+.aurora-blob:nth-child(1) {
+    width: 50vmax;
+    height: 50vmax;
+    background-color: var(--c-primary);
+    border-radius: 47% 53% 46% 54% / 40% 41% 59% 60%;
+    animation: moveBlobA 25s linear infinite;
+}
+
+.aurora-blob:nth-child(2) {
+    width: 60vmax;
+    height: 60vmax;
+    background-color: var(--c-secondary);
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    animation: moveBlobB 38s linear infinite -10s;
+}
+
+.aurora-blob:nth-child(3) {
+    width: 40vmax;
+    height: 40vmax;
+    background-color: var(--c-primary);
+    border-radius: 51% 49% 48% 52% / 59% 49% 51% 41%;
+    animation: moveBlobC 45s linear infinite -20s;
+}
+
+.aurora-blob:nth-child(4) {
+    width: 55vmax;
+    height: 55vmax;
+    background-color: var(--c-secondary);
+    border-radius: 40% 60% 31% 69% / 54% 59% 41% 46%;
+    animation: moveBlobD 55s linear infinite -35s;
+}

@@ -1,0 +1,174 @@
+.btn {
+    padding: .8em 1.5em;
+    border-radius: 12px;
+    border: 1.5px solid;
+    font-weight: 600;
+    font-size: .9em;
+    cursor: pointer;
+    transition: all 0.2s ease, transform 0.1s ease-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5em;
+    text-decoration: none;
+    box-shadow: 0 1px 4px rgb(91 206 250 / .06);
+    backdrop-filter: blur(6px) saturate(1.2);
+    -webkit-backdrop-filter: blur(6px) saturate(1.2);
+    outline: 1px solid rgb(255 255 255 / .18);
+}
+
+.btn:active {
+    transform: translateY(0) scale(.97);
+    transition-duration: 0.1s;
+}
+
+.btn-primary {
+    background: var(--c-btn-primary-bg);
+    color: var(--c-primary);
+    border-color: var(--c-primary);
+}
+
+.btn-primary:hover {
+    background: var(--c-primary);
+    color: var(--brilliant-white);
+    border-color: var(--c-secondary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgb(91 206 250 / .25);
+}
+
+.btn-secondary {
+    background: var(--c-btn-secondary-bg);
+    color: var(--c-secondary);
+    border-color: var(--c-secondary);
+}
+
+.btn-secondary:hover {
+    background: var(--c-secondary);
+    color: var(--brilliant-white);
+    border-color: var(--c-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgb(245 169 184 / .25);
+}
+
+.btn-danger {
+    background: var(--c-danger-bg, linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, rgba(248, 113, 113, 0.12) 100%));
+    color: var(--c-danger);
+    border-color: var(--c-danger);
+}
+
+.btn-danger:hover {
+    background: var(--c-danger);
+    color: var(--brilliant-white);
+    border-color: var(--c-danger);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .75rem;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    border: 1.5px solid var(--c-primary);
+    background: var(--c-btn-primary-bg);
+    color: var(--c-primary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease, transform 0.1s ease-out;
+    text-decoration: none;
+    font-size: .95rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.share-btn:hover {
+    background: var(--c-primary);
+    color: var(--brilliant-white);
+    border-color: var(--c-secondary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgb(91 206 250 / .25);
+}
+
+.share-btn:active {
+    transform: translateY(0) scale(.97);
+}
+
+.share-btn.secondary {
+    border-color: var(--c-secondary);
+    color: var(--c-secondary);
+    background: var(--c-btn-secondary-bg);
+}
+
+.share-btn.secondary:hover {
+    background: var(--c-secondary);
+    color: var(--brilliant-white);
+    border-color: var(--c-primary);
+}
+
+.share-btn.success {
+    background: linear-gradient(90deg, rgb(80 200 120 / .15) 0%, rgb(127 234 210 / .12) 100%);
+    border-color: var(--c-success);
+    color: var(--c-success);
+}
+
+.share-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.file-action-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--c-btn-primary-bg);
+    color: var(--c-primary);
+    border: 1.5px solid var(--c-primary);
+    cursor: pointer;
+    transition: all 0.2s ease, transform 0.1s ease-out;
+    box-shadow: 0 1px 4px rgb(91 206 250 / .06);
+}
+
+.file-action-btn:hover {
+    background: var(--c-primary);
+    color: var(--brilliant-white);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgb(91 206 250 / .25);
+}
+
+.file-action-btn:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-text-secondary);
+    color: var(--c-text-secondary);
+    box-shadow: none;
+    transform: none;
+    pointer-events: none;
+}
+
+.file-action-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.cancel-file-btn {
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-secondary);
+    color: var(--c-secondary);
+    opacity: 0.7;
+}
+
+.cancel-file-btn:hover {
+    background: var(--c-danger);
+    border-color: var(--c-danger);
+    color: var(--brilliant-white);
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}

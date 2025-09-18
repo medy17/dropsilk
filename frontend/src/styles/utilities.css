@@ -1,0 +1,51 @@
+.hidden {
+    display: none !important;
+}
+
+.spinner {
+    animation: rotate 2s linear infinite;
+    width: 1em;
+    height: 1em;
+}
+
+.spinner .path {
+    stroke: currentColor;
+    stroke-linecap: round;
+    animation: dash 1.5s ease-in-out infinite;
+}
+
+.pulse-effect {
+    position: relative;
+    overflow: visible !important;
+    z-index: 1;
+}
+
+.pulse-effect .pulse-ring:nth-of-type(1) {
+    animation-delay: 0s;
+}
+
+.pulse-effect .pulse-ring:nth-of-type(2) {
+    animation-delay: 0.8s;
+}
+
+.pulse-effect .pulse-ring:nth-of-type(3) {
+    animation-delay: 1.6s;
+}
+
+.pulse-ring {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border-radius: 14px;
+    animation-name: pulse-animation;
+    animation-duration: 2.5s;
+    animation-timing-function: ease-out;
+    animation-iteration-count: infinite;
+    pointer-events: none;
+    opacity: 0;
+    border-style: solid;
+    border-width: 1px;
+}

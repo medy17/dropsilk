@@ -1,0 +1,62 @@
+/* === XLSX Preview Styles === */
+.xlsx-preview-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.xlsx-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    border-bottom: 2px solid var(--c-panel-border);
+    flex-shrink: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-primary) transparent;
+}
+.xlsx-tabs::-webkit-scrollbar {
+    height: 4px;
+}
+.xlsx-tabs::-webkit-scrollbar-thumb {
+    background-color: var(--c-primary);
+    border-radius: 4px;
+}
+.xlsx-tab-btn {
+    padding: 0.75rem 1.25rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--c-text-secondary);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.xlsx-tab-btn:hover {
+    background-color: rgba(91, 206, 250, 0.08);
+    color: var(--c-primary);
+}
+.xlsx-tab-btn.active {
+    color: var(--c-primary);
+    border-bottom-color: var(--c-primary);
+}
+.xlsx-sheets {
+    flex-grow: 1;
+    overflow: auto;
+}
+.xlsx-sheet table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85em;
+}
+.xlsx-sheet th, .xlsx-sheet td {
+    padding: 0.5rem;
+    border: 1px solid var(--c-panel-border);
+    text-align: left;
+    white-space: nowrap;
+}
+.xlsx-sheet th {
+    background-color: rgba(91, 206, 250, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}

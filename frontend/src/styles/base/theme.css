@@ -1,0 +1,113 @@
+body[data-theme="dark"] .aurora-background {
+    opacity: 1;
+}
+
+body[data-theme="dark"] .main-content {
+    background: #fff0;
+}
+
+body[data-theme="dark"] .not-found-content {
+    background: #fff0;
+}
+
+body[data-theme="dark"] #theme-toggle .sun-icon {
+    display: block;
+}
+
+body[data-theme="dark"] #theme-toggle .moon-icon {
+    display: none;
+}
+
+body[data-theme="dark"] .not-found-title {
+    text-shadow: none;
+    background: -webkit-linear-gradient(var(--c-primary), var(--c-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #fff0;
+}
+
+body[data-theme="dark"] .tagline-section {
+    border: 1.5px solid rgb(245 169 184 / .3);
+}
+
+body[data-theme="dark"] .tagline-section h1 {
+    text-shadow: none;
+}
+
+body[data-theme="dark"] .flight-ticket-panel-wrapper {
+    filter: drop-shadow(0 0 15px rgb(91 206 250 / .1));
+}
+
+body[data-theme="dark"] .flight-ticket {
+    box-shadow: 0 4px 32px 0 rgb(0 0 0 / .2), 0 1.5px 0 0 var(--c-secondary);
+}
+
+body[data-theme="dark"] .flight-ticket h2 {
+    text-shadow: none;
+}
+
+body[data-theme="dark"] #dashboard-flight-code {
+    outline: none;
+}
+
+body[data-theme="dark"] #dashboard-flight-code .copy-feedback {
+    background: var(--dark-bg-root);
+}
+
+body[data-theme="dark"] .btn {
+    outline: none;
+}
+
+body[data-theme="dark"] .drop-zone.drag-over {
+    box-shadow: 0 8px 32px rgb(0 0 0 / .3), 0 0 0 2px rgb(91 206 250 / .3), inset 0 1px 0 rgb(255 255 255 / .05);
+}
+
+body[data-theme="dark"] .file-details__name {
+    -webkit-mask-image: -webkit-linear-gradient(to right, var(--dark-bg-base) 90%, transparent 100%);
+    mask-image: linear-gradient(to right, var(--dark-bg-base) 90%, transparent 100%);
+}
+
+body[data-theme="dark"] .zip-file-list {
+    background: rgb(255 255 255 / .02);
+}
+
+body[data-theme="dark"] #zip-modal-warning-footer {
+    background-color: rgb(248 113 113 / .08);
+    border-color: rgb(248 113 113 / .3);
+}
+
+
+
+body[data-theme="dark"] .pdf-page-canvas {
+    box-shadow: 0 2px 10px rgb(0 0 0 / .4);
+    filter: brightness(.9);
+}
+
+body[data-theme="dark"] .pdf-page-container {
+    background-color: #2c2c34;
+    box-shadow: 0 2px 10px rgb(0 0 0 / .4);
+}
+
+body[data-theme="dark"] .boarding-overlay {
+    background: var(--dark-bg-root);
+}
+
+body[data-theme="light"] .settings-menu {
+    background: rgb(255 255 255 / .9);
+}
+
+body[data-theme="light"] .settings-menu button {
+    color: var(--c-text-primary);
+}
+
+body[data-theme="dark"].video-modal-active .aurora-background,
+body[data-theme="dark"].video-modal-active .aurora-blob {
+    animation-play-state: paused;
+}
+
+#theme-toggle .sun-icon {
+    display: none;
+}
+
+#theme-toggle .moon-icon {
+    display: block;
+}

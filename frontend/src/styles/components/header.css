@@ -1,0 +1,101 @@
+.header {
+    width: 100%;
+    padding: 1.5em 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background: var(--c-header-bg);
+    border-bottom: 0 solid var(--c-header-border);
+    transition: background 0.3s ease, border-color 0.3s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.header .logo {
+    font-size: 1.5em;
+    font-weight: 800;
+    color: var(--c-primary);
+    display: flex;
+    align-items: center;
+    gap: .5em;
+    text-decoration: none;
+    min-width: 0;
+}
+
+.header .logo img {
+    height: 1.8em;
+    vertical-align: middle;
+    width: auto;
+    max-width: 100%;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+#donateBtnHeader {
+    display: none;
+}
+
+.header-nav-link {
+    background: none;
+    border: none;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: .95rem;
+    color: var(--c-text-secondary);
+    cursor: pointer;
+    padding: .5em;
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, transform 0.1s ease-out;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    min-width: 38px;
+    min-height: 38px;
+}
+
+.header-nav-link:hover {
+    color: var(--c-primary);
+    outline: none;
+    background-color: rgb(91 206 250 / .08);
+}
+
+.header-nav-link:hover svg {
+    color: var(--c-primary);
+}
+
+.header-nav-link:focus {
+    color: var(--c-primary);
+    outline: none;
+    background-color: rgb(91 206 250 / .08);
+}
+
+.header-nav-link:focus svg {
+    color: var(--c-primary);
+}
+
+.header-nav-link:active {
+    transform: translateY(0) scale(.97);
+    transition-duration: 0.1s;
+}
+
+.header-nav-link svg {
+    transition: color 0.2s ease-in-out;
+    width: 22px;
+    height: 22px;
+    vertical-align: middle;
+}
+
+.brand-text {
+    font-size: clamp(1rem, 4vw, 2rem);
+    white-space: nowrap;
+    transition: font-size 0.2s;
+}

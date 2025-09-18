@@ -1,0 +1,97 @@
+.drop-zone {
+    border: 2px dashed var(--c-dropzone-border);
+    text-align: center;
+    padding: 3rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background-color: var(--c-dropzone-bg);
+    transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+    position: relative;
+    overflow: hidden;
+    min-height: 290px;
+}
+
+.drop-zone.disabled {
+    cursor: not-allowed;
+    border-style: solid;
+    filter: grayscale(80%);
+    opacity: .6;
+}
+
+.drop-zone.disabled * {
+    pointer-events: none;
+    user-select: none;
+}
+
+.drop-zone.disabled .drop-zone__icon {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.drop-zone.disabled .drop-zone__buttons {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.drop-zone.drag-over {
+    border-color: var(--c-primary);
+    background: var(--c-dropzone-hover-bg);
+    transform: scale(1.02);
+    box-shadow: 0 8px 32px rgb(91 206 250 / .15), 0 0 0 2px rgb(91 206 250 / .3), inset 0 1px 0 rgb(255 255 255 / .2);
+}
+
+.drop-zone.drag-over::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgb(91 206 250 / .3), transparent);
+    animation: shimmer 1.5s infinite;
+    pointer-events: none;
+}
+
+.drop-zone.drag-over .drop-zone__icon {
+    color: var(--c-primary);
+    transform: scale(1.1);
+    filter: drop-shadow(0 4px 8px rgb(91 206 250 / .3));
+}
+
+.drop-zone.drag-over p {
+    color: var(--c-primary);
+    font-weight: 700;
+}
+
+.drop-zone.drag-over .secondary-text {
+    color: var(--c-secondary);
+    font-weight: 600;
+}
+
+.drop-zone.drag-active {
+    border-color: var(--c-secondary);
+    background: linear-gradient(135deg, rgb(245 169 184 / .15), rgb(91 206 250 / .08));
+    transform: scale(1.05);
+}
+
+.drop-zone.drag-active .drop-zone__icon {
+    color: var(--c-secondary);
+    animation: bounce 0.6s ease-in-out infinite alternate;
+}
+
+.drop-zone p {
+    margin: 0;
+    font-weight: 600;
+}
+
+.drop-zone__icon {
+    color: var(--c-primary);
+}
+
+.drop-zone__buttons {
+    display: flex;
+    gap: 1rem;
+}

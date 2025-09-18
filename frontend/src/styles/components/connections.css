@@ -1,0 +1,84 @@
+#connection-panel-list {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.network-user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .75rem;
+    border-radius: 12px;
+    background: linear-gradient(90deg, rgb(91 206 250 / .05) 0%, rgb(245 169 184 / .04) 100%);
+    transition: background 0.2s ease;
+}
+
+.network-user-item:hover {
+    background: linear-gradient(90deg, rgb(91 206 250 / .1) 0%, rgb(245 169 184 / .08) 100%);
+}
+
+.network-user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.network-user-name {
+    font-weight: 600;
+}
+
+.network-user-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .8em;
+    color: var(--c-text-secondary);
+    opacity: .8;
+}
+
+.btn.invite-user-btn {
+    padding: .5em 1em;
+    font-size: .85em;
+}
+
+.invite-user-btn:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+    background: #fff0;
+    border-color: var(--c-text-secondary);
+    color: var(--c-text-secondary);
+}
+
+.inflight-user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .75rem;
+    border-radius: 12px;
+    background: linear-gradient(90deg, rgb(91 206 250 / .05) 0%, rgb(245 169 184 / .04) 100%);
+}
+
+.inflight-user-details {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.inflight-user-name {
+    font-weight: 600;
+}
+
+.user-badge {
+    font-size: .75em;
+    font-weight: 700;
+    padding: .2em .6em;
+    border-radius: 99px;
+    background-color: var(--c-primary);
+    color: var(--brilliant-white);
+    text-transform: uppercase;
+}
+
+.inflight-user-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .8em;
+    color: var(--c-text-secondary);
+    opacity: .8;
+}

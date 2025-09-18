@@ -1,0 +1,62 @@
+.site-footer {
+    background-color: var(--c-footer-bg);
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--c-footer-border);
+    font-size: .9em;
+    color: var(--c-text-secondary);
+    margin-top: auto;
+    transition: background 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.footer-copyright {
+    flex-shrink: 0;
+}
+
+.footer-nav {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+.footer-nav-link {
+    background: none;
+    border: none;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+    font-size: 1em;
+    color: var(--c-text-secondary);
+    cursor: pointer;
+    padding: .5em;
+    border-radius: 6px;
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, transform 0.1s ease-out;
+    text-decoration: none;
+}
+
+.footer-nav-link:hover {
+    color: var(--c-primary);
+    background-color: rgb(91 206 250 / .08);
+    outline: none;
+}
+
+.footer-nav-link:focus {
+    color: var(--c-primary);
+    background-color: rgb(91 206 250 / .08);
+    outline: none;
+}
+
+.footer-nav-link:active {
+    transform: translateY(0) scale(.97);
+    transition-duration: 0.1s;
+}

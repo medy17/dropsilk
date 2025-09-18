@@ -1,0 +1,95 @@
+.docx-preview-container {
+    padding: 2rem;
+    line-height: 1.6;
+    background-color: var(--c-bg);
+    color: var(--c-text-primary);
+    overflow-wrap: break-word;
+}
+
+.docx-preview-container p {
+    margin-bottom: 1em;
+}
+
+.docx-preview-container h1 {
+    margin-top: 1.5em;
+    margin-bottom: .5em;
+    font-weight: 700;
+    color: var(--c-primary);
+}
+
+.docx-preview-container h2 {
+    margin-top: 1.5em;
+    margin-bottom: .5em;
+    font-weight: 700;
+    color: var(--c-primary);
+}
+
+.docx-preview-container h3 {
+    margin-top: 1.5em;
+    margin-bottom: .5em;
+    font-weight: 700;
+    color: var(--c-primary);
+}
+
+.docx-preview-container h4 {
+    margin-top: 1.5em;
+    margin-bottom: .5em;
+    font-weight: 700;
+    color: var(--c-primary);
+}
+
+.docx-preview-container h5 {
+    margin-top: 1.5em;
+    margin-bottom: .5em;
+    font-weight: 700;
+    color: var(--c-primary);
+}
+
+.docx-preview-container h6 {
+    margin-top: 1.5em;
+    margin-bottom: .5em;
+    font-weight: 700;
+    color: var(--c-primary);
+}
+
+.docx-preview-container ul {
+    padding-left: 2em;
+    margin-bottom: 1em;
+}
+
+.docx-preview-container ol {
+    padding-left: 2em;
+    margin-bottom: 1em;
+}
+
+.docx-preview-container li {
+    margin-bottom: .5em;
+}
+
+.docx-preview-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+.docx-preview-container th {
+    border: 1px solid var(--c-panel-border);
+    padding: .5em;
+    text-align: left;
+    background-color: rgb(91 206 250 / .1);
+}
+
+.docx-preview-container td {
+    border: 1px solid var(--c-panel-border);
+    padding: .5em;
+    text-align: left;
+}
+
+.docx-preview-container a {
+    color: var(--c-secondary);
+    text-decoration: underline;
+}
+
+.docx-preview-container a:hover {
+    color: var(--c-primary);
+}

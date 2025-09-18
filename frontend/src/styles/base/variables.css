@@ -1,0 +1,47 @@
+:root {
+    --brilliant-blue: #5bcefa;
+    --brilliant-pink: #f5a9b8;
+    --brilliant-white: #ffffff;
+    --dark-bg-base: #18181b;
+    --dark-bg-root: #111113;
+    --c-bg: var(--brilliant-white);
+    --c-text-primary: var(--dark-bg-base);
+    --c-text-secondary: #888;
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+    --c-panel-bg: var(--brilliant-white);
+    --c-panel-border: var(--brilliant-pink);
+    --c-panel-shadow: 0 8px 25px rgba(91, 206, 250, 0.07);
+    --c-header-bg: var(--c-panel-bg);
+    --c-header-border: transparent;
+    --c-footer-bg: var(--c-panel-bg);
+    --c-footer-border: #f0f0f0;
+    --c-dropzone-bg: #fafdff;
+    --c-dropzone-border: var(--c-panel-border);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(91, 206, 250, 0.12), rgba(245, 169, 184, 0.08));
+    --c-progress-track: #e0e0e0;
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(91, 206, 250, 0.12) 0%, rgba(245, 169, 184, 0.10) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(245, 169, 184, 0.12) 0%, rgba(91, 206, 250, 0.08) 100%);
+    --c-success: #50c878;
+    --c-danger: #ef4444;
+}
+
+body[data-theme="dark"] {
+    --c-bg: var(--dark-bg-root);
+    --c-text-primary: #f4f4f5;
+    --c-text-secondary: #a1a1aa;
+    --c-panel-bg: var(--dark-bg-base);
+    --c-panel-border: rgba(245, 169, 184, 0.4);
+    --c-panel-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.2);
+    --c-header-bg: rgba(24, 24, 27, 0.01);
+    --c-footer-bg: #111113;
+    --c-footer-border: rgba(255, 255, 255, 0.1);
+    --c-dropzone-bg: rgba(255, 255, 255, 0.02);
+    --c-dropzone-border: rgba(245, 169, 184, 0.25);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(91, 206, 250, 0.1), rgba(245, 169, 184, 0.08));
+    --c-progress-track: #37373d;
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(91, 206, 250, 0.15) 0%, rgba(245, 169, 184, 0.12) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(245, 169, 184, 0.15) 0%, rgba(91, 206, 250, 0.10) 100%);
+    --c-success: #3ec6a8;
+    --c-danger: #f87171;
+}

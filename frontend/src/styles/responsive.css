@@ -1,0 +1,304 @@
+@media (min-width: 768px) {
+    .header {
+        padding: 1.5em 2em;
+    }
+
+    .header-nav {
+        gap: 1.5rem;
+    }
+
+    #dashboard {
+        padding: 8rem 2rem 2rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .brand-text {
+        white-space: normal;
+    }
+}
+
+@media (max-width: 350px) {
+    .brand-text {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .not-found-content {
+        padding: 2rem 1.5rem;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .controls-left {
+        gap: .5rem;
+    }
+
+    .controls-right {
+        gap: .5rem;
+    }
+
+    .controls-right .download-btn {
+        display: none;
+    }
+
+    .time-container {
+        display: none;
+    }
+}
+
+@media (min-width: 992px) {
+    .main-content {
+        flex-direction: row;
+    }
+
+    .tagline-section {
+        text-align: left;
+        padding-right: 3em;
+        margin-bottom: 0;
+    }
+
+    .tagline-section p {
+        margin: 0;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 2fr 1fr;
+    }
+
+    .grid-col-span-2 {
+        grid-column: span 2 / span 2;
+    }
+
+    .dashboard-footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .invite-modal {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+
+    .share-actions {
+        gap: .8rem;
+    }
+
+    .share-btn {
+        padding: .9rem 1.2rem;
+        font-size: .9rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .file-action-btn--complete.is-entering,
+    .file-action-group.is-entering {
+        animation: none;
+        transform: none;
+        opacity: 1;
+    }
+}
+
+/* Standard responsive behavior for small viewports */
+@media (max-width: 550px) {
+    .flight-actions .btn span:not([class]) {
+        display: none;
+    }
+
+    .flight-actions .btn {
+        width: 44px; /* A standard, touch-friendly size */
+        height: 44px;
+        padding: 0;
+        justify-content: center;
+    }
+}
+
+/* === Responsive Navigation Logic === */
+@media (max-width: 991px) {
+    /* Show the hamburger button */
+    .drawer-toggle-btn {
+        display: flex;
+    }
+
+    #scanQrBtn {
+        display: inline-flex;
+        margin-top: 0.5rem;
+    }
+
+    .drawer-nav-link:active {
+        /* Make the background slightly darker than hover for a clear press effect */
+        background-color: rgba(91, 206, 250, 0.15);
+        color: var(--c-primary);
+        /* Add a subtle "push in" effect on tap */
+        transform: scale(0.95);
+    }
+
+    #donateBtnHeader {
+        display: flex;
+    }
+
+    #donateBtnHeader svg {
+        width: 22px;
+        height: 22px;
+        display: block;
+    }
+
+    /* Hide the text-based header links */
+    .header-nav #aboutBtn,
+    .header-nav #contactBtn {
+        display: none;
+    }
+    /* Make all header SVGs render consistently */
+    .header-nav-link svg {
+        width: var(--header-icon-size, 22px);
+        height: var(--header-icon-size, 22px);
+        display: block; /* avoids inline baseline gaps */
+    }
+
+    /* Ko‑fi has more internal padding → bump it slightly */
+    .header-nav-link svg#ko-fi {
+        transform: scale(1.3);
+        transform-origin: 50% 50%;
+        transform-box: fill-box; /* centre the scale on the path, not the box */
+    }
+
+    #drawer-toggle svg.bi-list {
+        transform: scale(1.3);
+        transform-origin: 50% 50%;
+        transform-box: fill-box;
+    }
+
+    /* Hide the entire footer navigation */
+    .footer-nav {
+        display: none;
+    }
+
+    /* Center the copyright text in the footer on mobile */
+    .footer-content {
+        justify-content: center;
+    }
+
+    /* --- Mobile Modal Animation Overrides --- */
+    .modal-overlay {
+        display: flex;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 1rem;
+    }
+
+    .modal-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .modal-overlay .invite-modal {
+        /* 1. Override desktop animation: set initial state to be off-screen RIGHT */
+        transform: translateX(100%);
+        opacity: 0.8; /* Start slightly transparent for a smoother entry */
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+        will-change: transform;
+
+        /* Consolidate other styles from 768px breakpoint */
+        max-width: 95vw;
+        max-height: 85vh;
+        border-radius: 16px;
+    }
+
+    .modal-overlay.show .invite-modal {
+        /* 2. Animate TO this state: on-screen and fully opaque */
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    /* 3. Override child element animations to match */
+    .modal-overlay .modal-header,
+    .modal-overlay .modal-body,
+    .modal-overlay .flight-code-display,
+    .modal-overlay .qr-section,
+    .modal-overlay .share-actions {
+        /* Initial state: slightly offset to the right */
+        transform: translateX(20px);
+    }
+
+    .modal-overlay.show .modal-header,
+    .modal-overlay.show .modal-body,
+    .modal-overlay.show .flight-code-display,
+    .modal-overlay.show .qr-section,
+    .modal-overlay.show .share-actions {
+        /* Animate TO this state: in the final position */
+        transform: translateX(0);
+    }
+
+    /* Consolidating .onboarding-tooltip styles from 768px breakpoint */
+    .onboarding-tooltip {
+        max-width: calc(100vw - 32px);
+        min-width: 280px;
+        padding: 1.25rem;
+        font-size: 0.95rem;
+    }
+    .onboarding-tooltip h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    .onboarding-tooltip p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+    .onboarding-tooltip .btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Responsive adjustments for the privacy toast */
+@media (max-width: 600px) {
+    #privacy-consent-toast {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+        width: auto;
+        transform: translateY(150%);
+    }
+
+    #privacy-consent-toast.show {
+        transform: translateY(0);
+    }
+
+    .privacy-toast-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    html {
+        font-size: 85%;
+    }
+
+}
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+    .modal-overlay,
+    .modal-overlay .invite-modal {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .file-action-btn--complete.is-entering,
+    .file-action-group.is-entering {
+        animation: none;
+        transform: none;
+        opacity: 1;
+    }
+}
+

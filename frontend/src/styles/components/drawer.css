@@ -1,0 +1,119 @@
+.drawer-toggle-btn {
+    display: none; /* Hidden by default, shown on mobile */
+}
+
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(24, 24, 27, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9998;
+    display: none;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+}
+.drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 300px;
+    max-width: 80vw;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    background: var(--c-panel-bg);
+    border-radius: 20px 0 0 20px;
+    border-left: 2px solid var(--c-panel-border);
+    box-shadow: -10px 0 30px rgba(91, 206, 250, 0.07);
+    --drawer-translate-x: 100%;
+    --drawer-scale: 1;
+    transform: translateX(var(--drawer-translate-x)) scale(var(--drawer-scale));
+}
+
+
+.drawer.drawer-ready {
+    transition: transform 1s cubic-bezier(.4, 0, 0.2, 1);
+}
+
+.drawer.drawer-exiting {
+    transform: scale(0.95) translateX(30px); /* Recede and move slightly right */
+    opacity: 0;
+    transition: transform 1s ease-in, opacity 0.2s ease-in;
+    will-change: transform, opacity;
+}
+
+
+body[data-theme="dark"] .drawer {
+    box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+    border-left-color: rgba(245, 169, 184, 0.4);
+}
+
+body.drawer-open {
+    overflow: hidden;
+}
+
+body.drawer-open .drawer-overlay {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+body.drawer-open .drawer {
+    --drawer-translate-x: 0;
+    will-change: transform;
+}
+
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid var(--c-primary);
+    flex-shrink: 0;
+}
+
+.drawer-header h3 {
+    margin: 0;
+    color: var(--c-primary);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.drawer-nav {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem 0.75rem;
+}
+
+.drawer-nav-link {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.9rem 1rem;
+    background: none;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--c-text-secondary);
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, transform 0.1s ease-out;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.drawer-nav-link:hover {
+    background-color: rgba(91, 206, 250, 0.1);
+    color: var(--c-primary);
+}
+
+.drawer-divider {
+    border: 0;
+    height: 1px;
+    background-color: var(--c-panel-border);
+    margin: 0.75rem 1.5rem;
+}

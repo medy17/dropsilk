@@ -1,6 +1,6 @@
 // js/app.js
 // This is the main entry point for the application.
-import "../styles.css"; // load for vite
+import "../styles/index.css"; // load for vite
 import { store } from "./state.js";
 import { renderUserName, showBoardingOverlay } from "./ui/view.js";
 import { initializeEventListeners } from "./ui/events.js";

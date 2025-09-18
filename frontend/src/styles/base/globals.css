@@ -1,0 +1,85 @@
+@view-transition {
+    navigation: auto;
+}
+
+body {
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    background: var(--c-bg);
+    color: var(--c-text-primary);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body.use-system-font {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Force elements with specific fonts to inherit from the body when system font is active */
+body.use-system-font .header-nav-link,
+body.use-system-font .footer-nav-link,
+body.use-system-font .ticket-actions,
+body.use-system-font #video-player-container {
+    font-family: inherit;
+}
+
+/* Protect elements that MUST remain monospace */
+body.use-system-font .not-found-title,
+body.use-system-font .flight-ticket h2,
+body.use-system-font .flight-code-input-wrapper input,
+body.use-system-font #dashboard-flight-code,
+body.use-system-font .network-user-id,
+body.use-system-font .inflight-user-id,
+body.use-system-font .time-container,
+body.use-system-font .flight-code-display .code,
+body.use-system-font #boarding-flight-code,
+body.use-system-font #zipSelectionInfo,
+body.use-system-font .audio-time {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+    font-size: 100%;
+    line-height: inherit;
+    margin: 0;
+}
+
+body.dragging * {
+    pointer-events: none;
+}
+
+body.dragging .drop-zone {
+    pointer-events: all;
+}
+
+body.sortable-drag {
+    cursor: grabbing !important;
+}
+
+body.sortable-drag * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+*::before {
+    box-sizing: border-box;
+}
+
+*::after {
+    box-sizing: border-box;
+}

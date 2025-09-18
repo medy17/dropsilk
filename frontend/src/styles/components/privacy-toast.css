@@ -1,0 +1,40 @@
+#privacy-consent-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translate(-50%, 150%); /* Start off-screen */
+    background-color: var(--c-panel-bg);
+    color: var(--c-text-primary);
+    border: 2px solid var(--c-primary);
+    border-radius: 16px;
+    box-shadow: var(--c-panel-shadow);
+    padding: 1.25rem;
+    max-width: 500px;
+    width: calc(100% - 3rem);
+    z-index: 1500;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    display: none; /* Initially hidden */
+}
+
+#privacy-consent-toast.show {
+    transform: translate(-50%, 0);
+}
+
+.privacy-toast-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.privacy-toast-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--c-text-secondary);
+    flex-grow: 1;
+}
+
+.privacy-toast-content .btn {
+    flex-shrink: 0;
+    padding: 0.75rem 1.25rem;
+}

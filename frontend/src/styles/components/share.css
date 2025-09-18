@@ -1,0 +1,55 @@
+.qr-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.qr-container {
+    background: linear-gradient(135deg, rgb(91 206 250 / .08), rgb(245 169 184 / .05));
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border: 1.5px solid rgb(91 206 250 / .2);
+    box-shadow: 0 4px 16px rgb(91 206 250 / .1), inset 0 1px 0 rgb(255 255 255 / .1);
+}
+
+.qr-container canvas {
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgb(91 206 250 / .15);
+}
+
+.qr-description {
+    color: var(--c-text-secondary);
+    font-size: .9rem;
+    margin-top: 1rem;
+    line-height: 1.4;
+}
+
+.share-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.flight-code-display {
+    background: linear-gradient(135deg, rgb(91 206 250 / .15), rgb(245 169 184 / .1));
+    border: 1.5px solid var(--c-primary);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.flight-code-display .code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--c-primary);
+    letter-spacing: .2em;
+    margin-bottom: .5rem;
+}
+
+.flight-code-display .label {
+    color: var(--c-text-secondary);
+    font-size: .85rem;
+    font-weight: 500;
+}

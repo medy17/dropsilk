@@ -1,0 +1,138 @@
+.zip-file-list {
+    max-height: 40vh;
+    overflow-y: auto;
+    border: 2px solid var(--c-panel-border);
+    border-radius: 12px;
+    padding: .5rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(90deg, rgb(91 206 250 / .02) 0%, rgb(245 169 184 / .01) 100%);
+    transition: border-color 0.3s, opacity 0.3s;
+}
+
+.zip-file-item {
+    display: flex;
+    align-items: center;
+    padding: .75rem;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+    font-weight: 500;
+}
+
+.zip-file-item:hover {
+    background-color: rgb(91 206 250 / .08);
+}
+
+.zip-file-details {
+    flex-grow: 1;
+    min-width: 0;
+    padding-left: .5rem;
+}
+
+.zip-file-name {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    color: var(--c-text-primary);
+}
+
+.zip-file-size {
+    display: block;
+    font-size: .9em;
+    color: var(--c-text-secondary);
+}
+
+.zip-actions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: .95em;
+    padding: 0 .25rem;
+    transition: opacity 0.3s;
+}
+
+.zip-actions-header .checkbox-label {
+    font-weight: 500;
+}
+
+#zipSelectionInfo {
+    color: var(--c-text-secondary);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .9em;
+}
+
+#zipModal.settings-mode .modal-footer {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--c-panel-border);
+}
+
+#zipModal.settings-mode .zip-actions-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: .5rem;
+}
+
+#zipModal.settings-mode #zipSelectionInfo {
+    white-space: normal;
+    line-height: 1.5;
+    color: var(--c-text-secondary);
+}
+
+#downloadSelectedBtn:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-text-secondary);
+    color: var(--c-text-secondary);
+    box-shadow: none;
+    transform: none;
+}
+
+#downloadSelectedBtn:disabled:hover {
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-text-secondary);
+    color: var(--c-text-secondary);
+    transform: none;
+    box-shadow: none;
+}
+
+#downloadSelectedBtn:hover {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgb(91 206 250 / .2);
+}
+
+.spinner-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+#zip-modal-warning-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: rgb(239 68 68 / .05);
+    border: 1px solid rgb(239 68 68 / .2);
+    padding: 1rem;
+    border-radius: 12px;
+}
+
+.zip-warning-text {
+    color: var(--c-danger);
+    font-size: .95em;
+    line-height: 1.5;
+    margin: 0;
+    text-align: center;
+}
+
+.zip-warning-text strong {
+    font-weight: 700;
+}
+
+.zip-warning-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: .75rem;
+}

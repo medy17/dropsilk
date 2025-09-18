@@ -1,0 +1,239 @@
+.queue-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem .5rem;
+    border-bottom: 1px solid var(--c-panel-border);
+}
+
+.queue-item:last-child {
+    border-bottom: none;
+}
+
+.queue-item:hover .drag-handle {
+    opacity: 1;
+    color: var(--c-primary);
+}
+
+.queue-item.is-sending {
+    opacity: 0.8;
+}
+
+.queue-item.is-sending .drag-handle {
+    display: none;
+}
+
+.queue-item.sortable-chosen {
+    cursor: grabbing;
+    box-shadow: var(--c-panel-shadow);
+    transform: scale(1.02);
+    background: var(--c-panel-bg);
+}
+
+.queue-item.sortable-ghost {
+    opacity: 0.3;
+    background: var(--c-dropzone-hover-bg);
+}
+
+.file-icon {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, rgb(91 206 250 / .1), rgb(245 169 184 / .1));
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    transition: box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgb(91 206 250 / .06);
+}
+
+.file-icon svg {
+    width: 28px;
+    height: 28px;
+    display: block;
+}
+
+.file-icon:hover {
+    box-shadow: 0 2px 8px rgb(91 206 250 / .18);
+    background: linear-gradient(135deg, rgb(91 206 250 / .18), rgb(245 169 184 / .18));
+}
+
+.file-icon:focus {
+    box-shadow: 0 2px 8px rgb(91 206 250 / .18);
+    background: linear-gradient(135deg, rgb(91 206 250 / .18), rgb(245 169 184 / .18));
+}
+
+.file-details {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.file-details__name {
+    font-weight: 600;
+    margin-bottom: .3em;
+    white-space: nowrap;
+    overflow: hidden;
+    -webkit-mask-image: -webkit-linear-gradient(to right, black 90%, transparent 100%);
+    mask-image: linear-gradient(to right, black 90%, transparent 100%);
+}
+
+.file-details__name span {
+    display: inline-block;
+    padding-right: 2rem;
+}
+
+.file-details__name:hover span {
+    animation: marquee-scroll 8s linear infinite alternate;
+}
+
+.file-details__progress-bar {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: var(--c-progress-track);
+    border: none;
+    accent-color: var(--c-primary);
+}
+
+.file-details__progress-bar::-webkit-progress-bar {
+    background-color: var(--c-progress-track);
+    border-radius: 4px;
+}
+
+.file-details__progress-bar::-webkit-progress-value {
+    background: linear-gradient(90deg, #3ec6a8 0%, #7fead2 100%);
+    border-radius: 4px;
+}
+
+.file-details__progress-bar::-moz-progress-bar {
+    background: linear-gradient(90deg, #3ec6a8 0%, #7fead2 100%);
+    border-radius: 4px;
+}
+
+.file-details__status {
+    font-size: .8em;
+    color: var(--c-text-secondary);
+    display: flex;
+    justify-content: space-between;
+    margin-top: .3em;
+}
+
+.file-action {
+    flex-shrink: 0;
+    min-width: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-left: 1rem;
+}
+
+.file-action a {
+    text-decoration: none;
+}
+
+.file-action a:active {
+    transform: translateY(0) scale(.97);
+    transition-duration: 0.1s;
+}
+
+.file-action-group {
+    display: flex;
+    gap: .75rem;
+}
+
+.file-action-group .file-action-btn.preview-btn {
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-secondary);
+    color: var(--c-secondary);
+}
+
+.file-action-group .file-action-btn.preview-btn:hover {
+    background: var(--c-secondary);
+    color: var(--brilliant-white);
+    box-shadow: 0 4px 12px rgb(245 169 184 / .25);
+}
+
+#sending-queue {
+    position: relative;
+}
+
+#receiver-queue {
+    position: relative;
+}
+
+.queue-collapsible {
+    max-height: 380px;
+    overflow: hidden;
+    padding-bottom: 3.5rem;
+    -webkit-mask-image: -webkit-linear-gradient(to bottom, black calc(100% - 80px), transparent 100%);
+    mask-image: linear-gradient(to bottom, black calc(100% - 80px), transparent 100%);
+}
+
+.expand-queue-btn {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    padding: .6em 1.2em;
+    font-size: .9em;
+}
+
+.expand-queue-btn:hover {
+    transform: translateX(-50%) translateY(-1px);
+}
+
+.expand-queue-btn:active {
+    transform: translateX(-50%) scale(.97);
+}
+
+.drag-handle {
+    flex-shrink: 0;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: var(--c-text-secondary);
+    opacity: 0.5;
+    transition: opacity 0.2s, color 0.2s;
+}
+
+.sortable-fallback {
+    display: none !important;
+}
+
+button.file-action-btn.file-action-btn--complete:disabled {
+    /* Fallback colour (older browsers) */
+    background-color: var(--c-success);
+
+    /* Fancy gradient */
+    background: linear-gradient(
+            90deg,
+            rgb(80 200 120 / 0.18) 0%,
+            rgb(127 234 210 / 0.15) 100%
+    );
+    border-color: var(--c-success);
+    color: var(--c-success);
+
+    opacity: 1; /* undo framework greying */
+    filter: none; /* undo any grayscale */
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+/* Ensure we start hidden before the animation applies */
+.is-entering {
+    transform: scale(0);
+    opacity: 0;
+    will-change: transform, opacity; /* GPU-friendly */
+}
+
+.file-action-btn--complete.is-entering,
+.file-action-group.is-entering {
+    animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+

@@ -1,0 +1,59 @@
+.boarding-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--c-bg);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.boarding-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.boarding-overlay.show .boarding-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.boarding-content {
+    text-align: center;
+    color: var(--c-text-primary);
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: opacity 0.4s ease 0.2s, transform 0.4s ease 0.2s;
+}
+
+.boarding-content .spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 1.5rem;
+    color: var(--c-primary);
+}
+
+.boarding-content h2 {
+    font-size: 1.8rem;
+    margin: 0 0 .5rem 0;
+    color: var(--c-primary);
+}
+
+.boarding-content p {
+    font-size: 1rem;
+    color: var(--c-text-secondary);
+    margin: 0;
+}
+
+#boarding-flight-code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    color: var(--c-secondary);
+    letter-spacing: .1em;
+}

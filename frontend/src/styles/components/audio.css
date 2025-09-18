@@ -1,0 +1,46 @@
+.audio-preview-container {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+#waveform {
+    cursor: pointer;
+}
+.audio-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+}
+.audio-btn {
+    background: var(--c-panel-bg);
+    border: 2px solid var(--c-secondary);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--c-primary);
+    transition: all 0.2s ease;
+}
+.audio-btn:hover {
+    background-color: var(--c-primary);
+    color: var(--brilliant-white);
+    border-color: var(--c-primary);
+    transform: scale(1.05);
+}
+.audio-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+.audio-time {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--c-text-secondary);
+    font-size: 1rem;
+    min-width: 110px;
+    text-align: center;
+}

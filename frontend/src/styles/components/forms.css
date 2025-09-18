@@ -1,0 +1,237 @@
+.flight-code-input-wrapper {
+    display: flex;
+    background: var(--c-panel-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1.5px solid var(--c-primary);
+    box-shadow: 0 1px 4px rgb(91 206 250 / .04);
+    transition: border-color 0.2s, background 0.3s ease;
+}
+
+.flight-code-input-wrapper:focus-within {
+    border-color: var(--c-secondary);
+}
+
+.flight-code-input-wrapper.input-error {
+    border-color: var(--c-danger);
+    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+
+.flight-code-input-wrapper input {
+    flex: 1 1 auto;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 1em;
+    width: calc(1ch * 6 + 1.5em);
+    background: none;
+    border: none;
+    color: var(--c-text-primary);
+    padding: 1em 1em;
+    outline: none;
+    text-align: center;
+    box-sizing: content-box;
+    text-transform: uppercase;
+}
+
+.flight-code-input-wrapper button {
+    width: auto;
+    background: none;
+    color: var(--c-primary);
+    padding: .5em .8em;
+    cursor: pointer;
+    font-size: 1.8em;
+    border-radius: 10px;
+    border: none;
+    transition: color 0.2s, transform 0.1s ease-out;
+}
+
+.flight-code-input-wrapper button:hover {
+    color: var(--c-secondary);
+    background: rgb(91 206 250 / .08);
+    outline: none;
+}
+
+.flight-code-input-wrapper button:focus {
+    color: var(--c-secondary);
+    background: rgb(91 206 250 / .08);
+    outline: none;
+}
+
+.flight-code-input-wrapper button:active {
+    transform: translateY(0) scale(.97);
+    transition-duration: 0.1s;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    gap: .75rem;
+}
+
+.checkbox-label:hover .custom-checkbox {
+    border-color: var(--c-primary);
+}
+
+.custom-checkbox-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.custom-checkbox-input:checked + .custom-checkbox {
+    background-color: var(--c-primary);
+    border-color: var(--c-primary);
+    transform: scale(1.05);
+}
+
+.custom-checkbox-input:checked + .custom-checkbox::after {
+    display: block;
+    transform: rotate(45deg) scale(1);
+}
+
+.custom-checkbox {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: var(--c-panel-bg);
+    border: 2px solid var(--c-text-secondary);
+    border-radius: 6px;
+    transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
+    flex-shrink: 0;
+}
+
+.custom-checkbox::after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--brilliant-white);
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.2s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Switch slider */
+.switch {
+    --sw-w: 52px;        /* total width */
+    --sw-h: 28px;        /* total height */
+    --sw-pad: 3px;       /* inner padding */
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0; /* Prevent the control from being squished */
+    width: var(--sw-w);
+    height: var(--sw-h);
+}
+
+.switch-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-track {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--c-progress-track);
+    border: 1.5px solid var(--c-panel-border);
+    box-sizing: border-box;
+    overflow: hidden; /* keeps the thumb inside */
+    transition: background 0.2s, border-color 0.2s;
+    padding: var(--sw-pad);
+}
+
+.switch-thumb {
+    position: absolute;
+    top: 50%;
+    left: var(--sw-pad);
+    transform: translateY(-50%); /* only move vertically */
+    box-sizing: border-box;      /* include border in width/height */
+    width: calc(var(--sw-h) - var(--sw-pad) * 2);
+    height: calc(var(--sw-h) - var(--sw-pad) * 2);
+    border-radius: 50%;
+    background: var(--c-panel-bg);
+    border: 2px solid var(--c-text-secondary);
+    transition: left 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.switch-input:checked + .switch-track {
+    background: linear-gradient(135deg, rgba(91, 206, 250, 0.35), rgba(245, 169, 184, 0.25));
+    border-color: var(--c-primary);
+}
+
+
+.switch-input:checked + .switch-track .switch-thumb {
+    left: auto;
+    right: var(--sw-pad);
+    transform: translateY(-50%);
+    background: var(--c-primary);
+    border-color: var(--c-primary);
+}
+/* Tri-state segmented control */
+.segmented {
+    display: inline-flex;
+    background: var(--c-panel-bg);
+    border: 1.5px solid var(--c-panel-border);
+    border-radius: 999px;
+    overflow: hidden;
+    flex-shrink: 0; /* Prevent the control from being squished */
+}
+.segmented .seg-btn {
+    padding: 0.4rem 0.8rem;
+    font-weight: 600;
+    border: none;
+    background: none;
+    color: var(--c-text-secondary);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.segmented .seg-btn:hover {
+    background: rgb(91 206 250 / .12);
+}
+.segmented .seg-btn.active {
+    background: var(--c-primary);
+    color: var(--brilliant-white);
+}
+
+/* Number input for settings */
+.settings-number-input {
+    background: var(--c-panel-bg);
+    border: 1.5px solid var(--c-panel-border);
+    border-radius: 8px;
+    color: var(--c-text-primary);
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    text-align: right;
+    width: 80px; /* Adjust width as needed */
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    -moz-appearance: textfield; /* Firefox */
+}
+
+.settings-number-input::-webkit-outer-spin-button,
+.settings-number-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.settings-number-input:focus {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 2px rgba(91, 206, 250, 0.2);
+}

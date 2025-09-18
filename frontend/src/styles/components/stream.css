@@ -1,0 +1,163 @@
+/* --- Stream Panel Styles --- */
+.stream-panel {
+    position: relative;
+}
+
+#remote-video, #local-video {
+    width: 100%;
+    border-radius: 8px;
+    background: #000;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+}
+
+.stream-controls {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    display: flex;
+    gap: .5rem;
+}
+
+.stream-controls .btn-icon {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    justify-content: center;
+    background: rgba(24, 24, 27, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--brilliant-white);
+}
+
+.stream-controls .btn-icon:hover {
+    background: rgba(24, 24, 27, 0.7);
+    color: var(--c-primary);
+    transform: scale(1.1);
+}
+
+/* Polished Quality Menu */
+.stream-settings-menu {
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 0;
+    background: rgba(24, 24, 27, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 8px;
+    padding: .5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: none;
+    width: 160px;
+    z-index: 20;
+    transform-origin: top right;
+    animation: scale-in 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.stream-settings-menu button {
+    width: 100%;
+    text-align: left;
+    padding: .5rem .75rem;
+    border-radius: 4px;
+    font-size: .9rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--brilliant-white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.stream-settings-menu button:hover {
+    background-color: var(--c-primary);
+    color: var(--brilliant-white);
+}
+
+.stream-settings-menu button.active {
+    background-color: var(--c-secondary);
+    color: var(--brilliant-white);
+    font-weight: 600;
+}
+
+.stream-settings-menu button.active::after {
+    content: '✔';
+    font-size: .8em;
+}
+
+
+/* --- Immersive Fullscreen --- */
+#screen-share-panel:fullscreen {
+    background-color: #000;
+    border: none;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+#screen-share-panel:fullscreen #remote-video {
+    border-radius: 0;
+    height: 100%;
+}
+
+#screen-share-panel.is-fullscreen .fullscreen-btn .icon-enter-fs {
+    display: none;
+}
+#screen-share-panel.is-fullscreen .fullscreen-btn .icon-exit-fs {
+    display: block;
+}
+.fullscreen-btn .icon-exit-fs {
+    display: none;
+}
+
+/* --- Flight Actions & Share Button --- */
+.flight-actions .btn {
+    padding: .7em 1.2em;
+    font-size: .85em;
+    flex-shrink: 0;
+}
+
+.flight-actions .btn:disabled {
+    cursor: not-allowed;
+    opacity: .6;
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-text-secondary);
+    color: var(--c-text-secondary);
+    box-shadow: none;
+    transform: none;
+}
+.flight-actions .btn:disabled:hover {
+    transform: none;
+}
+
+.flight-actions .btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+#shareScreenBtn.is-sharing {
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-secondary);
+    color: var(--c-secondary);
+}
+
+#shareScreenBtn.is-sharing:hover {
+    background: var(--c-secondary);
+    color: var(--brilliant-white);
+    border-color: var(--c-primary);
+}
+
+#shareScreenBtn .icon-stop {
+    display: none;
+}
+
+#shareScreenBtn.is-sharing .icon-start {
+    display: none;
+}
+
+#shareScreenBtn.is-sharing .icon-stop {
+    display: block;
+}

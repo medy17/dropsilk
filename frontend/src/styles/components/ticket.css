@@ -1,0 +1,105 @@
+.flight-ticket-panel-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    perspective: 1000px;
+}
+
+.flight-ticket {
+    background: var(--c-panel-bg);
+    color: var(--c-text-primary);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 4px 32px 0 rgb(91 206 250 / .07), 0 1.5px 0 0 var(--c-secondary);
+    border: 1.5px solid var(--c-primary);
+    transition: box-shadow 0.2s, background 0.3s ease, color 0.3s ease, transform 0.4s ease-out;
+    transform-style: preserve-3d;
+    position: relative;
+    overflow: hidden;
+}
+
+.flight-ticket h2 {
+    font-family: "IBM Plex Mono", monospace;
+    margin: 0;
+    font-weight: 700;
+    color: var(--c-primary);
+    letter-spacing: .02em;
+    text-shadow: 0 1px 0 #fff, 0 0 2px #fff;
+}
+
+.flight-ticket p {
+    opacity: .8;
+    margin: .5rem 0 1.5rem 0;
+    color: var(--c-text-primary);
+}
+
+.ticket-actions {
+    font-family: "IBM Plex Sans";
+    display: flex;
+    flex-direction: column;
+    gap: .8em;
+}
+
+.ticket-actions button {
+    width: 100%;
+    padding: 1em;
+    font-size: 1em;
+    border-radius: 12px;
+    border: 1.5px solid var(--c-primary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s, transform 0.1s ease-out;
+    background: var(--c-btn-primary-bg);
+    color: var(--c-primary);
+    box-shadow: 0 1px 4px rgb(91 206 250 / .06);
+}
+
+.ticket-actions button:hover {
+    background: var(--c-primary);
+    color: var(--brilliant-white);
+    border-color: var(--c-secondary);
+    outline: none;
+}
+
+.ticket-actions button:focus {
+    background: var(--c-primary);
+    color: var(--brilliant-white);
+    border-color: var(--c-secondary);
+    outline: none;
+}
+
+.ticket-actions button:active {
+    transform: translateY(0) scale(.97);
+    transition-duration: 0.1s;
+}
+
+.or-separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1em 0;
+    color: var(--c-primary);
+    opacity: .6;
+    font-weight: 500;
+    font-size: .95em;
+}
+
+.or-separator::before {
+    content: '';
+    flex: 1;
+    border-bottom: 2px dashed var(--c-secondary);
+}
+
+.or-separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 2px dashed var(--c-secondary);
+}
+
+.or-separator:not(:empty)::before {
+    margin-right: .5em;
+}
+
+.or-separator:not(:empty)::after {
+    margin-left: .5em;
+}
