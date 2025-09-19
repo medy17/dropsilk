@@ -111,3 +111,21 @@ body[data-theme="dark"].video-modal-active .aurora-blob {
 #theme-toggle .moon-icon {
     display: block;
 }
+
+body[data-theme="dark"] .ticket-actions .btn-secondary {
+    background: var(--c-btn-primary-bg);
+    color: var(--c-primary);
+    border-color: var(--c-primary);
+    backdrop-filter: none;
+}
+
+body[data-theme="dark"] .ticket-actions .btn-secondary:hover {
+    background: var(--c-primary);
+    color: var(--brilliant-white);
+    border-color: var(--c-secondary);
+}
+
+body[data-theme="dark"] .otp-input {
+    background-color: var(--c-panel-bg);
+    border: 1.5px solid var(--c-primary);
+}
