@@ -93,11 +93,14 @@ export function initializeEventListeners() {
         const inputs = Array.from(otpWrapper.querySelectorAll('.otp-input'));
 
         const forceCaretAtEnd = (input) => {
-            setTimeout(() => {
-                if (document.activeElement === input) {
-                    input.setSelectionRange(input.value.length, input.value.length);
-                }
-            }, 0);
+            // Only force if the caret isn't already at the end
+            if (document.activeElement === input && input.selectionStart !== input.value.length) {
+                setTimeout(() => {
+                    if (document.activeElement === input) {
+                        input.setSelectionRange(input.value.length, input.value.length);
+                    }
+                }, 0);
+            }
         };
 
         const updateInputStates = (focusedInput = null) => {
@@ -115,17 +118,36 @@ export function initializeEventListeners() {
             inputs.forEach((input, index) => {
                 const isActive = index === activeSlotIndex;
 
-                if (input.value) {
-                    input.classList.add('filled');
-                } else {
-                    input.classList.remove('filled');
+                // 1. Update 'filled' class only if it has changed
+                const hasValue = !!input.value;
+                if (hasValue !== input.classList.contains('filled')) {
+                    input.classList.toggle('filled', hasValue);
                 }
 
-                input.classList.toggle('inactive', !isActive);
-                input.classList.toggle('locked', !isActive);
-                input.toggleAttribute('disabled', index > activeSlotIndex);
-                input.toggleAttribute('readonly', index < activeSlotIndex);
-                input.setAttribute('tabindex', isActive ? '0' : '-1');
+                // 2. Update 'inactive'/'locked' classes only if they have changed
+                const shouldBeInactive = !isActive;
+                if (shouldBeInactive !== input.classList.contains('inactive')) {
+                    input.classList.toggle('inactive', shouldBeInactive);
+                    input.classList.toggle('locked', shouldBeInactive);
+                }
+
+                // 3. Update 'disabled' attribute only if it has changed
+                const shouldBeDisabled = index > activeSlotIndex;
+                if (shouldBeDisabled !== input.disabled) {
+                    input.disabled = shouldBeDisabled;
+                }
+
+                // 4. Update 'readonly' attribute only if it has changed
+                const shouldBeReadonly = index < activeSlotIndex;
+                if (shouldBeReadonly !== input.readOnly) {
+                    input.readOnly = shouldBeReadonly;
+                }
+
+                // 5. Update 'tabindex' attribute only if it has changed
+                const newTabIndex = isActive ? '0' : '-1';
+                if (input.getAttribute('tabindex') !== newTabIndex) {
+                    input.setAttribute('tabindex', newTabIndex);
+                }
             });
 
             const activeInput = inputs[activeSlotIndex];
