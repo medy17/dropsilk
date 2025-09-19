@@ -103,7 +103,7 @@ export function initializeEventListeners() {
             }
         };
 
-        const updateInputStates = (focusedInput = null) => {
+        const updateInputStates = (focusedInput = null, shouldAutoFocus = true) => {
             let firstEmptyIndex = -1;
             for (let i = 0; i < inputs.length; i++) {
                 if (!inputs[i].value) {
@@ -150,23 +150,27 @@ export function initializeEventListeners() {
                 }
             });
 
-            const activeInput = inputs[activeSlotIndex];
-            if (activeInput && document.activeElement !== activeInput) {
-                activeInput.focus();
-            }
+            // Only auto-focus if shouldAutoFocus is true
+            if (shouldAutoFocus) {
+                const activeInput = inputs[activeSlotIndex];
+                if (activeInput && document.activeElement !== activeInput) {
+                    activeInput.focus();
+                }
 
-            const inputToForceCaretOn = focusedInput || activeInput;
-            if (inputToForceCaretOn) {
-                forceCaretAtEnd(inputToForceCaretOn);
+                const inputToForceCaretOn = focusedInput || activeInput;
+                if (inputToForceCaretOn) {
+                    forceCaretAtEnd(inputToForceCaretOn);
+                }
             }
         };
 
-        updateInputStates();
-        window.updateOtpInputStates = updateInputStates;
+        // Initialize states without auto-focusing on first load
+        updateInputStates(null, false);
+        window.updateOtpInputStates = (focusedInput = null) => updateInputStates(focusedInput, true);
 
         otpWrapper.addEventListener('focusin', (e) => {
             if (e.target.classList.contains('otp-input')) {
-                updateInputStates(e.target);
+                updateInputStates(e.target, true);
             }
         });
 
@@ -201,7 +205,7 @@ export function initializeEventListeners() {
             if (target.value && target.nextElementSibling) {
                 setTimeout(() => target.nextElementSibling.focus(), 0);
             }
-            updateInputStates(target);
+            updateInputStates(target, true);
         });
 
         otpWrapper.addEventListener('keydown', (e) => {
@@ -251,7 +255,7 @@ export function initializeEventListeners() {
                     attemptToJoinFlight();
                     break;
             }
-            updateInputStates(document.activeElement);
+            updateInputStates(document.activeElement, true);
         });
 
         otpWrapper.addEventListener('paste', (e) => {
@@ -269,7 +273,7 @@ export function initializeEventListeners() {
                 otpWrapper.classList.remove('input-error');
                 lastOtpErrorSnapshot = null;
             }
-            updateInputStates();
+            updateInputStates(null, true);
         });
     }
 
