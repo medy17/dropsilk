@@ -137,16 +137,19 @@ export function handlePeerLeft() {
     renderNetworkUsersView();
 }
 
-// js/network/websocket.js -> handleServerError function
-
 async function handleServerError(message) {
     console.error("Server error:", message);
     if (message.includes("Flight not found")) {
         audioManager.play('error');
         if (navigator.vibrate) navigator.vibrate([75, 50, 75, 50, 75]);
-        const { uiElements } = await import('../ui/dom.js'); // Import uiElements object
-        uiElements.flightCodeInputWrapper.classList.add('input-error'); // Access the property
-        setTimeout(() => uiElements.flightCodeInputWrapper.classList.remove('input-error'), 1500);
+
+        const { setOtpInputError } = await import('../ui/events.js');
+        const { uiElements } = await import('../ui/dom.js');
+
+        const inputs = uiElements.flightCodeInputWrapper.querySelectorAll('.otp-input');
+        const currentCode = Array.from(inputs).map(input => input.value).join('').toUpperCase();
+
+        setOtpInputError(currentCode);
 
         showToast({
             type: 'danger',

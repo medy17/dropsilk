@@ -246,14 +246,14 @@
                 </button>
                 <div class="or-separator">OR</div>
                 <div class="flight-code-input-wrapper">
-                    <input
-                            id="flightCodeInput"
-                            type="text"
-                            placeholder="TRJXØD"
-                            value=""
-                            maxlength="6"
-                            pattern="[A-Za-z0-9]{6}"
-                    />
+                    <div class="otp-input-container">
+                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="T">
+                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="R">
+                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="J">
+                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="X">
+                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="Ø">
+                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="D">
+                    </div>
                     <button id="joinFlightBtn" aria-label="Join Flight">➤</button>
                 </div>
                 <p

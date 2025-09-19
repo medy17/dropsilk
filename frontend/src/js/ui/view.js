@@ -55,7 +55,13 @@ export function enterFlightMode(flightCode) {
 export function exitFlightMode() {
     uiElements.setupContainer.style.display = "flex";
     uiElements.dashboard.style.display = "none";
-    uiElements.flightCodeInput.value = "";
+    const inputs = uiElements.flightCodeInputWrapper?.querySelectorAll('.otp-input');
+    if (inputs) {
+        inputs.forEach(input => input.value = "");
+        // Assuming updateInputStates is made globally available or imported
+        // It will re-enable the first input and disable others
+        if (typeof window.updateOtpInputStates === 'function') window.updateOtpInputStates();
+    }
     uiElements.sendingQueueDiv.innerHTML = '<div class="empty-state">Select files to send</div>';
     uiElements.receiverQueueDiv.innerHTML = '<div class="empty-state">Waiting for incoming files</div>';
     store.actions.clearReceivedFiles();

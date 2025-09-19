@@ -9,7 +9,6 @@ export const uiElements = {
     userNameDisplay: document.getElementById("userNameDisplay"),
     createFlightBtn: document.getElementById("createFlightBtn"),
     joinFlightBtn: document.getElementById("joinFlightBtn"),
-    flightCodeInput: document.getElementById("flightCodeInput"),
     flightCodeInputWrapper: document.querySelector('.flight-code-input-wrapper'),
 
     // Scan QR Code
