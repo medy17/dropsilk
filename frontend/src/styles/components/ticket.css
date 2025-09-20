@@ -18,6 +18,10 @@
     overflow: hidden;
 }
 
+.flight-ticket.allow-pulse-overflow {
+    overflow: visible;
+}
+
 .flight-ticket h2 {
     font-family: "IBM Plex Mono", monospace;
     margin: 0;

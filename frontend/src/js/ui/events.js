@@ -14,6 +14,7 @@ import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 import { showToast } from '../utils/toast.js';
 import QrScanner from 'qr-scanner';
 import Sortable from 'sortablejs';
+import { clearAllPulseEffects } from './view.js';
 
 // Snapshot of OTP entered when last error was triggered
 let lastOtpErrorSnapshot = null;
@@ -82,6 +83,8 @@ function initializeSortableQueue() {
 
 export function initializeEventListeners() {
     uiElements.createFlightBtn?.addEventListener('click', () => {
+        localStorage.setItem('hasSeenCreateFlightPulse', 'true');
+        clearAllPulseEffects();
         store.actions.setIsFlightCreator(true);
         sendMessage({ type: 'create-flight' });
     });

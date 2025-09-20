@@ -2,7 +2,7 @@
 // This is the main entry point for the application.
 import "../styles/index.css"; // load for vite
 import { store } from "./state.js";
-import { renderUserName, showBoardingOverlay } from "./ui/view.js";
+import { renderUserName, showBoardingOverlay, initializeOnboardingPulses } from "./ui/view.js";
 import { initializeEventListeners } from "./ui/events.js";
 import { initializeModals } from "./ui/modals.js";
 import { connect as connectWebSocket } from "./network/websocket.js";
@@ -31,6 +31,9 @@ function initializeAppCore(isInvitedUser = false) {
 
     // Render the initial user name on the ticket.
     renderUserName();
+
+    // Show visual cues like pulsing buttons for new users.
+    initializeOnboardingPulses();
 
     // Connect to the signaling server.
     connectWebSocket();

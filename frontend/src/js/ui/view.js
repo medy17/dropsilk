@@ -30,6 +30,12 @@ function addPulseEffect(element) {
     if (!element || element.querySelector('.pulse-ring')) return;
     element.classList.add('pulse-effect');
     element.insertAdjacentHTML('beforeend', `<span class="pulse-ring"></span><span class="pulse-ring"></span><span class="pulse-ring"></span>`);
+
+    // Allow the parent ticket (if it exists) to overflow so the pulse isn't clipped.
+    const parentTicket = element.closest('.flight-ticket');
+    if (parentTicket) {
+        parentTicket.classList.add('allow-pulse-overflow');
+    }
 }
 
 export function clearAllPulseEffects() {
@@ -37,6 +43,17 @@ export function clearAllPulseEffects() {
         element.classList.remove('pulse-effect');
         element.querySelectorAll('.pulse-ring').forEach(ring => ring.remove());
     });
+    // Clean up any overflow overrides on flight tickets.
+    document.querySelectorAll('.flight-ticket.allow-pulse-overflow').forEach(ticket => {
+        ticket.classList.remove('allow-pulse-overflow');
+    });
+}
+
+export function initializeOnboardingPulses() {
+    const hasSeenCreateFlightPulse = localStorage.getItem('hasSeenCreateFlightPulse') === 'true';
+    if (!hasSeenCreateFlightPulse && uiElements.createFlightBtn) {
+        addPulseEffect(uiElements.createFlightBtn);
+    }
 }
 
 export function renderUserName() {
