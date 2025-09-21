@@ -94,10 +94,12 @@
     <link
             href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&display=swap"
             rel="stylesheet"
+            fetchpriority="high"
     />
     <link
             href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap"
             rel="stylesheet"
+            fetchpriority="high"
     />
 </head>
 <body>
@@ -113,6 +115,7 @@
     <a href="#" class="logo" onclick="location.reload()">
         <img
                 src="/logo.webp"
+                fetchpriority="high"
                 alt="DropSilk Logo - unlimited private sharing - no sign up"
         />
         <span class="brand-text">Drop<wbr />Silk</span>
@@ -1339,7 +1342,7 @@
         <div class="modal-body">
             <iframe
                     id="kofiframe"
-                    src="https://ko-fi.com/medy17/?hidefeed=true&widget=true&embed=true&preview=true"
+                    data-src="https://ko-fi.com/medy17/?hidefeed=true&widget=true&embed=true&preview=true"
                     style="border: none; width: 100%; padding: 4px; background: #f9f9f9"
                     height="712"
                     title="medy17"
@@ -1485,6 +1488,6 @@
 </script>
 
 <script src="/video.js" defer></script>
-<script type="module" src="src/js/app.js"></script>
+<script type="module" src="src/js/app.js" fetchpriority="high"></script>
 </body>
 </html>

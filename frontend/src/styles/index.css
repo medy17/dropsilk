@@ -1,8 +1,3 @@
-/* 
-  Import order is based on the legacy `styles.css` file structure 
-  to maintain the correct cascade.
-*/
-
 /* 1. Base Styles */
 @import "base/variables.css";
 @import "base/globals.css";

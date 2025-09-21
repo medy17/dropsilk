@@ -451,6 +451,31 @@ export function initializeEventListeners() {
     });
 
     setupDragAndDrop();
+    setupDonateButton();
+}
+
+function setupDonateButton() {
+    const donateButtons = [
+        document.getElementById('donateBtnHeader'),
+        document.getElementById('ko-fiBtn'),
+    ];
+    const kofiIframe = document.getElementById('kofiframe');
+
+    if (!kofiIframe) return;
+
+    const loadKoFi = () => {
+        if (kofiIframe.getAttribute('src')) return; // Already loaded
+        const src = kofiIframe.getAttribute('data-src');
+        if (src) {
+            kofiIframe.setAttribute('src', src);
+        }
+    };
+
+    donateButtons.forEach((btn) => {
+        if (btn) {
+            btn.addEventListener('click', loadKoFi);
+        }
+    });
 }
 
 function setupDragAndDrop() {
