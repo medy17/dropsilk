@@ -1,6 +1,7 @@
 // js/ui/view.js
 // Contains functions for rendering UI updates based on application state.
 
+import i18next from "../i18n.js";
 import { uiElements } from './dom.js';
 import { store } from '../state.js';
 import { getFileIcon, formatBytes } from '../utils/helpers.js';
@@ -79,8 +80,8 @@ export function exitFlightMode() {
         // It will re-enable the first input and disable others
         if (typeof window.updateOtpInputStates === 'function') window.updateOtpInputStates();
     }
-    uiElements.sendingQueueDiv.innerHTML = '<div class="empty-state">Select files to send</div>';
-    uiElements.receiverQueueDiv.innerHTML = '<div class="empty-state">Waiting for incoming files</div>';
+    uiElements.sendingQueueDiv.innerHTML = `<div class="empty-state">${i18next.t('selectFilesToSend')}</div>`;
+    uiElements.receiverQueueDiv.innerHTML = `<div class="empty-state">${i18next.t('waitingForIncomingFiles')}</div>`;
     store.actions.clearReceivedFiles();
     updateReceiverActions();
 }
@@ -92,7 +93,7 @@ function setDashboardFlightCode(code) {
     if (!btn.querySelector('.copy-feedback')) {
         const feedback = document.createElement('span');
         feedback.className = 'copy-feedback';
-        feedback.textContent = 'Copied!';
+        feedback.textContent = i18next.t('copied');
         btn.appendChild(feedback);
     }
 }
@@ -113,7 +114,7 @@ export function updateDashboardStatus(text, type) {
 
 export function renderNetworkUsersView() {
     const { lastNetworkUsers, currentFlightCode, isFlightCreator } = store.getState();
-    uiElements.connectionPanelTitle.textContent = "Users on Your Network";
+    uiElements.connectionPanelTitle.textContent = i18next.t('usersOnYourNetwork');
     const list = uiElements.connectionPanelList;
     list.innerHTML = '';
 
@@ -127,7 +128,7 @@ export function renderNetworkUsersView() {
     }
 
     if (lastNetworkUsers.length === 0) {
-        list.innerHTML = '<div class="empty-state">No other users found on your network.</div>';
+        list.innerHTML = `<div class="empty-state">${i18next.t('noOtherUsersFoundOnNetwork')}</div>`;
         return;
     }
 
@@ -137,10 +138,10 @@ export function renderNetworkUsersView() {
         userEl.innerHTML = `
             <div class="network-user-details">
                 <span class="network-user-name">${user.name}</span>
-                <span class="network-user-id">ID: ${user.id}</span>
+                <span class="network-user-id">${i18next.t('userId', { id: user.id })}</span>
             </div>
-            <button class="btn btn-primary invite-user-btn" data-invitee-id="${user.id}" ${!currentFlightCode ? 'disabled title="Create or join a flight to invite users"' : ''}>
-                Invite
+            <button class="btn btn-primary invite-user-btn" data-invitee-id="${user.id}" ${!currentFlightCode ? `disabled title="${i18next.t('createOrJoinFlightToInvite')}"` : ''}>
+                ${i18next.t('invite')}
             </button>`;
         list.appendChild(userEl);
 
@@ -154,28 +155,28 @@ export function renderNetworkUsersView() {
 export function renderInFlightView() {
     const { peerInfo, myId, myName } = store.getState();
     if (!peerInfo) return;
-    uiElements.connectionPanelTitle.textContent = "In Flight With";
+    uiElements.connectionPanelTitle.textContent = i18next.t('inFlightWith');
     uiElements.connectionPanelList.innerHTML = `
         <div class="inflight-user-item">
-            <div class="inflight-user-details"><span class="inflight-user-name">${myName}</span><span class="user-badge">You</span></div>
-            <span class="inflight-user-id">ID: ${myId}</span>
+            <div class="inflight-user-details"><span class="inflight-user-name">${myName}</span><span class="user-badge">${i18next.t('you')}</span></div>
+            <span class="inflight-user-id">${i18next.t('userId', { id: myId })}</span>
         </div>
         <div class="inflight-user-item">
             <div class="inflight-user-details"><span class="inflight-user-name">${peerInfo.name}</span></div>
-            <span class="inflight-user-id">ID: ${peerInfo.id}</span>
+            <span class="inflight-user-id">${i18next.t('userId', { id: peerInfo.id })}</span>
         </div>`;
 }
 
 export function disableDropZone() {
     uiElements.dropZone.classList.add('disabled');
-    uiElements.dropZoneText.textContent = 'Waiting for a peer to connect...';
-    uiElements.dropZoneSecondaryText.textContent = 'You can invite them using the button above.';
+    uiElements.dropZoneText.textContent = i18next.t('waitingForPeer');
+    uiElements.dropZoneSecondaryText.textContent = i18next.t('invitePeer');
 }
 
 export function enableDropZone() {
     uiElements.dropZone.classList.remove('disabled');
-    uiElements.dropZoneText.textContent = 'Drag & Drop files or folders';
-    uiElements.dropZoneSecondaryText.textContent = 'or select manually';
+    uiElements.dropZoneText.textContent = i18next.t('dragAndDrop');
+    uiElements.dropZoneSecondaryText.textContent = i18next.t('orSelectManually');
 }
 
 export function showLocalStreamView(stream, qualityChangeCallback) {
@@ -284,10 +285,10 @@ export function updateShareButton(isSharing) {
     const textSpan = btn.querySelector('span:not([class])');
     if (isSharing) {
         btn.classList.add('is-sharing');
-        if (textSpan) textSpan.textContent = btn.dataset.textStop;
+        if (textSpan) textSpan.textContent = i18next.t('stopSharing');
     } else {
         btn.classList.remove('is-sharing');
-        if (textSpan) textSpan.textContent = btn.dataset.textStart;
+        if (textSpan) textSpan.textContent = i18next.t('shareScreen');
     }
 }
 

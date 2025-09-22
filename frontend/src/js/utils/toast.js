@@ -1,6 +1,7 @@
 // js/utils/toast.js
 // Manages the creation and display of toast notifications.
 
+import i18next from "../i18n.js";
 import { uiElements } from '../ui/dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
@@ -73,8 +74,8 @@ export function showInvitationToast(fromName, flightCode) {
 
     showToast({
         type: 'info',
-        title: 'Flight Invitation',
-        body: `<b>${fromName}</b> has invited you to a flight.`,
+        title: i18next.t('flightInvitation'),
+        body: i18next.t('flightInvitationDescription', { fromName }),
         duration: 15000,
         actions: [
             {

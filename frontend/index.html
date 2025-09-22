@@ -121,8 +121,8 @@
         <span class="brand-text">Drop<wbr />Silk</span>
     </a>
     <nav class="header-nav">
-        <button id="aboutBtn" class="header-nav-link">About</button>
-        <button id="contactBtn" class="header-nav-link">Contact</button>
+        <button id="aboutBtn" class="header-nav-link" data-i18n="about">About</button>
+        <button id="contactBtn" class="header-nav-link" data-i18n="contact">Contact</button>
         <button id="donateBtnHeader" class="header-nav-link icon-only" aria-label="Donate">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="ko-fi" width = "22" height="22" fill="currentColor">
                 <path d="M2.608,19.5c0,0,8.267-0.023,11.966-0.048c2.438-0.418,2.683-2.517,2.658-3.663c4.352,0.235,7.422-2.777,6.649-6.784C23.108,4.998,19.022,4.5,19.022,4.5H0.723c-0.604,0-0.679,0.783-0.679,0.783s-0.082,7.184-0.022,11.596C0.186,19.257,2.608,19.5,2.608,19.5z M17.31,7.373h1.77c0,0,1.971,0.541,1.971,2.588c0,1.877-0.985,2.616-2.059,2.958c-0.928,0.114-1.682,0.027-1.682,0.027V7.373z M4.265,8.766C5.216,7.775,7.27,7.701,8.628,9.165c0,0,1.565-1.748,3.468-0.945c1.904,0.804,1.832,2.953,0.723,4.229c-1.246,1.425-4.011,3.9-4.011,3.9s-0.121,0.117-0.31,0.023c-0.076-0.056-0.108-0.088-0.108-0.088c-0.443-0.432-3.368-2.991-4.034-3.878C3.647,11.459,3.315,9.757,4.265,8.766z"></path>
@@ -183,12 +183,12 @@
 </div>
 <div class="main-content">
     <div class="tagline-section">
-        <h1>UNLIMITED.<br />SECURE.<br />SWIFT.</h1>
-        <p>
+        <h1 data-i18n="tagline">UNLIMITED.<br />SECURE.<br />SWIFT.</h1>
+        <p data-i18n="taglineDescription">
             Instantly share files, device to device. No cloud. No server. Just
             like a dance: it takes two to tango.
         </p>
-        <p>
+        <p data-i18n="getStarted">
             <strong>To get started, create a flight and invite another user
                 :)</strong>
         </p>
@@ -196,10 +196,10 @@
     <div class="flight-ticket-panel-wrapper">
         <div class="flight-ticket">
             <h2 id="userNameDisplay"></h2>
-            <p>Your file transfer ticket</p>
+            <p data-i18n="yourFileTransferTicket">Your file transfer ticket</p>
             <div class="ticket-actions">
-                <button id="createFlightBtn">Create a Flight</button>
-                <button id="scanQrBtn" class="btn btn-secondary">
+                <button id="createFlightBtn" data-i18n="createFlight">Create a Flight</button>
+                <button id="scanQrBtn" class="btn btn-secondary" data-i18n="scanQrCodeInvite">
                     <svg
                             viewBox="0 0 20 20"
                             width="20"
@@ -247,7 +247,7 @@
                     />
                 </svg>
                 </button>
-                <div class="or-separator">OR</div>
+                <div class="or-separator" data-i18n="or">OR</div>
                 <div class="flight-code-input-wrapper">
                     <div class="otp-input-container">
                         <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="T">
@@ -265,6 +265,7 @@
                 opacity: 0.9;
                 margin-top: 0.5em;
               "
+                        data-i18n="enterFlightCodeToJoin"
                 >
                     ENTER FLIGHT CODE TO JOIN
                 </p>
@@ -276,14 +277,14 @@
     <div id="dashboard-header" class="panel">
         <div class="flight-info">
             <div class="flight-info__code">
-                FLIGHT
+                <span data-i18n="flight">FLIGHT</span>
                 <button
                         id="dashboard-flight-code"
                         type="button"
                         title="Copy code to clipboard"
                 ></button>
             </div>
-            <div class="flight-info__status" id="dashboard-flight-status">
+            <div class="flight-info__status" id="dashboard-flight-status" data-i18n="readyToConnect">
                 Ready to connect
             </div>
         </div>
@@ -319,7 +320,7 @@
                       d="M4.646 3.146a.5.5 0 0 1 .708 0L8 5.793l2.646-2.647a.5.5 0 0 1 .708.708L8.707 6.501l2.647 2.646a.5.5 0 1 1-.708.708L8 7.209l-2.646 2.646a.5.5 0 1 1-.708-.708l2.647-2.646-2.647-2.647a.5.5 0 0 1 0-.708z"
               /></svg>
             </span>
-                <span>Share Screen</span>
+                <span data-i18n="shareScreen">Share Screen</span>
             </button>
             <button class="btn btn-primary" id="inviteBtn">
                 <svg
@@ -331,7 +332,7 @@
                 ><path
                         d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"
                 /></svg>
-                <span>Invite</span>
+                <span data-i18n="invite">Invite</span>
             </button>
             <button class="btn btn-secondary" id="leaveFlightBtnDashboard">
                 <svg
@@ -347,7 +348,7 @@
                         fill-rule="evenodd"
                         d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"
                 /></svg>
-                <span>Leave</span>
+                <span data-i18n="leave">Leave</span>
             </button>
         </div>
     </div>
@@ -357,7 +358,7 @@
             class="panel stream-panel grid-col-span-2 hidden"
     >
         <div class="panel-header">
-            <h3>Your Stream Preview</h3>
+            <h3 data-i18n="yourStreamPreview">Your Stream Preview</h3>
             <div class="stream-controls">
                 <div class="settings-menu-container">
                     <button
@@ -369,12 +370,12 @@
                         </svg>
                     </button>
                     <div class="stream-settings-menu">
-                        <button data-quality="quality">Quality</button>
-                        <button data-quality="clarity">Clarity</button>
-                        <button data-quality="smoothness" class="active">
+                        <button data-quality="quality" data-i18n="quality">Quality</button>
+                        <button data-quality="clarity" data-i18n="clarity">Clarity</button>
+                        <button data-quality="smoothness" class="active" data-i18n="smoothness">
                             Smoothness (Default)
                         </button>
-                        <button data-quality="performance">Performance</button>
+                        <button data-quality="performance" data-i18n="performance">Performance</button>
                     </div>
                 </div>
             </div>
@@ -387,7 +388,7 @@
             class="panel stream-panel grid-col-span-2 hidden"
     >
         <div class="panel-header">
-            <h3>Screen Share</h3>
+            <h3 data-i18n="screenShare">Screen Share</h3>
             <div class="stream-controls">
                 <button
                         id="fullscreen-stream-btn"
@@ -420,8 +421,8 @@
                         d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 1.5v3A1.5 1.5 0 0 0 11 6h3v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v.5z"
                 /></svg>
             </div>
-            <p>Drag & Drop files or folders</p>
-            <span class="secondary-text">or select manually</span>
+            <p data-i18n="dragAndDrop">Drag & Drop files or folders</p>
+            <span class="secondary-text" data-i18n="orSelectManually">or select manually</span>
             <div class="drop-zone__buttons">
                 <label for="fileInput_transfer" class="btn btn-primary">
                     <svg
@@ -448,7 +449,7 @@
                                 stroke-linecap="round"
                         />
                     </svg>
-                    Select Files
+                    <span data-i18n="selectFiles">Select Files</span>
                 </label>
                 <button class="btn btn-secondary">
                     <svg
@@ -475,7 +476,7 @@
                                 fill="none"
                         />
                     </svg>
-                    Select Folder
+                    <span data-i18n="selectFolder">Select Folder</span>
                 </button>
             </div>
             <input
@@ -487,35 +488,35 @@
         </div>
         <div class="panel">
             <div class="panel-header">
-                <h3 id="connection-panel-title">Users on Your Network</h3>
+                <h3 id="connection-panel-title" data-i18n="usersOnYourNetwork">Users on Your Network</h3>
             </div>
             <div id="connection-panel-list">
-                <div class="empty-state">No other users found.</div>
+                <div class="empty-state" data-i18n="noOtherUsersFound">No other users found.</div>
             </div>
         </div>
         <div class="panel grid-col-span-2">
-            <div class="panel-header"><h3>Sending Queue</h3></div>
+            <div class="panel-header"><h3 data-i18n="sendingQueue">Sending Queue</h3></div>
             <div id="sending-queue">
-                <div class="empty-state">Select files to send</div>
+                <div class="empty-state" data-i18n="selectFilesToSend">Select files to send</div>
             </div>
         </div>
         <div class="panel grid-col-span-2">
             <div class="panel-header">
-                <h3>Receiver Queue</h3>
+                <h3 data-i18n="receiverQueue">Receiver Queue</h3>
                 <div id="receiver-actions" style="display: none">
-                    <button id="downloadAllBtn" class="btn btn-primary">
+                    <button id="downloadAllBtn" class="btn btn-primary" data-i18n="downloadAllAsZip">
                         Download All as Zip
                     </button>
                 </div>
             </div>
             <div id="receiver-queue">
-                <div class="empty-state">Waiting for incoming files</div>
+                <div class="empty-state" data-i18n="waitingForIncomingFiles">Waiting for incoming files</div>
             </div>
         </div>
     </div>
     <div class="dashboard-footer-grid">
         <div class="panel">
-            <div class="panel-header"><h3>Overall Metrics</h3></div>
+            <div class="panel-header"><h3 data-i18n="overallMetrics">Overall Metrics</h3></div>
             <ul class="metrics-list">
                 <li>
               <span class="icon">
@@ -530,7 +531,7 @@
                   <path d="M10 17V3M10 3L4 9M10 3l6 6" />
                 </svg>
               </span>
-                    <div>Sent: <span id="metrics-sent">0.00 GB</span></div>
+                    <div><span data-i18n="sent">Sent</span>: <span id="metrics-sent">0.00 GB</span></div>
                 </li>
                 <li>
               <span class="icon">
@@ -545,7 +546,7 @@
                   <path d="M10 3v14M10 17l6-6M10 17l-6-6" />
                 </svg>
               </span>
-                    <div>Received: <span id="metrics-received">0.00 GB</span></div>
+                    <div><span data-i18n="received">Received</span>: <span id="metrics-received">0.00 GB</span></div>
                 </li>
                 <li>
               <span class="icon">
@@ -562,17 +563,17 @@
                   />
                 </svg>
               </span>
-                    <div>Speed: <span id="metrics-speed">0 KB/s</span></div>
+                    <div><span data-i18n="speed">Speed</span>: <span id="metrics-speed">0 KB/s</span></div>
                 </li>
             </ul>
         </div>
         <div class="panel promo-panel">
-            <div class="panel-header"><h3>Love DropSilk?</h3></div>
-            <p>
+            <div class="panel-header"><h3 data-i18n="loveDropSilk">Love DropSilk?</h3></div>
+            <p data-i18n="loveDropSilkDescription">
                 If you enjoy DropSilk, help us spread the word :). Remember to
                 connect both devices to Wi-Fi for the best speeds.
             </p>
-            <button class="btn btn-secondary" id="shareAppBtn">Share App</button>
+            <button class="btn btn-secondary" id="shareAppBtn" data-i18n="shareApp">Share App</button>
         </div>
     </div>
 </div>
@@ -588,8 +589,8 @@
                 stroke-width="5"
         ></circle
         ></svg>
-        <h2>Boarding Flight...</h2>
-        <p>
+        <h2 data-i18n="boardingFlight">Boarding Flight...</h2>
+        <p data-i18n="connectingToFlight">
             Connecting to flight <span id="boarding-flight-code"></span>
         </p>
     </div>
@@ -612,16 +613,17 @@
 
 <footer class="site-footer">
     <div class="footer-content">
-        <div class="footer-copyright">
+        <div class="footer-copyright" data-i18n="copyright">
             © 2025 DropSilk. A peer-to-peer passion project. v2.4
         </div>
         <nav class="footer-nav">
-            <button id="settingsBtn" class="footer-nav-link">Settings</button>
-            <button id="termsBtn" class="footer-nav-link">Terms</button>
+            <button id="settingsBtn" class="footer-nav-link" data-i18n="settings">Settings</button>
+            <button id="termsBtn" class="footer-nav-link" data-i18n="terms">Terms</button>
             <button
                     id="privacyBtn"
                     class="footer-nav-link"
                     aria-label="Privacy Policy for DropSilk free, unlimited file sharing peer to peer"
+                    data-i18n="privacy"
             >
                 Privacy
             </button>
@@ -629,6 +631,7 @@
                     id="securityBtn"
                     class="footer-nav-link"
                     aria-label="Security for DropSilk free, unlimited file sharing peer to peer"
+                    data-i18n="security"
             >
                 Security
             </button>
@@ -636,10 +639,11 @@
                     id="faqBtn"
                     class="footer-nav-link"
                     aria-label="Learn more about private file sharing"
+                    data-i18n="faq"
             >
                 FAQ
             </button>
-            <button id="ko-fiBtn" class="footer-nav-link">Donate</button>
+            <button id="ko-fiBtn" class="footer-nav-link" data-i18n="donate">Donate</button>
         </nav>
     </div>
 </footer>
@@ -651,7 +655,7 @@
 <div class="modal-overlay" id="inviteModal">
     <div class="invite-modal">
         <div class="modal-header">
-            <h3>Invite Others</h3>
+            <h3 data-i18n="inviteOthers">Invite Others</h3>
             <button
                     class="modal-close"
                     id="closeInviteModal"
@@ -670,17 +674,17 @@
         </div>
         <div class="flight-code-display">
             <div class="code" id="modalFlightCode">XXXXXX</div>
-            <div class="label">Flight Code</div>
+            <div class="label" data-i18n="flightCode">Flight Code</div>
         </div>
         <div class="qr-section">
             <div class="qr-container"><canvas id="qrCanvas"></canvas></div>
-            <p class="qr-description">
+            <p class="qr-description" data-i18n="scanQrCodeToJoin">
                 Scan this QR code to visit DropSilk and join with the flight code
                 above
             </p>
         </div>
         <div class="share-actions">
-            <button class="share-btn" id="copyLinkBtn">
+            <button class="share-btn" id="copyLinkBtn" data-i18n="copyLink">
                 <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
@@ -698,6 +702,7 @@
                     class="share-btn secondary"
                     id="shareNativeBtn"
                     style="display: none"
+                    data-i18n="share"
             >
                 <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -710,7 +715,7 @@
                 /></svg>
                 Share
             </button>
-            <button class="share-btn secondary" id="copyCodeBtn">
+            <button class="share-btn secondary" id="copyCodeBtn" data-i18n="copyCodeOnly">
                 <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
@@ -731,7 +736,7 @@
 <div class="modal-overlay" id="aboutModal">
     <div class="invite-modal">
         <div class="modal-header">
-            <h3>About Me</h3>
+            <h3 data-i18n="aboutMe">About Me</h3>
             <button
                     class="modal-close"
                     id="closeAboutModal"
@@ -749,43 +754,43 @@
             </button>
         </div>
         <div class="modal-body">
-            <p>
+            <p data-i18n="aboutMeDescription1">
                 <strong>DropSilk</strong> is a project born from the desire to have
                 a simple, private, and fast way to transfer files between devices.
             </p>
 
-            <p>
+            <p data-i18n="aboutMeDescription2">
                 I'm a developer passionate about creating useful and beautiful
                 applications. Hence, the implementation of WebRTC that you see
                 before you.
             </p>
 
-            <p>
+            <p data-i18n="aboutMeDescription3">
                 I'm a passionate techy with an unfortunate affinity for tackling the
                 most niche problems using wildly overengineered code.
             </p>
 
-            <p>
+            <p data-i18n="aboutMeDescription4">
                 This very website is proof of that. Click on my GitHub if my brand
                 of masochism appeals to you.
             </p>
 
-            <p>
+            <p data-i18n="aboutMeDescription5">
                 I'm currently in my second year of university in Malaysia, pursuing
                 a Computer Science degree with a Data Science specialisation.
             </p>
 
-            <p>
+            <p data-i18n="aboutMeDescription6">
                 I really wasn’t kidding about the masochism, in case that wasn’t
                 obvious.
             </p>
 
-            <p>
+            <p data-i18n="aboutMeDescription7">
                 Always open to new and interesting opportunities—so feel free to
                 reach out.
             </p>
 
-            <p>
+            <p data-i18n="aboutMeDescription8">
                 I’m only as busy as any other Comp Sci student (read: constantly).
             </p>
             <!-- TODO: Add more content here -->
@@ -830,7 +835,7 @@
                                 class="custom-checkbox-input"
                         />
                         <span class="custom-checkbox"></span>
-                        <span>Select All</span>
+                        <span data-i18n="selectAll">Select All</span>
                     </label>
                     <span id="zipSelectionInfo">0 files selected (0 Bytes)</span>
                 </div>
@@ -873,10 +878,10 @@
             <div id="zip-modal-warning-footer" style="display: none">
                 <p id="zipWarningText" class="zip-warning-text"></p>
                 <div class="zip-warning-actions">
-                    <button id="cancelZipBtn" class="btn btn-secondary">
+                    <button id="cancelZipBtn" class="btn btn-secondary" data-i18n="cancel">
                         Cancel
                     </button>
-                    <button id="proceedZipBtn" class="btn btn-primary">
+                    <button id="proceedZipBtn" class="btn btn-primary" data-i18n="proceedAnyway">
                         Proceed Anyway
                     </button>
                 </div>
@@ -889,7 +894,7 @@
 <div class="modal-overlay" id="contactModal">
     <div class="invite-modal">
         <div class="modal-header">
-            <h3>Contact</h3>
+            <h3 data-i18n="contact">Contact</h3>
             <button
                     class="modal-close"
                     id="closeContactModal"
@@ -907,14 +912,14 @@
             </button>
         </div>
         <div class="modal-body">
-            <p id="captcha-pretext">
+            <p id="captcha-pretext" data-i18n="contactDescription">
                 To prevent spam, please verify you're human to view my email
                 address.
             </p>
 
             <!-- State 1: Initial View -->
             <div id="email-view-initial-state" class="share-actions">
-                <button class="share-btn" id="viewEmailBtn">
+                <button class="share-btn" id="viewEmailBtn" data-i18n="viewEmail">
                     <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="20"
@@ -951,7 +956,7 @@
                     >
                 </div>
                 <div class="share-actions">
-                    <button class="share-btn" id="copyEmailBtn">
+                    <button class="share-btn" id="copyEmailBtn" data-i18n="copyEmail">
                         <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="20"
@@ -975,7 +980,7 @@
 <div class="modal-overlay" id="termsModal">
     <div class="invite-modal">
         <div class="modal-header">
-            <h3>Terms of Service</h3>
+            <h3 data-i18n="termsOfService">Terms of Service</h3>
             <button
                     class="modal-close"
                     id="closeTermsModal"
@@ -993,15 +998,15 @@
             </button>
         </div>
         <div class="modal-body">
-            <p><strong>Last Updated: September 13, 2025, UTC 2100 hrs</strong></p>
-            <p>
+            <p><strong data-i18n="lastUpdated" data-i18n-options='{"date": "September 13, 2025, UTC 2100 hrs"}'>Last Updated: September 13, 2025, UTC 2100 hrs</strong></p>
+            <p data-i18n="termsOfServiceIntro">
                 Welcome to DropSilk! These Terms of Service ("Terms") govern your
                 access to and use of the DropSilk website and services ("Service").
                 By using the Service, you agree to be bound by these Terms.
             </p>
 
-            <p><strong>1. Use of the Service</strong></p>
-            <p>
+            <p data-i18n="useOfService"><strong>1. Use of the Service</strong></p>
+            <p data-i18n="useOfServiceDescription">
                 You agree to use DropSilk only for lawful purposes. You are solely
                 responsible for the files you transfer ("Content") and for your
                 compliance with all applicable laws. You must have the legal right
@@ -1009,17 +1014,17 @@
                 transfer any Content that:
             </p>
             <ul>
-                <li>Is illegal, fraudulent, or malicious.</li>
-                <li>
+                <li data-i18n="useOfServiceListItem1">Is illegal, fraudulent, or malicious.</li>
+                <li data-i18n="useOfServiceListItem2">
                     Infringes on any third party's intellectual property rights (e.g.,
                     copyright, trademark).
                 </li>
-                <li>Contains viruses, malware, or other harmful code.</li>
-                <li>Is harassing, defamatory, or obscene.</li>
+                <li data-i18n="useOfServiceListItem3">Contains viruses, malware, or other harmful code.</li>
+                <li data-i18n="useOfServiceListItem4">Is harassing, defamatory, or obscene.</li>
             </ul>
 
-            <p><strong>2. No Warranty & Disclaimer</strong></p>
-            <p>
+            <p data-i18n="noWarranty"><strong>2. No Warranty & Disclaimer</strong></p>
+            <p data-i18n="noWarrantyDescription">
                 The Service is provided on an "AS IS" and "AS AVAILABLE" basis,
                 without any warranties of any kind, express or implied. We do not
                 guarantee that the Service will be secure, uninterrupted, error-free,
@@ -1027,8 +1032,8 @@
                 corruption. You use DropSilk at your own risk.
             </p>
 
-            <p><strong>3. Limitation of Liability</strong></p>
-            <p>
+            <p data-i18n="limitationOfLiability"><strong>3. Limitation of Liability</strong></p>
+            <p data-i18n="limitationOfLiabilityDescription">
                 To the fullest extent permitted by law, DropSilk and its creator(s)
                 shall not be liable for any indirect, incidental, special,
                 consequential, or punitive damages, including but not to-do loss of
@@ -1038,8 +1043,8 @@
                 unauthorized access, use, or alteration of your transmissions.
             </p>
 
-            <p><strong>4. Privacy</strong></p>
-            <p>
+            <p data-i18n="privacyPolicy"><strong>4. Privacy</strong></p>
+            <p data-i18n="privacyPolicyDescription">
                 Your privacy is important to us. Our Privacy Policy explains how we
                 handle the limited data required to operate the Service. By using
                 DropSilk, you agree to the collection and use of information in
@@ -1048,8 +1053,8 @@
                 servers.
             </p>
 
-            <p><strong>5. User Conduct and Termination</strong></p>
-            <p>
+            <p data-i18n="userConduct"><strong>5. User Conduct and Termination</strong></p>
+            <p data-i18n="userConductDescription">
                 You agree not to disrupt, interfere with, or attempt to gain
                 unauthorized access to the Service or its related systems. We
                 reserve the right to suspend or terminate your access to the Service
@@ -1057,16 +1062,16 @@
                 of these Terms.
             </p>
 
-            <p><strong>6. Changes to Terms</strong></p>
-            <p>
+            <p data-i18n="changesToTerms"><strong>6. Changes to Terms</strong></p>
+            <p data-i18n="changesToTermsDescription">
                 We may modify these Terms from time to time. We will post the most
                 current version on our site. By continuing to use the Service after
                 changes become effective, you agree to be bound by the revised
                 Terms.
             </p>
 
-            <p><strong>7. Contact</strong></p>
-            <p>
+            <p data-i18n="contactUs"><strong>7. Contact</strong></p>
+            <p data-i18n="contactUsDescription">
                 If you have any questions about these Terms, please contact us via
                 the method provided on the Contact page.
             </p>
@@ -1078,7 +1083,7 @@
 <div class="modal-overlay" id="privacyModal">
     <div class="invite-modal">
         <div class="modal-header">
-            <h3>Privacy & Cookie Policy</h3>
+            <h3 data-i18n="privacyAndCookiePolicy">Privacy & Cookie Policy</h3>
             <button
                     class="modal-close"
                     id="closePrivacyModal"
@@ -1096,30 +1101,30 @@
             </button>
         </div>
         <div class="modal-body">
-            <p><strong>Last Updated: September 16, 2025</strong></p>
-            <p>
+            <p><strong data-i18n="lastUpdated" data-i18n-options='{"date": "September 16, 2025"}'>Last Updated: September 16, 2025</strong></p>
+            <p data-i18n="privacyPolicyIntro">
                 Your privacy is paramount. DropSilk is architected to be as private
                 as possible. This policy explains what data we process and why.
             </p>
 
-            <p><strong>1. Data We Do NOT Collect</strong></p>
-            <p>
+            <p data-i18n="dataWeDoNotCollect"><strong>1. Data We Do NOT Collect</strong></p>
+            <p data-i18n="dataWeDoNotCollectDescription">
                 We do not collect, store, or have access to the files you transfer
                 or the content of your screen shares. All such data is sent directly
                 from your device to your peer's device using an encrypted,
                 peer-to-peer (P2P) connection.
             </p>
 
-            <p><strong>2. Data We Process to Provide the Service</strong></p>
+            <p data-i18n="dataWeProcess"><strong>2. Data We Process to Provide the Service</strong></p>
             <ul>
-                <li>
+                <li data-i18n="signalingData">
                     <strong>Signaling Data:</strong> To establish a P2P connection,
                     our server temporarily handles technical metadata (like IP
                     addresses and session descriptions). This is essential for
                     connecting you with your peer and is discarded as soon as your
                     session ends. It is never logged or stored.
                 </li>
-                <li>
+                <li data-i18n="previewUploads">
                     <strong>Preview Uploads:</strong> For certain file types (e.g.,
                     .pptx), a preview may be generated by temporarily uploading the
                     file to our secure third-party service, UploadThing. This file is
@@ -1129,19 +1134,19 @@
                 </li>
             </ul>
 
-            <p><strong>3. Cookies & Local Storage</strong></p>
-            <p>
+            <p data-i18n="cookiesAndLocalStorage"><strong>3. Cookies & Local Storage</strong></p>
+            <p data-i18n="cookiesAndLocalStorageDescription">
                 We use your browser's `localStorage` for essential functionality
                 and, with your consent, for analytics.
             </p>
             <ul>
-                <li>
+                <li data-i18n="essentialStorage">
                     <strong>Essential Storage:</strong> We store your theme preference
                     (e.g., `dropsilk-theme`), onboarding status, and your privacy
                     consent choice. These are necessary for the site to function as
                     you expect.
                 </li>
-                <li>
+                <li data-i18n="analyticsWithConsent">
                     <strong>Analytics (with Consent):</strong> If you accept, we use
                     Google Analytics to collect anonymous, aggregated usage data (like
                     page visits and feature usage). This helps us understand how the
@@ -1150,45 +1155,83 @@
                 </li>
             </ul>
 
-            <p><strong>4. Your Rights (GDPR, CCPA, PDPA)</strong></p>
-            <p>
+            <p data-i18n="yourRights"><strong>4. Your Rights (GDPR, CCPA, PDPA)</strong></p>
+            <p data-i18n="yourRightsDescription">
                 You have rights over your data. Since we don't store personal data
                 on our servers, these rights apply to the data on your own device
                 and with our third-party providers.
             </p>
             <ul>
-                <li>
+                <li data-i18n="rightToAccessAndErase">
                     <strong>Right to Access & Erase:</strong> You can view and delete
                     all data DropSilk stores on your device by clearing your browser's
                     cache and site data.
                 </li>
-                <li>
+                <li data-i18n="rightToWithdrawConsent">
                     <strong>Right to Withdraw Consent:</strong> You can withdraw your
                     consent for analytics at any time by clearing your browser's site
                     data for dropsilk.xyz. The consent banner will reappear on your
                     next visit.
                 </li>
-                <li>
+                <li data-i18n="rightToDoNotSell">
                     <strong>Right to "Do Not Sell" (CCPA):</strong> We do not sell
                     your personal information.
                 </li>
             </ul>
 
-            <p><strong>5. Third-Party Services</strong></p>
-            <p>We use trusted third parties for specific functions:</p>
+            <p data-i18n="thirdPartyServices"><strong>5. Third-Party Services</strong></p>
+            <p data-i18n="thirdPartyServicesDescription">We use trusted third parties for specific functions:</p>
             <ul>
-                <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"><strong>Google Analytics:</strong></a> For anonymous statistics (if you consent).</li>
-                <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"><strong>Google STUN Servers:</strong></a> For facilitating P2P connections. A client queries a STUN server to learn its own public IP Address.</li>
-                <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"><strong>Google reCAPTCHA:</strong></a> For spam protection on our contact details.</li>
-                <li><strong><a href="https://render.com/privacy" target="_blank" rel="noopener noreferrer">Render</a> & <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">Vercel:</a></strong> For hosting our backend and frontend, respectively.</li>
-                <li><a href="https://uploadthing.com/info/privacy-policy" target="_blank" rel="noopener noreferrer"><strong>UploadThing:</strong></a> For hosting optional file previews.
-                    You will be asked to reaffirm consent for this before we upload your file.
-                    Your file will be deleted from our UploadThing account by our server's automatic
-                    cleanup service within 24 hours of its upload. You may reach out to us via our contact page
-                    if you require immediate deletion.</li>
-                <li><a href="https://www.microsoft.com/en-us/privacy/privacystatement" target="_blank" rel="noopener noreferrer"><strong>Microsoft:</strong></a> For rendering complex formats and specifically PPTX previews via the Online Office Document Previewer.</li>
+                <li>
+                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+                        <strong>Google Analytics:</strong>
+                    </a>
+                    <span data-i18n="googleAnalytics">For anonymous statistics (if you consent).</span>
+                </li>
+
+                <li>
+                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+                        <strong>Google STUN Servers:</strong>
+                    </a>
+                    <span data-i18n="googleStunServers">For facilitating P2P connections. A client queries a STUN server to learn its own public IP Address.</span>
+                </li>
+
+                <li>
+                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+                        <strong>Google reCAPTCHA:</strong>
+                    </a>
+                    <span data-i18n="googleRecaptcha">For spam protection on our contact details.</span>
+                </li>
+
+                <li>
+                    <strong>
+                        <a href="https://render.com/privacy" target="_blank" rel="noopener noreferrer">Render</a>
+                        &amp;
+                        <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">Vercel:</a>
+                    </strong>
+                    <span data-i18n="renderAndVercel">For hosting our backend and frontend, respectively.</span>
+                </li>
+
+                <li>
+                    <a href="https://uploadthing.com/info/privacy-policy" target="_blank" rel="noopener noreferrer">
+                        <strong>UploadThing:</strong>
+                    </a>
+                    <span data-i18n="uploadThing">
+                      For hosting optional file previews. You will be asked to reaffirm consent for this before we upload your file.
+                      Your file will be deleted from our UploadThing account by our server's automatic cleanup service within 24
+                      hours of its upload. You may reach out to us via our contact page if you require immediate deletion.
+                    </span>
+                </li>
+
+                <li>
+                    <a href="https://www.microsoft.com/en-us/privacy/privacystatement" target="_blank"
+                       rel="noopener noreferrer">
+                        <strong>Microsoft:</strong>
+                    </a>
+                    <span data-i18n="microsoft">For rendering complex formats and specifically PPTX previews via the Online Office Document Previewer.</span>
+                </li>
             </ul>
-            <p>We encourage you to review their respective privacy policies.</p>
+            <p data-i18n="thirdPartyServicesReview">We encourage you to review their respective privacy policies.</p>
         </div>
     </div>
 </div>
@@ -1197,7 +1240,7 @@
 <div class="modal-overlay" id="securityModal">
     <div class="invite-modal">
         <div class="modal-header">
-            <h3>Security by Design</h3>
+            <h3 data-i18n="securityByDesign">Security by Design</h3>
             <button
                     class="modal-close"
                     id="closeSecurityModal"
@@ -1215,8 +1258,8 @@
             </button>
         </div>
         <div class="modal-body">
-            <p><strong>End-to-End Encryption</strong></p>
-            <p>
+            <p data-i18n="endToEndEncryption"><strong>End-to-End Encryption</strong></p>
+            <p data-i18n="endToEndEncryptionDescription">
                 All data transferred between you and your peer, including files and
                 screen shares, is encrypted end-to-end using industry-standard
                 WebRTC protocols (DTLS and SRTP). This means the data is encrypted
@@ -1225,24 +1268,24 @@
                 the contents of your transfer.
             </p>
 
-            <p><strong>No Cloud Storage Risk</strong></p>
-            <p>
+            <p data-i18n="noCloudStorageRisk"><strong>No Cloud Storage Risk</strong></p>
+            <p data-i18n="noCloudStorageRiskDescription">
                 Your files are never uploaded to or stored on a central server. The
                 transfer happens directly between the browsers of the connected
                 peers. This eliminates the risk of a traditional cloud data breach
                 exposing your files, as there is no central repository to attack.
             </p>
 
-            <p><strong>Ephemeral Sessions</strong></p>
-            <p>
+            <p data-i18n="ephemeralSessions"><strong>Ephemeral Sessions</strong></p>
+            <p data-i18n="ephemeralSessionsDescription">
                 Each "flight" is a temporary, private session. The connection
                 information is held by our server only for the duration of the
                 session. Once you or your peer disconnects, the session is
                 terminated and the connection data is discarded.
             </p>
 
-            <p><strong>Your Responsibility</strong></p>
-            <p>
+            <p data-i18n="yourResponsibility"><strong>Your Responsibility</strong></p>
+            <p data-i18n="yourResponsibilityDescription">
                 While we provide a secure channel, your security also depends on
                 you. Always ensure you are sharing files with a person you know and
                 trust. We recommend verifying the flight code with them through a
@@ -1257,7 +1300,7 @@
 <div class="modal-overlay" id="faqModal">
     <div class="invite-modal">
         <div class="modal-header">
-            <h3>Frequently Asked Questions</h3>
+            <h3 data-i18n="frequentlyAskedQuestions">Frequently Asked Questions</h3>
             <button class="modal-close" id="closeFaqModal" aria-label="Close modal">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                      fill="currentColor" viewBox="0 0 16 16"><path
@@ -1267,16 +1310,16 @@
             </button>
         </div>
         <div class="modal-body">
-            <p><strong>Is there a file size limit?</strong></p>
-            <p>
+            <p data-i18n="fileSizeLimit"><strong>Is there a file size limit?</strong></p>
+            <p data-i18n="fileSizeLimitDescription">
                 Theoretically, no. DropSilk is designed to handle large files by
                 streaming them directly. However, performance for extremely large
                 files (many gigabytes) can be affected by your device's memory
                 capacity and the stability of your network connection.
             </p>
 
-            <p><strong>Why is my transfer speed slow?</strong></p>
-            <p>
+            <p data-i18n="slowTransferSpeed"><strong>Why is my transfer speed slow?</strong></p>
+            <p data-i18n="slowTransferSpeedDescription">
                 Transfer speed is determined by the direct network path between you
                 and your peer. For the fastest speeds, ensure both devices are on
                 the same local Wi-Fi network (LAN). When transferring over the
@@ -1285,14 +1328,14 @@
                 speed and the receiver's download speed).
             </p>
 
-            <p><strong>Is DropSilk free to use?</strong></p>
-            <p>
+            <p data-i18n="isDropSilkFree"><strong>Is DropSilk free to use?</strong></p>
+            <p data-i18n="isDropSilkFreeDescription">
                 Yes, DropSilk is completely free. It was created as a passion
                 project to offer a simple and private file sharing solution.
             </p>
 
-            <p><strong>What browsers are supported?</strong></p>
-            <p>
+            <p data-i18n="supportedBrowsers"><strong>What browsers are supported?</strong></p>
+            <p data-i18n="supportedBrowsersDescription">
                 DropSilk works on all modern, up-to-date desktop browsers that
                 fully support WebRTC, such as Google Chrome, Mozilla Firefox,
                 Microsoft Edge, and Safari. DropSilk may look slightly different on
@@ -1301,8 +1344,8 @@
                 aesthetic.
             </p>
 
-            <p><strong>What happens if I get disconnected?</strong></p>
-            <p>
+            <p data-i18n="whatHappensIfDisconnected"><strong>What happens if I get disconnected?</strong></p>
+            <p data-i18n="whatHappensIfDisconnectedDescription">
                 If your network connection is interrupted, the file transfer will
                 stop. You will need to reconnect to the flight and restart the
                 transfer for any incomplete files. There is currently no
@@ -1310,8 +1353,8 @@
                 remain accessible and downloadable until you close the tab.
             </p>
 
-            <p><strong>How does screen sharing work?</strong></p>
-            <p>
+            <p data-i18n="howDoesScreenSharingWork"><strong>How does screen sharing work?</strong></p>
+            <p data-i18n="howDoesScreenSharingWorkDescription">
                 Screen sharing uses the same secure, peer-to-peer WebRTC technology
                 as file transfers. Your screen is streamed directly to
                 your peer, and is never visible to our servers.
@@ -1322,7 +1365,7 @@
 <div class="modal-overlay" id="donateModal">
     <div class="invite-modal kofi-modal">
         <div class="modal-header">
-            <h3>Support DropSilk</h3>
+            <h3 data-i18n="supportDropSilk">Support DropSilk</h3>
             <button
                     class="modal-close"
                     id="closeDonateModal"
@@ -1355,7 +1398,7 @@
 <div class="modal-overlay" id="previewModal">
     <div class="invite-modal preview-modal-content">
         <div class="modal-header">
-            <h3 id="preview-header-title">File Preview</h3>
+            <h3 id="preview-header-title" data-i18n="filePreview">File Preview</h3>
             <button
                     class="modal-close"
                     id="closePreviewModal"
@@ -1385,7 +1428,7 @@
                         stroke-width="5"
                 ></circle
                 ></svg>
-                <span>Preparing preview...</span>
+                <span data-i18n="preparingPreview">Preparing preview...</span>
             </div>
             <!-- Content will be injected here -->
             <div id="preview-content"></div>
@@ -1397,22 +1440,22 @@
 <!-- ONBOARDING ELEMENTS -->
 <div class="onboarding-overlay" id="welcomeOnboarding">
     <div class="onboarding-tooltip">
-        <h3>Welcome to DropSilk!</h3>
-        <p>
+        <h3 data-i18n="welcomeToDropSilk">Welcome to DropSilk!</h3>
+        <p data-i18n="welcomeToDropSilkDescription">
             This is a peer-to-peer file transfer app. To start, create a "flight"
             to connect with another device.
         </p>
-        <button class="btn btn-primary" id="dismissWelcome">Got It!</button>
+        <button class="btn btn-primary" id="dismissWelcome" data-i18n="gotIt">Got It!</button>
     </div>
 </div>
 <div class="onboarding-overlay" id="inviteOnboarding">
     <div class="onboarding-tooltip">
-        <h3>Your Flight is Ready!</h3>
-        <p>
+        <h3 data-i18n="yourFlightIsReady">Your Flight is Ready!</h3>
+        <p data-i18n="yourFlightIsReadyDescription">
             Now, share your unique flight code with the other device or use the
             invite button to connect them.
         </p>
-        <button class="btn btn-primary" id="dismissInvite">Start Sharing</button>
+        <button class="btn btn-primary" id="dismissInvite" data-i18n="startSharing">Start Sharing</button>
     </div>
 </div>
 
@@ -1436,7 +1479,7 @@
             </button>
             for details.
         </p>
-        <button id="accept-privacy-btn" class="btn btn-primary">Accept</button>
+        <button id="accept-privacy-btn" class="btn btn-primary" data-i18n="accept">Accept</button>
     </div>
 </div>
 
@@ -1444,20 +1487,20 @@
 <div class="drawer-overlay" id="drawer-overlay"></div>
 <aside class="drawer" id="drawer">
     <div class="drawer-header">
-        <h3>Menu</h3>
+        <h3 data-i18n="menu">Menu</h3>
         <button class="modal-close" id="drawer-close" aria-label="Close menu">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/></svg>
         </button>
     </div>
     <nav class="drawer-nav" id="drawer-nav">
-        <button id="drawer-aboutBtn" class="drawer-nav-link">About</button>
-        <button id="drawer-contactBtn" class="drawer-nav-link">Contact</button>
+        <button id="drawer-aboutBtn" class="drawer-nav-link" data-i18n="about">About</button>
+        <button id="drawer-contactBtn" class="drawer-nav-link" data-i18n="contact">Contact</button>
         <hr class="drawer-divider">
-        <button id="drawer-settingsBtn" class="drawer-nav-link">Settings</button>
-        <button id="drawer-termsBtn" class="drawer-nav-link">Terms</button>
-        <button id="drawer-privacyBtn" class="drawer-nav-link">Privacy</button>
-        <button id="drawer-securityBtn" class="drawer-nav-link">Security</button>
-        <button id="drawer-faqBtn" class="drawer-nav-link">FAQ</button>
+        <button id="drawer-settingsBtn" class="drawer-nav-link" data-i18n="settings">Settings</button>
+        <button id="drawer-termsBtn" class="drawer-nav-link" data-i18n="terms">Terms</button>
+        <button id="drawer-privacyBtn" class="drawer-nav-link" data-i18n="privacy">Privacy</button>
+        <button id="drawer-securityBtn" class="drawer-nav-link" data-i18n="security">Security</button>
+        <button id="drawer-faqBtn" class="drawer-nav-link" data-i18n="faq">FAQ</button>
     </nav>
 </aside>
 

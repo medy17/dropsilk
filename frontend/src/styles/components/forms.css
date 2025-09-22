@@ -287,21 +287,28 @@
 }
 /* Tri-state segmented control */
 .segmented {
-    display: inline-flex;
+    display: flex;
     background: var(--c-panel-bg);
     border: 1.5px solid var(--c-panel-border);
     border-radius: 999px;
     overflow: hidden;
     flex-shrink: 0; /* Prevent the control from being squished */
+    max-width: 190px;
+    width: 100%;
 }
 .segmented .seg-btn {
-    padding: 0.4rem 0.8rem;
+    padding: 0.4rem 0.5rem;
     font-weight: 600;
+    font-size: .8em;
     border: none;
     background: none;
     color: var(--c-text-secondary);
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    min-width: 0;
 }
 .segmented .seg-btn:hover {
     background: rgb(91 206 250 / .12);

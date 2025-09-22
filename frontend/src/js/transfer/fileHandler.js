@@ -1,5 +1,6 @@
 // js/transfer/fileHandler.js
 // Contains the core logic for file transfers, including queueing, chunking, and handling selections.
+import i18next from "../i18n.js";
 import { store } from '../state.js';
 import { showToast } from '../utils/toast.js';
 import { sendData, getBufferedAmount } from '../network/webrtc.js';
@@ -121,12 +122,13 @@ export function handleFolderSelection(files) {
 
     if (files.length > fileLimit || Array.from(files).some(f => f.size > sizeLimit)) {
         showToast({
-            type: 'info', title: 'Folder Selection Warning',
-            body: 'Folder contains a large number of files or files over 1GB. Continue?',
+            type: 'info',
+            title: i18next.t('folderSelectionWarning'),
+            body: i18next.t('folderSelectionWarningDescription'),
             duration: 0,
             actions: [
-                { text: 'Cancel', class: 'btn-secondary', callback: () => {} },
-                { text: 'Continue', class: 'btn-primary', callback: () => handleFileSelection(files) }
+                { text: i18next.t('cancel'), class: 'btn-secondary', callback: () => {} },
+                { text: i18next.t('proceedAnyway'), class: 'btn-primary', callback: () => handleFileSelection(files) }
             ]
         });
     } else {
@@ -306,8 +308,8 @@ export async function handleDataChannelMessage(event) {
                     console.error("OPFS setup failed, falling back to memory.", error);
                     showToast({
                         type: 'danger',
-                        title: 'Safe Mode Error',
-                        body: 'Could not write to disk. Falling back to in-memory transfer.',
+                        title: i18next.t('opfsError'),
+                        body: i18next.t('opfsErrorDescription'),
                         duration: 8000
                     });
                     opfsState.delete(incomingFileInfo.name); // Clean up partial state
@@ -354,8 +356,8 @@ export async function handleDataChannelMessage(event) {
                     console.error("Failed to finalize OPFS file:", e);
                     showToast({
                         type: 'danger',
-                        title: 'File Save Error',
-                        body: 'Could not save the file from disk. Please try again.',
+                        title: i18next.t('fileSaveError'),
+                        body: i18next.t('fileSaveErrorDescription'),
                         duration: 8000
                     });
                     opfsState.delete(incomingFileInfo.name);
@@ -493,8 +495,8 @@ export async function handleDataChannelMessage(event) {
             // Future files will not use OPFS if the error persists.
             showToast({
                 type: 'danger',
-                title: 'Out of Disk Space',
-                body: 'Safe Mode failed. The transfer for this file has been aborted.',
+                title: i18next.t('outOfDiskSpace'),
+                body: i18next.t('outOfDiskSpaceDescription'),
                 duration: 10000
             });
 
@@ -561,7 +563,7 @@ export function resetTransferState() {
                 // Also clear any in-memory writer states
                 for (const [key, value] of opfsState.entries()) {
                     if (value.writer) {
-                       await value.writer.close().catch(e => console.error("Error closing writer on reset:", e));
+                        await value.writer.close().catch(e => console.error("Error closing writer on reset:", e));
                     }
                     opfsState.delete(key);
                 }

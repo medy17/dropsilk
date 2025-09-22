@@ -5,9 +5,12 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "update-locales": "node scripts/update-locales.js"
   },
   "dependencies": {
+    "i18next": "^25.5.2",
+    "i18next-browser-languagedetector": "^8.2.0",
     "jszip": "^3.10.1",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",

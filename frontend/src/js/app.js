@@ -1,6 +1,7 @@
 // js/app.js
 // This is the main entry point for the application.
 import "../styles/index.css"; // load for vite
+import i18next from "./i18n.js";
 import { store } from "./state.js";
 import { renderUserName, showBoardingOverlay, initializeOnboardingPulses } from "./ui/view.js";
 import { initializeEventListeners } from "./ui/events.js";
@@ -11,6 +12,22 @@ import { showWelcomeOnboarding } from "./ui/onboarding.js";
 function initializeGlobalUI() {
     console.log("Initializing Global UI (Theme, Modals)...");
     initializeModals();
+}
+
+function translateStaticElements() {
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const optionsAttr = element.getAttribute('data-i18n-options');
+        let options = {};
+        if (optionsAttr) {
+            try {
+                options = JSON.parse(optionsAttr);
+            } catch (e) {
+                console.error(`Could not parse i18n options for key "${key}":`, optionsAttr, e);
+            }
+        }
+        element.innerHTML = i18next.t(key, options);
+    });
 }
 
 // Function now accepts a parameter to know if the user was invited
@@ -329,6 +346,13 @@ function initializePrivacyConsent() {
 // --- Main Execution ---
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DropSilk Initializing...");
+
+    i18next.init().then(() => {
+        translateStaticElements();
+        i18next.on('languageChanged', () => {
+            translateStaticElements();
+        });
+    });
 
     initializeGlobalUI();
 

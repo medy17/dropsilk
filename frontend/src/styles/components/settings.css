@@ -155,3 +155,30 @@
     border-color: var(--c-primary);
     box-shadow: 0 0 0 2px rgba(91, 206, 250, 0.2);
 }
+
+/* Select for Settings */
+.settings-select {
+    background: var(--c-panel-bg);
+    border: 1.5px solid var(--c-panel-border);
+    border-radius: 8px;
+    color: var(--c-text-primary);
+    padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+    font-weight: 600;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    cursor: pointer;
+    max-width: 190px;
+    width: 100%;
+}
+
+.settings-select:focus {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 2px rgba(91, 206, 250, 0.2);
+}

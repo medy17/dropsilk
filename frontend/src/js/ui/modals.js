@@ -11,6 +11,7 @@ import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
 import { showToast } from '../utils/toast.js';
 import QRCode from 'qrcode';
 import { audioManager } from '../utils/audioManager.js';
+import i18next from "../i18n.js";
 
 let captchaWidgetId = null;
 let zipModalMode = 'zip'; // 'zip' | 'settings'
@@ -136,9 +137,9 @@ function populateZipModal() {
 
     if (receivedFiles.length === 0) {
         uiElements.zipFileList.innerHTML =
-            '<div class="empty-state">No files to download.</div>';
+            `<div class="empty-state">${i18next.t('noFilesToDownload')}</div>`;
         // Also reset header info
-        uiElements.zipSelectionInfo.textContent = '0 files selected (0 Bytes)';
+        uiElements.zipSelectionInfo.textContent = i18next.t('filesSelected', { count: 0, size: formatBytes(0) });
         uiElements.downloadSelectedBtn.disabled = true;
         uiElements.selectAllZipCheckbox.checked = false;
         return;
@@ -180,9 +181,7 @@ function updateZipSelection() {
         0
     );
 
-    uiElements.zipSelectionInfo.textContent = `${totalSelected} files selected (${formatBytes(
-        totalSize
-    )})`;
+    uiElements.zipSelectionInfo.textContent = i18next.t('filesSelected', { count: totalSelected, size: formatBytes(totalSize) });
     uiElements.downloadSelectedBtn.disabled = totalSelected === 0;
 
     const all = uiElements.zipFileList.querySelectorAll('.zip-file-checkbox');
@@ -200,7 +199,7 @@ function resetZipModal() {
 
     // --- Reset title ---
     const header = document.querySelector('#zipModal .modal-header h3');
-    if (header) header.textContent = 'Download Files as Zip';
+    if (header) header.textContent = i18next.t('downloadFilesAsZip');
 
     uiElements.selectAllZipCheckbox.checked = false;
     updateZipSelection();
@@ -211,8 +210,8 @@ function resetZipModal() {
     const selectAllLabel = uiElements.selectAllZipCheckbox
         ?.closest('.checkbox-label')
         ?.querySelector('span:last-of-type');
-    if (selectAllLabel) selectAllLabel.textContent = 'Select All';
-    uiElements.zipSelectionInfo.textContent = '0 files selected (0 Bytes)';
+    if (selectAllLabel) selectAllLabel.textContent = i18next.t('selectAll');
+    uiElements.zipSelectionInfo.textContent = i18next.t('filesSelected', { count: 0, size: formatBytes(0) });
 
     const btn = uiElements.downloadSelectedBtn;
     const btnSpan = btn.querySelector('span');
@@ -221,7 +220,7 @@ function resetZipModal() {
     const spinnerIcon = btn.querySelector('.spinner-icon');
 
     // --- Reset button text and icons to default state ---
-    if (btnSpan) btnSpan.textContent = 'Download Selected as Zip';
+    if (btnSpan) btnSpan.textContent = i18next.t('downloadSelectedAsZip');
     if (downloadIcon) downloadIcon.style.display = 'inline-block';
     if (saveIcon) saveIcon.style.display = 'none';
     if (spinnerIcon) spinnerIcon.style.display = 'none';
@@ -356,6 +355,13 @@ export function initializeModals() {
     setupContactModal();
     setupZipModal();
     initializeDrawer();
+
+    i18next.on('languageChanged', () => {
+        const settingsModal = document.getElementById('zipModal');
+        if (settingsModal && settingsModal.classList.contains('show') && settingsModal.classList.contains('settings-mode')) {
+            openSettingsModal();
+        }
+    });
 }
 
 // ... (rest of the file is unchanged) ...
@@ -374,19 +380,19 @@ function setupInviteModal() {
         if (navigator.vibrate) {
             navigator.vibrate([50, 40, 15]);
         }
-        copyToClipboard(`https://dropsilk.xyz/?code=${store.getState().currentFlightCode}`, e.currentTarget, 'Link Copied!');
+        copyToClipboard(`https://dropsilk.xyz/?code=${store.getState().currentFlightCode}`, e.currentTarget, i18next.t('linkCopied'));
     });
 
     document.getElementById('copyCodeBtn')?.addEventListener('click', (e) => {
         if (navigator.vibrate) {
             navigator.vibrate([50, 40, 15]);
         }
-        copyToClipboard(store.getState().currentFlightCode, e.currentTarget, 'Code Copied!');
+        copyToClipboard(store.getState().currentFlightCode, e.currentTarget, i18next.t('codeCopied'));
     });
 
     shareNativeBtn?.addEventListener('click', async () => {
         const { currentFlightCode } = store.getState();
-        if (navigator.share) await navigator.share({ title: 'Join my DropSilk flight!', text: `Join my file transfer session with code: ${currentFlightCode}`, url: `https://dropsilk.xyz/?code=${currentFlightCode}` });
+        if (navigator.share) await navigator.share({ title: i18next.t('joinMyFlight'), text: i18next.t('joinMyFlightDescription', { code: currentFlightCode }), url: `https://dropsilk.xyz/?code=${currentFlightCode}` });
     });
 }
 
@@ -409,7 +415,7 @@ function setupContactModal() {
         if (navigator.vibrate) {
             navigator.vibrate([50, 40, 15]);
         }
-        copyToClipboard('ahmed@dropsilk.xyz', e.currentTarget, 'Email Copied!');
+        copyToClipboard('ahmed@dropsilk.xyz', e.currentTarget, i18next.t('emailCopied'));
     });
 }
 
@@ -481,10 +487,9 @@ function openSettingsModal() {
     zipModalMode = 'settings';
 
     const header = document.querySelector('#zipModal .modal-header h3');
-    if (header) header.textContent = 'Settings';
+    if (header) header.textContent = i18next.t('settings');
 
     const btn = uiElements.downloadSelectedBtn;
-
     btn.disabled = false;
 
     const btnSpan = btn.querySelector('span');
@@ -492,13 +497,13 @@ function openSettingsModal() {
     const saveIcon = btn.querySelector('.save-icon');
     const spinnerIcon = btn.querySelector('.spinner-icon');
 
-    if (btnSpan) btnSpan.textContent = 'Save Preferences';
+    if (btnSpan) btnSpan.textContent = i18next.t('savePreferences');
     if (downloadIcon) downloadIcon.style.display = 'none';
     if (saveIcon) saveIcon.style.display = 'inline-block';
     if (spinnerIcon) spinnerIcon.style.display = 'none';
 
     const selectAllLabel = uiElements.selectAllZipCheckbox?.closest('.checkbox-label')?.querySelector('span:last-of-type');
-    if (selectAllLabel) selectAllLabel.textContent = 'Enable All';
+    if (selectAllLabel) selectAllLabel.textContent = i18next.t('enableAll');
 
     populateSettingsModal();
     updateSettingsSummary();
@@ -523,8 +528,8 @@ function populateSettingsModal() {
       <div class="settings-list">
         <div class="settings-item">
           <div class="settings-item-info">
-            <div class="settings-item-title">Sounds</div>
-            <div class="settings-item-desc">Play sounds for connects, invites, and transfers.</div>
+            <div class="settings-item-title">${i18next.t('sounds')}</div>
+            <div class="settings-item-desc">${i18next.t('soundsDescription')}</div>
           </div>
           <label class="switch">
             <input type="checkbox" class="switch-input" id="settings-sounds" ${soundsEnabled ? 'checked' : ''}/>
@@ -533,8 +538,8 @@ function populateSettingsModal() {
         </div>
         <div class="settings-item">
           <div class="settings-item-info">
-            <div class="settings-item-title">Analytics</div>
-            <div class="settings-item-desc">Anonymous usage analytics (with your consent).</div>
+            <div class="settings-item-title">${i18next.t('analytics')}</div>
+            <div class="settings-item-desc">${i18next.t('analyticsDescription')}</div>
           </div>
           <label class="switch">
             <input type="checkbox" class="switch-input" id="settings-analytics" ${analyticsConsented ? 'checked' : ''}/>
@@ -543,8 +548,8 @@ function populateSettingsModal() {
         </div>
         <div class="settings-item">
           <div class="settings-item-info">
-            <div class="settings-item-title">Dark Mode</div>
-            <div class="settings-item-desc">Prefer darker colours throughout the app.</div>
+            <div class="settings-item-title">${i18next.t('darkMode')}</div>
+            <div class="settings-item-desc">${i18next.t('darkModeDescription')}</div>
           </div>
           <label class="switch">
             <input type="checkbox" class="switch-input" id="settings-theme" ${theme === 'dark' ? 'checked' : ''}/>
@@ -553,19 +558,37 @@ function populateSettingsModal() {
         </div>
         <div class="settings-item">
           <div class="settings-item-info">
-            <div class="settings-item-title">Animation Quality</div>
-            <div class="settings-item-desc">Control background animations to improve performance.</div>
+            <div class="settings-item-title">${i18next.t('animationQuality')}</div>
+            <div class="settings-item-desc">${i18next.t('animationQualityDescription')}</div>
           </div>
           <div class="segmented" id="settings-animation-quality">
-            <button type="button" class="seg-btn ${animationQuality === 'quality' ? 'active' : ''}" data-value="quality">Best</button>
-            <button type="button" class="seg-btn ${animationQuality === 'performance' ? 'active' : ''}" data-value="performance">Basic</button>
-            <button type="button" class="seg-btn ${animationQuality === 'off' ? 'active' : ''}" data-value="off">Off</button>
+            <button type="button" class="seg-btn ${animationQuality === 'quality' ? 'active' : ''}" data-value="quality">${i18next.t('best')}</button>
+            <button type="button" class="seg-btn ${animationQuality === 'performance' ? 'active' : ''}" data-value="performance">${i18next.t('basic')}</button>
+            <button type="button" class="seg-btn ${animationQuality === 'off' ? 'active' : ''}" data-value="off">${i18next.t('off')}</button>
           </div>
         </div>
         <div class="settings-item">
+            <div class="settings-item-info">
+                <div class="settings-item-title">${i18next.t('language')}</div>
+                <div class="settings-item-desc">${i18next.t('languageDescription')}</div>
+            </div>
+            <select class="settings-select" id="settings-language">
+                // START-AUTOGEN-LANG_OPTIONS
+                <option value="en" ${i18next.language.startsWith('en') ? 'selected' : ''}>${i18next.t('english')}</option>
+                <option value="es" ${i18next.language.startsWith('es') ? 'selected' : ''}>${i18next.t('spanish')}</option>
+                <option value="fr" ${i18next.language.startsWith('fr') ? 'selected' : ''}>${i18next.t('french')}</option>
+                <option value="it" ${i18next.language.startsWith('it') ? 'selected' : ''}>${i18next.t('italian')}</option>
+                <option value="ja" ${i18next.language.startsWith('ja') ? 'selected' : ''}>${i18next.t('japanese')}</option>
+                <option value="pt" ${i18next.language.startsWith('pt') ? 'selected' : ''}>${i18next.t('portuguese')}</option>
+                <option value="sw" ${i18next.language.startsWith('sw') ? 'selected' : ''}>${i18next.t('swahili')}</option>
+                <option value="zh" ${i18next.language.startsWith('zh') ? 'selected' : ''}>${i18next.t('chinese')}</option>
+// END-AUTOGEN-LANG_OPTIONS
+            </select>
+        </div>
+        <div class="settings-item">
           <div class="settings-item-info">
-            <div class="settings-item-title">Prefer System Font</div>
-            <div class="settings-item-desc">Use your device's default font for a native feel.</div>
+            <div class="settings-item-title">${i18next.t('preferSystemFont')}</div>
+            <div class="settings-item-desc">${i18next.t('preferSystemFontDescription')}</div>
           </div>
           <label class="switch">
             <input type="checkbox" class="switch-input" id="settings-system-font" ${useSystemFont ? 'checked' : ''}/>
@@ -574,8 +597,8 @@ function populateSettingsModal() {
         </div>
         <div class="settings-item">
           <div class="settings-item-info">
-            <div class="settings-item-title">Auto-Download</div>
-            <div class="settings-item-desc">Automatically download completed files under a certain size.</div>
+            <div class="settings-item-title">${i18next.t('autoDownload')}</div>
+            <div class="settings-item-desc">${i18next.t('autoDownloadDescription')}</div>
           </div>
           <label class="switch">
             <input type="checkbox" class="switch-input" id="settings-auto-download" ${autoDownloadEnabled ? 'checked' : ''}/>
@@ -584,30 +607,30 @@ function populateSettingsModal() {
         </div>
         <div class="settings-item" id="auto-download-size-container" style="${autoDownloadEnabled ? '' : 'display: none;'}">
             <div class="settings-item-info">
-                <div class="settings-item-title">Auto-Download Max Size (MB)</div>
-                <div class="settings-item-desc">Range: 0.001MB to 3000MB. Limits prevent browser crashes and spam.</div>
+                <div class="settings-item-title">${i18next.t('autoDownloadMaxSize')}</div>
+                <div class="settings-item-desc">${i18next.t('autoDownloadMaxSizeDescription')}</div>
             </div>
             <input type="number" class="settings-number-input" id="settings-auto-download-max-size" value="${autoDownloadMaxSize}" min="0.001" max="3000" step="any" />
         </div>
         <div class="settings-item">
           <div class="settings-item-info">
-            <div class="settings-item-title">PPTX Preview</div>
-            <div class="settings-item-desc">Control consent for PPTX preview uploads.</div>
+            <div class="settings-item-title">${i18next.t('pptxPreview')}</div>
+            <div class="settings-item-desc">${i18next.t('pptxPreviewDescription')}</div>
           </div>
           <div class="segmented" id="settings-pptx-consent">
-            <button type="button" class="seg-btn ${pptxConsent === 'ask' ? 'active' : ''}" data-value="ask">Ask</button>
-            <button type="button" class="seg-btn ${pptxConsent === 'allow' ? 'active' : ''}" data-value="allow">Allow</button>
-            <button type="button" class="seg-btn ${pptxConsent === 'deny' ? 'active' : ''}" data-value="deny">Deny</button>
+            <button type="button" class="seg-btn ${pptxConsent === 'ask' ? 'active' : ''}" data-value="ask">${i18next.t('ask')}</button>
+            <button type="button" class="seg-btn ${pptxConsent === 'allow' ? 'active' : ''}" data-value="allow">${i18next.t('allow')}</button>
+            <button type="button" class="seg-btn ${pptxConsent === 'deny' ? 'active' : ''}" data-value="deny">${i18next.t('deny')}</button>
           </div>
         </div>
 
         <div class="settings-item-full-width" style="margin-top: 1rem; margin-bottom: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--c-panel-border);">
-            <h4 style="margin: 0; color: var(--c-text-secondary); font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.05em;">Advanced</h4>
+            <h4 style="margin: 0; color: var(--c-text-secondary); font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.05em;">${i18next.t('advanced')}</h4>
         </div>
         <div class="settings-item">
             <div class="settings-item-info">
-                <div class="settings-item-title">Safe Mode (OPFS)</div>
-                <div class="settings-item-desc">Write directly to local storage instead of RAM to prevent browser crashes. May cause slower transfers on especially large files or slow storage devices. Requires refresh to apply.</div>
+                <div class="settings-item-title">${i18next.t('safeMode')}</div>
+                <div class="settings-item-desc">${i18next.t('safeModeDescription')}</div>
             </div>
             <label class="switch">
                 <input type="checkbox" class="switch-input" id="settings-opfs-buffer" ${opfsEnabled ? 'checked' : ''} ${!opfsSupported ? 'disabled' : ''}/>
@@ -616,17 +639,25 @@ function populateSettingsModal() {
         </div>
         <div class="settings-item">
           <div class="settings-item-info">
-            <div class="settings-item-title">Transfer Chunk Size (Bytes)</div>
-            <div class="settings-item-desc">Adjust for network conditions. Default: 262144 (256KB). Larger for LAN, smaller for Wi-Fi and Mobile Data. <br>Warning: too large or too small will cause disconnects and throttle downloads respectively.</div>
+            <div class="settings-item-title">${i18next.t('transferChunkSize')}</div>
+            <div class="settings-item-desc">${i18next.t('transferChunkSizeDescription')}</div>
           </div>
           <input type="number" class="settings-number-input" id="settings-chunk-size" value="${chunkSize}" min="16384" max="1048576" step="16384" />
         </div>
 
         <div class="settings-item-full-width">
-            <button class="btn btn-danger" id="reset-preferences-btn">Reset All Preferences</button>
+            <button class="btn btn-danger" id="reset-preferences-btn">${i18next.t('resetAllPreferences')}</button>
         </div>
       </div>
     `;
+
+    const langSelector = document.getElementById('settings-language');
+    if (langSelector) {
+        langSelector.addEventListener('change', (e) => {
+            const newLang = e.target.value;
+            i18next.changeLanguage(newLang);
+        });
+    }
 
     const segControls = document.querySelectorAll('.segmented');
     segControls.forEach(seg => {
@@ -659,12 +690,12 @@ function populateSettingsModal() {
         resetBtn.addEventListener('click', () => {
             showToast({
                 type: 'danger',
-                title: 'Confirm Reset',
-                body: 'Are you sure? This will reset all your preferences and disconnect you from your current session.',
+                title: i18next.t('confirmReset'),
+                body: i18next.t('confirmResetDescription'),
                 duration: 0, // Persist until user action
                 actions: [
-                    { text: 'Cancel', class: 'btn-secondary', callback: () => {} },
-                    { text: 'Reset', class: 'btn-danger', callback: () => {
+                    { text: i18next.t('cancel'), class: 'btn-secondary', callback: () => {} },
+                    { text: i18next.t('reset'), class: 'btn-danger', callback: () => {
                             Object.keys(localStorage).forEach(key => {
                                 if (key.startsWith('dropsilk-')) {
                                     localStorage.removeItem(key);
@@ -737,14 +768,14 @@ function toggleAllSettings(isOn) {
 function updateSettingsSummary() {
     const s = getSettingsSnapshot();
     const summary = [
-        `Sounds: <strong>${s.sounds ? 'On' : 'Off'}</strong>`,
-        `Analytics: <strong>${s.analytics ? 'On' : 'Off'}</strong>`,
-        `Theme: <strong>${s.darkMode ? 'Dark' : 'Light'}</strong>`,
-        `Animation: <strong>${s.animationQuality.charAt(0).toUpperCase() + s.animationQuality.slice(1)}</strong>`,
-        `Font: <strong>${s.systemFont ? 'System' : 'Default'}</strong>`,
-        `Auto-Download: <strong>${s.autoDownload ? `On (${s.autoDownloadMaxSize} MB)` : 'Off'}</strong>`,
-        `PPTX: <strong>${s.pptx[0].toUpperCase() + s.pptx.slice(1)}</strong>`,
-        `Safe Mode: <strong>${s.opfs ? 'On' : 'Off'}</strong>`
+        `${i18next.t('sounds')}: <strong>${s.sounds ? i18next.t('on') : i18next.t('off')}</strong>`,
+        `${i18next.t('analytics')}: <strong>${s.analytics ? i18next.t('on') : i18next.t('off')}</strong>`,
+        `${i18next.t('theme')}: <strong>${s.darkMode ? i18next.t('dark') : i18next.t('light')}</strong>`,
+        `${i18next.t('animation')}: <strong>${i18next.t(s.animationQuality)}</strong>`,
+        `${i18next.t('font')}: <strong>${s.systemFont ? i18next.t('system') : i18next.t('default')}</strong>`,
+        `${i18next.t('autoDownload')}: <strong>${s.autoDownload ? `${i18next.t('on')} (${s.autoDownloadMaxSize} MB)` : i18next.t('off')}</strong>`,
+        `${i18next.t('pptxPreview')}: <strong>${i18next.t(s.pptx)}</strong>`,
+        `${i18next.t('safeMode')}: <strong>${s.opfs ? i18next.t('on') : i18next.t('off')}</strong>`
     ].join(' • ');
     uiElements.zipSelectionInfo.innerHTML = summary;
     uiElements.selectAllZipCheckbox.checked = areAllSettingsEnabled();
@@ -760,7 +791,7 @@ function saveSettingsPreferences() {
 
     if (saveIcon) saveIcon.style.display = 'none';
     if (spinnerIcon) spinnerIcon.style.display = 'inline-block';
-    if (btnSpan) btnSpan.textContent = 'Saving...';
+    if (btnSpan) btnSpan.textContent = i18next.t('saving');
 
     const s = getSettingsSnapshot();
     applyTheme(s.darkMode ? 'dark' : 'light');
@@ -779,8 +810,8 @@ function saveSettingsPreferences() {
     if (maxSize !== clampedSize) {
         showToast({
             type: 'info',
-            title: 'Auto-Download Size Adjusted',
-            body: `The value was adjusted to fit the allowed range (0.001MB - 3000MB).`,
+            title: i18next.t('autoDownloadSizeAdjusted'),
+            body: i18next.t('autoDownloadSizeAdjustedDescription'),
             duration: 7000
         });
     }
@@ -796,8 +827,8 @@ function saveSettingsPreferences() {
     if (chunkSize !== clampedChunkSize) {
         showToast({
             type: 'info',
-            title: 'Chunk Size Adjusted',
-            body: `Value was adjusted to fit the allowed range (${formatBytes(minChunk)} - ${formatBytes(maxChunk)}).`,
+            title: i18next.t('chunkSizeAdjusted'),
+            body: i18next.t('chunkSizeAdjustedDescription', {min: formatBytes(minChunk), max: formatBytes(maxChunk)}),
             duration: 7000
         });
     }
@@ -809,10 +840,10 @@ function saveSettingsPreferences() {
     else if (!s.analytics && wasConsented) {
         showToast({
             type: 'info',
-            title: 'Analytics disabled',
-            body: 'Your preference will fully apply after a reload.',
+            title: i18next.t('analyticsDisabled'),
+            body: i18next.t('analyticsDisabledDescription'),
             duration: 7000,
-            actions: [{ text: 'Reload now', class: 'btn-primary', callback: () => location.reload() }]
+            actions: [{ text: i18next.t('reloadNow'), class: 'btn-primary', callback: () => location.reload() }]
         });
     }
     setPreviewConsent('pptx', s.pptx);
@@ -820,6 +851,6 @@ function saveSettingsPreferences() {
 
     setTimeout(() => {
         document.getElementById('closeZipModal')?.click();
-        showToast({ type: 'success', title: 'Preferences saved', body: 'Your settings have been updated.', duration: 4000 });
+        showToast({ type: 'success', title: i18next.t('preferencesSaved'), body: i18next.t('preferencesSavedDescription'), duration: 4000 });
     }, 500);
 }

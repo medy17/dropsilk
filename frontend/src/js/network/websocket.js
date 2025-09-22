@@ -1,6 +1,7 @@
 // js/network/websocket.js
 // Manages the WebSocket signalling server connection.
 
+import i18next from "../i18n.js";
 import { WEBSOCKET_URL } from '../config.js';
 import { store } from '../state.js';
 import { showInvitationToast, showToast } from '../utils/toast.js';
@@ -74,9 +75,9 @@ async function onMessage(event) {
         case "peer-joined":
             audioManager.play('connect');
             showToast({
-                type: 'success', // A new type, but will default gracefully
-                title: 'Peer Connected!',
-                body: `${msg.peer.name} has joined the flight.`,
+                type: 'success',
+                title: i18next.t('peerConnected'),
+                body: i18next.t('peerConnectedDescription', { peerName: msg.peer.name }),
                 duration: 5000
             });
 
@@ -93,7 +94,7 @@ async function onMessage(event) {
             }
             store.actions.setConnectionType(msg.connectionType || 'wan');
             store.actions.setPeerInfo(msg.peer);
-            updateDashboardStatus(`Peer Connected! (${store.getState().connectionType.toUpperCase()} mode)`, 'connected');
+            updateDashboardStatus(`${i18next.t('peerConnected')} (${store.getState().connectionType.toUpperCase()} mode)`, 'connected');
             renderInFlightView();
 
             if (state.isFlightCreator) {
@@ -153,11 +154,11 @@ async function handleServerError(message) {
 
         showToast({
             type: 'danger',
-            title: 'Flight Not Found',
-            body: "Please double-check the 6-character code and try again.",
+            title: i18next.t('flightNotFound'),
+            body: i18next.t('flightNotFoundDescription'),
             duration: 8000
         });
     } else {
-        showToast({ type: 'danger', title: 'An Error Occurred', body: message, duration: 8000 });
+        showToast({ type: 'danger', title: i18next.t('anErrorOccurred'), body: message, duration: 8000 });
     }
 }

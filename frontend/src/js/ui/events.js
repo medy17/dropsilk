@@ -1,6 +1,7 @@
 // js/ui/events.js
 // This file is responsible for attaching all event listeners to the DOM.
 
+import i18next from "../i18n.js";
 import { uiElements, folderInputTransfer } from './dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
@@ -49,8 +50,8 @@ function attemptToJoinFlight() {
         lastOtpErrorSnapshot = code;
         showToast({
             type: 'danger',
-            title: 'Invalid Code',
-            body: 'Please enter a 6-character flight code to join.',
+            title: i18next.t('invalidCode'),
+            body: i18next.t('invalidCodeDescription'),
             duration: 5000,
         });
     }
@@ -76,7 +77,7 @@ function initializeSortableQueue() {
         });
     } else {
         console.warn(
-            'SortableJS library not found or sending queue element is missing.'
+            i18next.t('sortableJsNotFound')
         );
     }
 }
@@ -320,16 +321,16 @@ export function initializeEventListeners() {
                         } else {
                             showToast({
                                 type: 'danger',
-                                title: 'Invalid QR Code',
-                                body: 'The QR code does not contain a valid flight link.',
+                                title: i18next.t('invalidQrCode'),
+                                body: i18next.t('invalidQrCodeDescription'),
                             });
                             stopScanner();
                         }
                     } catch (e) {
                         showToast({
                             type: 'danger',
-                            title: 'Invalid QR Code',
-                            body: 'This does not look like a DropSilk link.',
+                            title: i18next.t('invalidQrCode'),
+                            body: i18next.t('notDropSilkLink'),
                         });
                         stopScanner();
                     }
@@ -344,8 +345,8 @@ export function initializeEventListeners() {
             console.error('QR Scanner Error:', error);
             showToast({
                 type: 'danger',
-                title: 'Camera Error',
-                body: 'Could not access the camera. Please check permissions.',
+                title: i18next.t('cameraError'),
+                body: i18next.t('cameraErrorDescription'),
                 duration: 8000,
             });
             stopScanner();
@@ -402,14 +403,14 @@ export function initializeEventListeners() {
                     inviteeId,
                     flightCode: currentFlightCode,
                 });
-                inviteBtn.textContent = 'Invited';
+                inviteBtn.textContent = i18next.t('invited');
                 inviteBtn.disabled = true;
                 setTimeout(() => {
                     const currentBtn = document.querySelector(
                         `.invite-user-btn[data-invitee-id="${inviteeId}"]`
                     );
                     if (currentBtn) {
-                        currentBtn.textContent = 'Invite';
+                        currentBtn.textContent = i18next.t('invite');
                         currentBtn.disabled = false;
                     }
                 }, 3000);
