@@ -692,7 +692,7 @@
                         fill="currentColor"
                         viewBox="0 0 16 16"
                 ><path
-                        d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0  0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"
+                        d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"
                 /><path
                         d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"
                 /></svg>
@@ -754,8 +754,9 @@
             </button>
         </div>
         <div class="modal-body">
-            <p>
-                <span data-i18n="aboutMeDescription1">is a project born from the desire to have a simple, private, and fast way to transfer files between devices.</span>
+            <p data-i18n="aboutMeDescription1">
+                <strong>DropSilk</strong> is a project born from the desire to have
+                a simple, private, and fast way to transfer files between devices.
             </p>
 
             <p data-i18n="aboutMeDescription2">
@@ -801,7 +802,7 @@
 <div class="modal-overlay" id="zipModal">
     <div class="invite-modal">
         <div class="modal-header">
-            <h3 data-i18n="downloadFilesAsZip">Download Files as Zip</h3>
+            <h3>Download Files as Zip</h3>
             <button
                     class="modal-close"
                     id="closeZipModal"
@@ -870,7 +871,7 @@
                             stroke-width="5"
                     ></circle
                     ></svg>
-                    <span data-i18n="downloadSelectedAsZip">Download Selected as Zip</span>
+                    <span>Download Selected as Zip</span>
                 </button>
             </div>
             <!-- State 2: Warning Footer -->
@@ -1187,21 +1188,18 @@
                     </a>
                     <span data-i18n="googleAnalytics">For anonymous statistics (if you consent).</span>
                 </li>
-
                 <li>
                     <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
                         <strong>Google STUN Servers:</strong>
                     </a>
                     <span data-i18n="googleStunServers">For facilitating P2P connections. A client queries a STUN server to learn its own public IP Address.</span>
                 </li>
-
                 <li>
                     <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
                         <strong>Google reCAPTCHA:</strong>
                     </a>
                     <span data-i18n="googleRecaptcha">For spam protection on our contact details.</span>
                 </li>
-
                 <li>
                     <strong>
                         <a href="https://render.com/privacy" target="_blank" rel="noopener noreferrer">Render</a>
@@ -1210,7 +1208,6 @@
                     </strong>
                     <span data-i18n="renderAndVercel">For hosting our backend and frontend, respectively.</span>
                 </li>
-
                 <li>
                     <a href="https://uploadthing.com/info/privacy-policy" target="_blank" rel="noopener noreferrer">
                         <strong>UploadThing:</strong>
@@ -1221,7 +1218,6 @@
                       hours of its upload. You may reach out to us via our contact page if you require immediate deletion.
                     </span>
                 </li>
-
                 <li>
                     <a href="https://www.microsoft.com/en-us/privacy/privacystatement" target="_blank"
                        rel="noopener noreferrer">
@@ -1461,16 +1457,26 @@
 <div id="privacy-consent-toast">
     <div class="privacy-toast-content">
         <p>
-            <span data-i18n="privacyConsent">We use essential local storage for site functionality and analytics to
+            We use essential local storage for site functionality and analytics to
             improve your experience. By clicking "Accept", you consent to our use
             of these technologies. See our
-            <a href="#" id="privacy-link-in-toast">Privacy Policy</a>
-            for details.</span>
+            <button
+                    id="privacy-link-in-toast"
+                    class="footer-nav-link"
+                    style="
+              padding: 0;
+              display: inline;
+              vertical-align: baseline;
+              font-weight: 600;
+            "
+            >
+                Privacy Policy
+            </button>
+            for details.
         </p>
         <button id="accept-privacy-btn" class="btn btn-primary" data-i18n="accept">Accept</button>
     </div>
 </div>
-
 
 <!-- Drawer Structure -->
 <div class="drawer-overlay" id="drawer-overlay"></div>
