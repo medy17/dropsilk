@@ -18,9 +18,9 @@ let currentHandlerModule = null; // Store the currently active handler module
 const PREVIEW_CONSENT_KEY = 'dropsilk-preview-consent';
 
 function getConsentMap() {
-  try {
-    return JSON.parse(localStorage.getItem(PREVIEW_CONSENT_KEY) || '{}');
-  } catch { return {}; }
+    try {
+        return JSON.parse(localStorage.getItem(PREVIEW_CONSENT_KEY) || '{}');
+    } catch { return {}; }
 }
 
 function loadScript(url) {
@@ -86,23 +86,24 @@ document.addEventListener('keydown', (e) => {
 });
 
 function setConsent(ext, value) {
-  const map = getConsentMap();
-  map[ext] = value; // 'allow' | 'deny'
-  localStorage.setItem(PREVIEW_CONSENT_KEY, JSON.stringify(map));
+    const map = getConsentMap();
+    map[ext] = value; // 'allow' | 'deny'
+    localStorage.setItem(PREVIEW_CONSENT_KEY, JSON.stringify(map));
 }
 
 export function updatePptxPreviewButtonsDisabled(isDisabled) {
-  // Disable/enable any PPTX preview buttons currently in the UI
-  const buttons = document.querySelectorAll(
-    '.preview-btn[data-ext="pptx"]'
-  );
-  buttons.forEach((btn) => {
-    if (!(btn instanceof HTMLButtonElement)) return;
-    btn.disabled = !!isDisabled;
-    btn.title = isDisabled
-        ? i18n.t('pptxPreviewDisabledTooltip')
-        : i18n.t('previewFileTooltip');
-  });
+    // Disable/enable any PPTX preview buttons currently in the UI
+    const buttons = document.querySelectorAll(
+        '.preview-btn[data-ext="pptx"]'
+    );
+    buttons.forEach((btn) => {
+        if (!(btn instanceof HTMLButtonElement)) return;
+        btn.disabled = !!isDisabled;
+        // CORRECTED: Use i18next here for the tooltips
+        btn.title = isDisabled
+            ? i18next.t('pptxPreviewDisabledTooltip')
+            : i18next.t('previewFileTooltip');
+    });
 }
 
 /**
