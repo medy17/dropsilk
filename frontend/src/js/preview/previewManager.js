@@ -1,6 +1,6 @@
 // js/preview/previewManager.js
 // Manages loading and displaying file previews in a modal.
-
+import i18next from "../i18n.js";
 import { previewConfig } from './previewConfig.js';
 import { store } from '../state.js';
 import { showToast } from '../utils/toast.js';
@@ -100,8 +100,8 @@ export function updatePptxPreviewButtonsDisabled(isDisabled) {
     if (!(btn instanceof HTMLButtonElement)) return;
     btn.disabled = !!isDisabled;
     btn.title = isDisabled
-      ? 'PPTX preview disabled by your privacy choice'
-      : 'Preview File';
+        ? i18n.t('pptxPreviewDisabledTooltip')
+        : i18n.t('previewFileTooltip');
   });
 }
 
@@ -122,9 +122,7 @@ function ensureUploadConsent(ext) {
       title: 'PPTX Preview Consent',
       duration: 0,
       body: `
-        Previewing PPTX requires a temporary upload to a secure third-party
-        service (UploadThing) to generate a preview. The file is used only for
-        this preview and is automatically deleted by our backend shortly after.
+        ${i18n.t('pptxConsentBody')}
         <br/><br/>
         <label class="checkbox-label">
           <input type="checkbox"
@@ -136,7 +134,7 @@ function ensureUploadConsent(ext) {
       `,
       actions: [
         {
-          text: 'Decline',
+          text: i18n.t('decline'),
           class: 'btn-secondary',
           callback: () => {
             const remember = !!toast.element.querySelector(
@@ -150,7 +148,7 @@ function ensureUploadConsent(ext) {
           },
         },
         {
-          text: 'Continue',
+          text: i18n.t('continue'),
           class: 'btn-primary',
           callback: () => {
             const remember = !!toast.element.querySelector(
