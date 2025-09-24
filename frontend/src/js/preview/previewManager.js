@@ -110,60 +110,63 @@ export function updatePptxPreviewButtonsDisabled(isDisabled) {
  * Returns true if allowed, false if declined.
  */
 function ensureUploadConsent(ext) {
-  const map = getConsentMap();
-  const decided = map[ext];
-  if (decided === 'allow') return Promise.resolve(true);
-  if (decided === 'deny') return Promise.resolve(false);
+    const map = getConsentMap();
+    const decided = map[ext];
+    if (decided === 'allow') return Promise.resolve(true);
+    if (decided === 'deny') return Promise.resolve(false);
 
-  const rememberId = `remember-consent-${ext}-${Date.now()}`;
-  return new Promise((resolve) => {
-    const toast = showToast({
-      type: 'info',
-      title: 'PPTX Preview Consent',
-      duration: 0,
-      body: `
-        ${i18n.t('pptxConsentBody')}
+    const rememberId = `remember-consent-${ext}-${Date.now()}`;
+    return new Promise((resolve) => {
+        const toast = showToast({
+            type: 'info',
+            // CORRECTED: Use i18next and the translation key
+            title: i18next.t('pptxConsentTitle'),
+            duration: 0,
+            body: `
+        ${i18next.t('pptxConsentBody')}
         <br/><br/>
         <label class="checkbox-label">
           <input type="checkbox"
                  id="${rememberId}"
                  class="custom-checkbox-input" />
           <span class="custom-checkbox"></span>
-          <span>Remember my decision</span>
+          <span>${i18next.t('pptxConsentRemember')}</span>
         </label>
       `,
-      actions: [
-        {
-          text: i18n.t('decline'),
-          class: 'btn-secondary',
-          callback: () => {
-            const remember = !!toast.element.querySelector(
-              `#${rememberId}`
-            )?.checked;
-            if (remember) {
-              setConsent(ext, 'deny');
-              if (ext === 'pptx') updatePptxPreviewButtonsDisabled(true);
-            }
-            resolve(false);
-          },
-        },
-        {
-          text: i18n.t('continue'),
-          class: 'btn-primary',
-          callback: () => {
-            const remember = !!toast.element.querySelector(
-              `#${rememberId}`
-            )?.checked;
-            if (remember) {
-              setConsent(ext, 'allow');
-              if (ext === 'pptx') updatePptxPreviewButtonsDisabled(false);
-            }
-            resolve(true);
-          },
-        },
-      ],
+            actions: [
+                {
+                    // CORRECTED: Use i18next
+                    text: i18next.t('decline'),
+                    class: 'btn-secondary',
+                    callback: () => {
+                        const remember = !!toast.element.querySelector(
+                            `#${rememberId}`
+                        )?.checked;
+                        if (remember) {
+                            setConsent(ext, 'deny');
+                            if (ext === 'pptx') updatePptxPreviewButtonsDisabled(true);
+                        }
+                        resolve(false);
+                    },
+                },
+                {
+                    // CORRECTED: Use i18next
+                    text: i18next.t('continue'),
+                    class: 'btn-primary',
+                    callback: () => {
+                        const remember = !!toast.element.querySelector(
+                            `#${rememberId}`
+                        )?.checked;
+                        if (remember) {
+                            setConsent(ext, 'allow');
+                            if (ext === 'pptx') updatePptxPreviewButtonsDisabled(false);
+                        }
+                        resolve(true);
+                    },
+                },
+            ],
+        });
     });
-  });
 }
 
 // --- Public Preview Function ---
