@@ -20,12 +20,19 @@ let fileReadingDone = false;
 let sentOffset = 0;
 let lastSendProgressUpdate = 0; // For throttling UI updates
 
-// ETR State Variables ---
+// Sender ETR calculation state
 let transferStartTime = 0;
 let lastSpeedCalcTime = 0;
 let lastSpeedCalcOffset = 0;
 let speedSamples = [];
 const SPEED_SAMPLE_COUNT = 10; // Average over the last 10 speed samples for smoothness
+
+// Receiver ETR states
+let incomingTransferStartTime = 0;
+let lastIncomingSpeedCalcTime = 0;
+let lastIncomingSpeedCalcOffset = 0;
+let incomingSpeedSamples = [];
+// Speed sample count is reused for both sender and receiver
 
 let incomingFileInfo = null;
 let incomingFileData = [];
@@ -44,7 +51,6 @@ export function ensureQueueIsActive() {
         startFileSend(nextFile);
     }
 }
-
 
 function formatTimeRemaining(seconds) {
     if (!isFinite(seconds) || seconds < 0) {
@@ -186,10 +192,6 @@ function startFileSend(file) {
     const fileId = store.actions.getFileId(file);
     const fileElement = document.getElementById(fileId);
 
-    store.actions.setCurrentlySendingFile(file);
-    const fileId = store.actions.getFileId(file);
-    const fileElement = document.getElementById(fileId);
-
     if (fileElement) {
         fileElement.classList.add('is-sending');
 
@@ -257,7 +259,7 @@ export function drainQueue() {
 
         sentOffset += chunkSize;
         const now = Date.now();
-        if (now - lastSendProgressUpdate > 500) { // Update UI every 300ms
+        if (now - lastSendProgressUpdate > 100) { // Update UI every 100ms
             if (fileElement) {
                 const progressValue = sentOffset / file.size;
                 fileElement.querySelector('progress').value = progressValue;
@@ -341,7 +343,6 @@ export function drainQueue() {
 }
 
 
-
 export async function handleDataChannelMessage(event) {
     const data = event.data;
 
@@ -365,6 +366,11 @@ export async function handleDataChannelMessage(event) {
             incomingFileInfo = parsedData;
             incomingFileData = [];
             incomingFileReceived = 0;
+
+            incomingTransferStartTime = Date.now();
+            lastIncomingSpeedCalcTime = Date.now();
+            lastIncomingSpeedCalcOffset = 0;
+            incomingSpeedSamples = [];
 
             const useOpfs =
                 localStorage.getItem('dropsilk-use-opfs-buffer') === 'true' &&
@@ -405,11 +411,14 @@ export async function handleDataChannelMessage(event) {
             uiElements.receiverQueueDiv.insertAdjacentHTML('beforeend', `
                 <div class="queue-item" id="${fileId}">
                     <div class="file-icon">${getFileIcon(incomingFileInfo.name)}</div>
-                    <div class="file-details">
+                        <div class="file-details">
                         <div class="file-details__name" title="${incomingFileInfo.name}"><span>${incomingFileInfo.name}</span></div>
-                        <progress class="file-details__progress-bar" value="0" max="1"></progress>
-                        <div class="file-details__status"><span class="percent">0%</span></div>
-                    </div>
+                            <progress class="file-details__progress-bar" value="0" max="1"></progress>
+                            <div class="file-details__status">
+                                <span class="percent">0%</span>
+                                <span class="status-text">${i18next.t('receiving', 'Receiving...')}</span>
+                            </div>
+                        </div>
                     <div class="file-action"></div>
                 </div>`);
 
@@ -484,7 +493,13 @@ export async function handleDataChannelMessage(event) {
             if (fileElement) {
                 // Final UI update for the progress bar and status text
                 fileElement.querySelector('progress').value = 1;
-                fileElement.querySelector('.percent').textContent = 'Complete!';
+                // Keep the percentage at 100%
+                fileElement.querySelector('.percent').textContent = '100%';
+                // Update the status text to "Complete!"
+                const statusTextElement = fileElement.querySelector('.status-text');
+                if (statusTextElement) {
+                    statusTextElement.textContent = i18next.t('completeStatus', 'Complete!');
+                }
 
                 const actionContainer = fileElement.querySelector('.file-action');
 
@@ -590,15 +605,46 @@ export async function handleDataChannelMessage(event) {
     const chunkSize = data.byteLength || data.size || 0;
     store.actions.updateMetricsOnReceive(chunkSize);
     incomingFileReceived += chunkSize;
+
     if (incomingFileInfo?.size) {
         const now = Date.now();
-        if (now - lastReceiveProgressUpdate > 100) { // Update every 100ms
+        if (now - lastReceiveProgressUpdate > 100) { // Update UI every 100ms
             const progressValue = incomingFileReceived / incomingFileInfo.size;
             const fileId = store.actions.getFileId(incomingFileInfo.name);
             const fileElement = document.getElementById(fileId);
+
             if (fileElement) {
                 fileElement.querySelector('progress').value = progressValue;
                 fileElement.querySelector('.percent').textContent = `${Math.round(progressValue * 100)}%`;
+
+                const elapsedSinceLastCalc = (now - lastIncomingSpeedCalcTime) / 1000;
+                if (elapsedSinceLastCalc > 0.5) { // Calculate speed every 500ms
+                    const bytesSinceLastCalc = incomingFileReceived - lastIncomingSpeedCalcOffset;
+                    const currentSpeed = bytesSinceLastCalc / elapsedSinceLastCalc;
+
+                    if (isFinite(currentSpeed) && currentSpeed > 0) {
+                        incomingSpeedSamples.push(currentSpeed);
+                        if (incomingSpeedSamples.length > SPEED_SAMPLE_COUNT) {
+                            incomingSpeedSamples.shift();
+                        }
+                    }
+                    lastIncomingSpeedCalcTime = now;
+                    lastIncomingSpeedCalcOffset = incomingFileReceived;
+                }
+
+                if (incomingSpeedSamples.length > 0) {
+                    const averageSpeed = incomingSpeedSamples.reduce((a, b) => a + b, 0) / incomingSpeedSamples.length;
+                    if (averageSpeed > 0) {
+                        const bytesRemaining = incomingFileInfo.size - incomingFileReceived;
+                        const etrSeconds = bytesRemaining / averageSpeed;
+                        const etrText = formatTimeRemaining(etrSeconds); // Reuse the same helper function
+
+                        const statusTextElement = fileElement.querySelector('.status-text');
+                        if (statusTextElement) {
+                            statusTextElement.textContent = etrText;
+                        }
+                    }
+                }
             }
             lastReceiveProgressUpdate = now;
         }
