@@ -20,6 +20,13 @@ let fileReadingDone = false;
 let sentOffset = 0;
 let lastSendProgressUpdate = 0; // For throttling UI updates
 
+// ETR State Variables ---
+let transferStartTime = 0;
+let lastSpeedCalcTime = 0;
+let lastSpeedCalcOffset = 0;
+let speedSamples = [];
+const SPEED_SAMPLE_COUNT = 10; // Average over the last 10 speed samples for smoothness
+
 let incomingFileInfo = null;
 let incomingFileData = [];
 let incomingFileReceived = 0;
@@ -36,6 +43,29 @@ export function ensureQueueIsActive() {
         const nextFile = state.fileToSendQueue[0];
         startFileSend(nextFile);
     }
+}
+
+
+function formatTimeRemaining(seconds) {
+    if (!isFinite(seconds) || seconds < 0) {
+        return i18next.t('calculating'); // e.g., "Calculating..."
+    }
+    if (seconds < 1) {
+        return i18next.t('lessThanASecond'); // e.g., "Less than a second"
+    }
+
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+
+    const parts = [];
+    if (hours > 0) parts.push(i18next.t('hr', { count: hours })); // e.g., "1 hr", "2 hrs"
+    if (minutes > 0) parts.push(i18next.t('min', { count: minutes })); // e.g., "1 min", "2 mins"
+    if (remainingSeconds > 0 || parts.length === 0) {
+        parts.push(i18next.t('sec', { count: remainingSeconds })); // e.g., "1 sec", "5 secs"
+    }
+
+    return i18next.t('timeRemaining', { time: parts.slice(0, 2).join(' ') }); // e.g., "1 min 15 sec remaining"
 }
 
 export function cancelFileSend(fileId) {
@@ -156,6 +186,10 @@ function startFileSend(file) {
     const fileId = store.actions.getFileId(file);
     const fileElement = document.getElementById(fileId);
 
+    store.actions.setCurrentlySendingFile(file);
+    const fileId = store.actions.getFileId(file);
+    const fileElement = document.getElementById(fileId);
+
     if (fileElement) {
         fileElement.classList.add('is-sending');
 
@@ -181,6 +215,11 @@ function startFileSend(file) {
     chunkQueue = [];
     fileReadingDone = false;
     sentOffset = 0;
+
+    transferStartTime = Date.now();
+    lastSpeedCalcTime = Date.now();
+    lastSpeedCalcOffset = 0;
+    speedSamples = [];
 
     sendData(JSON.stringify({ name: file.name, type: file.type, size: file.size }));
 
@@ -218,11 +257,45 @@ export function drainQueue() {
 
         sentOffset += chunkSize;
         const now = Date.now();
-        if (now - lastSendProgressUpdate > 100) { // Update every 100ms
+        if (now - lastSendProgressUpdate > 500) { // Update UI every 300ms
             if (fileElement) {
                 const progressValue = sentOffset / file.size;
                 fileElement.querySelector('progress').value = progressValue;
                 fileElement.querySelector('.percent').textContent = `${Math.round(progressValue * 100)}%`;
+
+                // --- ETR CALCULATION LOGIC ---
+                const elapsedSinceLastCalc = (now - lastSpeedCalcTime) / 1000;
+                // Calculate speed every 500ms for a more stable reading
+                if (elapsedSinceLastCalc > 0.5) {
+                    const bytesSinceLastCalc = sentOffset - lastSpeedCalcOffset;
+                    const currentSpeed = bytesSinceLastCalc / elapsedSinceLastCalc; // bytes/sec
+
+                    // Add to our samples for a moving average
+                    if (isFinite(currentSpeed) && currentSpeed > 0) {
+                        speedSamples.push(currentSpeed);
+                        if (speedSamples.length > SPEED_SAMPLE_COUNT) {
+                            speedSamples.shift(); // Keep only the last N samples
+                        }
+                    }
+
+                    lastSpeedCalcTime = now;
+                    lastSpeedCalcOffset = sentOffset;
+                }
+
+                // Only display ETR if we have valid speed samples to work with
+                if (speedSamples.length > 0) {
+                    const averageSpeed = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
+
+                    if (averageSpeed > 0) {
+                        const bytesRemaining = file.size - sentOffset;
+                        const etrSeconds = bytesRemaining / averageSpeed;
+                        const etrText = formatTimeRemaining(etrSeconds);
+
+                        // Update the status text with the ETR, replacing "Sending..."
+                        fileElement.querySelector('.status-text').textContent = etrText;
+                    }
+                }
+                // --- END ETR LOGIC ---
             }
             lastSendProgressUpdate = now;
         }
@@ -233,7 +306,11 @@ export function drainQueue() {
         if (fileElement) {
             fileElement.classList.remove('is-sending');
             fileElement.querySelector('progress').value = 1; // Final update
-            fileElement.querySelector('.status-text').textContent = 'Sent!';
+
+            // Revert to the final "Sent!" status, as you planned.
+            // Using i18next.t() is good practice for translation.
+            fileElement.querySelector('.status-text').textContent = i18next.t('sentStatus', 'Sent!');
+
             fileElement.querySelector('.percent').textContent = `100%`;
             const cancelButton = fileElement.querySelector('.cancel-file-btn');
             if (cancelButton) cancelButton.remove();
@@ -263,7 +340,7 @@ export function drainQueue() {
     }
 }
 
-// js/transfer/fileHandler.js
+
 
 export async function handleDataChannelMessage(event) {
     const data = event.data;
