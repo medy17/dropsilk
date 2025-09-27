@@ -43,6 +43,8 @@
   "overallMetrics": "Overall Metrics",
   "sent": "Sent",
   "received": "Received",
+  "receiving": "Receiving...",
+  "completeStatus": "Complete!",
   "speed": "Speed",
   "calculating": "Calculating...",
   "lessThanASecond": "Less than a second",
