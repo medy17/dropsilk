@@ -1,9 +1,10 @@
 // js/preview/handlers/pdfPreview.js
 // Renders PDF files in the preview modal using PDF.js.
+import * as pdfjsLib from 'pdfjs-dist/build/pdf';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker?url';
 
 // PDF.js will be available globally as 'pdfjsLib' after pdf.min.js is loaded.
 // We explicitly set the worker source to the CDN path.
-const PDF_WORKER_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 // Observer for lazy loading ---
 let activeObserver = null;
@@ -38,13 +39,9 @@ export default async function renderPdfPreview(blob, contentElement) {
     contentElement.dataset.objectUrl = pdfUrl;
 
     try {
-        if (window.pdfjsLib) {
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDF_WORKER_SRC;
-        } else {
-            throw new Error("PDF.js library (pdfjsLib) not found.");
-        }
+        pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-        const loadingTask = window.pdfjsLib.getDocument(pdfUrl);
+        const loadingTask = pdfjsLib.getDocument(pdfUrl);
         const pdfDoc = await loadingTask.promise;
 
         // --- Setup Intersection Observer ---

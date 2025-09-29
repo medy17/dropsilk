@@ -1,5 +1,6 @@
 // js/preview/handlers/docxPreview.js
 // Renders DOCX and other word processing documents using Mammoth.js.
+import * as mammoth from "mammoth";
 
 export default async function renderDocxPreview(blob, contentElement) {
     try {
@@ -7,7 +8,7 @@ export default async function renderDocxPreview(blob, contentElement) {
         const arrayBuffer = await blob.arrayBuffer();
 
         // 2. Use Mammoth.js to convert the document to HTML.
-        const result = await window.mammoth.convertToHtml({ arrayBuffer });
+        const result = await mammoth.convertToHtml({ arrayBuffer });
         const html = result.value; // The generated HTML
 
         // 3. Create a container for the styled content.

@@ -9,12 +9,18 @@
     "update-locales": "node scripts/update-locales.js"
   },
   "dependencies": {
+    "highlight.js": "^11.11.1",
     "i18next": "^25.5.2",
     "i18next-browser-languagedetector": "^8.2.0",
     "jszip": "^3.10.1",
+    "mammoth": "^1.11.0",
+    "marked": "^16.3.0",
+    "pdfjs-dist": "^5.4.149",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
     "sortablejs": "^1.15.6",
-    "uploadthing": "^7.7.4"
+    "uploadthing": "^7.7.4",
+    "wavesurfer.js": "^7.10.3",
+    "xlsx": "^0.18.5"
   }
 }

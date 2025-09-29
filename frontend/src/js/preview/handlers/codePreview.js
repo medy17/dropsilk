@@ -1,5 +1,20 @@
 // js/preview/handlers/codePreview.js
 // Renders code and text files with syntax highlighting.
+import hljs from 'highlight.js/lib/core';
+import javascript from 'highlight.js/lib/languages/javascript';
+import python from 'highlight.js/lib/languages/python';
+import xml from 'highlight.js/lib/languages/xml';
+import css from 'highlight.js/lib/languages/css';
+import markdown from 'highlight.js/lib/languages/markdown';
+import 'highlight.js/styles/github.css';
+
+// Register languages
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('python', python);
+hljs.registerLanguage('xml', xml); // For HTML
+hljs.registerLanguage('css', css);
+hljs.registerLanguage('markdown', markdown);
+
 
 export default async function renderCodePreview(blob, contentElement) {
     try {
@@ -10,9 +25,7 @@ export default async function renderCodePreview(blob, contentElement) {
         code.textContent = text;
 
         // Use highlight.js to apply syntax highlighting
-        if (window.hljs) {
-            window.hljs.highlightElement(code);
-        }
+        hljs.highlightElement(code);
 
         pre.appendChild(code);
         contentElement.appendChild(pre);

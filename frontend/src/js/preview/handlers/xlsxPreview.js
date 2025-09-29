@@ -1,14 +1,12 @@
 // js/preview/handlers/xlsxPreview.js
 // Renders Excel (XLSX, XLS) files using SheetJS.
+import * as XLSX from "xlsx";
 
 export default async function renderXlsxPreview(blob, contentElement) {
-    if (!window.XLSX) {
-        throw new Error('SheetJS (XLSX) library not found.');
-    }
 
     const arrayBuffer = await blob.arrayBuffer();
     const data = new Uint8Array(arrayBuffer);
-    const workbook = window.XLSX.read(data, { type: "array" });
+    const workbook = XLSX.read(data, { type: "array" });
 
     // Create main container
     const xlsxContainer = document.createElement('div');
@@ -41,7 +39,7 @@ export default async function renderXlsxPreview(blob, contentElement) {
 
         // Convert sheet to HTML table
         const worksheet = workbook.Sheets[sheetName];
-        sheetDiv.innerHTML = window.XLSX.utils.sheet_to_html(worksheet);
+        sheetDiv.innerHTML = XLSX.utils.sheet_to_html(worksheet);
 
         // Add event listener to tab button
         tabButton.addEventListener('click', () => {

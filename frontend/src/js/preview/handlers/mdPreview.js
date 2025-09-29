@@ -1,13 +1,11 @@
 // js/preview/handlers/mdPreview.js
+import { marked } from 'marked';
 
 export default async function renderMarkdownPreview(blob, contentElement) {
-    if (!window.marked) {
-        throw new Error('Marked.js library not found.');
-    }
 
     try {
         const markdownText = await blob.text();
-        const html = window.marked.parse(markdownText);
+        const html = marked.parse(markdownText);
 
         const container = document.createElement('div');
         container.className = 'markdown-body'; // Use the class from github-markdown-css

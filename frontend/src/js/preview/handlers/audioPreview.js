@@ -1,5 +1,6 @@
 // js/preview/handlers/audioPreview.js
 // Renders audio files with a visual waveform using WaveSurfer.js.
+import WaveSurfer from "wavesurfer.js";
 
 let wavesurfer = null;
 
@@ -11,11 +12,6 @@ export async function cleanup() {
 }
 
 export default async function renderAudioPreview(blob, contentElement) {
-    // Ensure WaveSurfer library is loaded
-    if (!window.WaveSurfer) {
-        throw new Error('WaveSurfer.js library not found.');
-    }
-
     // Clean up any previous instance
     await cleanup();
 
@@ -52,7 +48,7 @@ export default async function renderAudioPreview(blob, contentElement) {
     contentElement.appendChild(playerContainer);
 
     // Initialize WaveSurfer
-    wavesurfer = window.WaveSurfer.create({
+    wavesurfer = WaveSurfer.create({
         container: '#waveform',
         waveColor: 'rgba(245, 169, 184, 0.7)',
         progressColor: '#5bcefa',
