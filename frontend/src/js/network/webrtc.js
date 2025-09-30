@@ -186,6 +186,7 @@ export function initializePeerConnection(isOfferer) {
 
     if (isOfferer) {
         dataChannel = peerConnection.createDataChannel('fileTransfer');
+        dataChannel.binaryType = 'arraybuffer';
         // Fire onbufferedamountlow well before we stall
         dataChannel.bufferedAmountLowThreshold =
             Math.floor(HIGH_WATER_MARK / 2);
@@ -202,6 +203,7 @@ export function initializePeerConnection(isOfferer) {
     } else {
         peerConnection.ondatachannel = (event) => {
             dataChannel = event.channel;
+            dataChannel.binaryType = 'arraybuffer';
             dataChannel.bufferedAmountLowThreshold =
                 Math.floor(HIGH_WATER_MARK / 2);
             setupDataChannel();
