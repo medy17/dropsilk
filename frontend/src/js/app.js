@@ -347,12 +347,10 @@ function initializePrivacyConsent() {
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DropSilk Initializing...");
 
-    i18next.init().then(() => {
-        translateStaticElements();
-        i18next.on('languageChanged', () => {
-            translateStaticElements();
-        });
-    });
+    const applyTranslations = () => translateStaticElements();
+    if (i18next.isInitialized) applyTranslations();
+    else i18next.on('initialized', applyTranslations);
+    i18next.on('languageChanged', applyTranslations);
 
     initializeGlobalUI();
 
