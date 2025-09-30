@@ -110,7 +110,7 @@ function generateQRCode() {
         return;
     }
 
-    const url = `https://dropsilk.xyz/?code=${currentFlightCode}`;
+    const url = `${location.origin}/?code=${currentFlightCode}`;
     const qrDotColor = getComputedStyle(document.documentElement).getPropertyValue('--c-primary').trim();
     const qrColors = { dark: qrDotColor, light: '#00000000' };
 
@@ -392,7 +392,7 @@ function setupInviteModal() {
 
     shareNativeBtn?.addEventListener('click', async () => {
         const { currentFlightCode } = store.getState();
-        if (navigator.share) await navigator.share({ title: i18next.t('joinMyFlight'), text: i18next.t('joinMyFlightDescription', { code: currentFlightCode }), url: `https://dropsilk.xyz/?code=${currentFlightCode}` });
+        if (navigator.share) await navigator.share({ title: i18next.t('joinMyFlight'), text: i18next.t('joinMyFlightDescription', { code: currentFlightCode }), url: `${location.origin}/?code=${currentFlightCode}` });
     });
 }
 
