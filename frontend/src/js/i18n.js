@@ -16,7 +16,7 @@ import zh from '../locales/zh.json';
 i18next
     .use(LanguageDetector)
     .init({
-        debug: true,
+        debug: import.meta.env?.DEV === true,
         fallbackLng: 'en',
         resources: {
 // START-AUTOGEN-RESOURCES

@@ -1,7 +1,7 @@
 // js/network/webrtc.js
 // Handles the creation and management of the WebRTC peer connection.
 
-import { ICE_SERVERS } from '../config.js';
+import { ICE_SERVERS, HIGH_WATER_MARK } from '../config.js';
 import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
 import {
@@ -186,6 +186,9 @@ export function initializePeerConnection(isOfferer) {
 
     if (isOfferer) {
         dataChannel = peerConnection.createDataChannel('fileTransfer');
+        // Fire onbufferedamountlow well before we stall
+        dataChannel.bufferedAmountLowThreshold =
+            Math.floor(HIGH_WATER_MARK / 2);
         setupDataChannel();
         peerConnection
             .createOffer()
@@ -199,6 +202,8 @@ export function initializePeerConnection(isOfferer) {
     } else {
         peerConnection.ondatachannel = (event) => {
             dataChannel = event.channel;
+            dataChannel.bufferedAmountLowThreshold =
+                Math.floor(HIGH_WATER_MARK / 2);
             setupDataChannel();
         };
     }
