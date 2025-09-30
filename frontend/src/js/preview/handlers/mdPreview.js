@@ -1,12 +1,13 @@
 // js/preview/handlers/mdPreview.js
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 export default async function renderMarkdownPreview(blob, contentElement) {
 
     try {
         const markdownText = await blob.text();
-        const html = marked.parse(markdownText);
-
+        const htmlUnsafe = marked.parse(markdownText);
+        const html = DOMPurify.sanitize(htmlUnsafe);
         const container = document.createElement('div');
         container.className = 'markdown-body'; // Use the class from github-markdown-css
         container.innerHTML = html;
