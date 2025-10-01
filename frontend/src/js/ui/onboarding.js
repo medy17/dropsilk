@@ -296,16 +296,23 @@ export function showInviteOnboarding() {
         requestAnimationFrame(showOnboarding);
     }
 
-    // Handle resize/orientation changes
-    let resizeTimeout;
-    const handleResize = () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-            if (inviteOnboarding.classList.contains('show')) {
-                showOnboarding();
-            }
-        }, 100);
-    };
+    // Handle resize/orientation changes — only re-position, don't re-show
+        let resizeTimeout;
+        const handleResize = () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                        if (!inviteOnboarding.classList.contains('show')) return;
+                        const rect2 = inviteBtn.getBoundingClientRect();
+                        const tooltip =
+                                inviteOnboarding.querySelector('.onboarding-tooltip');
+                        const viewport = getViewportInfo();
+                        if (isMobileDevice()) {
+                                positionTooltipMobile(tooltip, rect2, viewport);
+                            } else {
+                                positionTooltipDesktop(tooltip, rect2, viewport);
+                            }
+                    }, 100);
+            };
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
