@@ -2,6 +2,16 @@
     navigation: auto;
 }
 
+/* Prevent any horizontal expansion from any fixed/painted element */
+html {
+    overflow-x: clip;
+}
+@supports not (overflow-x: clip) {
+    html {
+        overflow-x: hidden;
+    }
+}
+
 body {
     font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
     background: var(--c-bg);
