@@ -72,3 +72,37 @@
     font-size: .85em;
     padding: .6em 1.2em;
 }
+/* Stabilise fixed/animated UI (toasts, privacy toast, onboarding) */
+#toast-container,
+#privacy-consent-toast,
+.toast,
+.onboarding-overlay,
+.onboarding-tooltip {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+}
+
+/* Use GPU-friendly transforms for entrance/exit */
+.toast {
+    transform: translate3d(100%, 0, 0);
+}
+.toast.show {
+    transform: translate3d(0, 0, 0);
+}
+
+#privacy-consent-toast {
+    transform: translate3d(0, 150%, 0);
+}
+#privacy-consent-toast.show {
+    transform: translate3d(0, 0, 0);
+}
+
+/* Create a local stacking/painting context for the toast container */
+#toast-container {
+    contain: layout paint style;
+}
+
+/* On many Android builds, backdrop-filter can trigger repaint jitter.
+   Prefer a simple overlay on coarse pointers (phones/tablets). */

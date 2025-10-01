@@ -302,3 +302,9 @@
     }
 }
 
+@media (pointer: coarse) {
+    .onboarding-overlay {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
