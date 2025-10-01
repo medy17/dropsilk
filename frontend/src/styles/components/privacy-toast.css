@@ -32,6 +32,7 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    min-width: 0;
 }
 
 .privacy-toast-content p {
@@ -45,4 +46,6 @@
 .privacy-toast-content .btn {
     flex-shrink: 0;
     padding: 0.75rem 1.25rem;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
