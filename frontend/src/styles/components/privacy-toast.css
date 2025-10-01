@@ -6,7 +6,7 @@
     /* Bottom with safe-area support */
     bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
     /* Animate only Y; X is pinned by insets */
-    transform: translateY(150%);
+    transform: translate3d(0, 150%, 0);
     background-color: var(--c-panel-bg);
     color: var(--c-text-primary);
     border: 2px solid var(--c-primary);
@@ -22,10 +22,19 @@
     display: none; /* Initially hidden */
     /* Make sure borders/padding don’t cause overflow even on quirky engines */
     box-sizing: border-box;
+
+    /*
+   * Performance Fix:
+   * Promote the toast to its own compositing layer to prevent flickering
+   * on mobile browsers, especially during viewport changes.
+   */
+    will-change: transform, opacity;
+    backface-visibility: hidden;
 }
 
 #privacy-consent-toast.show {
-    transform: translateY(0);
+    /* Match the hardware-accelerated transform for a smooth animation */
+    transform: translate3d(0, 0, 0);
 }
 
 .privacy-toast-content {
