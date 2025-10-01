@@ -13,7 +13,7 @@ function getViewportInfo() {
         // Use visualViewport for better mobile support
         vw: window.visualViewport?.width || window.innerWidth,
         vh: window.visualViewport?.height || window.innerHeight,
-        // Safe area (accounting for mobile browser UI)
+        // Safe offsets (account for mobile browser UI/toolbars)
         safeTop: window.visualViewport?.offsetTop || 0,
         safeLeft: window.visualViewport?.offsetLeft || 0
     };
@@ -27,42 +27,63 @@ function positionTooltipMobile(tooltip, targetRect, viewport) {
     tooltip.style.width = 'auto';
     tooltip.style.maxWidth = `${Math.min(320, viewport.vw - (padding * 2))}px`;
 
+    // Ensure we measure actual size (if a CSS transition/transform is active)
+    const prevVisibility = tooltip.style.visibility;
+    const prevTransform = tooltip.style.transform;
+    tooltip.style.visibility = 'hidden';
+    tooltip.style.transform = 'none';
+
     // Get tooltip dimensions after setting max-width
     const tooltipRect = tooltip.getBoundingClientRect();
 
     let top, left;
 
-    // Always center horizontally on mobile
-    left = (viewport.vw - tooltipRect.width) / 2;
+    // Always center horizontally on mobile (include safeLeft)
+    left = viewport.safeLeft + (viewport.vw - tooltipRect.width) / 2;
 
     // For vertical positioning, use a simpler strategy
-    const targetCenterY = targetRect.top + (targetRect.height / 2);
+    // Map target rect to the visual viewport coordinate space using safeTop.
+    // getBoundingClientRect() is typically visual-viewport relative, but
+    // safeTop guards against iOS dynamic UI inconsistencies.
+    const targetTopVis = targetRect.top - viewport.safeTop;
+    const targetBottomVis = targetRect.bottom - viewport.safeTop;
+    const targetCenterY = targetTopVis + (targetRect.height / 2);
     const viewportCenter = viewport.vh / 2;
 
     if (targetCenterY < viewportCenter) {
         // Target is in upper half - position tooltip below target
-        top = targetRect.bottom + 20;
+        top = viewport.safeTop + targetBottomVis + 20;
 
         // But make sure it doesn't go off screen
-        if (top + tooltipRect.height > viewport.vh - padding) {
-            top = viewport.vh - tooltipRect.height - padding;
+        if (top + tooltipRect.height > viewport.safeTop + viewport.vh - padding) {
+            top = viewport.safeTop + viewport.vh - tooltipRect.height - padding;
         }
     } else {
         // Target is in lower half - position tooltip above target
-        top = targetRect.top - tooltipRect.height - 20;
+        top = viewport.safeTop + targetTopVis - tooltipRect.height - 20;
 
         // Make sure it doesn't go above screen
-        if (top < padding) {
-            top = padding;
+        if (top < viewport.safeTop + padding) {
+            top = viewport.safeTop + padding;
         }
     }
 
     // Final safety checks
-    left = Math.max(padding, Math.min(left, viewport.vw - tooltipRect.width - padding));
-    top = Math.max(padding, Math.min(top, viewport.vh - tooltipRect.height - padding));
+    left = Math.max(
+        viewport.safeLeft + padding,
+        Math.min(left, viewport.safeLeft + viewport.vw - tooltipRect.width - padding)
+    );
+    top = Math.max(
+        viewport.safeTop + padding,
+        Math.min(top, viewport.safeTop + viewport.vh - tooltipRect.height - padding)
+    );
 
     tooltip.style.left = `${left}px`;
     tooltip.style.top = `${top}px`;
+
+    // Restore styles
+    tooltip.style.visibility = prevVisibility;
+    tooltip.style.transform = prevTransform;
 }
 
 function positionTooltipDesktop(tooltip, targetRect, viewport) {
@@ -150,26 +171,29 @@ export function showWelcomeOnboarding() {
     if (!target) return;
 
     const showOnboarding = () => {
-        const rect = target.getBoundingClientRect();
         const tooltip = welcomeOnboarding.querySelector('.onboarding-tooltip');
-        const viewport = getViewportInfo();
-
-        // Position tooltip
-        if (isMobileDevice()) {
-            positionTooltipMobile(tooltip, rect, viewport);
-        } else {
-            positionTooltipDesktop(tooltip, rect, viewport);
-        }
-
-        // Highlight the target's parent container
-        target.classList.add('onboarding-highlight-parent');
-
+        // Make overlay visible first so measurements are correct
         welcomeOnboarding.style.display = 'block';
-        // Force reflow before adding show class
-        welcomeOnboarding.offsetHeight;
-        welcomeOnboarding.classList.add('show');
+        // Next frame: measure and position
+        requestAnimationFrame(() => {
+            const rect = target.getBoundingClientRect();
+            const viewport = getViewportInfo();
 
-        document.body.style.overflow = 'hidden';
+            if (isMobileDevice()) {
+                positionTooltipMobile(tooltip, rect, viewport);
+            } else {
+                positionTooltipDesktop(tooltip, rect, viewport);
+            }
+
+            // Highlight the target's parent container
+            target.classList.add('onboarding-highlight-parent');
+
+            // Force reflow then animate in
+            // eslint-disable-next-line no-unused-expressions
+            welcomeOnboarding.offsetHeight;
+            welcomeOnboarding.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        });
     };
 
     // Scroll target into view if needed, then show onboarding
@@ -204,6 +228,7 @@ export function showWelcomeOnboarding() {
     window.addEventListener('orientationchange', handleResize);
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', handleResize);
+        window.visualViewport.addEventListener('scroll', handleResize);
     }
 
     uiElements.dismissWelcomeBtn.onclick = () => {
@@ -222,6 +247,7 @@ export function showWelcomeOnboarding() {
         window.removeEventListener('orientationchange', handleResize);
         if (window.visualViewport) {
             window.visualViewport.removeEventListener('resize', handleResize);
+            window.visualViewport.removeEventListener('scroll', handleResize);
         }
         clearTimeout(resizeTimeout);
 
@@ -238,25 +264,28 @@ export function showInviteOnboarding() {
     if (onboardingState.invite || !inviteOnboarding || !dashboardFlightCodeBtn || !inviteBtn || !parentElement) return;
 
     const showOnboarding = () => {
-        const rect2 = inviteBtn.getBoundingClientRect();
         const tooltip = inviteOnboarding.querySelector('.onboarding-tooltip');
-
-        // Highlight the parent container
-        parentElement.classList.add('onboarding-highlight-parent');
-
-        // Position tooltip relative to invite button
-        const viewport = getViewportInfo();
-        if (isMobileDevice()) {
-            positionTooltipMobile(tooltip, rect2, viewport);
-        } else {
-            positionTooltipDesktop(tooltip, rect2, viewport);
-        }
-
+        // Make overlay visible first so measurements are correct
         inviteOnboarding.style.display = 'block';
-        inviteOnboarding.offsetHeight; // Force reflow
-        inviteOnboarding.classList.add('show');
+        requestAnimationFrame(() => {
+            const rect2 = inviteBtn.getBoundingClientRect();
+            const viewport = getViewportInfo();
 
-        document.body.style.overflow = 'hidden';
+            // Highlight the parent container
+            parentElement.classList.add('onboarding-highlight-parent');
+
+            if (isMobileDevice()) {
+                positionTooltipMobile(tooltip, rect2, viewport);
+            } else {
+                positionTooltipDesktop(tooltip, rect2, viewport);
+            }
+
+            // Force reflow then animate in
+            // eslint-disable-next-line no-unused-expressions
+            inviteOnboarding.offsetHeight;
+            inviteOnboarding.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        });
     };
 
     const didScroll = scrollDashboardIntoView();
@@ -281,7 +310,8 @@ export function showInviteOnboarding() {
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
     if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleResize);
+        window.visualViewport.addEventListener('resize', handleResize);
+        window.visualViewport.addEventListener('scroll', handleResize);
     }
 
     uiElements.dismissInviteBtn.onclick = () => {
@@ -300,6 +330,7 @@ export function showInviteOnboarding() {
         window.removeEventListener('orientationchange', handleResize);
         if (window.visualViewport) {
             window.visualViewport.removeEventListener('resize', handleResize);
+            window.visualViewport.removeEventListener('scroll', handleResize);
         }
         clearTimeout(resizeTimeout);
     };
