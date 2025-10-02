@@ -579,6 +579,7 @@ function populateSettingsModal() {
                 <option value="fr" ${i18next.language.startsWith('fr') ? 'selected' : ''}>${i18next.t('french')}</option>
                 <option value="it" ${i18next.language.startsWith('it') ? 'selected' : ''}>${i18next.t('italian')}</option>
                 <option value="ja" ${i18next.language.startsWith('ja') ? 'selected' : ''}>${i18next.t('japanese')}</option>
+                <option value="ms" ${i18next.language.startsWith('ms') ? 'selected' : ''}>${i18next.t('malay')}</option>
                 <option value="pt" ${i18next.language.startsWith('pt') ? 'selected' : ''}>${i18next.t('portuguese')}</option>
                 <option value="sw" ${i18next.language.startsWith('sw') ? 'selected' : ''}>${i18next.t('swahili')}</option>
                 <option value="zh" ${i18next.language.startsWith('zh') ? 'selected' : ''}>${i18next.t('chinese')}</option>

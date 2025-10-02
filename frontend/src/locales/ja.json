@@ -267,5 +267,6 @@
   "outOfDiskSpace": "ディスクの空き容量が不足しています",
   "outOfDiskSpaceDescription": "セーフモードを終了しました。このファイルの転送は取り消されました。",
   "folderSelectionWarning": "フォルダ選択の警告",
-  "folderSelectionWarningDescription": "選択したフォルダには大量のファイル、または 1 GB を超えるファイルが含まれています。続行しますか？"
+  "folderSelectionWarningDescription": "選択したフォルダには大量のファイル、または 1 GB を超えるファイルが含まれています。続行しますか？",
+  "malay": "Malay (Bahasa Melayu)"
 }

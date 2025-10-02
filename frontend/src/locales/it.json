@@ -267,5 +267,6 @@
   "outOfDiskSpace": "Memoria Esaurita",
   "outOfDiskSpaceDescription": "La Modalità Sicura è fallita. Trasferimento di questo file annullato.",
   "folderSelectionWarning": "Avviso Selezione Cartella",
-  "folderSelectionWarningDescription": "La cartella contiene molti file o file oltre 1GB. Continuare?"
+  "folderSelectionWarningDescription": "La cartella contiene molti file o file oltre 1GB. Continuare?",
+  "malay": "Malay (Bahasa Melayu)"
 }

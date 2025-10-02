@@ -14,6 +14,7 @@ const languageMap = {
     pt: { name: 'Portuguese', nativeName: 'Português'},
     fr: { name: 'French', nativeName: 'Français' },
     it: { name: 'Italian', nativeName: 'Italiano' },
+    ms: { name: 'Malay', nativeName: 'Bahasa Melayu' },
     // Example for adding French:
     // fr: { name: 'French', nativeName: 'Français' },
 };

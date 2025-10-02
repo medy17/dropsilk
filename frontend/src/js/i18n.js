@@ -8,6 +8,7 @@ import es from '../locales/es.json';
 import fr from '../locales/fr.json';
 import it from '../locales/it.json';
 import ja from '../locales/ja.json';
+import ms from '../locales/ms.json';
 import pt from '../locales/pt.json';
 import sw from '../locales/sw.json';
 import zh from '../locales/zh.json';
@@ -34,6 +35,9 @@ i18next
             },
             ja: {
                 translation: ja,
+            },
+            ms: {
+                translation: ms,
             },
             pt: {
                 translation: pt,
