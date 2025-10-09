@@ -14,9 +14,7 @@
   
   <div>
     <!-- Placeholder Badges - Replace with your actual links -->
-    <img src="https://img.shields.io/github/v/release/medy17/dropsilk?style=for-the-badge" alt="Release Version"/>
     <img src="https://img.shields.io/github/license/medy17/dropsilk?style=for-the-badge" alt="License"/>
-    <img src="https://img.shields.io/github/stars/medy17/dropsilk?style=for-the-badge&logo=github" alt="GitHub Stars"/>
     <img src="https://img.shields.io/github/last-commit/medy17/dropsilk?style=for-the-badge" alt="Last Commit"/>
   </div>
 </div>
