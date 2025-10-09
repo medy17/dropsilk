@@ -13,11 +13,11 @@
   </p>
   
   <div>
-    <!-- Placeholder Badges - Replace with your actual links -->
     <img src="https://img.shields.io/github/license/medy17/dropsilk?style=for-the-badge" alt="License"/>
     <img src="https://img.shields.io/github/last-commit/medy17/dropsilk?style=for-the-badge" alt="Last Commit"/>
   </div>
 </div>
+---
 
 ## Overview
 
@@ -57,8 +57,6 @@ This project was born from the desire for a simple, fast, and secure way to move
 -   **Internationalization (i18n):** Full support for multiple languages.
 
 ### Screenshots & Demo
-
-**(PLACEHOLDER: Insert a high-quality GIF showcasing the workflow: creating a flight, inviting a peer, and transferring a file.)**
 
 |                                                           Main Interface (Light)                                                           |                                                     Settings Modal                                                      |
 | :----------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------: |
