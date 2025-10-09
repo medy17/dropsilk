@@ -17,7 +17,6 @@
     <img src="https://img.shields.io/github/last-commit/medy17/dropsilk?style=for-the-badge" alt="Last Commit"/>
   </div>
 </div>
----
 
 ## Overview
 
