@@ -18,7 +18,6 @@
     <img src="https://img.shields.io/github/last-commit/medy17/dropsilk?style=for-the-badge" alt="Last Commit"/>
   </div>
 </div>
----
 
 ## Overview
 
@@ -61,13 +60,13 @@ This project was born from the desire for a simple, fast, and secure way to move
 
 **(PLACEHOLDER: Insert a high-quality GIF showcasing the workflow: creating a flight, inviting a peer, and transferring a file.)**
 
-|                                                           Main Interface (Light)                                                           |                                                        Dashboard (Dark)                                                         |
-| :----------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------: |
-| <img src="https://raw.githubusercontent.com/medy17/dropsilk/refs/heads/main/readme-assets/light-mode-home.png" alt="DropSilk Home Light"/> | <img src="https://raw.githubusercontent.com/medy17/dropsilk/refs/heads/main/readme-assets/dashboard-dark.png" alt="Dashboard"/> |
+|                                                           Main Interface (Light)                                                           |                                                     Settings Modal                                                      |
+| :----------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------: |
+| <img src="https://raw.githubusercontent.com/medy17/dropsilk/refs/heads/main/readme-assets/light-mode-home.png" alt="DropSilk Home Light"/> | <img src="https://raw.githubusercontent.com/medy17/dropsilk/refs/heads/main/readme-assets/settings.png" alt="License"/> |
 
-|                                                     Settings Modal                                                      |                                                          File Preview                                                          |
-| :---------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------: |
-| <img src="https://raw.githubusercontent.com/medy17/dropsilk/refs/heads/main/readme-assets/settings.png" alt="License"/> | <img src="https://raw.githubusercontent.com/medy17/dropsilk/refs/heads/main/readme-assets/sample-preview.jpeg" alt="Preview"/> |
+|                                                        Dashboard (Dark)                                                         |                                                          File Preview                                                          |
+| :-----------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------: |
+| <img src="https://raw.githubusercontent.com/medy17/dropsilk/refs/heads/main/readme-assets/dashboard-dark.png" alt="Dashboard"/> | <img src="https://raw.githubusercontent.com/medy17/dropsilk/refs/heads/main/readme-assets/sample-preview.jpeg" alt="Preview"/> |
 
 ## Technical Deep Dive
 
