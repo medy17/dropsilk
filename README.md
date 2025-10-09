@@ -10,6 +10,7 @@
   
   <p>
     <a href="https://dropsilk.xyz"><strong>Live Demo »</strong></a>
+    <a href="https://dropsilk.vercel.app"><strong>Backup Live Demo »</strong></a>
   </p>
   
   <div>
