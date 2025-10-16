@@ -8,7 +8,8 @@ import { renderUserName, showBoardingOverlay, initializeOnboardingPulses } from 
 import { initializeEventListeners } from "./ui/events.js";
 import { initializeModals } from "./ui/modals.js";
 import { connect as connectWebSocket } from "./network/websocket.js";
-import { showWelcomeOnboarding } from "./ui/onboarding.js";
+import { showWelcomeOnboarding, showTutorialPrompt } from "./ui/onboarding.js";
+import { initTutorial } from "./ui/tutorial.js";
 
 function initializeGlobalUI() {
     console.log("Initializing Global UI (Theme, Modals)...");
@@ -37,6 +38,9 @@ function initializeAppCore(isInvitedUser = false) {
 
     // Attach all event listeners specific to the app.
     initializeEventListeners();
+
+    // Initialize tutorial module (sets up DOM and base listeners)
+    initTutorial();
 
     // Initialize the user's state (including onboarding state).
     store.actions.initializeUser();
@@ -320,11 +324,11 @@ function initializePrivacyConsent() {
         }, 500);
     };
 
-    const hasSeenWelcome = store.getState().onboardingState.welcome;
-    if (hasSeenWelcome) {
+    const hasFinishedOnboarding = store.getState().onboardingState.welcome;
+    if (hasFinishedOnboarding) {
         showPrivacyToast();
     } else {
-        document.addEventListener("onboardingWelcomeDismissed", showPrivacyToast, {
+        document.addEventListener("onboardingFlowFinished", showPrivacyToast, {
             once: true,
         });
     }

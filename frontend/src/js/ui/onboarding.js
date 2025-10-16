@@ -1,6 +1,7 @@
 // js/ui/onboarding.js
 import { store } from '../state.js';
 import { uiElements } from './dom.js';
+import { startTutorial } from './tutorial.js';
 
 function isMobileDevice() {
     return window.innerWidth <= 768;
@@ -161,11 +162,42 @@ function scrollDashboardIntoView() {
     return false;
 }
 
+export function showTutorialPrompt() {
+    const tutorialState = localStorage.getItem('dropsilk-tutorial-state');
+    if (tutorialState === 'completed' || tutorialState === 'skipped') {
+        // If tutorial is done or skipped, show the privacy toast immediately.
+        document.dispatchEvent(new CustomEvent('onboardingFlowFinished'));
+        return;
+    }
+
+    const { tutorialPrompt } = uiElements;
+    if (!tutorialPrompt) return;
+
+    // Show the modal-like prompt
+    tutorialPrompt.classList.add('show');
+
+    document.getElementById('startTutorialBtn').onclick = () => {
+        tutorialPrompt.classList.remove('show');
+        startTutorial();
+        // The tutorial itself will dispatch 'onboardingFlowFinished' when done.
+    };
+
+    document.getElementById('skipTutorialBtn').onclick = () => {
+        tutorialPrompt.classList.remove('show');
+        localStorage.setItem('dropsilk-tutorial-state', 'skipped');
+        document.dispatchEvent(new CustomEvent('onboardingFlowFinished'));
+    };
+}
+
 export function showWelcomeOnboarding() {
     const { onboardingState, invitationPending } = store.getState();
     const { welcomeOnboarding } = uiElements;
 
-    if (onboardingState.welcome || invitationPending || !welcomeOnboarding) return;
+    if (onboardingState.welcome || invitationPending || !welcomeOnboarding) {
+        // If welcome is already seen, we can proceed to the next step.
+        showTutorialPrompt();
+        return;
+    }
 
     const target = document.querySelector('.flight-ticket-panel-wrapper');
     if (!target) return;
@@ -192,7 +224,6 @@ export function showWelcomeOnboarding() {
             // eslint-disable-next-line no-unused-expressions
             welcomeOnboarding.offsetHeight;
             welcomeOnboarding.classList.add('show');
-            document.body.style.overflow = 'hidden';
         });
     };
 
@@ -237,7 +268,6 @@ export function showWelcomeOnboarding() {
             welcomeOnboarding.style.display = 'none';
         }, 300);
         store.actions.updateOnboardingState('welcome');
-        document.body.style.overflow = '';
 
         // Revert the z-index change
         target.classList.remove('onboarding-highlight-parent');
@@ -251,8 +281,8 @@ export function showWelcomeOnboarding() {
         }
         clearTimeout(resizeTimeout);
 
-        // --- MODIFICATION: Signal that the welcome onboarding is complete ---
-        document.dispatchEvent(new CustomEvent('onboardingWelcomeDismissed'));
+        // Proceed to the next step in the onboarding flow.
+        showTutorialPrompt();
     };
 }
 
@@ -284,7 +314,6 @@ export function showInviteOnboarding() {
             // eslint-disable-next-line no-unused-expressions
             inviteOnboarding.offsetHeight;
             inviteOnboarding.classList.add('show');
-            document.body.style.overflow = 'hidden';
         });
     };
 
@@ -327,7 +356,6 @@ export function showInviteOnboarding() {
             inviteOnboarding.style.display = 'none';
         }, 300);
         store.actions.updateOnboardingState('invite');
-        document.body.style.overflow = '';
 
         // Revert the z-index change
         parentElement.classList.remove('onboarding-highlight-parent');

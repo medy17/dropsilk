@@ -12,6 +12,43 @@ import { audioManager } from '../utils/audioManager.js';
 
 let ws;
 
+// Local, side-effect-free demo helper
+const DEMO_FILES = {
+    photo_1: {
+        name: 'mountain-vista.jpg',
+        type: 'image/jpeg',
+        base64: 'R0lGODlhAQABAIABAP8AAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+    },
+    doc_1: {
+        name: 'project-notes.docx',
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        content: 'This is a demo DOCX file.',
+    },
+    audio_1: {
+        name: 'background-music.mp3',
+        type: 'audio/mpeg',
+        content: 'This is a demo MP3 file.',
+    },
+    text_1: {
+        name: 'readme.txt',
+        type: 'text/plain',
+        content: 'This is a demo text file.',
+    },
+};
+
+async function getDemoFileBlob(fileId) {
+    const fileInfo = DEMO_FILES[fileId];
+    if (!fileInfo) return null;
+    let blob;
+    if (fileInfo.base64) {
+        const res = await fetch(`data:${fileInfo.type};base64,${fileInfo.base64}`);
+        blob = await res.blob();
+    } else {
+        blob = new Blob([fileInfo.content], { type: fileInfo.type });
+    }
+    return { name: fileInfo.name, type: fileInfo.type, blob };
+}
+
 export function connect() {
     ws = new WebSocket(WEBSOCKET_URL);
     ws.onopen = onOpen;
@@ -31,7 +68,7 @@ function onOpen() {
         type: "register-details",
         name: store.getState().myName,
         localIpPrefix: "unknown",
-        localIp: "unknown"
+        localIp: "unknown",
     });
 
     try {
@@ -57,44 +94,69 @@ async function onMessage(event) {
         case "registered":
             store.actions.setMyId(msg.id);
             break;
+
         case "users-on-network-update":
             store.actions.setLastNetworkUsers(msg.users);
             if (!state.peerInfo) {
                 renderNetworkUsersView();
             }
             break;
+
         case "flight-invitation":
             audioManager.play('invite');
             showInvitationToast(msg.fromName, msg.flightCode);
             break;
+
         case "flight-created":
             enterFlightMode(msg.flightCode);
-            // Show the "invite" onboarding step with a small delay for the UI transition
             setTimeout(showInviteOnboarding, 300);
             break;
+
+        case "flight-created-for-demo":
+            enterFlightMode(msg.flightCode);
+            break;
+
+        case "bot-file-incoming": {
+            const { handleDataChannelMessage } = await import('../transfer/fileHandler.js');
+            const demoFile = await getDemoFileBlob(msg.fileId);
+            if (!demoFile) return;
+
+            // Feed metadata, data, EOF into the receiver just like a real peer
+            await handleDataChannelMessage(new MessageEvent('message', {
+                data: JSON.stringify({
+                    name: demoFile.name,
+                    type: demoFile.type,
+                    size: demoFile.blob.size,
+                }),
+            }));
+            await handleDataChannelMessage(new MessageEvent('message', { data: await demoFile.blob.arrayBuffer() }));
+            await handleDataChannelMessage(new MessageEvent('message', { data: "EOF" }));
+            break;
+        }
+
         case "peer-joined":
             audioManager.play('connect');
             showToast({
                 type: 'success',
                 title: i18next.t('peerConnected'),
                 body: i18next.t('peerConnectedDescription', { peerName: msg.peer.name }),
-                duration: 5000
+                duration: 5000,
             });
 
             document.getElementById('closeInviteModal')?.click();
             hideBoardingOverlay();
-
             clearAllPulseEffects();
-
             localStorage.setItem('hasSeenInvitePulse', 'true');
-
 
             if (!state.currentFlightCode) {
                 enterFlightMode(msg.flightCode);
             }
             store.actions.setConnectionType(msg.connectionType || 'wan');
             store.actions.setPeerInfo(msg.peer);
-            updateDashboardStatus(`${i18next.t('peerConnected')} (${store.getState().connectionType.toUpperCase()} mode)`, 'connected');
+            updateDashboardStatus(
+                `${i18next.t('peerConnected')} (${store.getState().connectionType.toUpperCase()} mode)`,
+                'connected',
+            );
             renderInFlightView();
 
             if (state.isFlightCreator) {
@@ -102,12 +164,15 @@ async function onMessage(event) {
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
             break;
+
         case "signal":
             await handleSignal(msg.data);
             break;
+
         case "peer-left":
             handlePeerLeft();
             break;
+
         case "error":
             failBoarding();
             await handleServerError(msg.message);
@@ -117,7 +182,12 @@ async function onMessage(event) {
 
 function onClose() {
     failBoarding();
-    showToast({ type: 'danger', title: 'Connection Lost', body: 'Connection to the server was lost. Please refresh the page to reconnect.', duration: 0 });
+    showToast({
+        type: 'danger',
+        title: 'Connection Lost',
+        body: 'Connection to the server was lost. Please refresh the page to reconnect.',
+        duration: 0,
+    });
     store.actions.resetState();
 }
 
@@ -148,7 +218,7 @@ async function handleServerError(message) {
         const { uiElements } = await import('../ui/dom.js');
 
         const inputs = uiElements.flightCodeInputWrapper.querySelectorAll('.otp-input');
-        const currentCode = Array.from(inputs).map(input => input.value).join('').toUpperCase();
+        const currentCode = Array.from(inputs).map((input) => input.value).join('').toUpperCase();
 
         setOtpInputError(currentCode);
 
@@ -156,7 +226,7 @@ async function handleServerError(message) {
             type: 'danger',
             title: i18next.t('flightNotFound'),
             body: i18next.t('flightNotFoundDescription'),
-            duration: 8000
+            duration: 8000,
         });
     } else {
         showToast({ type: 'danger', title: i18next.t('anErrorOccurred'), body: message, duration: 8000 });

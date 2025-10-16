@@ -68,6 +68,11 @@ export const uiElements = {
     inviteOnboarding: document.getElementById('inviteOnboarding'),
     dismissWelcomeBtn: document.getElementById('dismissWelcome'),
     dismissInviteBtn: document.getElementById('dismissInvite'),
+
+    // Tutorial
+    tutorialPrompt: document.getElementById('tutorialPromptModal'),
+    tutorialOverlay: document.getElementById('tutorialOverlay'),
+    tutorialTooltip: document.getElementById('tutorialTooltip'),
 };
 
 // Create the folder input element dynamically

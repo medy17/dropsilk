@@ -6,9 +6,9 @@
     width: 100%;
     height: 100%;
     z-index: 9000;
-    background: rgba(0, 0, 0, 0.4); /* Added this line */
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    /*
+    background: rgba(0, 0, 0, 0.4); !* Added this line *!
+    */
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
     pointer-events: none;
@@ -23,7 +23,7 @@
 
 .onboarding-overlay.show {
     opacity: 1;
-    pointer-events: all;
+    pointer-events: none;
 }
 
 .onboarding-overlay.show .onboarding-tooltip {
@@ -47,6 +47,7 @@
     transition: opacity 0.3s ease-out 0.2s, transform 0.3s ease-out 0.2s;
     z-index: 9001;
     box-sizing: border-box;
+    pointer-events: all;
 }
 
 .onboarding-tooltip h3 {
@@ -63,4 +64,11 @@
 
 .onboarding-tooltip .btn {
     width: 100%;
+}
+
+#tutorialTooltipActions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
 }

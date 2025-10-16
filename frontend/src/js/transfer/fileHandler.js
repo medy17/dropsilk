@@ -574,6 +574,11 @@ export async function handleDataChannelMessage(event) {
         }
     }
 
+    if (!incomingFileInfo) {
+        console.warn("Received a file chunk without file metadata. Ignoring.");
+        return;
+    }
+
     const opfsFile = incomingFileInfo ? opfsState.get(incomingFileInfo.name) : undefined;
 
     if (opfsFile) {
