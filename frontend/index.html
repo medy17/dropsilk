@@ -101,6 +101,47 @@
             rel="stylesheet"
             fetchpriority="high"
     />
+    <script>
+  (function () {
+    try {
+      var keys = [
+        'dropsilk:animation-quality',
+        'dropsilk.animQuality',
+        'dropsilk.animationQuality',
+        'animationQuality',
+      ];
+      var v = null;
+      for (var i = 0; i < keys.length; i++) {
+        var x = localStorage.getItem(keys[i]);
+        if (x) {
+          v = x.toLowerCase();
+          break;
+        }
+      }
+      if (!v && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        v = 'reduced';
+      }
+      var cls =
+        v === 'off' || v === 'none'
+          ? 'no-effects'
+          : v === 'reduced' || v === 'performance' || v === 'low'
+          ? 'reduced-effects'
+          : '';
+      if (cls) {
+        // Wait for <body> to exist, then apply before paint
+        var raf = requestAnimationFrame;
+        var run = function run() {
+          if (document.body) {
+            document.body.classList.add(cls);
+          } else {
+            raf(run);
+          }
+        };
+        raf(run);
+      }
+    } catch (e) {}
+  })();
+</script>
 </head>
 <body>
 <!-- AURORA BACKGROUND -->

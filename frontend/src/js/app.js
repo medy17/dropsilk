@@ -1,3 +1,4 @@
+import { initEffects } from "./ui/effects.js";
 // js/app.js
 // This is the main entry point for the application.
 import "../styles/index.css"; // load for vite
@@ -274,10 +275,12 @@ function initializeRecaptchaLazyLoad() {
 
             if (window.grecaptcha && typeof window.grecaptcha.render === "function") {
                 renderRecaptchaIfNeeded();
-            } else {
+            }
+            else {
                 loadRecaptchaScriptAndRender();
             }
-        } else {
+        }
+        else {
             // Subsequent clicks: ensure it's visible and rendered
             renderRecaptchaIfNeeded();
         }
@@ -346,7 +349,7 @@ function initializePrivacyConsent() {
 // --- Main Execution ---
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DropSilk Initializing...");
-
+    initEffects();
     const applyTranslations = () => translateStaticElements();
     if (i18next.isInitialized) applyTranslations();
     else i18next.on('initialized', applyTranslations);

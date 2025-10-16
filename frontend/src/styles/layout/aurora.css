@@ -20,9 +20,12 @@
     mix-blend-mode: overlay;
 }
 
-/* Performance mode: keep star field, enable quality mode aurora blobs */
+/* Performance mode: keep star field, but stop animating it; hide blobs */
+body.reduced-effects .aurora-background {
+  animation: none !important;               /* freeze background star field */
+}
 body.reduced-effects .aurora-blob {
-  display: none !important;
+  display: none !important;                 /* you already had this */
 }
 
 body.no-effects .aurora-background {

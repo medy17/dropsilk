@@ -6,7 +6,7 @@
     height: 100%;
     background: var(--c-bg);
     z-index: 9999;
-    display: flex;
+    display: none;              /* don’t animate when hidden */
     align-items: center;
     justify-content: center;
     opacity: 0;
@@ -15,6 +15,7 @@
 }
 
 .boarding-overlay.show {
+    display: flex;              /* only mount when visible */
     opacity: 1;
     pointer-events: auto;
 }
@@ -22,6 +23,12 @@
 .boarding-overlay.show .boarding-content {
     transform: translateY(0);
     opacity: 1;
+}
+
+/* If someone toggles visibility without the .show class, still pause animations */
+.boarding-overlay:not(.show) .spinner,
+.boarding-overlay:not(.show) .spinner .path {
+    animation-play-state: paused;
 }
 
 .boarding-content {

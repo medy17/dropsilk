@@ -49,3 +49,8 @@
     border-style: solid;
     border-width: 1px;
 }
+
+body.reduced-effects .pulse-ring,
+body.no-effects .pulse-ring {
+  animation: none !important;
+}

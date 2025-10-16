@@ -184,38 +184,52 @@
         justify-content: center;
     }
 
-    /* --- Mobile Modal Animation Overrides --- */
-    .modal-overlay {
-        display: flex;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        padding: 1rem;
-    }
+  /* --- Mobile Modal Animation Overrides --- */
+  .modal-overlay {
+    display: flex; /* keep mounted so transitions fire */
+    visibility: hidden; /* hide without unmounting */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 1rem;
+  }
+  .modal-overlay.show {
+    visibility: visible; /* becomes visible */
+    opacity: 1;
+    pointer-events: auto;
+  }
 
-    .modal-overlay.show {
-        opacity: 1;
-        pointer-events: auto;
-    }
+   .modal-overlay .invite-modal {
+     transform: translateX(100%);
+     opacity: 0.8;
+     transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+     will-change: transform;
+     max-width: 95vw;
+     max-height: 85vh;
+     border-radius: 16px;
+   }
+   .modal-overlay.show .invite-modal {
+     transform: translateX(0);
+     opacity: 1;
+   }
 
-    .modal-overlay .invite-modal {
-        /* 1. Override desktop animation: set initial state to be off-screen RIGHT */
-        transform: translateX(100%);
-        opacity: 0.8; /* Start slightly transparent for a smoother entry */
-        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
-        will-change: transform;
+  /* Pause any animations inside hidden overlays to avoid idle ticks */
+  .modal-overlay:not(.show) .spinner,
+  .modal-overlay:not(.show) .spinner .path,
+  .modal-overlay:not(.show) .spinner-icon,
+  .modal-overlay:not(.show) .pulse-ring {
+    animation-play-state: paused !important;
+  }
 
-        /* Consolidate other styles from 768px breakpoint */
-        max-width: 95vw;
-        max-height: 85vh;
-        border-radius: 16px;
-    }
+  /* Ensure the boarding overlay never mounts unless shown, to avoid its spinner running */
+  .boarding-overlay {
+    display: none !important;
+  }
+  .boarding-overlay.show {
+    display: flex !important;
+  }
 
-    .modal-overlay.show .invite-modal {
-        /* 2. Animate TO this state: on-screen and fully opaque */
-        transform: translateX(0);
-        opacity: 1;
-    }
+
 
     /* 3. Override child element animations to match */
     .modal-overlay .modal-header,
