@@ -75,15 +75,16 @@ Data path in practice:
 
 Boot sequence (simplified):
 
-1. DOMContentLoaded in `js/app.js`.
-2. Initialise UI shell (modals, theming, drawer, privacy toast scaffolding).
-3. Bind DOM event listeners and set up drag‑and‑drop.
-4. Initialise user store (random name, onboarding state).
-5. Show onboarding pulses/coachmarks as appropriate.
-6. If a “code” parameter is present in the URL, show the boarding overlay.
-7. Connect to the WebSocket signalling server.
-8. Translate static `[data-i18n]` strings; re‑translate on language change.
-9. On consent, activate analytics and speed insights (deferred scripts).
+1. Inline script in `<head>` applies animation quality from `localStorage` to prevent flashes.
+2. `DOMContentLoaded` in `js/app.js`.
+3. Initialise UI shell (modals, theming, drawer, privacy toast scaffolding).
+4. Bind DOM event listeners and set up drag‑and‑drop.
+5. Initialise user store (random name, onboarding state).
+6. Show onboarding pulses/coachmarks as appropriate.
+7. If a “code” parameter is present in the URL, show the boarding overlay.
+8. Connect to the WebSocket signalling server.
+9. Translate static `[data-i18n]` strings; re‑translate on language change.
+10. On consent, activate analytics and speed insights (deferred scripts).
 
 Once connected:
 
@@ -133,7 +134,8 @@ src/
 │  │  ├─ events.js            # All event listeners + drag‑and‑drop
 │  │  ├─ view.js              # Small “render” helpers (no framework)
 │  │  ├─ modals.js            # Modals, settings, theme/consent UX
-│  │  └─ onboarding.js        # Welcome/invite overlays & positioning
+│  │  ├─ onboarding.js        # Welcome/invite overlays & positioning
+│  │  └─ effects.js           # Animation quality controller (persists + applies)
 │  │
 │  ├─ utils/
 │  │  ├─ helpers.js           # Pure utilities (formatBytes, file icon, etc.)
@@ -156,7 +158,7 @@ src/
 │  ├─ en.json … zh.json
 │
 └─ scripts/
-   └─ update-locales.js       # Keeps i18n imports/resources/options in sync
+└─ update-locales.js       # Keeps i18n imports/resources/options in sync
 ```
 
 Static assets (favicons, sounds, workers, images) live in `public/` and are
@@ -168,7 +170,7 @@ Where should new things go?
 - New transfer features: `js/transfer/`.
 - New preview type: `js/preview/handlers/` plus `previewConfig.js` entry.
 - New UI behaviour: bind in `js/ui/events.js`, render helpers in `js/ui/view.js`.
-- New settings: `js/ui/modals.js` (settings modal content and persistence).
+- New settings: `js/ui/modals.js` (UI), `js/ui/effects.js` (persistence/application).
 - Small pure helpers: `js/utils/`.
 - New CSS: follow the existing split (base/layout/components/utilities).
 
@@ -372,11 +374,14 @@ Security:
     - All modals (invite, zip, settings, donate, about/contact/terms/privacy/
       security/FAQ, preview).
     - Settings modal doubles as a host for preferences and “advanced” options.
-    - Updates theme, fonts, animation quality, analytics consent, chunk size,
-      OPFS mode, preview consent.
+    - Updates theme, fonts, analytics consent, chunk size, OPFS mode, etc.
 - `ui/onboarding.js`:
     - Welcome/Invite overlays; computes safe positions using VisualViewport and
       re‑positions on orientation/resize.
+- `ui/effects.js`:
+    - Manages the "Animation Quality" setting. Reads from `localStorage`, applies
+      `<body>` classes (`reduced-effects`, `no-effects`), and reflects the
+      current choice in the UI.
 
 Design principle: keep each of these files scoped to one job to minimise
 surprise and cross‑module coupling.
@@ -390,9 +395,11 @@ surprise and cross‑module coupling.
     - Light/dark toggled by `body[data-theme]` and CSS variables.
     - Theme switch updates `<meta name="theme-color">` and re‑draws QR codes.
 - Animations:
-    - Aurora background and blobs (disabled via settings for performance).
-    - Reduced motion honoured with `prefers-reduced-motion`.
-    - “Pulses” use CSS keyframes and are opt‑out once seen.
+    - Aurora background and blobs are managed via user settings (`high`/`reduced`/`off`)
+      to ensure zero idle CPU cost when disabled or reduced.
+    - Reduced motion is honoured with `prefers-reduced-motion`.
+    - UI animations are paused in hidden elements (e.g., modal loaders) to prevent
+      background style recalculations.
 - Responsive:
     - Breakpoints at `max-width: 991px`, `768px`, etc.
     - Drawer appears on small screens; footer links collapse; controls compact.
@@ -465,6 +472,9 @@ Security posture:
 - WebSocket URL resolution is dynamic:
     - If `location.protocol !== 'https:'` → `ws://<host>:8080` (useful on LAN).
     - Else → production `wss://dropsilk-backend.onrender.com`.
+- **Pre-paint script**: A small, inline script in `index.html` reads the animation
+  quality from `localStorage` and applies a class to `<body>` before the first
+  paint. This prevents a "flash" of unwanted animations on page load.
 
 Public assets:
 
@@ -517,9 +527,14 @@ added later.
 - Use Web Workers for blocking IO (file reads).
 - Avoid frequent DOM reads/writes in loops; batch updates and throttle.
 - DataChannel: honour `bufferedAmount` thresholds to prevent stalling.
-- Animations:
-    - Use transforms and opacity where possible; avoid layout thrash.
-    - Provide “performance”/“off” options in settings.
+- **Animations**:
+    - The single biggest source of idle performance cost comes from hidden but
+      mounted elements with infinite CSS animations (e.g., spinners in modals).
+      This causes constant style recalculations even when invisible.
+    - **Rule**: All hidden elements with animations must either be unmounted (`display: none`)
+      or have their animations explicitly paused (`animation-play-state: paused`).
+    - The "Animation Quality" setting in the UI directly controls this, allowing
+      the app to achieve near-zero CPU usage at idle in `reduced` or `off` modes.
 - OPFS safe mode for large receives avoids memory spikes/crashes.
 
 
@@ -569,7 +584,8 @@ Add a new setting:
 
 1. Add UI in `populateSettingsModal()` in `ui/modals.js`.
 2. Persist to `localStorage` (use a `dropsilk-*` key).
-3. Apply in `saveSettingsPreferences()` and reflect in the UI.
+3. If it affects performance/animations, wire it up in `js/ui/effects.js`.
+4. Apply in `saveSettingsPreferences()` and reflect in the UI.
 
 Add a new language:
 

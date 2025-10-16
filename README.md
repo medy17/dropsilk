@@ -41,6 +41,7 @@ This project was born from the desire for a simple, fast, and secure way to move
 -   **High-Performance Architecture:**
     -   **Web Worker:** File reading and chunking are offloaded to a background thread to keep the UI perfectly responsive.
     -   **OPFS "Safe Mode":** For very large files, DropSilk can write directly to the Origin Private File System, preventing browser memory crashes.
+    -   **Zero-Cost Idle UI:** Animations are programmatically paused when hidden or disabled, ensuring the UI consumes no CPU at idle for a smooth experience.
     -   **Adjustable Chunk Size:** Advanced users can tune transfer performance for their network conditions.
 -   **Rich Transfer Management:**
     -   Multi-file and folder uploads.
@@ -87,6 +88,7 @@ DropSilk is built on a few key architectural principles to ensure performance, p
 2.  **Decoupled Signaling:** A lightweight WebSocket server acts as a "rendezvous" point. Its only job is to help two peers find each other and exchange the metadata needed to establish the direct WebRTC connection. Once the connection is made, the signaling server is no longer involved in the transfer itself.
 3.  **Non-Blocking File Processing with Web Workers:** Reading large files on the main browser thread can freeze the UI. DropSilk delegates all file reading and chunking to a dedicated Web Worker. The main thread simply sends the file object to the worker and receives ready-to-send chunks, ensuring the interface remains fluid and responsive at all times.
 4.  **OPFS for Stability (Safe Mode):** Browsers have memory limits. Attempting to buffer a multi-gigabyte file in RAM can cause the tab to crash. The "Safe Mode" feature leverages the **Origin Private File System (OPFS)** to stream incoming file chunks directly to disk instead of memory, making the application robust enough to handle massive files.
+5.  **Performance-First UI Rendering:** The application is engineered to feel fast, not just transfer files fast. Hidden UI elements with infinite animations (like loading spinners) are paused to prevent background CPU usage. All browser resources are hence dedicated to the user's current interaction for a smooth, lag-free experience.
 
 ### Project Structure
 
@@ -95,28 +97,28 @@ The project follows a modular structure to separate concerns, making it easier t
 ```
 dropsilk
 └── frontend/
-    ├── SVGs/              # Vector graphics
-    ├── public/            # Static assets (favicons, sounds, images, workers, video)
-    │   └── etc.
-    └── src/
-        ├── js/
-        │   ├── network/   # WebRTC and WebSocket
-        │   ├── preview/   # File preview handlers (audio, code, docx, image, md, pdf, pptx, xlsx)
-        │   │   └── handlers/ # Specific preview logic
-        │   ├── transfer/  # File and ZIP transfer logic
-        │   ├── ui/        # UI elements (DOM, events, modals, onboarding, views)
-        │   ├── utils/     # Helper functions (audio, toast, upload)
-        │   ├── app.js     # Main application entry
-        │   ├── config.js  # Application configuration
-        │   └── state.js   # Global state
-        └── styles/
-            ├── base/      # Core styles (animations, globals, theme, variables)
-            ├── components/ # Component-specific styles (audio, buttons, forms, previews, etc.)
-            │   └── etc.
-            ├── layout/    # Page layout styles
-            ├── index.css    # Main CSS entry
-            ├── responsive.css # Responsive design
-            └── utilities.css # Utility styles
+├── SVGs/              # Vector graphics
+├── public/            # Static assets (favicons, sounds, images, workers, video)
+│   └── etc.
+└── src/
+├── js/
+│   ├── network/   # WebRTC and WebSocket
+│   ├── preview/   # File preview handlers
+│   │   └── handlers/ # Specific preview logic
+│   ├── transfer/  # File and ZIP transfer logic
+│   ├── ui/        # UI modules (DOM, events, modals, effects, views)
+│   ├── utils/     # Helper functions
+│   ├── app.js     # Main application entry
+│   ├── config.js  # Application configuration
+│   └── state.js   # Global state
+└── styles/
+├── base/      # Core styles (animations, globals, theme, variables)
+├── components/ # Component-specific styles
+│   └── etc.
+├── layout/    # Page layout styles
+├── index.css    # Main CSS entry
+├── responsive.css # Responsive design
+└── utilities.css # Utility styles
 ```
 
 ## Getting Started
