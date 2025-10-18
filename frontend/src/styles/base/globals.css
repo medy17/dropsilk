@@ -5,6 +5,8 @@
 /* Prevent any horizontal expansion from any fixed/painted element */
 html {
     overflow-x: clip;
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-primary) #fff0;
 }
 @supports not (overflow-x: clip) {
     html {
@@ -92,4 +94,50 @@ body.sortable-drag * {
 
 *::after {
     box-sizing: border-box;
+}
+
+html::-webkit-scrollbar {
+    width: 8px;
+}
+
+html::-webkit-scrollbar-track {
+    background: #fff0;
+}
+
+html::-webkit-scrollbar-thumb {
+    background-color: var(--c-primary);
+    border-radius: 20px;
+    border: 2px solid var(--c-panel-bg);
+}
+
+html::-webkit-scrollbar-thumb:hover {
+    background-color: #379fd6;
+}
+
+html::-webkit-scrollbar-button {
+    display: none;
+    height: 0;
+}
+
+body::-webkit-scrollbar {
+    width: 8px;
+}
+
+body::-webkit-scrollbar-track {
+    background: #fff0;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: var(--c-primary);
+    border-radius: 20px;
+    border: 2px solid var(--c-panel-bg);
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background-color: #379fd6;
+}
+
+body::-webkit-scrollbar-button {
+    display: none;
+    height: 0;
 }
