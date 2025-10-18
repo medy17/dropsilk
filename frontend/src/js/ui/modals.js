@@ -110,7 +110,8 @@ function generateQRCode() {
         return;
     }
 
-    const url = `${location.origin}/?code=${currentFlightCode}`;
+    const origin = window.electronAPI ? 'https://dropsilk.xyz' : location.origin;
+    const url = `${origin}/?code=${currentFlightCode}`;
     const qrDotColor = getComputedStyle(document.documentElement).getPropertyValue('--c-primary').trim();
     const qrColors = { dark: qrDotColor, light: '#00000000' };
 
@@ -380,7 +381,8 @@ function setupInviteModal() {
         if (navigator.vibrate) {
             navigator.vibrate([50, 40, 15]);
         }
-        copyToClipboard(`https://dropsilk.xyz/?code=${store.getState().currentFlightCode}`, e.currentTarget, i18next.t('linkCopied'));
+        const origin = window.electronAPI ? 'https://dropsilk.xyz' : location.origin;
+        copyToClipboard(`${origin}/?code=${store.getState().currentFlightCode}`, e.currentTarget, i18next.t('linkCopied'));
     });
 
     document.getElementById('copyCodeBtn')?.addEventListener('click', (e) => {
@@ -392,7 +394,8 @@ function setupInviteModal() {
 
     shareNativeBtn?.addEventListener('click', async () => {
         const { currentFlightCode } = store.getState();
-        if (navigator.share) await navigator.share({ title: i18next.t('joinMyFlight'), text: i18next.t('joinMyFlightDescription', { code: currentFlightCode }), url: `${location.origin}/?code=${currentFlightCode}` });
+        const origin = window.electronAPI ? 'https://dropsilk.xyz' : location.origin;
+        if (navigator.share) await navigator.share({ title: i18next.t('joinMyFlight'), text: i18next.t('joinMyFlightDescription', { code: currentFlightCode }), url: `${origin}/?code=${currentFlightCode}` });
     });
 }
 
