@@ -1,14 +1,19 @@
-// js/config.js (Updated)
+// js/config.js (FINAL, CORRECTED VERSION)
 
 function getWebSocketUrl() {
-    // If the page is not served over HTTPS, assume it's a local dev environment.
+    // Vite sets this variable automatically. It's 'production' during a build, and 'development' during dev.
+    if (import.meta.env.MODE === 'production') {
+        // For any production build (web deploy OR Electron), always use the production URL.
+        return "wss://dropsilk-backend.onrender.com";
+    }
+
+    // The following logic will only run in development mode (`npm run dev` or `npm run dev:electron`).
     if (window.location.protocol !== "https:") {
-        // Connect to the backend using the *same hostname* but on the backend port (8080).
-        // This works for localhost, 127.0.0.1, and any LAN IP like 192.168.1.105.
+        // Connect to the local backend using the same hostname but on port 8080.
         return `ws://${window.location.hostname}:8080`;
     }
 
-    // Otherwise, connect to the production backend.
+    // A fallback for rare cases like using HTTPS in local dev.
     return "wss://dropsilk-backend.onrender.com";
 }
 

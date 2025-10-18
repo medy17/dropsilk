@@ -1,15 +1,44 @@
 {
-  "devDependencies": {
-    "vite": "^7.1.5"
-  },
+  "name": "dropsilk",
+  "version": "2.4.0",
+  "author": "Ahmed medy17 <> (ahmed@dropsilk.xyz) (https://github.com/medy17)",
+  "description": "A modern, privacy-focused, peer-to-peer file transfer application built with WebRTC",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build:web": "vite build",
+    "dev:electron": "concurrently \"npm:dev\" \"cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "build:electron": "cross-env VITE_API_BASE_URL=https://dropsilk-backend.onrender.com vite build --base=./ && electron-builder",
     "preview": "vite preview",
     "update-locales": "node scripts/update-locales.js"
   },
+  "build": {
+    "appId": "com.dropsilk.app",
+    "productName": "DropSilk",
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/favicons/favicon-512x512.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "public/favicons/favicon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "public/favicons"
+    }
+  },
   "dependencies": {
     "dompurify": "^3.2.7",
+    "electron-squirrel-startup": "^1.0.1",
     "highlight.js": "^11.11.1",
     "i18next": "^25.5.2",
     "i18next-browser-languagedetector": "^8.2.0",
@@ -23,5 +52,12 @@
     "uploadthing": "^7.7.4",
     "wavesurfer.js": "^7.10.3",
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^38.3.0",
+    "electron-builder": "^26.0.12",
+    "vite": "^7.1.5"
   }
 }

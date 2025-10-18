@@ -61,6 +61,7 @@ responsibilities:
 - State: a tiny in‑memory store with imperative actions (no reactivity lib).
 - i18n: i18next with a language auto‑detector and a small tool to sync locales.
 - Styling: CSS modules split into base/layout/components/utilities + themes.
+- Desktop Shell (Electron): Provides native integrations like file/folder dialogs through a secure IPC bridge.
 
 Data path in practice:
 
@@ -367,6 +368,7 @@ Security:
     - All listeners bound in one place.
     - Drag‑and‑drop, OTP flight code behaviour, QR scan flow, sortable queue,
       screen sharing toggles, “leave” behaviour.
+    - Progressive Enhancement for Desktop: Checks for the existence of `window.electronAPI`. If present, it overrides the default file/folder input behavior to call the native OS dialogs via IPC.
 - `ui/view.js`:
     - Small pure-ish functions that read from the store and mutate view state.
     - Manages queue expansion, metrics UI, panels, pulses, and stream views.
@@ -459,7 +461,7 @@ Security posture:
 ## 14) Build system and environments
 
 - Build tool: Vite (+ ESM everywhere).
-- Dev server: `npm run dev` (see package.json).
+- Dev server: `npm run dev` or `npm run dev:electron` for desktop. (see package.json).
 - Environments:
     - `.env.local` must include:
 
@@ -468,6 +470,10 @@ Security posture:
       ```
 
       This powers the UploadThing client for PPTX previews.
+
+- Electron Build: `npm run build:electron` orchestrates a two-step process:
+  - `vite build --base=./`: Vite builds the frontend with relative paths (`./`) for the app to work when loaded from the local filesystem via Electron's protocol.
+  - `electron-builder`: This tool packages the Vite output along with the `electron/` scripts into distributable installers (`.dmg`, `.exe`, `.AppImage`).
 
 - WebSocket URL resolution is dynamic:
     - If `location.protocol !== 'https:'` → `ws://<host>:8080` (useful on LAN).

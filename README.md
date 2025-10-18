@@ -30,6 +30,7 @@ This project was born from the desire for a simple, fast, and secure way to move
 -   **Direct P2P Transfers:** Files are sent directly between browsers using WebRTC for maximum speed and privacy.
 -   **End-to-End Encrypted:** All transfers (files and screen sharing) are encrypted using DTLS and SRTP protocols.
 -   **No File Size Limits:** Transfer large files without worrying about hitting a server-side limit.
+-   **Desktop App Support:** DropSilk is available as a desktop app for Windows at the moment.
 -   **Screen Sharing:** Securely share your screen with the connected peer, with adjustable quality settings.
 -   **In-Browser File Previews:** Preview a wide range of file types directly in the browser before downloading:
     -   Images (`jpg`, `png`, `gif`, `webp`, `svg`...)
@@ -92,34 +93,228 @@ DropSilk is built on a few key architectural principles to ensure performance, p
 
 ### Project Structure
 
-The project follows a modular structure to separate concerns, making it easier to maintain and scale.
+This project uses a modular structure for extensibility and maintainability.
+The following is a list of most of the important files and folders.
+(I wish I could have made this prettier, but CSS support is limited in GFM. Thanks, GitHub.)
 
-```
-dropsilk
-└── frontend/
-├── SVGs/              # Vector graphics
-├── public/            # Static assets (favicons, sounds, images, workers, video)
-│   └── etc.
-└── src/
-├── js/
-│   ├── network/   # WebRTC and WebSocket
-│   ├── preview/   # File preview handlers
-│   │   └── handlers/ # Specific preview logic
-│   ├── transfer/  # File and ZIP transfer logic
-│   ├── ui/        # UI modules (DOM, events, modals, effects, views)
-│   ├── utils/     # Helper functions
-│   ├── app.js     # Main application entry
-│   ├── config.js  # Application configuration
-│   └── state.js   # Global state
-└── styles/
-├── base/      # Core styles (animations, globals, theme, variables)
-├── components/ # Component-specific styles
-│   └── etc.
-├── layout/    # Page layout styles
-├── index.css    # Main CSS entry
-├── responsive.css # Responsive design
-└── utilities.css # Utility styles
-```
+<details open>
+  <summary><strong>dropsilk</strong></summary>
+  <ul>
+    <li>
+      <details open>
+        <summary>frontend/</summary>
+        <ul>
+          <li>index.html</li>
+          <li>package.json</li>
+          <li>vercel.json</li>
+          <li>
+            <details>
+              <summary>scripts/</summary>
+              <ul>
+                <li>update-locales.js</li>
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>SVGs/</summary>
+              <ul>
+                <li>archive.svg</li>
+                <li>audio.svg</li>
+                <li>code.svg</li>
+                <li>document.svg</li>
+                <li>generic.svg</li>
+                <li>image.svg</li>
+                <li>video.svg</li>
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>electron/</summary>
+              <ul>
+                <li>main.js</li>
+                <li>preload.js</li>
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>public/</summary>
+              <ul>
+                <li>404.html</li>
+                <li>logo.webp</li>
+                <li>robots.txt</li>
+                <li>sender.worker.js</li>
+                <li>site.webmanifest</li>
+                <li>sitemap.xml</li>
+                <li>social-share-image.jpg</li>
+                <li>social-share-image-square.jpg</li>
+                <li>SSIV2.png</li>
+                <li>video.js</li>
+                <li>favicons/</li>
+                <li>
+                  <details>
+                    <summary>sounds/</summary>
+                    <ul>
+                      <li>connect.mp3</li>
+                      <li>disconnect.mp3</li>
+                      <li>error.mp3</li>
+                      <li>invite.mp3</li>
+                      <li>queue_start.mp3</li>
+                      <li>receive_complete.mp3</li>
+                      <li>send_complete.mp3</li>
+                    </ul>
+                  </details>
+                </li>
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>src/</summary>
+              <ul>
+                <li>
+                  <details>
+                    <summary>js/</summary>
+                    <ul>
+                      <li>
+                        <details>
+                          <summary>network/</summary>
+                          <ul>
+                            <li>webrtc.js</li>
+                            <li>websocket.js</li>
+                          </ul>
+                        </details>
+                      </li>
+                      <li>
+                        <details>
+                          <summary>preview/</summary>
+                          <ul>
+                            <li>handlers/</li>
+                            <li>previewConfig.js</li>
+                            <li>previewManager.js</li>
+                          </ul>
+                        </details>
+                      </li>
+                      <li>
+                        <details>
+                          <summary>transfer/</summary>
+                          <ul>
+                            <li>fileHandler.js</li>
+                            <li>zipHandler.js</li>
+                          </ul>
+                        </details>
+                      </li>
+                      <li>
+                        <details>
+                          <summary>ui/</summary>
+                          <ul>
+                            <li>dom.js</li>
+                            <li>effects.js</li>
+                            <li>events.js</li>
+                            <li>modals.js</li>
+                            <li>onboarding.js</li>
+                            <li>view.js</li>
+                          </ul>
+                        </details>
+                      </li>
+                      <li>
+                        <details>
+                          <summary>utils/</summary>
+                          <ul>
+                            <li>audioManager.js</li>
+                            <li>helpers.js</li>
+                            <li>toast.js</li>
+                            <li>uploadHelper.js</li>
+                          </ul>
+                        </details>
+                      </li>
+                      <li>app.js</li>
+                      <li>config.js</li>
+                      <li>i18n.js</li>
+                      <li>state.js</li>
+                    </ul>
+                  </details>
+                </li>
+                <li>
+                  <details>
+                    <summary>styles/</summary>
+                    <ul>
+                      <li>index.css</li>
+                      <li>responsive.css</li>
+                      <li>utilities.css</li>
+                      <li>
+                        <details>
+                          <summary>base/</summary>
+                          <ul>
+                            <li>animations.css</li>
+                            <li>globals.css</li>
+                            <li>theme.css</li>
+                            <li>variables.css</li>
+                          </ul>
+                        </details>
+                      </li>
+                      <li>
+                        <details>
+                          <summary>components/</summary>
+                          <ul>
+                            <li>audio.css</li>
+                            <li>boarding.css</li>
+                            <li>buttons.css</li>
+                            <li>connections.css</li>
+                            <li>dashboard.css</li>
+                            <li>docx.css</li>
+                            <li>drawer.css</li>
+                            <li>dropzone.css</li>
+                            <li>footer.css</li>
+                            <li>forms.css</li>
+                            <li>header.css</li>
+                            <li>metrics.css</li>
+                            <li>modals.css</li>
+                            <li>not-found.css</li>
+                            <li>onboarding.css</li>
+                            <li>pdf.css</li>
+                            <li>pptx.css</li>
+                            <li>preview.css</li>
+                            <li>privacy-toast.css</li>
+                            <li>qr-scanner.css</li>
+                            <li>queues.css</li>
+                            <li>settings.css</li>
+                            <li>share.css</li>
+                            <li>stream.css</li>
+                            <li>ticket.css</li>
+                            <li>toast.css</li>
+                            <li>video-player.css</li>
+                            <li>xlsx.css</li>
+                            <li>zip.css</li>
+                          </ul>
+                        </details>
+                      </li>
+                      <li>
+                        <details>
+                          <summary>layout/</summary>
+                          <ul>
+                            <li>aurora.css</li>
+                            <li>layout.css</li>
+                          </ul>
+                        </details>
+                      </li>
+                    </ul>
+                  </details>
+                </li>
+              </ul>
+            </details>
+          </li>
+        </ul>
+      </details>
+    </li>
+    <li>readme-assets</li>
+    <li>ARCHITECTURE.md</li>
+    <li>LICENSE.md</li>
+    <li>README.md</li>
+  </ul>
+</details>
 
 ## Getting Started
 

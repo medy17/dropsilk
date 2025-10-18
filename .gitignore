@@ -7,3 +7,5 @@ frontend/node_modules
 .idea
 .env
 /frontend/vite.config.js
+release
+dist
