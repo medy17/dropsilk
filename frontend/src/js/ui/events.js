@@ -17,6 +17,41 @@ import QrScanner from "qr-scanner";
 import Sortable from "sortablejs";
 import {clearAllPulseEffects} from "./view.js";
 
+/**
+ * A simple helper to guess a file's MIME type from its extension.
+ * Crucial for creating proper File objects in the Electron renderer process.
+ * @param {string} fileName The name of the file (e.g., "my-video.mp4").
+ * @returns {string} The guessed MIME type or a generic fallback.
+ */
+function getMimeTypeFromPath(fileName) {
+    const extension = fileName.split('.').pop().toLowerCase();
+    const mimeTypes = {
+        // Video
+        'mp4': 'video/mp4',
+        'mov': 'video/quicktime',
+        'mkv': 'video/x-matroska',
+        'webm': 'video/webm',
+        'avi': 'video/x-msvideo',
+        'm4v': 'video/x-m4v',
+        // Image
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'png': 'image/png',
+        'gif': 'image/gif',
+        'webp': 'image/webp',
+        'svg': 'image/svg+xml',
+        // Audio
+        'mp3': 'audio/mpeg',
+        'wav': 'audio/wav',
+        'ogg': 'audio/ogg',
+        'm4a': 'audio/mp4',
+        // Document
+        'pdf': 'application/pdf',
+        // Add other common types as needed
+    };
+    return mimeTypes[extension] || 'application/octet-stream'; // Generic binary fallback
+}
+
 // Snapshot of OTP entered when last error was triggered
 let lastOtpErrorSnapshot = null;
 // Flag to track if the last action was a deletion
@@ -385,7 +420,10 @@ export function initializeEventListeners() {
                 const filesData = await window.electronAPI.selectFiles();
                 if (filesData.length > 0) {
                     const fileObjects = filesData.map(
-                        (f) => new File([f.data], f.name, {path: f.path})
+                        (f) => new File([f.data], f.name, {
+                            type: getMimeTypeFromPath(f.name),
+                            path: f.path
+                        })
                     );
                     handleFileSelection(fileObjects);
                 }
@@ -397,7 +435,10 @@ export function initializeEventListeners() {
                 const filesData = await window.electronAPI.selectFolder();
                 if (filesData.length > 0) {
                     const fileObjects = filesData.map(
-                        (f) => new File([f.data], f.name, {path: f.path})
+                        (f) => new File([f.data], f.name, {
+                            type: getMimeTypeFromPath(f.name),
+                            path: f.path
+                        })
                     );
                     handleFolderSelection(fileObjects);
                 }

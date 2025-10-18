@@ -504,7 +504,7 @@ export async function handleDataChannelMessage(event) {
                 const actionContainer = fileElement.querySelector('.file-action');
 
                 const fileExtension = finalFileInfo.name.toLowerCase().split('.').pop();
-                const isVideo = finalFileInfo.type.startsWith('video/') || ['mkv', 'ts'].includes(fileExtension);
+                const isVideo = finalFileInfo.type.startsWith('video/') || ['mp4', 'mov', 'mkv', 'webm', 'ts', 'm4v', 'avi'].includes(fileExtension);
                 const canPreview = isPreviewable(finalFileInfo.name);
 
                 // Read persisted preview consent map
