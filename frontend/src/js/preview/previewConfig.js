@@ -4,7 +4,7 @@
 export const previewConfig = {
     // Handler for common image formats
     image: {
-        extensions: ['avif', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'],
+        extensions: ['avif', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'heic'],
         handler: () => import('./handlers/imagePreview.js'),
     },
     // Handler for audio formats
