@@ -4,8 +4,13 @@
 export const previewConfig = {
     // Handler for common image formats
     image: {
-        extensions: ['avif', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'heic'],
+        extensions: ['avif', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'],
         handler: () => import('./handlers/imagePreview.js'),
+    },
+    // Handler for HEIC/HEIF
+    heic: {
+        extensions: ['heic', 'heif'],
+        handler: () => import('./handlers/heicPreview.js'),
     },
     // Handler for audio formats
     audio: {

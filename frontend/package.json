@@ -39,6 +39,7 @@
   "dependencies": {
     "dompurify": "^3.2.7",
     "electron-squirrel-startup": "^1.0.1",
+    "heic2any": "^0.0.4",
     "highlight.js": "^11.11.1",
     "i18next": "^25.5.2",
     "i18next-browser-languagedetector": "^8.2.0",
