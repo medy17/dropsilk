@@ -1,7 +1,7 @@
 // js/network/webrtc.js
 // Handles the creation and management of the WebRTC peer connection.
 
-import { ICE_SERVERS, HIGH_WATER_MARK } from '../config.js';
+import { HIGH_WATER_MARK } from '../config.js';
 import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
 import {
@@ -20,6 +20,53 @@ import {
     ensureQueueIsActive,
     drainQueue,
 } from '../transfer/fileHandler.js';
+
+// --- NEW ---
+// Read the backend URL from the environment variable, same as in uploadHelper.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+/**
+ * --- NEW ---
+ * Fetches STUN/TURN server configuration from our backend.
+ * This allows connections behind restrictive firewalls (NAT traversal) by
+ * using temporary credentials generated securely by the server.
+ * @returns {Promise<RTCIceServer[]>} A promise resolving to an array of ICE servers.
+ */
+async function getIceServers() {
+    // For LAN-only connections, we don't need any external servers.
+    if (store.getState().connectionType === 'lan') {
+        return [];
+    }
+
+    // The backend endpoint we created to securely fetch Cloudflare credentials.
+    const turnEndpoint = `${API_BASE_URL}/api/turn-credentials`;
+
+    try {
+        const response = await fetch(turnEndpoint);
+        if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}`);
+        }
+        const { username, credential } = await response.json();
+
+        // This is the configuration provided in your Cloudflare screenshot.
+        return [
+            {
+                urls: [
+                    "stun:stun.cloudflare.com:3478",
+                    "turn:turn.cloudflare.com:3478?transport=udp",
+                    "turn:turn.cloudflare.com:3478?transport=tcp",
+                    "turns:turn.cloudflare.com:5349?transport=tcp", // Secure TURN
+                ],
+                username,
+                credential,
+            },
+        ];
+    } catch (error) {
+        console.error("Could not get TURN server credentials, falling back to public STUN.", error);
+        // Fallback to a public STUN server if the backend call fails for any reason.
+        return [{ urls: "stun:stun.l.google.com:19302" }];
+    }
+}
 
 let peerConnection;
 let dataChannel;
@@ -153,14 +200,11 @@ async function renegotiate() {
     }
 }
 
-export function initializePeerConnection(isOfferer) {
+export async function initializePeerConnection(isOfferer) {
     if (peerConnection) return;
 
-    const { connectionType } = store.getState();
-    const pcConfig =
-        connectionType === 'lan' ? { iceServers: [] } : { iceServers: ICE_SERVERS };
-
-    peerConnection = new RTCPeerConnection(pcConfig);
+    const iceServers = await getIceServers();
+    peerConnection = new RTCPeerConnection({ iceServers });
 
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
@@ -191,15 +235,16 @@ export function initializePeerConnection(isOfferer) {
         dataChannel.bufferedAmountLowThreshold =
             Math.floor(HIGH_WATER_MARK / 2);
         setupDataChannel();
-        peerConnection
-            .createOffer()
-            .then((offer) => peerConnection.setLocalDescription(offer))
-            .then(() =>
-                sendMessage({
-                    type: 'signal',
-                    data: { sdp: peerConnection.localDescription },
-                })
-            );
+        try {
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            sendMessage({
+                type: 'signal',
+                data: { sdp: peerConnection.localDescription },
+            });
+        } catch (err) {
+            console.error("Error creating offer:", err);
+        }
     } else {
         peerConnection.ondatachannel = (event) => {
             dataChannel = event.channel;
@@ -216,7 +261,7 @@ export async function handleSignal(data) {
         console.warn(
             'Received signal before peerConnection initialized. Initializing now.'
         );
-        initializePeerConnection(store.getState().isFlightCreator);
+        await initializePeerConnection(store.getState().isFlightCreator);
     }
     try {
         if (data.sdp) {

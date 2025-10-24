@@ -98,7 +98,7 @@ async function onMessage(event) {
             renderInFlightView();
 
             if (state.isFlightCreator) {
-                initializePeerConnection(true);
+                await initializePeerConnection(true);
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
             break;
