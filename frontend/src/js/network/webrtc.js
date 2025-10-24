@@ -46,21 +46,9 @@ async function getIceServers() {
         if (!response.ok) {
             throw new Error(`Server responded with ${response.status}`);
         }
-        const { username, credential } = await response.json();
-
-        // This is the configuration provided in your Cloudflare screenshot.
-        return [
-            {
-                urls: [
-                    "stun:stun.cloudflare.com:3478",
-                    "turn:turn.cloudflare.com:3478?transport=udp",
-                    "turn:turn.cloudflare.com:3478?transport=tcp",
-                    "turns:turn.cloudflare.com:5349?transport=tcp", // Secure TURN
-                ],
-                username,
-                credential,
-            },
-        ];
+        // --- FIX: The backend now sends the full { iceServers: [...] } object ---
+        const data = await response.json();
+        return data.iceServers; 
     } catch (error) {
         console.error("Could not get TURN server credentials, falling back to public STUN.", error);
         // Fallback to a public STUN server if the backend call fails for any reason.
