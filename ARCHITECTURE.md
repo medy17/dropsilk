@@ -25,27 +25,27 @@ on the architecture of the project itself.
 
 ## Table of contents
 
- 1. High‑level overview
- 2. Runtime flow
- 3. Directory layout and file placement
- 4. Module boundaries and conventions
- 5. State management
- 6. Networking (WebSocket + WebRTC)
- 7. File transfers (worker + OPFS + flow control)
- 8. Preview subsystem
- 9. Screen sharing
- 10. UI architecture (DOM, events, view, modals, onboarding)
- 11. Styling and theming
- 12. Internationalisation (i18n)
- 13. Privacy, consent, and third‑party scripts
- 14. Build system and environments
- 15. Testing and manual QA
- 16. Performance guidelines
- 17. Accessibility notes
- 18. Security notes
- 19. Common workflows (recipes)
- 20. Adding or changing translations
- 21. Known limitations and cross‑browser notes
+1. High‑level overview
+2. Runtime flow
+3. Directory layout and file placement
+4. Module boundaries and conventions
+5. State management
+6. Networking (WebSocket + WebRTC)
+7. File transfers (worker + OPFS + flow control)
+8. Preview subsystem
+9. Screen sharing
+10. UI architecture (DOM, events, view, modals, onboarding)
+11. Styling and theming
+12. Internationalisation (i18n)
+13. Privacy, consent, and third‑party scripts
+14. Build system and environments
+15. Testing and manual QA
+16. Performance guidelines
+17. Accessibility notes
+18. Security notes
+19. Common workflows (recipes)
+20. Adding or changing translations
+21. Known limitations and cross‑browser notes
 
 
 ## 1) High‑level overview
@@ -239,7 +239,10 @@ WebSocket client (`js/network/websocket.js`):
 
 WebRTC client (`js/network/webrtc.js`):
 
-- Builds `RTCPeerConnection` with ICE servers (prod) or none (LAN mode).
+- Builds `RTCPeerConnection` with a full ICE configuration. The backend provides
+  STUN and TURN server credentials, allowing for robust NAT traversal even
+  behind restrictive firewalls. In development or local network environments,
+  it can fall back to operating without external ICE servers.
 - Creates a reliable `RTCDataChannel` named `fileTransfer`.
     - `bufferedAmountLowThreshold` set to `HIGH_WATER_MARK / 2`.
     - `onbufferedamountlow` calls `drainQueue()` to keep the pipe full.
@@ -472,8 +475,8 @@ Security posture:
       This powers the UploadThing client for PPTX previews.
 
 - Electron Build: `npm run build:electron` orchestrates a two-step process:
-  - `vite build --base=./`: Vite builds the frontend with relative paths (`./`) for the app to work when loaded from the local filesystem via Electron's protocol.
-  - `electron-builder`: This tool packages the Vite output along with the `electron/` scripts into distributable installers (`.dmg`, `.exe`, `.AppImage`).
+    - `vite build --base=./`: Vite builds the frontend with relative paths (`./`) for the app to work when loaded from the local filesystem via Electron's protocol.
+    - `electron-builder`: This tool packages the Vite output along with the `electron/` scripts into distributable installers (`.dmg`, `.exe`, `.AppImage`).
 
 - WebSocket URL resolution is dynamic:
     - If `location.protocol !== 'https:'` → `ws://<host>:8080` (useful on LAN).
@@ -492,7 +495,7 @@ PDF.js worker:
 - Imported as `pdf.worker?url` and assigned to `GlobalWorkerOptions.workerSrc`
   at runtime.
 
-  
+
 ## 15) Testing and manual QA
 
 There’s no formal test suite yet. For manual checks:
@@ -619,7 +622,9 @@ Add a new language:
 - PPTX preview depends on UploadThing and Microsoft Office embed; it will not
   work offline and requires consent/LAN connectivity to the backend.
 - Some CSS effects vary slightly across browsers (e.g., gradient masks).
-- LAN mode (no STUN) assumes peers can route traffic directly.
+- Connectivity relies on WebRTC's ICE framework (STUN/TURN). In highly
+  restrictive network environments where even TURN relaying is blocked, direct
+  peer-to-peer connections may fail.
 
 ---
 
