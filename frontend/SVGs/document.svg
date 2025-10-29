@@ -11,7 +11,7 @@
       }
 
       .st1 {
-        fill: #7f7f7f;
+        fill: none;
         stroke: #f5a9b8;
         stroke-linecap: round;
         stroke-linejoin: round;

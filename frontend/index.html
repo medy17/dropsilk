@@ -1,5 +1,5 @@
 <!doctype html>
-<!--suppress HtmlDeprecatedAttribute -->
+<!--suppress ALL -->
 <html lang="en">
 <head>
     <!-- Google tag (gtag.js) - Deferred until consent -->
@@ -94,12 +94,10 @@
     <link
             href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&display=swap"
             rel="stylesheet"
-            fetchpriority="high"
     />
     <link
             href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap"
             rel="stylesheet"
-            fetchpriority="high"
     />
     <script>
   (function () {
@@ -239,54 +237,21 @@
             <h2 id="userNameDisplay"></h2>
             <p data-i18n="yourFileTransferTicket">Your file transfer ticket</p>
             <div class="ticket-actions">
-                <button id="createFlightBtn" data-i18n="createFlight">Create a Flight</button>
-                <button id="scanQrBtn" class="btn btn-secondary" data-i18n="scanQrCodeInvite">
-                    <svg
-                            viewBox="0 0 20 20"
-                            width="20"
-                            height="20"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                    >
-                        <path
-                                d="M4 8V4h4m8 4V4h-4m-8 8v4h4m8-4v4h-4"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                        />
-                        <rect
-                                x="8"
-                                y="8"
-                                width="4"
-                                height="4"
-                                rx="1"
-                                fill="currentColor"
-                                stroke="none"
-                        />
-                    </svg
-                    >Scan QR Code Invite<svg
-                        viewBox="0 0 20 20"
-                        width="20"
-                        height="20"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                >
-                    <path
-                            d="M4 8V4h4m8 4V4h-4m-8 8v4h4m8-4v4h-4"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                    />
-                    <rect
-                            x="8"
-                            y="8"
-                            width="4"
-                            height="4"
-                            rx="1"
-                            fill="currentColor"
-                            stroke="none"
-                    />
-                </svg>
+                <button id="createFlightBtn" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
+                        <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
+                    </svg>
+                    <span data-i18n="createFlight">Create a Flight</span>
+                </button>
+                <button id="scanQrBtn" class="btn btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-qr-code-scan" viewBox="0 0 16 16">
+                        <path d="M0 .5A.5.5 0 0 1 .5 0h3a.5.5 0 0 1 0 1H1v2.5a.5.5 0 0 1-1 0zm12 0a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V1h-2.5a.5.5 0 0 1-.5-.5M.5 12a.5.5 0 0 1 .5.5V15h2.5a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1H15v-2.5a.5.5 0 0 1 .5-.5M4 4h1v1H4z"/>
+                        <path d="M7 2H2v5h5zM3 3h3v3H3zm2 8H4v1h1z"/>
+                        <path d="M7 9H2v5h5zm-4 1h3v3H3zm8-6h1v1h-1z"/>
+                        <path d="M9 2h5v5H9zm1 1v3h3V3zM8 8v2h1v1H8v1h2v-2h1v2h1v-1h2v-1h-3V8zm2 2H9V9h1zm4 2h-1v1h-2v1h3zm-4 2v-1H8v1z"/>
+                        <path d="M12 9h2V8h-2z"/>
+                    </svg>
+                    <span data-i18n="scanQrCodeInvite">Scan QR Code Invite</span>
                 </button>
                 <div class="or-separator" data-i18n="or">OR</div>
                 <div class="flight-code-input-wrapper">
@@ -362,7 +327,6 @@
               /></svg>
             </span>
                 <span data-i18n="shareScreen">Share Screen</span>
-            </button>
             <button class="btn btn-primary" id="inviteBtn">
                 <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -390,6 +354,7 @@
                         d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"
                 /></svg>
                 <span data-i18n="leave">Leave</span>
+            </button>
             </button>
         </div>
     </div>
@@ -1566,6 +1531,6 @@
 </script>
 
 <script src="/video.js" defer></script>
-<script type="module" src="src/js/app.js" fetchpriority="high"></script>
+<script type="module" src="src/js/app.js"></script>
 </body>
 </html>
