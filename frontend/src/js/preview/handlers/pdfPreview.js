@@ -3,11 +3,15 @@
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker?url';
 
-// PDF.js will be available globally as 'pdfjsLib' after pdf.min.js is loaded.
-// We explicitly set the worker source to the CDN path.
-
-// Observer for lazy loading ---
+// Module-level state for the observer, accessible by both render and cleanup.
 let activeObserver = null;
+
+export async function cleanup() {
+    if (activeObserver) {
+        activeObserver.disconnect();
+        activeObserver = null;
+    }
+}
 
 async function renderPage(pdfDoc, pageNum, canvas) {
     const page = await pdfDoc.getPage(pageNum);
@@ -24,14 +28,9 @@ async function renderPage(pdfDoc, pageNum, canvas) {
 }
 
 export default async function renderPdfPreview(blob, contentElement) {
-    // Observer Cleanup ---
-    // Disconnect any existing observer from a previous preview
-    if (activeObserver) {
-        activeObserver.disconnect();
-        activeObserver = null;
-    }
+    // Call cleanup at the start to handle any lingering state from a previous preview.
+    await cleanup();
 
-    // Ensure contentElement is clean and ready
     contentElement.innerHTML = '<div id="pdf-viewer-container"></div>';
     const viewerContainer = contentElement.querySelector('#pdf-viewer-container');
 
@@ -44,10 +43,9 @@ export default async function renderPdfPreview(blob, contentElement) {
         const loadingTask = pdfjsLib.getDocument(pdfUrl);
         const pdfDoc = await loadingTask.promise;
 
-        // --- Setup Intersection Observer ---
         const observerOptions = {
             root: viewerContainer,
-            rootMargin: '200px 0px', // Start loading pages 200px before they enter the viewport
+            rootMargin: '200px 0px',
         };
 
         const pageObserver = new IntersectionObserver(async (entries, observer) => {
@@ -55,26 +53,23 @@ export default async function renderPdfPreview(blob, contentElement) {
                 if (entry.isIntersecting) {
                     const pageContainer = entry.target;
                     const pageNum = parseInt(pageContainer.dataset.pageNumber, 10);
-
-                    // Stop observing this page once it's triggered
                     observer.unobserve(pageContainer);
 
-                    // Render the page
                     const canvas = pageContainer.querySelector('canvas');
                     try {
                         await renderPage(pdfDoc, pageNum, canvas);
-                        pageContainer.querySelector('.page-loader')?.remove(); // Remove loader on success
+                        pageContainer.querySelector('.page-loader')?.remove();
                     } catch (renderError) {
                         console.error(`Failed to render page ${pageNum}`, renderError);
-                        pageContainer.innerHTML = '<p class="empty-state">Error</p>'; // Show error on failure
+                        pageContainer.innerHTML = '<p class="empty-state">Error</p>';
                     }
                 }
             }
         }, observerOptions);
 
+        // Assign to the module-level variable so cleanup() can access it.
         activeObserver = pageObserver;
 
-        // Create placeholders instead of rendering directly ---
         for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
             const page = await pdfDoc.getPage(pageNum);
             const viewport = page.getViewport({ scale: 1.5 });
@@ -82,10 +77,7 @@ export default async function renderPdfPreview(blob, contentElement) {
             const pageContainer = document.createElement('div');
             pageContainer.className = 'pdf-page-container';
             pageContainer.dataset.pageNumber = pageNum;
-            // Set dimensions on the container to prevent layout shifts and ensure correct scrollbar size
-            pageContainer.style.width = `${viewport.width}px`;
-            pageContainer.style.height = `${viewport.height}px`;
-
+            pageContainer.style.aspectRatio = viewport.width / viewport.height;
             pageContainer.innerHTML = `
                 <canvas class="pdf-page-canvas"></canvas>
                 <div class="page-loader">
@@ -94,28 +86,16 @@ export default async function renderPdfPreview(blob, contentElement) {
             `;
 
             viewerContainer.appendChild(pageContainer);
-            pageObserver.observe(pageContainer); // Start observing the placeholder
+            pageObserver.observe(pageContainer);
         }
 
-        // Add self-cleaning event listener for when the modal closes ---
-        const modal = document.getElementById('previewModal');
-        const cleanup = () => {
-            if (activeObserver) {
-                activeObserver.disconnect();
-                activeObserver = null;
-            }
-            modal.removeEventListener('click', cleanupOnOverlay);
-        };
-        const cleanupOnOverlay = (e) => { if (e.target === modal) cleanup(); };
-
-        document.getElementById('closePreviewModal').addEventListener('click', cleanup, { once: true });
-        modal.addEventListener('click', cleanupOnOverlay, { once: true });
-
+        // REMOVED: All self-managed event listeners for modal closing.
+        // The previewManager now handles this by calling our exported cleanup() function.
 
     } catch (error) {
         console.error('Error rendering PDF:', error);
         viewerContainer.innerHTML = `<p class="empty-state">Failed to render PDF: ${error.message}. It might be corrupted or unsupported.</p>`;
-        if (activeObserver) activeObserver.disconnect(); // Clean up on error
+        await cleanup(); // Also clean up on error.
         throw error;
     }
 }

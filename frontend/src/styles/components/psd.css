@@ -1,0 +1,20 @@
+/* css/components/psd.css */
+/* Styles for the PSD preview handler */
+
+.psd-viewer {
+    /* Center the container within the modal's flex layout */
+    margin: auto;
+    /* Ensure the container shrinks to fit on small viewports */
+    max-width: 100%;
+    /* This prevents the loader from causing a layout shift */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.psd-viewer canvas {
+    /* Make the canvas fill its container responsively */
+    display: block;
+    width: 100%;
+    height: auto;
+}

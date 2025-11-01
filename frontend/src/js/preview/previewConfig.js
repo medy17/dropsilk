@@ -48,6 +48,11 @@ export const previewConfig = {
         handler: () => import('./handlers/pptxPreview.js'),
         requiresUploadConsent: true,
     },
+    // handler for PSD
+    psd: {
+        extensions: ['psd'],
+        handler: () => import('./handlers/psdPreview.js'),
+    },
     // handler for XLSX
     xlsx: {
         extensions: ['xlsx', 'xls', 'csv'],

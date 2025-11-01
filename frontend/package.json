@@ -37,6 +37,7 @@
     }
   },
   "dependencies": {
+    "ag-psd": "^28.4.1",
     "dompurify": "^3.2.7",
     "electron-squirrel-startup": "^1.0.1",
     "heic2any": "^0.0.4",
