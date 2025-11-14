@@ -9,6 +9,7 @@ import { initializeEventListeners } from "./ui/events.js";
 import { initializeModals } from "./ui/modals.js";
 import { connect as connectWebSocket } from "./network/websocket.js";
 import { showWelcomeOnboarding } from "./ui/onboarding.js";
+import { inject } from "@vercel/analytics";
 
 function initializeGlobalUI() {
     console.log("Initializing Global UI (Theme, Modals)...");
@@ -141,6 +142,21 @@ function activateSpeedInsights() {
         .catch((err) => {
             console.error("Failed to load Speed Insights:", err);
         });
+}
+
+/**
+ * Activates Vercel Analytics after consent.
+ */
+let vercelAnalyticsLoaded = false;
+function activateVercelAnalytics() {
+    if (vercelAnalyticsLoaded) return;
+    try {
+        inject();
+        vercelAnalyticsLoaded = true;
+        console.log("Vercel Analytics activated after consent.");
+    } catch (e) {
+        console.error("Failed to load Vercel Analytics:", e);
+    }
 }
 
 // Expose activators so Settings UI can enable them after consent
@@ -306,6 +322,7 @@ function initializePrivacyConsent() {
         // Load analytics-related scripts immediately for returning users.
         activateAnalytics();
         activateSpeedInsights();
+        activateVercelAnalytics();
         return; // Don't show the toast if already consented
     }
 
@@ -334,6 +351,7 @@ function initializePrivacyConsent() {
         localStorage.setItem("dropsilk-privacy-consent", "true");
         activateAnalytics();
         activateSpeedInsights();
+        activateVercelAnalytics();
         consentToast.classList.remove("show");
         setTimeout(() => {
             consentToast.style.display = "none";
