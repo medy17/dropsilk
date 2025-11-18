@@ -3,7 +3,6 @@
 
 import { showPreview, updatePptxPreviewButtonsDisabled } from '../preview/previewManager.js';
 import { isPreviewable } from '../preview/previewConfig.js';
-import { RECAPTCHA_SITE_KEY } from '../config.js';
 import { store } from '../state.js';
 import { uiElements } from './dom.js';
 import { formatBytes } from '../utils/helpers.js';
@@ -49,25 +48,6 @@ function initializeAnimationQuality() {
 
     applyAnimationQuality(quality);
 }
-
-function onRecaptchaLoadCallback() {
-    const recaptchaContainer = document.getElementById('recaptcha-container');
-    if (recaptchaContainer && recaptchaContainer.innerHTML.trim() === '') {
-        captchaWidgetId = grecaptcha.render('recaptcha-container', {
-            'sitekey': RECAPTCHA_SITE_KEY,
-            'callback': 'onCaptchaSuccessCallback',
-            'theme': uiElements.body.getAttribute('data-theme') || 'light'
-        });
-    }
-}
-window.onRecaptchaLoad = onRecaptchaLoadCallback;
-
-function onCaptchaSuccessCallback() {
-    document.getElementById('email-view-captcha-state').style.display = 'none';
-    document.getElementById('email-view-revealed-state').style.display = 'block';
-    document.getElementById('captcha-pretext').style.display = 'none';
-}
-window.onCaptchaSuccessCallback = onCaptchaSuccessCallback;
 
 // --- MODULE LOGIC ---
 
@@ -400,21 +380,15 @@ function setupInviteModal() {
 }
 
 function setupContactModal() {
-    const viewEmailBtn = document.getElementById('viewEmailBtn');
     const copyEmailBtn = document.getElementById('copyEmailBtn');
     const initialState = document.getElementById('email-view-initial-state');
     const captchaState = document.getElementById('email-view-captcha-state');
 
-    viewEmailBtn?.addEventListener('click', () => {
-        initialState.style.display = 'none';
-        captchaState.style.display = 'block';
-
-        if (window.grecaptcha && captchaWidgetId === null) {
-            onRecaptchaLoadCallback();
-        }
-    });
-
     copyEmailBtn?.addEventListener('click', (e) => {
+        const el = document.getElementById('revealed-email-link');
+        const email = el?.textContent?.trim() || '';
+        if (!email) return;
+        // Haptics
         if (navigator.vibrate) {
             navigator.vibrate([50, 40, 15]);
         }
@@ -435,9 +409,8 @@ function resetContactModal() {
     const pretext = document.getElementById('captcha-pretext');
     if (pretext) pretext.style.display = 'block';
 
-    if (window.grecaptcha && captchaWidgetId !== null) {
-        grecaptcha.reset(captchaWidgetId);
-    }
+    // If there is an existing widget, reset it for a fresh challenge next time.
+    if (typeof window.grecaptcha?.reset === 'function') window.grecaptcha.reset();
 }
 
 // --- ZIP & Settings Modal Logic ---

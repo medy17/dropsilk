@@ -1,6 +1,6 @@
-import { initEffects } from "./ui/effects.js";
 // js/app.js
 // This is the main entry point for the application.
+import { initEffects } from "./ui/effects.js";
 import "../styles/index.css"; // load for vite
 import i18next from "./i18n.js";
 import { store } from "./state.js";
@@ -173,6 +173,8 @@ let recaptchaWidgetId = null;
 let recaptchaScriptLoading = null;
 
 function getRecaptchaSiteKey() {
+    // Prefer build-time env; fall back to any DOM-provided key if needed.
+    if (RECAPTCHA_SITE_KEY) return RECAPTCHA_SITE_KEY;
     const scriptPh = document.getElementById("recaptcha-script");
     const container = document.getElementById("recaptcha-container");
     const keyFromScript = scriptPh?.getAttribute("data-sitekey") || "";
@@ -195,6 +197,44 @@ function revealEmailUI() {
     if (initial) initial.style.display = "none";
     if (captcha) captcha.style.display = "none";
     if (revealed) revealed.style.display = "block";
+}
+
+function setEmailInUI(email) {
+    const link = document.getElementById("revealed-email-link");
+    if (!link) return;
+    const safeEmail = String(email || "").trim();
+    link.textContent = safeEmail || "email-protected";
+    link.href = safeEmail ? `mailto:${safeEmail}` : "#";
+}
+
+async function requestRealEmail(token) {
+    try {
+        const base = API_BASE_URL || "";
+        // If API_BASE_URL is empty, this will hit same-origin /request-email
+        const endpoint = `${base}/request-email`;
+        const res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data?.email) {
+            throw new Error(data?.error || `HTTP ${res.status}`);
+        }
+        setEmailInUI(data.email);
+        revealEmailUI();
+    } catch (err) {
+        console.error("Failed to fetch contact email:", err);
+        // Keep the CAPTCHA state visible so user can retry
+        const captcha = document.getElementById("email-view-captcha-state");
+        const initial = document.getElementById("email-view-initial-state");
+        if (initial) initial.style.display = "none";
+        if (captcha) captcha.style.display = "block";
+        // Reset the widget to let the user try again
+        if (typeof window.grecaptcha?.reset === "function" && recaptchaWidgetId !== null) {
+            window.grecaptcha.reset(recaptchaWidgetId);
+        }
+    }
 }
 
 function renderRecaptchaIfNeeded() {
@@ -223,9 +263,8 @@ function renderRecaptchaIfNeeded() {
     const widgetId = window.grecaptcha.render(container, {
         sitekey,
         callback: (token) => {
-            // Token received; reveal email UI
-            revealEmailUI();
-            // You can verify token server-side if you wish.
+            // Token received: verify server-side and then reveal.
+            requestRealEmail(token);
         },
         "error-callback": () => {
             console.warn("reCAPTCHA error occurred.");
@@ -280,7 +319,12 @@ function initializeRecaptchaLazyLoad() {
     const viewEmailBtn = document.getElementById("viewEmailBtn");
     if (!viewEmailBtn) return;
 
-    viewEmailBtn.addEventListener("click", () => {
+    // Avoid double-binding if called twice somehow
+    if (viewEmailBtn.dataset.bound === "true") return;
+    viewEmailBtn.dataset.bound = "true";
+
+    viewEmailBtn.addEventListener("click", (e) => {
+        e.preventDefault();
         if (!recaptchaRequested) {
             recaptchaRequested = true;
             // Show CAPTCHA state
@@ -374,6 +418,9 @@ document.addEventListener("DOMContentLoaded", () => {
     i18next.on('languageChanged', applyTranslations);
 
     initializeGlobalUI();
+
+    // Ensure dummy is shown until reveal
+    setEmailInUI(""); // clears/fallbacks initial link
 
     const isAppPage = document.querySelector(".main-content");
 
