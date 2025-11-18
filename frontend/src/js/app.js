@@ -12,10 +12,6 @@ import { showWelcomeOnboarding } from "./ui/onboarding.js";
 import { inject } from "@vercel/analytics";
 import { RECAPTCHA_SITE_KEY, API_BASE_URL } from "./config.js";
 
-// Expose minimal diagnostics for staging verification (non-sensitive values only).
-// Site key and API base URL are safe to expose.
-try { window.__dsConfig = { apiBaseUrl: API_BASE_URL || "", recaptchaSiteKey: RECAPTCHA_SITE_KEY || "" }; } catch (_) {}
-
 function initializeGlobalUI() {
     console.log("Initializing Global UI (Theme, Modals)...");
     initializeModals();
@@ -177,30 +173,6 @@ let recaptchaRequested = false;
 let recaptchaWidgetId = null;
 let recaptchaScriptLoading = null;
 
-// Lightweight status helper so users see progress/errors without opening DevTools.
-function setEmailCaptchaStatus(message = "", type = "info") {
-    try {
-        const host = document.getElementById("email-view-captcha-state");
-        if (!host) return;
-        let el = document.getElementById("email-view-status");
-        if (!el) {
-            el = document.createElement("div");
-            el.id = "email-view-status";
-            el.style.marginTop = "0.75rem";
-            el.style.fontSize = "0.9rem";
-            el.style.lineHeight = "1.2";
-            host.appendChild(el);
-        }
-        el.textContent = String(message || "");
-        // Simple color cue; keep inline to avoid CSS churn.
-        if (type === "error") el.style.color = "#b00020";
-        else if (type === "success") el.style.color = "#0a7c2f";
-        else el.style.color = "inherit";
-    } catch (_) {
-        // non-fatal
-    }
-}
-
 function getRecaptchaSiteKey() {
     // Prefer build-time env; fall back to any DOM-provided key if needed.
     if (RECAPTCHA_SITE_KEY) return RECAPTCHA_SITE_KEY;
@@ -241,8 +213,6 @@ async function requestRealEmail(token) {
         const base = API_BASE_URL || "";
         // If API_BASE_URL is empty, this will hit same-origin /request-email
         const endpoint = `${base}/request-email`;
-        console.log("[DropSilk] Verifying reCAPTCHA; requesting email from:", endpoint);
-        setEmailCaptchaStatus("Verifying…", "info");
         const res = await fetch(endpoint, {
             method: "POST",
             headers: {
@@ -255,13 +225,10 @@ async function requestRealEmail(token) {
         if (!res.ok || !data?.email) {
             throw new Error(data?.error || `HTTP ${res.status}`);
         }
-        setEmailCaptchaStatus("Verified ✓", "success");
         setEmailInUI(data.email);
         revealEmailUI();
     } catch (err) {
         console.error("Failed to fetch contact email:", err);
-        const msg = (err && err.message) ? String(err.message) : "Verification failed. Please try again.";
-        setEmailCaptchaStatus(`Verification failed: ${msg}`, "error");
         // Keep the CAPTCHA state visible so user can retry
         const captcha = document.getElementById("email-view-captcha-state");
         const initial = document.getElementById("email-view-initial-state");
