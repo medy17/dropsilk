@@ -256,12 +256,24 @@
                 <div class="or-separator" data-i18n="or">OR</div>
                 <div class="flight-code-input-wrapper">
                     <div class="otp-input-container">
-                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="T">
-                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="R">
-                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="J">
-                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="X">
-                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="Ø">
-                        <input type="text" maxlength="1" class="otp-input" inputmode="text" pattern="[a-zA-Z0-9]" autocomplete="off" placeholder="D">
+                        <!-- The Ghost Input: Handles all logic -->
+                        <input
+                                type="text"
+                                id="otp-ghost-input"
+                                class="otp-ghost-input"
+                                maxlength="6"
+                                autocomplete="one-time-code"
+                                inputmode="text"
+                                spellcheck="false"
+                        >
+
+                        <!-- The Visual Slots: Purely for display -->
+                        <div class="otp-visual-slot active"></div>
+                        <div class="otp-visual-slot"></div>
+                        <div class="otp-visual-slot"></div>
+                        <div class="otp-visual-slot"></div>
+                        <div class="otp-visual-slot"></div>
+                        <div class="otp-visual-slot"></div>
                     </div>
                     <button id="joinFlightBtn" aria-label="Join Flight">➤</button>
                 </div>

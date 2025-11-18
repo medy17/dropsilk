@@ -1,7 +1,5 @@
 /* src/styles/components/forms.css */
 
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700&display=swap");
-
 .flight-code-input-wrapper {
     display: flex;
     align-items: stretch; /* To make inputs and button same height */
@@ -12,14 +10,38 @@
     animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
 }
 
+/* === OTP Ghost Input Implementation === */
+
 .otp-input-container {
     display: flex;
     flex-grow: 1;
     gap: 0.5rem;
+    position: relative; /* Crucial for absolute positioning of ghost input */
+    cursor: text;
 }
 
-.otp-input {
-    width: 100%; /* flex child */
+/* The invisible input that handles all typing/pasting logic */
+.otp-ghost-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 10; /* Sits on top of visuals */
+    cursor: text;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    background: transparent;
+    color: transparent;
+    caret-color: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* The visual boxes that display the numbers */
+.otp-visual-slot {
+    width: 100%;
     flex: 1 1 0;
     min-width: 0;
     font-family: "IBM Plex Mono", monospace;
@@ -30,97 +52,47 @@
     border-radius: 12px;
     background: var(--c-panel-bg);
     color: var(--c-text-primary);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    text-transform: uppercase;
-    padding: 0;
-    caret-color: transparent;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s, opacity 0.2s;
     box-shadow: 0 1px 4px rgb(91 206 250 / .04);
-    line-height: 3.5rem; /* vertical centering */
-    /* New: For disabled states */
-    cursor: text; /* Default for active input */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 3.5rem;
+    user-select: none;
+    text-transform: uppercase;
 }
 
-/* New: Styles for inputs that are not currently the active editable one */
-.otp-input.locked {
-    pointer-events: none; /* Prevents direct clicking into the input */
-    cursor: default; /* No text-editing cursor */
-    /*
-    opacity: 0.7; !* Slight visual fade for non-interactive inputs *!
-    */
+/* Styling for the "Active" slot (where the cursor conceptually is) */
+.otp-visual-slot.active {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 3px rgba(91, 206, 250, 0.4);
+    z-index: 1;
+    opacity: 1;
 }
 
-
-
-.otp-input[disabled] {
-    opacity: 0.5; /* More disabled look for later empty boxes */
-    cursor: not-allowed; /* Clear indication it cannot be interacted with */
-}
-
-/* New: Comprehensive Placeholder Styling for subtle appearance */
-.otp-input::placeholder {
-    /* Resetting all potentially conflicting styles */
-    color: var(--c-text-secondary);     /* Subtle color */
-    opacity: 0.5;                       /* More subtle transparency */
-    font-weight: 500;                   /* Lighter than input's bold */
-    text-transform: none;               /* Do not force uppercase */
-    letter-spacing: normal;             /* Standard letter spacing */
-    font-size: 1.2rem;                  /* Slightly smaller than input text */
-    text-shadow: none;                  /* Important: remove any text shadow */
-    -webkit-text-fill-color: var(--c-text-secondary); /* For webkit override */
-}
-
-/* For specific browser engines */
-.otp-input::-webkit-input-placeholder { /* Chrome, Safari, Edge */
-    color: var(--c-text-secondary);
-    opacity: 0.5;
-    font-weight: 500;
-    text-transform: none;
-    text-shadow: none;
-    -webkit-text-fill-color: var(--c-text-secondary); /* Force fill color */
-}
-.otp-input::-moz-placeholder { /* Firefox */
-    color: var(--c-text-secondary);
-    opacity: 0.5;
-    font-weight: 500;
-    text-transform: none;
-    text-shadow: none;
-    /* Note: -moz-text-fill-color is not standard/reliable, focus on color/opacity */
-}
-/* For Internet Explorer */
-.otp-input:-ms-input-placeholder {
-    color: var(--c-text-secondary);
-    opacity: 0.5;
-    font-weight: 500;
-    text-transform: none;
-}
-
-.flight-code-input-wrapper.input-error .otp-input {
-    border-color: var(--c-danger);
-}
-
-/* Keep danger styling when focused */
-.flight-code-input-wrapper.input-error .otp-input:focus {
-    border-color: var(--c-danger);
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.35);
-}
-
-.otp-input.filled {
+/* Styling for filled slots */
+.otp-visual-slot.filled {
     color: var(--c-success);
+    opacity: 1;
 }
 
-.flight-code-input-wrapper.input-error .otp-input.filled {
+/* Dim inactive/empty slots */
+.otp-visual-slot:not(.active):not(.filled) {
+    opacity: 0.6;
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Error States */
+.flight-code-input-wrapper.input-error .otp-visual-slot {
+    border-color: var(--c-danger);
     color: var(--c-danger);
 }
 
-
-.otp-input:focus {
-    border-color: var(--c-primary);
-    box-shadow: 0 0 0 3px rgba(91, 206, 250, 0.4); /* Blue focus ring */
-    /*
-    color: var(--c-text-primary);
-    */
+body[data-theme="dark"] .otp-visual-slot:not(.active):not(.filled) {
+    background-color: rgba(255, 255, 255, 0.03);
 }
+
+/* === Button Styles === */
 
 .flight-code-input-wrapper button {
     flex-shrink: 0;
@@ -154,16 +126,12 @@
     outline: none;
 }
 
-.flight-code-input-wrapper button:focus {
-    color: var(--c-secondary);
-    background: rgb(91 206 250 / .08);
-    outline: none;
-}
-
 .flight-code-input-wrapper button:active {
     transform: scale(.97);
     transition-duration: 0.1s;
 }
+
+/* === Checkbox & Switch Styles === */
 
 .checkbox-label {
     display: flex;
@@ -285,6 +253,7 @@
     background: var(--c-primary);
     border-color: var(--c-primary);
 }
+
 /* Tri-state segmented control */
 .segmented {
     display: flex;
