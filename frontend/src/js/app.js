@@ -245,7 +245,10 @@ async function requestRealEmail(token) {
         setEmailCaptchaStatus("Verifying…", "info");
         const res = await fetch(endpoint, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
             body: JSON.stringify({ token }),
         });
         const data = await res.json();
@@ -257,7 +260,8 @@ async function requestRealEmail(token) {
         revealEmailUI();
     } catch (err) {
         console.error("Failed to fetch contact email:", err);
-        setEmailCaptchaStatus("Verification failed. Please try again.", "error");
+        const msg = (err && err.message) ? String(err.message) : "Verification failed. Please try again.";
+        setEmailCaptchaStatus(`Verification failed: ${msg}`, "error");
         // Keep the CAPTCHA state visible so user can retry
         const captcha = document.getElementById("email-view-captcha-state");
         const initial = document.getElementById("email-view-initial-state");
