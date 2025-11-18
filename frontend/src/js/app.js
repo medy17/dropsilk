@@ -10,6 +10,7 @@ import { initializeModals } from "./ui/modals.js";
 import { connect as connectWebSocket } from "./network/websocket.js";
 import { showWelcomeOnboarding } from "./ui/onboarding.js";
 import { inject } from "@vercel/analytics";
+import { RECAPTCHA_SITE_KEY, API_BASE_URL } from "./config.js";
 
 function initializeGlobalUI() {
     console.log("Initializing Global UI (Theme, Modals)...");
