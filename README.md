@@ -339,11 +339,14 @@ To run DropSilk locally, you'll need both this frontend repository and the corre
     ```
 
 3.  **Set up environment variables:**
-    The PPTX preview feature uses UploadThing, which requires API endpoints hosted on a server. Create a `.env.local` file in the root of the project and add the URL of your backend.
+    Create a `.env.local` file in the project root and configure the backend URL and your reCAPTCHA site key.
     ```
     # .env.local
     VITE_API_BASE_URL=http://localhost:8080
+    VITE_RECAPTCHA_SITE_KEY=<your_recaptcha_site_key>
     ```
+    - `VITE_API_BASE_URL` points the frontend to your backend (used for previews, TURN credentials, and the email reveal endpoint).
+    - `VITE_RECAPTCHA_SITE_KEY` is the public site key used in the Contact modal to verify human users before revealing the email address.
 
 4.  **Clone and run the Backend Signaling Server:**
     *(Follow the instructions in the backend repository's README)*. By default, it runs on `localhost:8080`. The frontend is already configured to connect to this address in development mode.
@@ -357,6 +360,24 @@ npm run dev
 ```
 
 Open your browser and navigate to `http://localhost:5173` (or the address provided by Vite). You should now have a fully functional local version of DropSilk!
+
+### Contact email (reCAPTCHA)
+
+When the user clicks “View Email” in the Contact modal, the app renders a reCAPTCHA challenge and, on success, exchanges the token with the backend to retrieve the email address.
+
+- Env vars:
+  - `VITE_RECAPTCHA_SITE_KEY` must be set at build time (Vite only injects `VITE_*` variables).
+  - `VITE_API_BASE_URL` must be a full URL (include `http://` or `https://`).
+- Client request:
+  - `POST ${VITE_API_BASE_URL}/request-email`
+  - Headers: `Content-Type: application/json`, `Accept: application/json`
+  - Body: `{"token":"<recaptcha_token_from_client>"}`
+  - No credentials/cookies.
+- Backend response contract:
+  - Success 200: `{"email":"you@domain.com"}`
+  - Failure 4xx/5xx: `{"error":"<string_reason>"}`
+    - Possible values currently: `reCAPTCHA token is required`, `recaptcha_failed`, `server_not_configured`, `internal_error`.
+- CORS: the backend should allow your dev/staging/production origins for `POST` with `Content-Type`.
 
 ## License
 
