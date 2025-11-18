@@ -21,10 +21,6 @@ export const WEBSOCKET_URL = getWebSocketUrl();
 // ICE_SERVERS are now fetched dynamically from the backend in webrtc.js to support TURN.
 export const HIGH_WATER_MARK = 1024 * 1024; // buffer size for data channel
 // reCAPTCHA: read from Vite env; do not hardcode in source.
-export const RECAPTCHA_SITE_KEY =
-  (import.meta.env && import.meta.env.VITE_RECAPTCHA_SITE_KEY) || "";
-// Backend base URL (already used elsewhere in the app via import.meta.env),
-// exporting here for consistency so other modules can rely on a single source.
 export const RECAPTCHA_SITE_KEY = (import.meta.env?.VITE_RECAPTCHA_SITE_KEY) || "";
 export const API_BASE_URL = (import.meta.env?.VITE_API_BASE_URL) || "";
 export const OPFS_THRESHOLD = 256 * 1024 * 1024; // 256 MB
