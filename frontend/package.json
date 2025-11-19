@@ -10,8 +10,12 @@
     "dev:electron": "concurrently \"npm:dev\" \"cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "build:electron": "cross-env VITE_API_BASE_URL=https://dropsilk-backend.onrender.com vite build --base=./ && electron-builder",
     "preview": "vite preview",
-    "update-locales": "node scripts/update-locales.js"
-  },
+    "update-locales": "node scripts/update-locales.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
+    },
   "build": {
     "appId": "com.dropsilk.app",
     "productName": "DropSilk",
@@ -57,10 +61,13 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "^39.2.1",
     "electron-builder": "^26.0.12",
-    "vite": "^7.2.2"
+    "jsdom": "^27.2.0",
+    "vite": "^7.2.2",
+    "vitest": "^4.0.10"
   }
 }
