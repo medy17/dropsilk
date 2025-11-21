@@ -1,47 +1,85 @@
 :root {
-    --brilliant-blue: #5bcefa;
-    --brilliant-pink: #f5a9b8;
-    --brilliant-white: #ffffff;
-    --dark-bg-base: #18181b;
-    --dark-bg-root: #111113;
-    --c-bg: var(--brilliant-white);
-    --c-text-primary: var(--dark-bg-base);
-    --c-text-secondary: #888;
-    --c-primary: var(--brilliant-blue);
-    --c-secondary: var(--brilliant-pink);
-    --c-panel-bg: var(--brilliant-white);
-    --c-panel-border: var(--brilliant-pink);
-    --c-panel-shadow: 0 8px 25px rgba(91, 206, 250, 0.07);
-    --c-header-bg: var(--c-panel-bg);
-    --c-header-border: transparent;
-    --c-footer-bg: var(--c-panel-bg);
-    --c-footer-border: #f0f0f0;
-    --c-dropzone-bg: #fafdff;
-    --c-dropzone-border: var(--c-panel-border);
-    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(91, 206, 250, 0.12), rgba(245, 169, 184, 0.08));
-    --c-progress-track: #e0e0e0;
-    --c-btn-primary-bg: linear-gradient(90deg, rgba(91, 206, 250, 0.12) 0%, rgba(245, 169, 184, 0.10) 100%);
-    --c-btn-secondary-bg: linear-gradient(90deg, rgba(245, 169, 184, 0.12) 0%, rgba(91, 206, 250, 0.08) 100%);
-    --c-success: #50c878;
+    /* --- Brand Colors (The Silk Spectrum) --- */
+    --silk-cyan: #22d3ee;
+    --silk-blue: #3b82f6;
+    --silk-purple: #a855f7;
+    --silk-pink: #f472b6;
+
+    /* --- Gradients --- */
+    --gradient-primary: linear-gradient(135deg, var(--silk-blue), var(--silk-purple));
+    --gradient-glow: linear-gradient(90deg, var(--silk-cyan), var(--silk-pink));
+    --gradient-glass: linear-gradient(145deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.3));
+
+    /* --- Light Theme Base --- */
+    --c-bg: #f3f4f6;
+    --c-text-primary: #111827;
+    --c-text-secondary: #6b7280;
+
+    /* --- Functional Colors --- */
+    --c-primary: var(--silk-blue);
+    --c-secondary: var(--silk-purple);
+    --c-success: #10b981;
     --c-danger: #ef4444;
+
+    /* --- Surface & Panels (Glassmorphism) --- */
+    --c-panel-bg: rgba(255, 255, 255, 0.75);
+    --c-panel-border: rgba(255, 255, 255, 0.8);
+    --c-panel-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+
+    /* --- Components --- */
+    --c-header-bg: rgba(255, 255, 255, 0.1);
+    --c-header-border: rgba(255, 255, 255, 0.2);
+    --c-footer-bg: transparent;
+    --c-footer-border: rgba(0, 0, 0, 0.05);
+
+    --c-dropzone-bg: rgba(255, 255, 255, 0.4);
+    --c-dropzone-border: rgba(59, 130, 246, 0.3);
+    --c-dropzone-hover-bg: rgba(255, 255, 255, 0.9);
+
+    --c-progress-track: rgba(0, 0, 0, 0.05);
+
+    /* --- Buttons --- */
+    --c-btn-primary-bg: var(--c-text-primary);
+    --c-btn-primary-text: #ffffff;
+    --c-btn-secondary-bg: rgba(255, 255, 255, 0.6);
+
+    /* --- Spacing & Radius --- */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
 }
 
 body[data-theme="dark"] {
-    --c-bg: var(--dark-bg-root);
-    --c-text-primary: #f4f4f5;
-    --c-text-secondary: #a1a1aa;
-    --c-panel-bg: var(--dark-bg-base);
-    --c-panel-border: rgba(245, 169, 184, 0.4);
-    --c-panel-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.2);
-    --c-header-bg: rgba(24, 24, 27, 0.01);
-    --c-footer-bg: #111113;
-    --c-footer-border: rgba(255, 255, 255, 0.1);
-    --c-dropzone-bg: rgba(255, 255, 255, 0.02);
-    --c-dropzone-border: rgba(245, 169, 184, 0.25);
-    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(91, 206, 250, 0.1), rgba(245, 169, 184, 0.08));
-    --c-progress-track: #37373d;
-    --c-btn-primary-bg: linear-gradient(90deg, rgba(91, 206, 250, 0.15) 0%, rgba(245, 169, 184, 0.12) 100%);
-    --c-btn-secondary-bg: linear-gradient(90deg, rgba(245, 169, 184, 0.15) 0%, rgba(91, 206, 250, 0.10) 100%);
-    --c-success: #3ec6a8;
+    /* --- Dark Theme Base (Deep Void) --- */
+    --c-bg: #030712; /* Almost black */
+    --c-text-primary: #f9fafb;
+    --c-text-secondary: #9ca3af;
+
+    /* Colors glow more in dark mode */
+    --c-primary: #60a5fa;
+    --c-secondary: #c084fc;
+    --c-success: #34d399;
     --c-danger: #f87171;
+
+    /* --- Surface & Panels --- */
+    --c-panel-bg: rgba(17, 24, 39, 0.6);
+    --c-panel-border: rgba(255, 255, 255, 0.08);
+    --c-panel-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+
+    /* --- Components --- */
+    --c-header-bg: rgba(0, 0, 0, 0.2);
+    --c-header-border: rgba(255, 255, 255, 0.05);
+    --c-footer-bg: transparent;
+    --c-footer-border: rgba(255, 255, 255, 0.05);
+
+    --c-dropzone-bg: rgba(255, 255, 255, 0.03);
+    --c-dropzone-border: rgba(255, 255, 255, 0.1);
+    --c-dropzone-hover-bg: rgba(255, 255, 255, 0.08);
+
+    --c-progress-track: rgba(255, 255, 255, 0.1);
+
+    /* --- Buttons --- */
+    --c-btn-primary-bg: #ffffff;
+    --c-btn-primary-text: #000000;
+    --c-btn-secondary-bg: rgba(255, 255, 255, 0.1);
 }

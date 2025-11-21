@@ -1,91 +1,112 @@
 #dashboard-flight-code {
-    display: inline-block;
-    background: linear-gradient(90deg, rgb(91 206 250 / .12) 0%, rgb(245 169 184 / .1) 100%);
-    color: var(--c-primary);
     font-family: "IBM Plex Mono", monospace;
-    font-size: 1em;
+    font-size: 1.1em;
     font-weight: 700;
-    border-radius: 10px;
-    padding: .25em .7em;
-    letter-spacing: .15em;
-    margin-left: .5em;
-    border: 1.5px solid var(--c-secondary);
-    box-shadow: 0 1px 4px rgb(91 206 250 / .06);
-    backdrop-filter: blur(6px) saturate(1.2);
-    -webkit-backdrop-filter: blur(6px) saturate(1.2);
-    outline: 1px solid rgb(255 255 255 / .18);
-    transition: box-shadow 0.2s, border-color 0.2s, background 0.2s, color 0.2s, transform 0.15s;
+    color: var(--c-text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--c-panel-border);
+    padding: 0.4em 0.8em;
+    border-radius: 8px;
     cursor: pointer;
-    user-select: none;
+    transition: all 0.2s;
+    margin-left: 0.5rem;
     position: relative;
-    overflow: hidden;
+    box-shadow: none; /* Reset old style */
 }
 
-#dashboard-flight-code:active {
-    transform: scale(.97);
+#dashboard-flight-code:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--c-primary);
+    color: var(--c-primary);
 }
 
 #dashboard-flight-code.copied {
-    background: linear-gradient(90deg, rgb(62 198 168 / .18) 0%, rgb(127 234 210 / .18) 100%);
-    color: var(--c-success);
     border-color: var(--c-success);
-    box-shadow: 0 0 0 2px #3ec6a833;
+    color: var(--c-success);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+#dashboard-flight-code .copy-feedback {
+    position: absolute;
+    top: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--c-panel-bg);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    box-shadow: var(--c-panel-shadow);
 }
 
 #dashboard-flight-code.copied .copy-feedback {
     opacity: 1;
 }
 
-#dashboard-flight-code .copy-feedback {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background: rgb(255 255 255 / .95);
-    color: var(--c-success);
-    font-size: .95em;
-    font-weight: 700;
-    border-radius: 6px;
-    padding: .2em .8em;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-    z-index: 2;
-}
-
 .flight-info {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem;
     flex-wrap: wrap;
 }
 
 .flight-info__code {
-    font-size: 1.5rem;
-    font-weight: 700;
+    display: flex;
+    align-items: center;
 }
 
-.flight-info__code span {
-    font-weight: 800;
-    color: var(--c-primary);
+.flight-info__code span:first-child {
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--c-text-secondary);
+    margin-right: 0.5rem;
+    font-weight: 600;
 }
 
 .flight-info__status {
-    background-color: var(--c-panel-bg);
-    color: var(--c-secondary);
+    font-size: 0.85em;
+    padding: 0.3em 0.8em;
+    border-radius: 20px;
     font-weight: 600;
-    padding: .5em 1em;
-    border-radius: 99px;
-    font-size: .9em;
-    border: 1.5px solid var(--c-primary);
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(4px);
+    /* Colors set via JS, but default borders handled here */
+    border: 1px solid transparent;
 }
 
 .flight-actions {
     display: flex;
-    gap: .8rem;
+    gap: 0.8rem;
+}
+
+/* --- Panel Headers --- */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--c-panel-border);
+}
+
+.panel-header h3 {
+    font-weight: 600;
+    color: var(--c-text-primary);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+/* --- Promo Panel --- */
+.promo-panel {
+    background: linear-gradient(145deg, rgba(var(--silk-purple), 0.05), rgba(var(--silk-blue), 0.05));
+    border: 1px solid rgba(var(--silk-purple), 0.1);
 }
 
 .promo-panel .btn {
     margin-top: 1rem;
 }
-

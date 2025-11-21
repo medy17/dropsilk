@@ -1,109 +1,96 @@
 .flight-ticket-panel-wrapper {
     position: relative;
     width: 100%;
-    max-width: 380px;
-    perspective: 1000px;
+    max-width: 420px;
+    perspective: 1500px; /* Deeper perspective for 3D effect */
 }
 
 .flight-ticket {
-    background: var(--c-panel-bg);
-    color: var(--c-text-primary);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 4px 32px 0 rgb(91 206 250 / .07), 0 1.5px 0 0 var(--c-secondary);
-    border: 1.5px solid var(--c-primary);
-    transition: box-shadow 0.2s, background 0.3s ease, color 0.3s ease, transform 0.4s ease-out;
-    transform-style: preserve-3d;
+    background: rgba(255, 255, 255, 0.7); /* Frosted glass base */
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.05),
+            0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    text-align: center;
     position: relative;
     overflow: hidden;
+    transform-style: preserve-3d;
+    transition: transform 0.4s ease-out, box-shadow 0.4s ease;
 }
 
-.flight-ticket.allow-pulse-overflow {
-    overflow: visible;
+body[data-theme="dark"] .flight-ticket {
+    background: rgba(20, 20, 25, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+            0 20px 50px rgba(0, 0, 0, 0.4),
+            0 1px 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Decorative gradient top border */
+.flight-ticket::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--gradient-glow);
+    z-index: 2;
 }
 
 .flight-ticket h2 {
-    font-family: "IBM Plex Mono", monospace;
-    margin: 0;
-    font-weight: 700;
-    color: var(--c-primary);
-    letter-spacing: .02em;
-    text-shadow: 0 1px 0 #fff, 0 0 2px #fff;
+    font-family: "IBM Plex Sans", sans-serif; /* Clean sans-serif for name */
+    font-weight: 800;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    margin-top: 0;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
 }
 
 .flight-ticket p {
-    opacity: .8;
-    margin: .5rem 0 1.5rem 0;
-    color: var(--c-text-primary);
+    color: var(--c-text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
 }
 
+/* --- Ticket Actions --- */
 .ticket-actions {
-    font-family: "IBM Plex Sans";
     display: flex;
     flex-direction: column;
-    gap: .8em;
+    gap: 1rem;
 }
 
 .ticket-actions button {
     width: 100%;
-    padding: 1em;
-    font-size: 1em;
-    border-radius: 12px;
-    border: 1.5px solid var(--c-primary);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s, transform 0.1s ease-out;
-    background: var(--c-btn-primary-bg);
-    color: var(--c-primary);
-    box-shadow: 0 1px 4px rgb(91 206 250 / .06);
+    justify-content: center;
+    /* Reset specific button styles handled by .btn class */
+    box-shadow: none;
 }
 
-.ticket-actions button:hover {
-    background: var(--c-primary);
-    color: var(--brilliant-white);
-    border-color: var(--c-secondary);
-    outline: none;
-}
-
-.ticket-actions button:focus {
-    background: var(--c-primary);
-    color: var(--brilliant-white);
-    border-color: var(--c-secondary);
-    outline: none;
-}
-
-.ticket-actions button:active {
-    transform: translateY(0) scale(.97);
-    transition-duration: 0.1s;
-}
-
+/* Separator */
 .or-separator {
     display: flex;
     align-items: center;
-    text-align: center;
-    margin: 1em 0;
-    color: var(--c-primary);
-    opacity: .6;
-    font-weight: 500;
-    font-size: .95em;
+    color: var(--c-text-secondary);
+    font-size: 0.8em;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    margin: 0.5rem 0;
 }
 
-.or-separator::before {
-    content: '';
-    flex: 1;
-    border-bottom: 2px dashed var(--c-secondary);
-}
-
+.or-separator::before,
 .or-separator::after {
     content: '';
     flex: 1;
-    border-bottom: 2px dashed var(--c-secondary);
-}
-
-.or-separator:not(:empty)::before {
-    margin-right: .5em;
-}
-
-.or-separator:not(:empty)::after {
-    margin-left: .5em;
+    height: 1px;
+    background: var(--c-panel-border);
+    margin: 0 1rem;
 }

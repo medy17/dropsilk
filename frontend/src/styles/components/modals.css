@@ -1,11 +1,8 @@
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgb(24 24 27 / .8);
-    backdrop-filter: blur(8px);
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Lighter overlay for glass effect */
+    backdrop-filter: blur(8px);      /* Heavy blur */
     -webkit-backdrop-filter: blur(8px);
     display: none;
     align-items: center;
@@ -20,134 +17,23 @@
     opacity: 1;
 }
 
-.modal-overlay.show .invite-modal {
-    transform: scale(1) translateY(0);
-}
-
-.modal-overlay.show .modal-header {
-    opacity: 1;
-    transform: translateY(0);
-    transition-delay: 0.05s;
-}
-
-.modal-overlay.show .modal-body {
-    opacity: 1;
-    transform: translateY(0);
-    transition-delay: 0.1s;
-}
-
-.modal-overlay.show .flight-code-display {
-    opacity: 1;
-    transform: translateY(0);
-    transition-delay: 0.1s;
-}
-
-.modal-overlay.show .qr-section {
-    opacity: 1;
-    transform: translateY(0);
-    transition-delay: 0.15s;
-}
-
-.modal-overlay.show .share-actions {
-    opacity: 1;
-    transform: translateY(0);
-    transition-delay: 0.2s;
-}
-
-.modal-overlay .modal-header {
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-}
-
-.modal-overlay .modal-body {
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-}
-
-.modal-overlay .flight-code-display {
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-}
-
-.modal-overlay .qr-section {
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-}
-
-.modal-overlay .share-actions {
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-}
-
-.modal-overlay.zipping-in-progress .zip-file-list {
-    pointer-events: none;
-    opacity: .6;
-}
-
-.modal-overlay.zipping-in-progress .zip-actions-header {
-    pointer-events: none;
-    opacity: .6;
-}
-
-.modal-overlay.zipping-in-progress .modal-close {
-    pointer-events: none;
-    opacity: .5;
-    cursor: not-allowed;
-}
-
 .invite-modal {
     background: var(--c-panel-bg);
-    border-radius: 20px;
+    border: 1px solid var(--c-panel-border);
+    border-radius: 24px;
     padding: 2rem;
-    box-shadow: 0 20px 60px rgb(91 206 250 / .15), 0 8px 32px rgb(245 169 184 / .1), 0 0 0 1px rgb(91 206 250 / .1);
-    border: 2px solid var(--c-primary);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     max-width: 400px;
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
-    transform: scale(.95) translateY(20px);
-    transition: transform 0.3s cubic-bezier(.4, 0, .2, 1), opacity 0.3s cubic-bezier(.4, 0, .2, 1), background 0.3s ease;
-    scrollbar-width: thin;
-    scrollbar-color: var(--c-primary) #fff0;
+    transform: scale(.95) translateY(10px);
+    transition: transform 0.3s cubic-bezier(.4, 0, .2, 1);
 }
 
-.modal-overlay .invite-modal {
-    max-height: 85vh;
-    overflow-y: auto;               /* make content scrollable */
-    -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
-
-    border-radius: 16px;            /* keep rounded corners */
-    background-color: var(--c-panel-bg);
-    clip-path: inset(0 round 16px); /* ensure scrollbars respect border radius */
-}
-
-.invite-modal::-webkit-scrollbar {
-    width: 8px;
-}
-
-.invite-modal::-webkit-scrollbar-track {
-    background: #fff0;
-}
-
-.invite-modal::-webkit-scrollbar-thumb {
-    background-color: var(--c-primary);
-    border-radius: 20px;
-    border: 2px solid var(--c-panel-bg);
-}
-
-.invite-modal::-webkit-scrollbar-thumb:hover {
-    background-color: #379fd6;
-}
-
-.invite-modal::-webkit-scrollbar-button {
-    display: none;
-    height: 0;
+.modal-overlay.show .invite-modal {
+    transform: scale(1) translateY(0);
 }
 
 .modal-header {
@@ -155,116 +41,92 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--c-primary);
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--c-panel-border);
 }
 
 .modal-header h3 {
     margin: 0;
-    color: var(--c-primary);
-    font-size: 1.4rem;
+    color: var(--c-text-primary);
+    font-size: 1.5rem;
     font-weight: 700;
 }
 
 .modal-close {
-    background: none;
+    background: rgba(0,0,0,0.05);
     border: none;
-    font-size: 1.5rem;
-    color: var(--c-secondary);
+    color: var(--c-text-secondary);
     cursor: pointer;
     padding: .5rem;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
     transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
+}
+
+body[data-theme="dark"] .modal-close {
+    background: rgba(255,255,255,0.1);
 }
 
 .modal-close:hover {
-    background: linear-gradient(135deg, rgb(245 169 184 / .15), rgb(91 206 250 / .1));
-    color: var(--c-primary);
+    background: var(--c-danger);
+    color: white;
     transform: rotate(90deg);
 }
 
-.modal-close:active {
-    transform: rotate(90deg) scale(.95);
-}
-
 .modal-body {
-    padding-top: .5rem;
     color: var(--c-text-secondary);
+    line-height: 1.6;
 }
 
 .modal-body ul {
-    padding-left: 1.5em;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    padding-left: 1.2rem;
 }
 
-.modal-body ul li {
-    margin-bottom: .75rem;
-    line-height: 1.6;
-    color: var(--c-text-secondary);
-}
-
-.modal-body a,
-.modal-body a:visited { /* Target both unvisited and visited links */
-    color: var(--c-secondary);
-    font-weight: 500;
-    text-decoration: underline;
-    text-decoration-color: rgba(245, 169, 184, 0.5); /* Softer underline color */
-    text-underline-offset: 3px; /* Gives the underline some breathing room */
-    transition: color 0.2s ease, text-decoration-color 0.2s ease;
-}
-
-.modal-body a:hover,
-.modal-body a:focus {
+.modal-body a {
     color: var(--c-primary);
-    text-decoration-color: rgba(91, 206, 250, 0.9); /* Make underline stronger on hover */
-    outline: none;
-}
-
-
-.modal-body p {
-    line-height: 1.6;
-    margin-bottom: 1rem;
-}
-
-.modal-body .flight-code-display a.code {
     text-decoration: none;
+    font-weight: 600;
+}
+
+/* QR Section */
+.qr-container {
+    background: white;
+    padding: 1rem;
+    border-radius: 16px;
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.qr-container canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 200px;
+}
+
+/* Flight Code Display in Modal */
+.flight-code-display {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--c-panel-border);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.flight-code-display .code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
     color: var(--c-primary);
-    transition: color 0.2s, transform 0.1s ease-out;
-}
-
-.modal-body .flight-code-display a.code:hover {
-    color: var(--c-secondary);
-}
-
-.modal-body .flight-code-display a.code:active {
-    transform: scale(.97);
+    letter-spacing: 0.2em;
 }
 
 .modal-footer {
     margin-top: 1.5rem;
     padding-top: 1rem;
-    border-top: 2px solid var(--c-panel-border);
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    border-top: 1px solid var(--c-panel-border);
+    display: flex; flex-direction: column; gap: 1rem;
 }
-
-.kofi-modal {
-    width: 420px;
-    max-width: 95vw;
-}
-
-#recaptcha-container {
-    display: flex;
-    justify-content: center;
-    margin: 1.5rem 0;
-}
-

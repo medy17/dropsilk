@@ -1,8 +1,6 @@
-/* src/styles/components/forms.css */
-
 .flight-code-input-wrapper {
     display: flex;
-    align-items: stretch; /* To make inputs and button same height */
+    align-items: stretch;
     gap: 0.5rem;
 }
 
@@ -10,305 +8,144 @@
     animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
 }
 
-/* === OTP Ghost Input Implementation === */
-
+/* === OTP Input Structure === */
 .otp-input-container {
     display: flex;
     flex-grow: 1;
     gap: 0.5rem;
-    position: relative; /* Crucial for absolute positioning of ghost input */
+    position: relative;
     cursor: text;
 }
 
-/* The invisible input that handles all typing/pasting logic */
 .otp-ghost-input {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     opacity: 0;
-    z-index: 10; /* Sits on top of visuals */
+    z-index: 10;
     cursor: text;
-    font-size: 16px; /* Prevents iOS zoom on focus */
-    background: transparent;
-    color: transparent;
-    caret-color: transparent;
-    border: none;
-    outline: none;
-    padding: 0;
-    margin: 0;
 }
 
-/* The visual boxes that display the numbers */
+/* === Visual Slots === */
 .otp-visual-slot {
     width: 100%;
     flex: 1 1 0;
     min-width: 0;
     font-family: "IBM Plex Mono", monospace;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.8rem;
+    font-weight: 600;
     text-align: center;
-    border: 1.5px solid var(--c-primary);
+
+    /* Glassy Input Style */
+    border: 1px solid var(--c-panel-border);
+    background: rgba(255, 255, 255, 0.5);
     border-radius: 12px;
-    background: var(--c-panel-bg);
     color: var(--c-text-primary);
-    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s, opacity 0.2s;
-    box-shadow: 0 1px 4px rgb(91 206 250 / .04);
+
     display: flex;
     align-items: center;
     justify-content: center;
     height: 3.5rem;
     user-select: none;
     text-transform: uppercase;
+    transition: all 0.2s;
+    box-shadow: none;
 }
 
-/* Styling for the "Active" slot (where the cursor conceptually is) */
+body[data-theme="dark"] .otp-visual-slot {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Active Slot */
 .otp-visual-slot.active {
-    border-color: var(--c-primary);
-    box-shadow: 0 0 0 3px rgba(91, 206, 250, 0.4);
+    border-color: var(--silk-blue);
+    background: var(--c-bg);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    transform: translateY(-2px);
+    opacity: 1;
     z-index: 1;
-    opacity: 1;
 }
 
-/* Styling for filled slots */
+/* Filled Slot */
 .otp-visual-slot.filled {
-    color: var(--c-success);
+    color: var(--c-text-primary);
+    border-color: var(--silk-cyan);
+    font-weight: 800;
     opacity: 1;
 }
 
-/* Dim inactive/empty slots */
+/* Inactive Slot */
 .otp-visual-slot:not(.active):not(.filled) {
-    opacity: 0.6;
-    background-color: rgba(0, 0, 0, 0.02);
+    opacity: 0.7;
 }
 
-/* Error States */
+/* Error State */
 .flight-code-input-wrapper.input-error .otp-visual-slot {
     border-color: var(--c-danger);
     color: var(--c-danger);
 }
 
-body[data-theme="dark"] .otp-visual-slot:not(.active):not(.filled) {
-    background-color: rgba(255, 255, 255, 0.03);
-}
-
-/* === Button Styles === */
-
+/* === Join Button === */
 .flight-code-input-wrapper button {
     flex-shrink: 0;
-    width: auto;
-    background: var(--c-panel-bg);
-    color: var(--c-primary);
+    width: 3.5rem;
+    background: var(--c-btn-primary-bg);
+    color: var(--c-btn-primary-text);
     padding: 0;
     cursor: pointer;
-    font-size: 1.8em;
+    font-size: 1.5em;
     border-radius: 12px;
-    border: 1.5px solid var(--c-primary);
-    box-shadow: 0 1px 4px rgb(91 206 250 / .04);
-    transition: color 0.2s, transform 0.1s ease-out, background 0.2s, border-color 0.2s;
-    flex-shrink: 0;
-    width: 3.5rem;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s;
 }
 
 .flight-code-input-wrapper button:hover {
-    background: var(--c-primary);
-    color: var(--brilliant-white);
-    border-color: var(--c-secondary);
-    outline: none;
-}
-
-.flight-code-input-wrapper button:focus {
-    color: var(--c-secondary);
-    background: rgb(91 206 250 / .08);
-    outline: none;
+    background: var(--c-text-primary);
+    transform: translateX(3px);
 }
 
 .flight-code-input-wrapper button:active {
-    transform: scale(.97);
-    transition-duration: 0.1s;
+    transform: translateX(3px) scale(0.95);
 }
 
-/* === Checkbox & Switch Styles === */
-
+/* === Checkboxes & Switches === */
 .checkbox-label {
     display: flex;
     align-items: center;
     cursor: pointer;
-    position: relative;
-    user-select: none;
     gap: .75rem;
 }
 
-.checkbox-label:hover .custom-checkbox {
-    border-color: var(--c-primary);
-}
-
-.custom-checkbox-input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
+.custom-checkbox {
+    width: 20px; height: 20px;
+    background: var(--c-panel-bg);
+    border: 2px solid var(--c-text-secondary);
+    border-radius: 6px;
+    position: relative;
+    transition: all 0.2s;
 }
 
 .custom-checkbox-input:checked + .custom-checkbox {
     background-color: var(--c-primary);
     border-color: var(--c-primary);
-    transform: scale(1.05);
-}
-
-.custom-checkbox-input:checked + .custom-checkbox::after {
-    display: block;
-    transform: rotate(45deg) scale(1);
-}
-
-.custom-checkbox {
-    position: relative;
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    background: var(--c-panel-bg);
-    border: 2px solid var(--c-text-secondary);
-    border-radius: 6px;
-    transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
-    flex-shrink: 0;
 }
 
 .custom-checkbox::after {
     content: "";
     position: absolute;
     display: none;
-    left: 6px;
-    top: 2px;
-    width: 5px;
-    height: 10px;
-    border: solid var(--brilliant-white);
+    left: 6px; top: 2px;
+    width: 5px; height: 10px;
+    border: solid white;
     border-width: 0 3px 3px 0;
-    transform: rotate(45deg) scale(0);
-    transition: transform 0.2s cubic-bezier(.4, 0, .2, 1);
+    transform: rotate(45deg);
 }
 
-/* Switch slider */
-.switch {
-    --sw-w: 52px;        /* total width */
-    --sw-h: 28px;        /* total height */
-    --sw-pad: 3px;       /* inner padding */
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    flex-shrink: 0; /* Prevent the control from being squished */
-    width: var(--sw-w);
-    height: var(--sw-h);
-}
-
-.switch-input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.switch-track {
-    position: relative;
+.custom-checkbox-input:checked + .custom-checkbox::after {
     display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: 999px;
-    background: var(--c-progress-track);
-    border: 1.5px solid var(--c-panel-border);
-    box-sizing: border-box;
-    overflow: hidden; /* keeps the thumb inside */
-    transition: background 0.2s, border-color 0.2s;
-    padding: var(--sw-pad);
-}
-
-.switch-thumb {
-    position: absolute;
-    top: 50%;
-    left: var(--sw-pad);
-    transform: translateY(-50%); /* only move vertically */
-    box-sizing: border-box;      /* include border in width/height */
-    width: calc(var(--sw-h) - var(--sw-pad) * 2);
-    height: calc(var(--sw-h) - var(--sw-pad) * 2);
-    border-radius: 50%;
-    background: var(--c-panel-bg);
-    border: 2px solid var(--c-text-secondary);
-    transition: left 0.2s, background 0.2s, border-color 0.2s;
-}
-
-.switch-input:checked + .switch-track {
-    background: linear-gradient(135deg, rgba(91, 206, 250, 0.35), rgba(245, 169, 184, 0.25));
-    border-color: var(--c-primary);
-}
-
-
-.switch-input:checked + .switch-track .switch-thumb {
-    left: auto;
-    right: var(--sw-pad);
-    transform: translateY(-50%);
-    background: var(--c-primary);
-    border-color: var(--c-primary);
-}
-
-/* Tri-state segmented control */
-.segmented {
-    display: flex;
-    background: var(--c-panel-bg);
-    border: 1.5px solid var(--c-panel-border);
-    border-radius: 999px;
-    overflow: hidden;
-    flex-shrink: 0; /* Prevent the control from being squished */
-    max-width: 190px;
-    width: 100%;
-}
-.segmented .seg-btn {
-    padding: 0.4rem 0.5rem;
-    font-weight: 600;
-    font-size: .8em;
-    border: none;
-    background: none;
-    color: var(--c-text-secondary);
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-    flex: 1;
-    text-align: center;
-    white-space: nowrap;
-    min-width: 0;
-}
-.segmented .seg-btn:hover {
-    background: rgb(91 206 250 / .12);
-}
-.segmented .seg-btn.active {
-    background: var(--c-primary);
-    color: var(--brilliant-white);
-}
-
-/* Number input for settings */
-.settings-number-input {
-    background: var(--c-panel-bg);
-    border: 1.5px solid var(--c-panel-border);
-    border-radius: 8px;
-    color: var(--c-text-primary);
-    padding: 0.5rem 0.75rem;
-    font-weight: 600;
-    text-align: right;
-    width: 85px; /* Adjust width as needed */
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-    -moz-appearance: textfield; /* Firefox */
-}
-
-.settings-number-input::-webkit-outer-spin-button,
-.settings-number-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.settings-number-input:focus {
-    border-color: var(--c-primary);
-    box-shadow: 0 0 0 2px rgba(91, 206, 250, 0.2);
 }

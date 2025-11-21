@@ -1,183 +1,128 @@
 .btn {
-    padding: .8em 1.5em;
-    border-radius: 12px;
-    border: 1.5px solid;
+    padding: 0.9em 1.8em;
+    border-radius: 999px; /* Pill shape */
+    border: none;
     font-weight: 600;
-    font-size: .9em;
+    font-size: 0.95em;
     cursor: pointer;
-    transition: all 0.2s ease, transform 0.1s ease-out;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: .5em;
+    gap: 0.6em;
     text-decoration: none;
-    box-shadow: 0 1px 4px rgb(91 206 250 / .06);
-    backdrop-filter: blur(6px) saturate(1.2);
-    -webkit-backdrop-filter: blur(6px) saturate(1.2);
-    outline: 1px solid rgb(255 255 255 / .18);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    /* Remove old borders/outlines */
+    outline: none;
 }
 
 .btn:active {
-    transform: translateY(0) scale(.97);
-    transition-duration: 0.1s;
+    transform: scale(0.96);
 }
 
+/* --- Primary: High Contrast --- */
 .btn-primary {
     background: var(--c-btn-primary-bg);
-    color: var(--c-primary);
-    border-color: var(--c-primary);
+    color: var(--c-btn-primary-text);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary:hover {
-    background: var(--c-primary);
-    color: var(--brilliant-white);
-    border-color: var(--c-secondary);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgb(91 206 250 / .25);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(var(--silk-blue), 0.3);
 }
 
+body[data-theme="dark"] .btn-primary:hover {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* --- Secondary: Glassy --- */
 .btn-secondary {
     background: var(--c-btn-secondary-bg);
-    color: var(--c-secondary);
-    border-color: var(--c-secondary);
+    color: var(--c-text-primary);
+    border: 1px solid var(--c-panel-border);
 }
 
 .btn-secondary:hover {
-    background: var(--c-secondary);
-    color: var(--brilliant-white);
-    border-color: var(--c-primary);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgb(245 169 184 / .25);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--c-text-primary);
+    transform: translateY(-2px);
 }
 
+/* --- Danger --- */
 .btn-danger {
-    background: var(--c-danger-bg, linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, rgba(248, 113, 113, 0.12) 100%));
+    background: rgba(239, 68, 68, 0.1);
     color: var(--c-danger);
-    border-color: var(--c-danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .btn-danger:hover {
     background: var(--c-danger);
-    color: var(--brilliant-white);
+    color: white;
     border-color: var(--c-danger);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 }
 
+/* --- Share Btn (Specific for Modal) --- */
 .share-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    background: var(--c-panel-bg);
+    color: var(--c-text-primary);
+    border: 1px solid var(--c-panel-border);
+    font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: .75rem;
-    padding: 1rem 1.5rem;
-    border-radius: 12px;
-    border: 1.5px solid var(--c-primary);
-    background: var(--c-btn-primary-bg);
-    color: var(--c-primary);
-    font-weight: 600;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
     cursor: pointer;
-    transition: all 0.2s ease, transform 0.1s ease-out;
-    text-decoration: none;
-    font-size: .95rem;
-    position: relative;
-    overflow: hidden;
-    line-height: 1;
 }
 
 .share-btn:hover {
     background: var(--c-primary);
-    color: var(--brilliant-white);
-    border-color: var(--c-secondary);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgb(91 206 250 / .25);
-}
-
-.share-btn:active {
-    transform: translateY(0) scale(.97);
-}
-
-.share-btn.secondary {
-    border-color: var(--c-secondary);
-    color: var(--c-secondary);
-    background: var(--c-btn-secondary-bg);
-}
-
-.share-btn.secondary:hover {
-    background: var(--c-secondary);
-    color: var(--brilliant-white);
-    border-color: var(--c-primary);
-}
-
-.share-btn.success {
-    background: linear-gradient(90deg, rgb(80 200 120 / .15) 0%, rgb(127 234 210 / .12) 100%);
-    border-color: var(--c-success);
-    color: var(--c-success);
+    color: white;
+    border-color: transparent;
 }
 
 .share-btn svg {
-    display: block;
     width: 20px;
     height: 20px;
-    flex: 0 0 auto;
-    vertical-align: middle;
-    pointer-events: none;
+    display: block;
 }
 
-.share-btn > span {
-    display: inline-flex;
-    align-items: center;
-}
-
+/* --- File Action (Icons) --- */
 .file-action-btn {
-    flex-shrink: 0;
-    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--c-text-secondary);
+    border: 1px solid transparent;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: var(--c-btn-primary-bg);
-    color: var(--c-primary);
-    border: 1.5px solid var(--c-primary);
     cursor: pointer;
-    transition: all 0.2s ease, transform 0.1s ease-out;
-    box-shadow: 0 1px 4px rgb(91 206 250 / .06);
+    transition: all 0.2s;
 }
 
 .file-action-btn:hover {
-    background: var(--c-primary);
-    color: var(--brilliant-white);
+    background: var(--c-panel-bg);
+    color: var(--c-primary);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgb(91 206 250 / .25);
 }
 
 .file-action-btn:disabled {
     cursor: not-allowed;
-    opacity: .5;
-    background: var(--c-btn-secondary-bg);
-    border-color: var(--c-text-secondary);
-    color: var(--c-text-secondary);
-    box-shadow: none;
-    transform: none;
-    pointer-events: none;
-}
-
-.file-action-btn svg {
-    width: 20px;
-    height: 20px;
-}
-
-.cancel-file-btn {
-    background: var(--c-btn-secondary-bg);
-    border-color: var(--c-secondary);
-    color: var(--c-secondary);
-    opacity: 0.7;
+    opacity: 0.5;
 }
 
 .cancel-file-btn:hover {
-    background: var(--c-danger);
-    border-color: var(--c-danger);
-    color: var(--brilliant-white);
-    opacity: 1;
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--c-danger);
 }

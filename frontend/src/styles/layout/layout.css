@@ -3,82 +3,84 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    flex-grow: 1;
-    padding: 8rem 2em 2em;
-    gap: 3em;
-    background: var(--c-bg);
+    min-height: 100vh;
+    padding: 6rem 1.5rem 2rem;
     position: relative;
     z-index: 1;
 }
 
 .tagline-section {
-    flex-basis: 50%;
     text-align: center;
-    background: var(--c-panel-bg);
-    border-radius: 18px;
-    box-shadow: 0 2px 16px rgb(91 206 250 / .04);
-    padding: 2em 2em 2em 2em;
-    margin-bottom: 2em;
-    max-width: 600px;
-    border: 1.5px solid rgb(245 169 184 / .18);
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 2;
+    /* Remove box styling to make it text-only hero */
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
 }
 
 .tagline-section h1 {
-    font-size: clamp(3em, 8vw, 5.5em);
-    font-weight: 800;
-    line-height: 1.1;
-    margin: 0 0 .5em 0;
-    color: var(--c-primary);
-    letter-spacing: .01em;
-    text-shadow: 0 2px 8px rgb(91 206 250 / .08);
+    font-size: clamp(3rem, 10vw, 6rem);
+    font-weight: 900;
+    line-height: 0.95;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.03em;
+    background: linear-gradient(to bottom right, var(--c-text-primary), var(--c-text-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
 }
 
 .tagline-section p {
-    font-size: 1.1em;
+    font-size: 1.2rem;
     color: var(--c-text-secondary);
-    max-width: 450px;
+    max-width: 500px;
     margin: 0 auto;
+    line-height: 1.6;
 }
 
-.flight-ticket-panel-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 380px;
-    perspective: 1000px;
-}
-
+/* --- Dashboard Layout --- */
 #dashboard {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1280px; /* Wider container */
     margin: 0 auto;
-    padding: 8rem 1rem 2rem;
+    padding: 7rem 1.5rem 3rem;
     display: none;
     flex-direction: column;
-    gap: 1.5rem;
-    flex-grow: 1;
+    gap: 2rem;
     position: relative;
     z-index: 1;
 }
 
+/* --- Universal Glass Panel --- */
 .panel {
-    background-color: var(--c-panel-bg);
-    border-radius: 16px;
+    background: var(--c-panel-bg);
+    border: 1px solid var(--c-panel-border);
+    border-radius: var(--radius-lg);
     padding: 1.5rem;
     box-shadow: var(--c-panel-shadow);
-    border: 2px solid var(--c-panel-border);
-    min-width: 355px;
-    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
 }
 
+/* --- Header Styling override --- */
 #dashboard-header {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
+    backdrop-filter: none;
+    margin-bottom: 1rem;
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
     gap: 1rem;
-    border-bottom: 2px solid var(--c-primary);
 }
 
 .dashboard-grid {
@@ -93,33 +95,15 @@
     gap: 1.5rem;
 }
 
-.panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.panel-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    color: var(--c-primary);
-}
-
-.panel-header .icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--c-text-secondary);
-    font-size: 1.5rem;
-    padding: .2em;
-}
-
+/* --- Empty states --- */
 .empty-state {
-    text-align: center;
+    padding: 3rem 1rem;
     color: var(--c-text-secondary);
-    padding: 1rem 0;
-    font-size: .9em;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
 }
 
 .not-found-container {
@@ -130,16 +114,4 @@
     text-align: center;
     flex-grow: 1;
     padding: 2rem;
-    min-height: calc(100vh - 12rem);
-    position: relative;
-    z-index: 1;
-}
-
-.not-found-content {
-    background: var(--c-panel-bg);
-    border: 2px solid var(--c-panel-border);
-    box-shadow: var(--c-panel-shadow);
-    border-radius: 20px;
-    padding: 3rem 4rem;
-    max-width: 600px;
 }
