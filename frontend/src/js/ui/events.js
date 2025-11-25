@@ -410,6 +410,20 @@ function setupChat() {
         const text = input.value.trim();
         if (!text) return;
 
+        const MAX_CHAT_CHARS = 20000;
+        if (text.length > MAX_CHAT_CHARS) {
+            showToast({
+                type: 'danger',
+                title: i18next.t('chatTooLongTitle', 'Message too long'),
+                body: i18next.t(
+                    'chatTooLongBody',
+                    'Limit is 20,000 characters. Consider sending a .txt via file sharing.',
+                ),
+                duration: 7000,
+            });
+            return;
+        }
+
         const state = store.getState();
         if (!state.peerInfo) {
             showToast({

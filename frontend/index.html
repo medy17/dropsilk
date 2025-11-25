@@ -681,6 +681,9 @@
         <div class="panel grid-col-span-2" id="chat-panel">
             <div class="panel-header">
                 <h3 data-i18n="chat">Chat</h3>
+                <button id="chat-fullscreen-btn" class="file-action-btn chat-fs-btn" title="Expand chat" aria-label="Expand chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M1 5V1h4v1H2v3H1zM11 1h4v4h-1V2h-3V1zM1 11h1v3h3v1H1v-4zM14 11h1v4h-4v-1h3v-3z"/></svg>
+                </button>
             </div>
             <div id="chat-log" class="chat-log">
                 <div class="empty-state" data-i18n="startChatPlaceholder">
@@ -691,7 +694,7 @@
                 <input
                         id="chat-input"
                         type="text"
-                        maxlength="2000"
+                        maxlength="20000"
                         placeholder="Type a message…"
                 />
                 <button

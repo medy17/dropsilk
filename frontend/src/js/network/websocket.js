@@ -20,6 +20,7 @@ import {
     failBoarding,
     clearAllPulseEffects,
     resetChatView,
+    disableChat,
 } from '../ui/view.js';
 import { showInviteOnboarding } from '../ui/onboarding.js';
 import { audioManager } from '../utils/audioManager.js';
@@ -169,6 +170,7 @@ export function handlePeerLeft() {
     store.actions.setHasScrolledForChatReceive(false);
     resetPeerConnectionState();
     resetChatView();
+    disableChat();
     updateDashboardStatus('Peer disconnected. Waiting...', 'disconnected');
     disableDropZone();
     renderNetworkUsersView();

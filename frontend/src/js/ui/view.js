@@ -11,6 +11,7 @@ let chatPanelInView = true;
 let unreadChatCount = 0;
 let chatNewMsgBtn = null;
 let chatVisibilityObserver = null;
+let chatFullscreenInitialized = false;
 
 function ensureChatVisibilityObserver() {
     if (chatVisibilityObserver) return;
@@ -25,6 +26,51 @@ function ensureChatVisibilityObserver() {
         }
     }, { threshold: 0.2 });
     chatVisibilityObserver.observe(panel);
+}
+
+function initializeChatFullscreenToggle() {
+    if (chatFullscreenInitialized) return;
+    const panel = document.getElementById('chat-panel');
+    const btn = document.getElementById('chat-fullscreen-btn');
+    if (!panel || !btn) return;
+
+    const expandSVG = () =>
+        '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M1 5V1h4v1H2v3H1zM11 1h4v4h-1V2h-3V1zM1 11h1v3h3v1H1v-4zM14 11h1v4h-4v-1h3v-3z"/></svg>';
+    const collapseSVG = () =>
+        '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M5 1H1v4h1V2h3V1zM10 1v1h3v3h1V1h-4zM1 10v4h4v-1H2v-3H1zM14 10h-1v3h-3v1h4v-4z"/></svg>';
+
+    const refreshIcon = () => {
+        const isFs = document.fullscreenElement === panel;
+        if (isFs) {
+            btn.innerHTML = collapseSVG();
+            btn.title = i18next.t('exitFullscreen', 'Exit fullscreen');
+            btn.setAttribute('aria-label', i18next.t('exitFullscreen', 'Exit fullscreen'));
+        } else {
+            btn.innerHTML = expandSVG();
+            btn.title = i18next.t('enterFullscreen', 'Expand chat');
+            btn.setAttribute('aria-label', i18next.t('enterFullscreen', 'Expand chat'));
+        }
+    };
+
+    btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            if (document.fullscreenElement === panel) {
+                await document.exitFullscreen();
+            } else {
+                await panel.requestFullscreen();
+            }
+        } catch (err) {
+            console.error('Chat fullscreen toggle failed:', err);
+        }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+        refreshIcon();
+    });
+
+    refreshIcon();
+    chatFullscreenInitialized = true;
 }
 
 function ensureChatNewMsgButton() {
@@ -135,10 +181,13 @@ export function enterFlightMode(flightCode) {
     disableDropZone();
     renderNetworkUsersView();
     resetChatView();
+    // Disable chat until a peer connects
+    disableChat();
     // Initialize chat visibility tracking when entering a flight
     setTimeout(() => {
         ensureChatVisibilityObserver();
         ensureChatNewMsgButton();
+        initializeChatFullscreenToggle();
     }, 0);
 }
 
@@ -434,6 +483,34 @@ export function resetChatView() {
     }
 }
 
+export function disableChat() {
+    const panel = document.getElementById('chat-panel');
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('chat-send-btn');
+    const fsBtn = document.getElementById('chat-fullscreen-btn');
+    if (panel) panel.classList.add('disabled');
+    if (input) {
+        input.disabled = true;
+        // Keep existing placeholder; disabled state communicates clearly
+    }
+    if (sendBtn) sendBtn.disabled = true;
+    if (fsBtn) fsBtn.disabled = true;
+}
+
+export function enableChat() {
+    const panel = document.getElementById('chat-panel');
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('chat-send-btn');
+    const fsBtn = document.getElementById('chat-fullscreen-btn');
+    if (panel) panel.classList.remove('disabled');
+    if (input) {
+        input.disabled = false;
+        input.placeholder = i18next.t('typeMessagePlaceholder', 'Type a message…');
+    }
+    if (sendBtn) sendBtn.disabled = false;
+    if (fsBtn) fsBtn.disabled = false;
+}
+
 export function appendChatMessage({ author, text, timestamp }) {
     const log = document.getElementById('chat-log');
     if (!log) return;
@@ -492,7 +569,28 @@ export function appendChatMessage({ author, text, timestamp }) {
     </div>
   `;
 
-    item.querySelector('.chat-text').textContent = trimmed;
+    // Truncate long messages to current limit (2000), with Read More toggle
+    const TRUNCATE_LIMIT = 2000;
+    const needsTruncate = trimmed.length > TRUNCATE_LIMIT;
+    const shortText = needsTruncate
+        ? `${trimmed.slice(0, TRUNCATE_LIMIT)}…`
+        : trimmed;
+
+    const textEl = item.querySelector('.chat-text');
+    textEl.textContent = shortText;
+
+    if (needsTruncate) {
+        const readMoreBtn = document.createElement('button');
+        readMoreBtn.type = 'button';
+        readMoreBtn.className = 'btn btn-secondary chat-read-more-btn';
+        readMoreBtn.textContent = i18next.t('readMore', 'Read More');
+        readMoreBtn.addEventListener('click', () => {
+            textEl.textContent = trimmed; // expand to full
+            readMoreBtn.remove();
+        });
+        const bubble = item.querySelector('.chat-bubble');
+        bubble.insertBefore(readMoreBtn, bubble.querySelector('.chat-meta'));
+    }
     log.appendChild(item);
 
     if (atBottom) {
