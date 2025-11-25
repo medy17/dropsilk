@@ -40,6 +40,8 @@
   "receiverQueue": "Receiver Queue",
   "downloadAllAsZip": "Download All as Zip",
   "waitingForIncomingFiles": "Waiting for incoming files",
+  "chat": "Chat",
+  "chatEmpty": "Say hello to your peer",
   "overallMetrics": "Overall Metrics",
   "sent": "Sent",
   "received": "Received",

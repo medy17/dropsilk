@@ -361,6 +361,14 @@ export async function handleDataChannelMessage(event) {
                 hideRemoteStreamView();
                 return;
             }
+            if (parsedData.type === 'chat') {
+                const { appendChatMessage } = await import('../ui/view.js');
+                // Append as message from peer
+                const ts = parsedData.ts || Date.now();
+                appendChatMessage({ text: parsedData.text || '', sender: 'peer', ts });
+                store.actions.addChatMessage({ id: ts, text: parsedData.text || '', sender: 'peer', ts });
+                return;
+            }
 
             // Otherwise, it's file metadata
             incomingFileInfo = parsedData;

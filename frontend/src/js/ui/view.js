@@ -1,10 +1,11 @@
 // js/ui/view.js
 // Contains functions for rendering UI updates based on application state.
 
-import i18next from "../i18n.js";
+ 
 import { uiElements } from './dom.js';
 import { store } from '../state.js';
 import { getFileIcon, formatBytes } from '../utils/helpers.js';
+import i18next from "../i18n.js";
 
 export function showBoardingOverlay(flightCode) {
     if (uiElements.boardingOverlay) {
@@ -299,6 +300,71 @@ export function updateShareButton(isSharing) {
 export function updateReceiverActions() {
     const { receivedFiles } = store.getState();
     uiElements.receiverActionsContainer.style.display = receivedFiles.length > 3 ? 'block' : 'none';
+}
+
+// --- Chat UI helpers ---
+export function setChatEnabled(enabled) {
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('chat-send-btn');
+    if (!input || !sendBtn) return;
+    input.disabled = !enabled;
+    sendBtn.disabled = !enabled;
+}
+
+export function showTypingIndicator() {
+    const container = document.getElementById('chat-messages');
+    let indicator = document.getElementById('typing-indicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'typing-indicator';
+        indicator.className = 'typing-indicator';
+        indicator.innerHTML = '<span></span><span></span><span></span>';
+        container.appendChild(indicator);
+    }
+    indicator.style.display = 'flex';
+    container.scrollTop = container.scrollHeight;
+}
+
+export function hideTypingIndicator() {
+    const indicator = document.getElementById('typing-indicator');
+    if (indicator) {
+        indicator.style.display = 'none';
+    }
+}
+
+export function appendChatMessage({ text, sender = 'me', ts = Date.now() }) {
+    const container = document.getElementById('chat-messages');
+    if (!container) return;
+
+    if (container.querySelector('.empty-state')) {
+        container.innerHTML = '';
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.className = `chat-message ${sender === 'peer' ? 'peer' : 'me'}`;
+    // Use textContent to avoid HTML injection
+    const messageSpan = document.createElement('span');
+    messageSpan.textContent = String(text).slice(0, 1000);
+    wrapper.appendChild(messageSpan);
+
+    const meta = document.createElement('small');
+    meta.className = 'chat-meta';
+    const d = new Date(ts);
+    meta.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    meta.style.color = '#888';
+    wrapper.appendChild(meta);
+
+    container.appendChild(wrapper);
+    // Scroll to bottom
+    container.scrollTop = container.scrollHeight;
+
+    // Animate the message
+    wrapper.style.transform = 'scale(0.9)';
+    wrapper.style.opacity = '0';
+    setTimeout(() => {
+        wrapper.style.transform = 'scale(1)';
+        wrapper.style.opacity = '1';
+    }, 50);
 }
 
 export function updateMetricsUI() {

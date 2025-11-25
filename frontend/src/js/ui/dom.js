@@ -63,6 +63,12 @@ export const uiElements = {
     connectionPanelTitle: document.getElementById("connection-panel-title"),
     connectionPanelList: document.getElementById("connection-panel-list"),
 
+    // Chat
+    chatPanel: document.getElementById('chat-panel'),
+    chatMessages: document.getElementById('chat-messages'),
+    chatInput: document.getElementById('chat-input'),
+    chatSendBtn: document.getElementById('chat-send-btn'),
+
     // Onboarding
     welcomeOnboarding: document.getElementById('welcomeOnboarding'),
     inviteOnboarding: document.getElementById('inviteOnboarding'),

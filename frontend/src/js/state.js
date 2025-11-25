@@ -18,6 +18,9 @@ const initialState = {
     currentlySendingFile: null,
     fileIdMap: new Map(), // Maps file objects to DOM element IDs
     receivedFiles: [], // For zipping
+    
+    // Chat state
+    chatMessages: [], // { id, text, sender: 'me'|'peer', ts }
 
     // Metrics state
     totalBytesSent: 0,
@@ -122,6 +125,18 @@ export const store = {
 
         addReceivedFile: (file) => { state.receivedFiles.push(file); },
         clearReceivedFiles: () => { state.receivedFiles = []; },
+
+        // Chat actions
+        addChatMessage: (message) => {
+            // message: { id, text, sender, ts }
+            if (!message || typeof message.text !== 'string') return;
+            // Keep a reasonable history cap (e.g., last 200 messages)
+            state.chatMessages.push(message);
+            if (state.chatMessages.length > 200) {
+                state.chatMessages.splice(0, state.chatMessages.length - 200);
+            }
+        },
+        clearChat: () => { state.chatMessages = []; },
 
         setMetricsInterval: (interval) => { state.metricsInterval = interval; },
         updateMetricsOnSend: (chunkSize) => {

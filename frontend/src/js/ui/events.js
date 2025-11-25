@@ -5,7 +5,7 @@ import i18next from "../i18n.js";
 import {uiElements, folderInputTransfer} from "./dom.js";
 import {store} from "../state.js";
 import {sendMessage} from "../network/websocket.js";
-import {startScreenShare, stopScreenShare} from "../network/webrtc.js";
+import {startScreenShare, stopScreenShare, sendData} from "../network/webrtc.js";
 import {
     handleFileSelection,
     handleFolderSelection,
@@ -15,7 +15,7 @@ import {downloadAllFilesAsZip} from "../transfer/zipHandler.js";
 import {showToast} from "../utils/toast.js";
 import QrScanner from "qr-scanner";
 import Sortable from "sortablejs";
-import {clearAllPulseEffects} from "./view.js";
+import {clearAllPulseEffects, appendChatMessage} from "./view.js";
 
 /**
  * A simple helper to guess a file's MIME type from its extension.
@@ -353,6 +353,8 @@ export function initializeEventListeners() {
 
     setupDragAndDrop();
     setupDonateButton();
+
+    setupChatEvents();
 }
 
 function setupDonateButton() {
@@ -422,4 +424,43 @@ function setupDragAndDrop() {
         dropZone.classList.remove("drag-over", "drag-active");
         handleFileSelection(e.dataTransfer.files);
     }
+}
+
+function setupChatEvents() {
+    const input = uiElements.chatInput;
+    const sendBtn = uiElements.chatSendBtn;
+
+    if (!input || !sendBtn) return;
+
+    const send = () => {
+        const raw = (input.value || '').trim();
+        if (!raw) return;
+        const text = raw.slice(0, 1000);
+        const payload = { type: 'chat', text, ts: Date.now(), from: store.getState().myName };
+        try {
+            sendData(JSON.stringify(payload));
+        } catch (e) {
+            console.warn('Failed to send chat payload:', e);
+        }
+        // Local echo
+        appendChatMessage({ text, sender: 'me', ts: payload.ts });
+        store.actions.addChatMessage({ id: payload.ts, text, sender: 'me', ts: payload.ts });
+        input.value = '';
+        input.style.height = '';
+    };
+
+    // Auto-resize height for textarea (single-line to a couple lines)
+    const autoResize = () => {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    };
+
+    input.addEventListener('input', autoResize);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            send();
+        }
+    });
+    sendBtn.addEventListener('click', send);
 }

@@ -14,6 +14,7 @@ import {
     showLocalStreamView,
     hideLocalStreamView,
     updateShareButton,
+    setChatEnabled,
 } from '../ui/view.js';
 import {
     handleDataChannelMessage,
@@ -276,6 +277,7 @@ function setupDataChannel() {
     dataChannel.onopen = () => {
         console.log('Data channel opened!');
         enableDropZone();
+        try { setChatEnabled(true); } catch (_) {}
 
         const shareScreenBtn = document.getElementById('shareScreenBtn');
         if (isMobile() || !navigator.mediaDevices?.getDisplayMedia) {
@@ -301,6 +303,7 @@ function setupDataChannel() {
     dataChannel.onclose = () => {
         console.log('Data channel closed.');
         handlePeerLeft();
+        try { setChatEnabled(false); } catch (_) {}
         const { metricsInterval } = store.getState();
         if (metricsInterval) clearInterval(metricsInterval);
     };
