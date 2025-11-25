@@ -490,8 +490,13 @@ export function disableChat() {
     const fsBtn = document.getElementById('chat-fullscreen-btn');
     if (panel) panel.classList.add('disabled');
     if (input) {
-        input.disabled = true;
-        // Keep existing placeholder; disabled state communicates clearly
+        if (input.isContentEditable) {
+            input.setAttribute('contenteditable', 'false');
+            input.setAttribute('aria-disabled', 'true');
+            input.setAttribute('tabindex', '-1');
+        } else {
+            input.disabled = true;
+        }
     }
     if (sendBtn) sendBtn.disabled = true;
     if (fsBtn) fsBtn.disabled = true;
@@ -504,8 +509,15 @@ export function enableChat() {
     const fsBtn = document.getElementById('chat-fullscreen-btn');
     if (panel) panel.classList.remove('disabled');
     if (input) {
-        input.disabled = false;
-        input.placeholder = i18next.t('typeMessagePlaceholder', 'Type a message…');
+        if (input.isContentEditable || input.getAttribute('contenteditable') !== null) {
+            input.setAttribute('contenteditable', 'true');
+            input.removeAttribute('aria-disabled');
+            input.removeAttribute('tabindex');
+            input.setAttribute('data-placeholder', i18next.t('typeMessagePlaceholder', 'Type a message…'));
+        } else {
+            input.disabled = false;
+            input.placeholder = i18next.t('typeMessagePlaceholder', 'Type a message…');
+        }
     }
     if (sendBtn) sendBtn.disabled = false;
     if (fsBtn) fsBtn.disabled = false;

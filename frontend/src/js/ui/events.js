@@ -406,8 +406,24 @@ function setupChat() {
 
     if (!form || !input || !sendBtn) return;
 
+    const getInputText = () => {
+        // Support contenteditable or input
+        if (input.isContentEditable) {
+            return (input.innerText || '').replace(/\u00a0/g, ' ').trim();
+        }
+        return (input.value || '').trim();
+    };
+
+    const clearInput = () => {
+        if (input.isContentEditable) {
+            input.textContent = '';
+        } else {
+            input.value = '';
+        }
+    };
+
     const send = () => {
-        const text = input.value.trim();
+        const text = getInputText();
         if (!text) return;
 
         const MAX_CHAT_CHARS = 20000;
@@ -448,7 +464,7 @@ function setupChat() {
                 text,
                 timestamp: payload.sentAt,
             });
-            input.value = '';
+            clearInput();
         } catch (err) {
             console.error('Failed to send chat message:', err);
             showToast({
@@ -460,8 +476,8 @@ function setupChat() {
         }
     };
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
+    // Click to send (since chat input is no longer in a form)
+    sendBtn.addEventListener('click', () => {
         send();
     });
 
@@ -469,6 +485,24 @@ function setupChat() {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             send();
+        }
+    });
+
+    // Optional: enforce max length while typing for contenteditable
+    input.addEventListener('input', () => {
+        const MAX_CHAT_CHARS = 20000;
+        if (input.isContentEditable) {
+            const text = (input.innerText || '').replace(/\u00a0/g, ' ');
+            if (text.length > MAX_CHAT_CHARS) {
+                input.innerText = text.slice(0, MAX_CHAT_CHARS);
+                // move caret to end
+                const range = document.createRange();
+                range.selectNodeContents(input);
+                range.collapse(false);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
         }
     });
 }

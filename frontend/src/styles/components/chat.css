@@ -108,9 +108,11 @@
     display: flex;
     gap: 0.5rem;
     margin-top: 0.75rem;
+    align-items: center; /* keep Send button from stretching */
 }
 
-.chat-input-row input[type='text'] {
+.chat-input-row input[type='text'],
+.chat-input-row .chat-input {
     flex: 1 1 auto;
     border-radius: 12px;
     border: 1.5px solid var(--c-panel-border);
@@ -120,9 +122,18 @@
     color: var(--c-text-primary);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
+    display: block;            /* ensure block-level for contenteditable */
+    min-width: 0;              /* allow flex item to shrink without overflowing */
+    box-sizing: border-box;    /* include padding in width calculations */
+    white-space: pre-wrap;     /* wrap long text and preserve newlines */
+    word-break: break-word;    /* break long words */
+    overflow-wrap: anywhere;   /* force wrap for extremely long tokens */
+    max-height: 8rem;          /* prevent runaway height */
+    overflow-y: auto;          /* scroll when exceeding max height */
 }
 
-.chat-input-row input[type='text']:focus {
+.chat-input-row input[type='text']:focus,
+.chat-input-row .chat-input:focus {
     border-color: var(--c-primary);
     box-shadow: 0 0 0 2px rgba(91, 206, 250, 0.2);
 }
@@ -137,4 +148,13 @@
     padding: 0.25rem 0.5rem;
     font-size: 0.8rem;
     align-self: flex-start;
+}
+
+/* Placeholder styling for contenteditable chat input */
+.chat-editable:empty:before {
+    content: attr(data-placeholder);
+    color: var(--c-text-secondary);
+}
+.chat-editable:focus:before {
+    content: none;
 }

@@ -690,22 +690,26 @@
                     Chat messages will appear here once a peer is connected.
                 </div>
             </div>
-            <form class="chat-input-row" id="chat-form" autocomplete="off">
-                <input
+            <div class="chat-input-row" id="chat-form" role="group" aria-label="Chat input">
+                <div
                         id="chat-input"
-                        type="text"
-                        maxlength="20000"
-                        placeholder="Type a message…"
-                />
+                        class="chat-input chat-editable"
+                        contenteditable="true"
+                        data-placeholder="Type a message…"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                ></div>
                 <button
-                        type="submit"
+                        type="button"
                         class="btn btn-primary"
                         id="chat-send-btn"
                         data-i18n="send"
                 >
                     Send
                 </button>
-            </form>
+            </div>
         </div>
     </div>
     <div class="dashboard-footer-grid">
