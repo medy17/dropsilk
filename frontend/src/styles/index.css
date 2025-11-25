@@ -1,47 +1,48 @@
 /* 1. Base Styles */
-@import "base/variables.css";
-@import "base/globals.css";
-@import "base/theme.css";
-@import "base/animations.css";
+@import 'base/variables.css';
+@import 'base/globals.css';
+@import 'base/theme.css';
+@import 'base/animations.css';
 
 /* 2. Layout Styles */
-@import "layout/aurora.css";
-@import "layout/layout.css";
+@import 'layout/aurora.css';
+@import 'layout/layout.css';
 
 /* 3. Component Styles (in order of appearance in legacy file) */
-@import "components/header.css";
-@import "components/ticket.css";
-@import "components/dashboard.css";
-@import "components/connections.css";
-@import "components/settings.css";
-@import "components/zip.css";
-@import "components/share.css";
-@import "components/not-found.css";
-@import "components/forms.css";
-@import "components/modals.css";
-@import "components/buttons.css";
-@import "components/dropzone.css";
-@import "components/queues.css";
-@import "components/metrics.css";
-@import "components/footer.css";
-@import "components/toast.css";
-@import "components/video-player.css";
-@import "components/preview.css";
-@import "components/pdf.css";
-@import "components/psd.css";
-@import "components/docx.css";
-@import "components/audio.css";
-@import "components/xlsx.css";
-@import "components/pptx.css";
-@import "components/onboarding.css";
-@import "components/boarding.css";
-@import "components/qr-scanner.css";
-@import "components/stream.css";
-@import "components/privacy-toast.css";
-@import "components/drawer.css";
+@import 'components/header.css';
+@import 'components/ticket.css';
+@import 'components/dashboard.css';
+@import 'components/connections.css';
+@import 'components/settings.css';
+@import 'components/zip.css';
+@import 'components/share.css';
+@import 'components/not-found.css';
+@import 'components/forms.css';
+@import 'components/modals.css';
+@import 'components/buttons.css';
+@import 'components/dropzone.css';
+@import 'components/queues.css';
+@import 'components/metrics.css';
+@import 'components/chat.css';
+@import 'components/footer.css';
+@import 'components/toast.css';
+@import 'components/video-player.css';
+@import 'components/preview.css';
+@import 'components/pdf.css';
+@import 'components/psd.css';
+@import 'components/docx.css';
+@import 'components/audio.css';
+@import 'components/xlsx.css';
+@import 'components/pptx.css';
+@import 'components/onboarding.css';
+@import 'components/boarding.css';
+@import 'components/qr-scanner.css';
+@import 'components/stream.css';
+@import 'components/privacy-toast.css';
+@import 'components/drawer.css';
 
 /* 4. Utility Classes */
-@import "utilities.css";
+@import 'utilities.css';
 
 /* 5. Responsive Overrides */
-@import "responsive.css";
+@import 'responsive.css';

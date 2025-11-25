@@ -1,0 +1,102 @@
+#chat-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.chat-log {
+    flex: 1 1 auto;
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    position: relative; /* allow absolute-positioned new message button */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Floating new message button for chat (reuse queue button style) */
+#chat-new-msg-btn {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    /* ensure it appears above panels */
+}
+
+.chat-message {
+    display: flex;
+}
+
+.chat-message--me {
+    justify-content: flex-end;
+}
+
+.chat-message--peer {
+    justify-content: flex-start;
+}
+
+.chat-bubble {
+    max-width: 75%;
+    padding: 0.55rem 0.75rem;
+    border-radius: 12px;
+    background: linear-gradient(
+            135deg,
+            rgba(91, 206, 250, 0.14),
+            rgba(245, 169, 184, 0.12)
+    );
+    border: 1px solid var(--c-panel-border);
+    box-shadow: 0 1px 4px rgb(91 206 250 / 0.08);
+}
+
+.chat-message--me .chat-bubble {
+    background: linear-gradient(
+            135deg,
+            rgba(91, 206, 250, 0.2),
+            rgba(245, 169, 184, 0.16)
+    );
+    border-color: var(--c-primary);
+}
+
+.chat-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--c-text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.chat-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--c-text-secondary);
+}
+
+.chat-input-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.chat-input-row input[type='text'] {
+    flex: 1 1 auto;
+    border-radius: 999px;
+    border: 1.5px solid var(--c-panel-border);
+    padding: 0.55rem 0.9rem;
+    font-size: 0.9rem;
+    background: var(--c-panel-bg);
+    color: var(--c-text-primary);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.chat-input-row input[type='text']:focus {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 2px rgba(91, 206, 250, 0.2);
+}
+
+.chat-input-row button {
+    flex-shrink: 0;
+}

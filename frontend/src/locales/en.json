@@ -280,5 +280,14 @@
   "portuguese": "Portuguese (Português)",
   "french": "French (Français)",
   "italian": "Italian (Italiano)",
-  "malay": "Malay (Bahasa Melayu)"
+  "malay": "Malay (Bahasa Melayu)",
+  "chat": "Chat",
+  "startChatPlaceholder": "Chat messages will appear here once a peer is connected.",
+  "typeMessagePlaceholder": "Type a message…",
+  "send": "Send",
+  "peer": "Peer",
+  "noPeerForChatTitle": "No peer connected",
+  "noPeerForChatBody": "You can only send chat messages once someone has joined your flight.",
+  "chatSendFailedTitle": "Message not sent",
+  "chatSendFailedBody": "We couldn’t send your message. Please try again."
 }
