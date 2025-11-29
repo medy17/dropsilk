@@ -114,8 +114,12 @@ function isElementInViewport(el) {
 export function showBoardingOverlay(flightCode) {
     if (uiElements.boardingOverlay) {
         uiElements.setupContainer.style.display = 'none';
-        document.getElementById('boarding-flight-code').textContent =
-            flightCode.toUpperCase();
+        const codeEl = document.getElementById('boarding-flight-code');
+        if (codeEl) {
+            codeEl.textContent = flightCode.toUpperCase();
+        } else {
+            console.warn('Boarding flight code element not found');
+        }
         uiElements.boardingOverlay.classList.add('show');
     }
 }
@@ -175,8 +179,14 @@ export function renderUserName() {
 
 export function enterFlightMode(flightCode) {
     store.actions.setCurrentFlightCode(flightCode);
-    uiElements.setupContainer.style.display = 'none';
-    uiElements.dashboard.style.display = 'flex';
+
+    // Safety check for elements
+    const setup = uiElements.setupContainer || document.querySelector(".main-content");
+    const dash = uiElements.dashboard || document.getElementById("dashboard");
+
+    if (setup) setup.style.display = 'none';
+    if (dash) dash.style.display = 'flex';
+
     setDashboardFlightCode(flightCode);
     disableDropZone();
     renderNetworkUsersView();
@@ -291,13 +301,11 @@ export function renderNetworkUsersView() {
             id: user.id,
         })}</span>
             </div>
-            <button class="btn btn-primary invite-user-btn" data-invitee-id="${
-            user.id
-        }" ${
-            !currentFlightCode
+            <button class="btn btn-primary invite-user-btn" data-invitee-id="${user.id
+            }" ${!currentFlightCode
                 ? `disabled title="${i18next.t('createOrJoinFlightToInvite')}"`
                 : ''
-        }>
+            }>
                 ${i18next.t('invite')}
             </button>`;
         list.appendChild(userEl);
@@ -323,12 +331,11 @@ export function renderInFlightView() {
     })}</span>
         </div>
         <div class="inflight-user-item">
-            <div class="inflight-user-details"><span class="inflight-user-name">${
-        peerInfo.name
-    }</span></div>
+            <div class="inflight-user-details"><span class="inflight-user-name">${peerInfo.name
+        }</span></div>
             <span class="inflight-user-id">${i18next.t('userId', {
-        id: peerInfo.id,
-    })}</span>
+            id: peerInfo.id,
+        })}</span>
         </div>`;
 }
 
@@ -556,9 +563,8 @@ export function appendChatMessage({ author, text, timestamp }) {
     }
 
     const item = document.createElement('div');
-    item.className = `chat-message chat-message--${
-        author === 'me' ? 'me' : 'peer'
-    }`;
+    item.className = `chat-message chat-message--${author === 'me' ? 'me' : 'peer'
+        }`;
 
     const safeTime = timestamp || Date.now();
     const authorLabel =
