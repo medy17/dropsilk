@@ -1,0 +1,160 @@
+#chat-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+#chat-panel.disabled {
+    cursor: not-allowed;
+    filter: grayscale(80%);
+    opacity: .6;
+}
+#chat-panel.disabled * {
+    pointer-events: none;
+    user-select: none;
+}
+
+#chat-panel:fullscreen {
+    background: var(--c-panel-bg);
+}
+
+#chat-panel:fullscreen .chat-log {
+    max-height: none;
+}
+
+/* Chat fullscreen toggle: match secondary action aesthetics */
+#chat-fullscreen-btn.chat-fs-btn {
+    background: var(--c-btn-secondary-bg);
+    border-color: var(--c-secondary);
+    color: var(--c-secondary);
+}
+#chat-fullscreen-btn.chat-fs-btn:hover {
+    background: var(--c-secondary);
+    color: var(--brilliant-white);
+    transform: translateY(-1px);
+}
+
+.chat-log {
+    flex: 1 1 auto;
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    position: relative; /* allow absolute-positioned new message button */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Floating new message button for chat (reuse queue button style) */
+#chat-new-msg-btn {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    /* ensure it appears above panels */
+}
+
+.chat-message {
+    display: flex;
+}
+
+.chat-message--me {
+    justify-content: flex-end;
+}
+
+.chat-message--peer {
+    justify-content: flex-start;
+}
+
+.chat-bubble {
+    max-width: 75%;
+    padding: 0.55rem 0.75rem;
+    border-radius: 12px;
+    background: linear-gradient(
+            135deg,
+            rgba(91, 206, 250, 0.14),
+            rgba(245, 169, 184, 0.12)
+    );
+    border: 1px solid var(--c-panel-border);
+    box-shadow: 0 1px 4px rgb(91 206 250 / 0.08);
+}
+
+.chat-message--me .chat-bubble {
+    background: linear-gradient(
+            135deg,
+            rgba(91, 206, 250, 0.2),
+            rgba(245, 169, 184, 0.16)
+    );
+    border-color: var(--c-primary);
+}
+
+.chat-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--c-text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.chat-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--c-text-secondary);
+}
+
+.chat-input-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    align-items: center; /* keep Send button from stretching */
+}
+
+.chat-input-row input[type='text'],
+.chat-input-row .chat-input {
+    flex: 1 1 auto;
+    border-radius: 12px;
+    border: 1.5px solid var(--c-panel-border);
+    padding: 0.55rem 0.9rem;
+    font-size: 0.9rem;
+    background: var(--c-panel-bg);
+    color: var(--c-text-primary);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    display: block;            /* ensure block-level for contenteditable */
+    min-width: 0;              /* allow flex item to shrink without overflowing */
+    box-sizing: border-box;    /* include padding in width calculations */
+    white-space: pre-wrap;     /* wrap long text and preserve newlines */
+    word-break: break-word;    /* break long words */
+    overflow-wrap: anywhere;   /* force wrap for extremely long tokens */
+    max-height: 8rem;          /* prevent runaway height */
+    overflow-y: auto;          /* scroll when exceeding max height */
+}
+
+.chat-input-row input[type='text']:focus,
+.chat-input-row .chat-input:focus {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 2px rgba(91, 206, 250, 0.2);
+}
+
+.chat-input-row button {
+    flex-shrink: 0;
+}
+
+/* Small inline Read More button inside chat bubbles */
+.chat-read-more-btn {
+    margin-top: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    align-self: flex-start;
+}
+
+/* Placeholder styling for contenteditable chat input */
+.chat-editable:empty:before {
+    content: attr(data-placeholder);
+    color: var(--c-text-secondary);
+}
+.chat-editable:focus:before {
+    content: none;
+}

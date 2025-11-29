@@ -30,6 +30,7 @@ const initialState = {
     // UI State
     hasScrolledForSend: false,
     hasScrolledForReceive: false,
+    hasScrolledForChatReceive: false,
     onboardingState: {
         welcome: false, // Has the user seen the initial welcome message?
         invite: false,  // Has the user seen the "now invite someone" message?
@@ -139,6 +140,7 @@ export const store = {
         },
         setHasScrolledForSend: (value) => { state.hasScrolledForSend = value; },
         setHasScrolledForReceive: (value) => { state.hasScrolledForReceive = value; },
+        setHasScrolledForChatReceive: (value) => { state.hasScrolledForChatReceive = value; },
         updateOnboardingState: (step) => {
             if (state.onboardingState.hasOwnProperty(step)) {
                 state.onboardingState[step] = true;

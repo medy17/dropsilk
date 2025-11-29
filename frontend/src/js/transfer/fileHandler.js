@@ -1,13 +1,17 @@
 // js/transfer/fileHandler.js
 // Contains the core logic for file transfers, including queueing, chunking, and handling selections.
-import i18next from "../i18n.js";
+import i18next from '../i18n.js';
 import { store } from '../state.js';
 import { showToast } from '../utils/toast.js';
 import { sendData, getBufferedAmount } from '../network/webrtc.js';
 import { HIGH_WATER_MARK, OPFS_THRESHOLD } from '../config.js';
 import { uiElements } from '../ui/dom.js';
 import { getFileIcon } from '../utils/helpers.js';
-import { updateReceiverActions, checkQueueOverflow } from '../ui/view.js';
+import {
+    updateReceiverActions,
+    checkQueueOverflow,
+    appendChatMessage,
+} from '../ui/view.js';
 import { isPreviewable } from '../preview/previewConfig.js';
 import { showPreview } from '../preview/previewManager.js';
 import { audioManager } from '../utils/audioManager.js';
@@ -46,7 +50,11 @@ let queueStartSoundTimeout = null; // To manage the "start" sound timing
 
 export function ensureQueueIsActive() {
     const state = store.getState();
-    if (state.peerInfo && !state.currentlySendingFile && state.fileToSendQueue.length > 0) {
+    if (
+        state.peerInfo &&
+        !state.currentlySendingFile &&
+        state.fileToSendQueue.length > 0
+    ) {
         const nextFile = state.fileToSendQueue[0];
         startFileSend(nextFile);
     }
@@ -82,10 +90,12 @@ export function cancelFileSend(fileId) {
 
     const state = store.getState();
     const currentlySendingFile = state.currentlySendingFile;
-    const currentFileId = currentlySendingFile ? store.actions.getFileId(currentlySendingFile) : null;
+    const currentFileId = currentlySendingFile
+        ? store.actions.getFileId(currentlySendingFile)
+        : null;
 
     if (fileId === currentFileId) {
-        console.log("Cancelling active transfer:", currentlySendingFile.name);
+        console.log('Cancelling active transfer:', currentlySendingFile.name);
         if (worker) {
             worker.terminate();
             worker = null;
@@ -115,7 +125,7 @@ export function handleFileSelection(files) {
 
     const fragment = document.createDocumentFragment();
 
-    Array.from(files).forEach(file => {
+    Array.from(files).forEach((file) => {
         const fileId = `send-${Date.now()}-${Math.random()}`;
         store.actions.addFileIdMapping(file, fileId);
 
@@ -129,7 +139,9 @@ export function handleFileSelection(files) {
                 </div>
                 <div class="file-icon">${getFileIcon(file.name)}</div>
                 <div class="file-details">
-                    <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
+                    <div class="file-details__name" title="${
+            file.name
+        }"><span>${file.name}</span></div>
                     <div class="file-details__status"><span class="status-text">Queued</span></div>
                 </div>
                 <div class="file-action">
@@ -144,7 +156,10 @@ export function handleFileSelection(files) {
     uiElements.sendingQueueDiv.appendChild(fragment);
 
     if (isFirstSend && !store.getState().hasScrolledForSend) {
-        uiElements.sendingQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        uiElements.sendingQueueDiv.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+        });
         store.actions.setHasScrolledForSend(true);
     }
     checkQueueOverflow('sending-queue');
@@ -156,7 +171,7 @@ export function handleFolderSelection(files) {
     const fileLimit = 50;
     const sizeLimit = 1 * 1024 * 1024 * 1024; // 1 GB
 
-    if (files.length > fileLimit || Array.from(files).some(f => f.size > sizeLimit)) {
+    if (files.length > fileLimit || Array.from(files).some((f) => f.size > sizeLimit)) {
         showToast({
             type: 'info',
             title: i18next.t('folderSelectionWarning'),
@@ -164,8 +179,12 @@ export function handleFolderSelection(files) {
             duration: 0,
             actions: [
                 { text: i18next.t('cancel'), class: 'btn-secondary', callback: () => {} },
-                { text: i18next.t('proceedAnyway'), class: 'btn-primary', callback: () => handleFileSelection(files) }
-            ]
+                {
+                    text: i18next.t('proceedAnyway'),
+                    class: 'btn-primary',
+                    callback: () => handleFileSelection(files),
+                },
+            ],
         });
     } else {
         handleFileSelection(files);
@@ -198,7 +217,9 @@ function startFileSend(file) {
         fileElement.innerHTML = `
             <div class="file-icon">${getFileIcon(file.name)}</div>
             <div class="file-details">
-                <div class="file-details__name" title="${file.name}"><span>${file.name}</span></div>
+                <div class="file-details__name" title="${
+            file.name
+        }"><span>${file.name}</span></div>
                 <progress class="file-details__progress-bar" value="0" max="1"></progress>
                 <div class="file-details__status">
                     <span class="percent">0%</span>
@@ -213,7 +234,7 @@ function startFileSend(file) {
     }
 
     if (worker) worker.terminate();
-    worker = new Worker("sender.worker.js");
+    worker = new Worker('sender.worker.js');
     chunkQueue = [];
     fileReadingDone = false;
     sentOffset = 0;
@@ -227,17 +248,18 @@ function startFileSend(file) {
 
     worker.onmessage = (e) => {
         const { type, chunk } = e.data;
-        if (type === "chunk") {
+        if (type === 'chunk') {
             chunkQueue.push(chunk);
             drainQueue();
-        } else if (type === "done") {
+        } else if (type === 'done') {
             fileReadingDone = true;
             worker.terminate();
             worker = null;
             drainQueue();
         }
     };
-    const customChunkSize = parseInt(localStorage.getItem('dropsilk-chunk-size'), 10) || null;
+    const customChunkSize =
+        parseInt(localStorage.getItem('dropsilk-chunk-size'), 10) || null;
     worker.postMessage({ file: file, config: { chunkSize: customChunkSize } });
 }
 
@@ -259,11 +281,14 @@ export function drainQueue() {
 
         sentOffset += chunkSize;
         const now = Date.now();
-        if (now - lastSendProgressUpdate > 100) { // Update UI every 100ms
+        if (now - lastSendProgressUpdate > 100) {
+            // Update UI every 100ms
             if (fileElement) {
                 const progressValue = sentOffset / file.size;
                 fileElement.querySelector('progress').value = progressValue;
-                fileElement.querySelector('.percent').textContent = `${Math.round(progressValue * 100)}%`;
+                fileElement.querySelector('.percent').textContent = `${Math.round(
+                    progressValue * 100,
+                )}%`;
 
                 // --- ETR CALCULATION LOGIC ---
                 const elapsedSinceLastCalc = (now - lastSpeedCalcTime) / 1000;
@@ -286,7 +311,8 @@ export function drainQueue() {
 
                 // Only display ETR if we have valid speed samples to work with
                 if (speedSamples.length > 0) {
-                    const averageSpeed = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
+                    const averageSpeed =
+                        speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
 
                     if (averageSpeed > 0) {
                         const bytesRemaining = file.size - sentOffset;
@@ -304,14 +330,17 @@ export function drainQueue() {
     }
 
     if (fileReadingDone && chunkQueue.length === 0) {
-        sendData("EOF");
+        sendData('EOF');
         if (fileElement) {
             fileElement.classList.remove('is-sending');
             fileElement.querySelector('progress').value = 1; // Final update
 
             // Revert to the final "Sent!" status, as you planned.
             // Using i18next.t() is good practice for translation.
-            fileElement.querySelector('.status-text').textContent = i18next.t('sentStatus', 'Sent!');
+            fileElement.querySelector('.status-text').textContent = i18next.t(
+                'sentStatus',
+                'Sent!',
+            );
 
             fileElement.querySelector('.percent').textContent = `100%`;
             const cancelButton = fileElement.querySelector('.cancel-file-btn');
@@ -342,27 +371,37 @@ export function drainQueue() {
     }
 }
 
-
 export async function handleDataChannelMessage(event) {
     const data = event.data;
 
-    if (typeof data === "string") {
-        if (data.startsWith("{")) {
-            // A new file is starting, so cancel any pending "complete" sound
-            if (receiveCompletionTimer) {
-                clearTimeout(receiveCompletionTimer);
-                receiveCompletionTimer = null;
-            }
-
+    if (typeof data === 'string') {
+        if (data.startsWith('{')) {
             const parsedData = JSON.parse(data);
 
+            // Control message for screen-share ending
             if (parsedData.type === 'stream-ended') {
                 const { hideRemoteStreamView } = await import('../ui/view.js');
                 hideRemoteStreamView();
                 return;
             }
 
-            // Otherwise, it's file metadata
+            // Chat message: handled separately from file metadata
+            if (parsedData.kind === 'chat') {
+                appendChatMessage({
+                    author: 'peer',
+                    text: parsedData.text || '',
+                    timestamp: parsedData.sentAt || Date.now(),
+                });
+                return;
+            }
+
+            // Otherwise, we assume this is file metadata for a new incoming file.
+            // A new file is starting, so cancel any pending "complete" sound.
+            if (receiveCompletionTimer) {
+                clearTimeout(receiveCompletionTimer);
+                receiveCompletionTimer = null;
+            }
+
             incomingFileInfo = parsedData;
             incomingFileData = [];
             incomingFileReceived = 0;
@@ -384,22 +423,25 @@ export async function handleDataChannelMessage(event) {
                     for await (const key of root.keys()) {
                         await root.removeEntry(key);
                     }
-                    const fileHandle = await root.getFileHandle(incomingFileInfo.name, { create: true });
+                    const fileHandle = await root.getFileHandle(incomingFileInfo.name, {
+                        create: true,
+                    });
                     const writer = await fileHandle.createWritable();
                     opfsState.set(incomingFileInfo.name, { writer, fileHandle });
                 } catch (error) {
-                    console.error("OPFS setup failed, falling back to memory.", error);
+                    console.error('OPFS setup failed, falling back to memory.', error);
                     showToast({
                         type: 'danger',
                         title: i18next.t('opfsError'),
                         body: i18next.t('opfsErrorDescription'),
-                        duration: 8000
+                        duration: 8000,
                     });
                     opfsState.delete(incomingFileInfo.name); // Clean up partial state
                 }
             }
 
-            const isFirstReceivedFile = store.getState().receivedFiles.length === 0;
+            const isFirstReceivedFile =
+                store.getState().receivedFiles.length === 0;
 
             if (uiElements.receiverQueueDiv.querySelector('.empty-state')) {
                 uiElements.receiverQueueDiv.innerHTML = '';
@@ -408,29 +450,40 @@ export async function handleDataChannelMessage(event) {
             const fileId = `file-recv-${Date.now()}`;
             store.actions.addFileIdMapping(incomingFileInfo.name, fileId);
 
-            uiElements.receiverQueueDiv.insertAdjacentHTML('beforeend', `
+            uiElements.receiverQueueDiv.insertAdjacentHTML(
+                'beforeend',
+                `
                 <div class="queue-item" id="${fileId}">
                     <div class="file-icon">${getFileIcon(incomingFileInfo.name)}</div>
                         <div class="file-details">
-                        <div class="file-details__name" title="${incomingFileInfo.name}"><span>${incomingFileInfo.name}</span></div>
+                        <div class="file-details__name" title="${
+                    incomingFileInfo.name
+                }"><span>${incomingFileInfo.name}</span></div>
                             <progress class="file-details__progress-bar" value="0" max="1"></progress>
                             <div class="file-details__status">
                                 <span class="percent">0%</span>
-                                <span class="status-text">${i18next.t('receiving', 'Receiving...')}</span>
+                                <span class="status-text">${i18next.t(
+                    'receiving',
+                    'Receiving...',
+                )}</span>
                             </div>
                         </div>
                     <div class="file-action"></div>
-                </div>`);
+                </div>`,
+            );
 
             if (isFirstReceivedFile && !store.getState().hasScrolledForReceive) {
-                uiElements.receiverQueueDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                uiElements.receiverQueueDiv.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                });
                 store.actions.setHasScrolledForReceive(true);
             }
             checkQueueOverflow('receiver-queue');
 
             return;
         }
-        if (data === "EOF") {
+        if (data === 'EOF') {
             let receivedBlob;
             const opfsFile = opfsState.get(incomingFileInfo.name);
 
@@ -439,25 +492,29 @@ export async function handleDataChannelMessage(event) {
                     await opfsFile.writer.close();
                     receivedBlob = await opfsFile.fileHandle.getFile();
                 } catch (e) {
-                    console.error("Failed to finalize OPFS file:", e);
+                    console.error('Failed to finalize OPFS file:', e);
                     showToast({
                         type: 'danger',
                         title: i18next.t('fileSaveError'),
                         body: i18next.t('fileSaveErrorDescription'),
-                        duration: 8000
+                        duration: 8000,
                     });
                     opfsState.delete(incomingFileInfo.name);
                     return; // Abort further processing
                 }
                 opfsState.delete(incomingFileInfo.name);
             } else {
-                receivedBlob = new Blob(incomingFileData, { type: incomingFileInfo.type });
+                receivedBlob = new Blob(incomingFileData, {
+                    type: incomingFileInfo.type,
+                });
             }
 
-
-            const autoDownloadEnabled = localStorage.getItem('dropsilk-auto-download') === 'true';
+            const autoDownloadEnabled =
+                localStorage.getItem('dropsilk-auto-download') === 'true';
             if (autoDownloadEnabled) {
-                const maxSizeMB = parseFloat(localStorage.getItem('dropsilk-auto-download-max-size') || '100');
+                const maxSizeMB = parseFloat(
+                    localStorage.getItem('dropsilk-auto-download-max-size') || '100',
+                );
                 const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
                 if (receivedBlob.size > 0 && receivedBlob.size <= maxSizeBytes) {
@@ -471,12 +528,12 @@ export async function handleDataChannelMessage(event) {
                         // We do not call URL.revokeObjectURL here because the object URL is
                         // still needed for the manual "Save" button in the UI.
                     } catch (e) {
-                        console.error("Auto-download failed:", e);
+                        console.error('Auto-download failed:', e);
                         showToast({
                             type: 'danger',
                             title: 'Auto-Download Failed',
                             body: 'Could not automatically save the file. Please download it manually.',
-                            duration: 8000
+                            duration: 8000,
                         });
                     }
                 }
@@ -484,7 +541,10 @@ export async function handleDataChannelMessage(event) {
 
             const finalFileInfo = { ...incomingFileInfo };
 
-            store.actions.addReceivedFile({ name: finalFileInfo.name, blob: receivedBlob });
+            store.actions.addReceivedFile({
+                name: finalFileInfo.name,
+                blob: receivedBlob,
+            });
             updateReceiverActions();
 
             const fileId = store.actions.getFileId(finalFileInfo.name);
@@ -498,20 +558,27 @@ export async function handleDataChannelMessage(event) {
                 // Update the status text to "Complete!"
                 const statusTextElement = fileElement.querySelector('.status-text');
                 if (statusTextElement) {
-                    statusTextElement.textContent = i18next.t('completeStatus', 'Complete!');
+                    statusTextElement.textContent = i18next.t(
+                        'completeStatus',
+                        'Complete!',
+                    );
                 }
 
                 const actionContainer = fileElement.querySelector('.file-action');
 
                 const fileExtension = finalFileInfo.name.toLowerCase().split('.').pop();
-                const isVideo = finalFileInfo.type.startsWith('video/') || ['mp4', 'mov', 'mkv', 'webm', 'ts', 'm4v', 'avi'].includes(fileExtension);
+                const isVideo =
+                    finalFileInfo.type.startsWith('video/') ||
+                    ['mp4', 'mov', 'mkv', 'webm', 'ts', 'm4v', 'avi'].includes(
+                        fileExtension,
+                    );
                 const canPreview = isPreviewable(finalFileInfo.name);
 
                 // Read persisted preview consent map
                 let previewConsent = {};
                 try {
                     previewConsent = JSON.parse(
-                        localStorage.getItem('dropsilk-preview-consent') || '{}'
+                        localStorage.getItem('dropsilk-preview-consent') || '{}',
                     );
                 } catch (_) {}
 
@@ -540,7 +607,11 @@ export async function handleDataChannelMessage(event) {
                         }
                         buttonsHTML += `<button class="file-action-btn preview-btn" data-preview-type="generic" data-ext="${fileExtension}" ${disabledAttr} title="${titleText}">${previewIconSVG}</button>`;
                     }
-                    buttonsHTML += `<a href="${URL.createObjectURL(receivedBlob)}" download="${finalFileInfo.name}" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>`;
+                    buttonsHTML += `<a href="${URL.createObjectURL(
+                        receivedBlob,
+                    )}" download="${
+                        finalFileInfo.name
+                    }" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>`;
 
                     // Add the 'is-entering' class to the group for the pop-in animation
                     actionContainer.innerHTML = `<div class="file-action-group is-entering">${buttonsHTML}</div>`;
@@ -574,13 +645,15 @@ export async function handleDataChannelMessage(event) {
         }
     }
 
-    const opfsFile = incomingFileInfo ? opfsState.get(incomingFileInfo.name) : undefined;
+    const opfsFile = incomingFileInfo
+        ? opfsState.get(incomingFileInfo.name)
+        : undefined;
 
     if (opfsFile) {
         try {
             await opfsFile.writer.write(data);
         } catch (error) {
-            console.error("OPFS write failed:", error);
+            console.error('OPFS write failed:', error);
             opfsState.delete(incomingFileInfo.name); // Stop trying to write to OPFS
 
             // It's too late to switch to memory for this file, so we show an error.
@@ -589,7 +662,7 @@ export async function handleDataChannelMessage(event) {
                 type: 'danger',
                 title: i18next.t('outOfDiskSpace'),
                 body: i18next.t('outOfDiskSpaceDescription'),
-                duration: 10000
+                duration: 10000,
             });
 
             // We need to signal a failure state for the current file.
@@ -608,18 +681,24 @@ export async function handleDataChannelMessage(event) {
 
     if (incomingFileInfo?.size) {
         const now = Date.now();
-        if (now - lastReceiveProgressUpdate > 100) { // Update UI every 100ms
+        if (now - lastReceiveProgressUpdate > 100) {
+            // Update UI every 100ms
             const progressValue = incomingFileReceived / incomingFileInfo.size;
             const fileId = store.actions.getFileId(incomingFileInfo.name);
             const fileElement = document.getElementById(fileId);
 
             if (fileElement) {
                 fileElement.querySelector('progress').value = progressValue;
-                fileElement.querySelector('.percent').textContent = `${Math.round(progressValue * 100)}%`;
+                fileElement.querySelector('.percent').textContent = `${Math.round(
+                    progressValue * 100,
+                )}%`;
 
-                const elapsedSinceLastCalc = (now - lastIncomingSpeedCalcTime) / 1000;
-                if (elapsedSinceLastCalc > 0.5) { // Calculate speed every 500ms
-                    const bytesSinceLastCalc = incomingFileReceived - lastIncomingSpeedCalcOffset;
+                const elapsedSinceLastCalc =
+                    (now - lastIncomingSpeedCalcTime) / 1000;
+                if (elapsedSinceLastCalc > 0.5) {
+                    // Calculate speed every 500ms
+                    const bytesSinceLastCalc =
+                        incomingFileReceived - lastIncomingSpeedCalcOffset;
                     const currentSpeed = bytesSinceLastCalc / elapsedSinceLastCalc;
 
                     if (isFinite(currentSpeed) && currentSpeed > 0) {
@@ -633,13 +712,17 @@ export async function handleDataChannelMessage(event) {
                 }
 
                 if (incomingSpeedSamples.length > 0) {
-                    const averageSpeed = incomingSpeedSamples.reduce((a, b) => a + b, 0) / incomingSpeedSamples.length;
+                    const averageSpeed =
+                        incomingSpeedSamples.reduce((a, b) => a + b, 0) /
+                        incomingSpeedSamples.length;
                     if (averageSpeed > 0) {
-                        const bytesRemaining = incomingFileInfo.size - incomingFileReceived;
+                        const bytesRemaining =
+                            incomingFileInfo.size - incomingFileReceived;
                         const etrSeconds = bytesRemaining / averageSpeed;
                         const etrText = formatTimeRemaining(etrSeconds); // Reuse the same helper function
 
-                        const statusTextElement = fileElement.querySelector('.status-text');
+                        const statusTextElement =
+                            fileElement.querySelector('.status-text');
                         if (statusTextElement) {
                             statusTextElement.textContent = etrText;
                         }
@@ -686,12 +769,14 @@ export function resetTransferState() {
                 // Also clear any in-memory writer states
                 for (const [key, value] of opfsState.entries()) {
                     if (value.writer) {
-                        await value.writer.close().catch(e => console.error("Error closing writer on reset:", e));
+                        await value.writer
+                            .close()
+                            .catch((e) => console.error('Error closing writer on reset:', e));
                     }
                     opfsState.delete(key);
                 }
             } catch (e) {
-                console.error("Could not clear OPFS on reset:", e);
+                console.error('Could not clear OPFS on reset:', e);
             }
         })();
     }

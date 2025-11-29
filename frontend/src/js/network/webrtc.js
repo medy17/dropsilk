@@ -6,8 +6,10 @@ import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
 import {
     enableDropZone,
+    enableChat,
     updateDashboardStatus,
     disableDropZone,
+    disableChat,
     renderNetworkUsersView,
     showRemoteStreamView,
     hideRemoteStreamView,
@@ -276,6 +278,7 @@ function setupDataChannel() {
     dataChannel.onopen = () => {
         console.log('Data channel opened!');
         enableDropZone();
+        enableChat();
 
         const shareScreenBtn = document.getElementById('shareScreenBtn');
         if (isMobile() || !navigator.mediaDevices?.getDisplayMedia) {
@@ -301,6 +304,7 @@ function setupDataChannel() {
     dataChannel.onclose = () => {
         console.log('Data channel closed.');
         handlePeerLeft();
+        disableChat();
         const { metricsInterval } = store.getState();
         if (metricsInterval) clearInterval(metricsInterval);
     };
