@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-// 1. Load Package.json safely
 let pkg = { version: '0.0.0' };
 try {
     pkg = require('../package.json');
@@ -20,9 +19,21 @@ const runGit = (command) => {
 };
 
 const baseVersion = pkg.version;
-// Default to 'main' if no git repo found
-const branch = runGit('git rev-parse --abbrev-ref HEAD') || 'main';
-const isMain = branch === 'main' || branch === 'master';
+
+// --- CHANGED LOGIC START ---
+
+// 1. Try Vercel Env Var first (Best for Vercel Previews)
+// 2. Fallback to local git command
+// 3. Fallback to 'main'
+const rawBranch = process.env.VERCEL_GIT_COMMIT_REF ||
+    runGit('git rev-parse --abbrev-ref HEAD') ||
+    'main';
+
+// Determine if this is a "Production" build
+// Vercel usually uses 'main' or 'master' for prod.
+const isMain = rawBranch === 'main' || rawBranch === 'master';
+
+// --- CHANGED LOGIC END ---
 
 let versionData = {
     full: baseVersion,
@@ -33,15 +44,25 @@ let versionData = {
 };
 
 if (!isMain) {
-    const safeBranch = branch.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
-    const commitCount = runGit(`git rev-list --count main..HEAD`) || '0';
+    const safeBranch = rawBranch.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
 
-    versionData.full = `${baseVersion}-${safeBranch}.${commitCount}`;
+    // Attempt to get commit count.
+    // On Vercel (shallow clone), this might fail or return a low number.
+    // We can fallback to Vercel's commit SHA (shortened) if count fails.
+    let buildId = runGit(`git rev-list --count main..HEAD`);
+
+    if (!buildId && process.env.VERCEL_GIT_COMMIT_SHA) {
+        // Fallback: Use first 7 chars of SHA if we can't count commits
+        buildId = process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 7);
+    }
+
+    buildId = buildId || 'dev'; // Final fallback
+
+    versionData.full = `${baseVersion}-${safeBranch}.${buildId}`;
     versionData.branch = safeBranch;
-    versionData.build = commitCount;
+    versionData.build = buildId;
 }
 
-// 2. Ensure directory exists before writing
 const destDir = path.join(__dirname, '../src/js');
 if (!fs.existsSync(destDir)){
     fs.mkdirSync(destDir, { recursive: true });
@@ -54,4 +75,4 @@ export const VERSION = ${JSON.stringify(versionData, null, 4)};
 const destPath = path.join(destDir, 'version.gen.js');
 fs.writeFileSync(destPath, content);
 
-console.log(`✅ Version Generated: ${versionData.full}`);
+console.log(`✅ Version Generated: ${versionData.full} [${isMain ? 'PROD' : 'DEV'}]`);
