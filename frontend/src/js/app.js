@@ -1,5 +1,6 @@
 // js/app.js
 // This is the main entry point for the application.
+import { VERSION } from './version.gen.js';
 import { initEffects } from "./ui/effects.js";
 import "../styles/index.css"; // load for vite
 import i18next from "./i18n.js";
@@ -443,5 +444,25 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(
             "On a non-app page (e.g., 404). Core logic will not be initialized."
         );
+    }
+
+    const versionEl = document.getElementById('app-version');
+
+    // Safety check: ensure both element AND data exist
+    if (versionEl && VERSION) {
+        if (VERSION.isProduction) {
+            versionEl.textContent = `v${VERSION.base}`;
+            versionEl.className = 'version-tag prod';
+        } else {
+            // Note the backticks ` ` for template literals
+            versionEl.innerHTML = `
+                <span class="v-base">v${VERSION.base}</span>
+                <span class="v-sep">•</span>
+                <span class="v-branch">${VERSION.branch}</span>
+                <span class="v-build">#${VERSION.build}</span>
+            `;
+            versionEl.className = 'version-tag dev';
+            versionEl.title = `Full Build: ${VERSION.full}`;
+        }
     }
 });
