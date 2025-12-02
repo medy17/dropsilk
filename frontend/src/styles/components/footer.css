@@ -60,3 +60,61 @@
     transform: translateY(0) scale(.97);
     transition-duration: 0.1s;
 }
+
+/* Base version container */
+#app-version {
+    margin-left: 0.5em;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+/* PRODUCTION STYLE: Clean, subtle text */
+.version-tag.prod {
+    opacity: 0.7;
+    font-family: 'IBM Plex Mono', monospace; /* or your mono font */
+}
+
+/* DEV STYLE: The "Pop" */
+.version-tag.dev {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75em; /* Slightly smaller to fit the extra info */
+    background: rgba(91, 206, 250, 0.15); /* Light Primary Color bg */
+    border: 1px solid var(--c-primary);    /* Primary Color border */
+    color: var(--c-primary);
+    padding: 2px 8px;
+    border-radius: 12px; /* Pill shape */
+    font-weight: 600;
+    gap: 6px;
+    transition: all 0.2s ease;
+    cursor: help;
+}
+
+.version-tag.dev:hover {
+    background: var(--c-primary);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Specific styling for the parts inside the dev badge */
+.version-tag.dev .v-base {
+    opacity: 0.9;
+}
+
+.version-tag.dev .v-branch {
+    text-transform: uppercase;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.version-tag.dev .v-build {
+    opacity: 0.7;
+}
+
+.version-tag.dev .v-sep {
+    opacity: 0.4;
+    font-size: 0.8em;
+}

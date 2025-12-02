@@ -11,3 +11,4 @@ release
 dist
 frontend/.env
 pnpm-lock.yaml
+frontend/src/js/version.gen.js
