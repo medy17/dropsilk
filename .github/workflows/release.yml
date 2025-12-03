@@ -1,6 +1,6 @@
 name: Build and Release
 
-# This workflow runs when you push a tag that looks like a version number (e.g., v1.0.0)
+# This workflow runs when you push a tag that looks like a version number (e.g v1.0.0)
 on:
   push:
     tags:
