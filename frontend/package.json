@@ -1,8 +1,12 @@
 {
   "name": "dropsilk",
-  "version": "2.9.6",
+  "version": "2.9.7",
   "author": "Ahmed medy17 <> (ahmed@dropsilk.xyz) (https://github.com/medy17)",
   "description": "A modern, privacy-focused, peer-to-peer file transfer application built with WebRTC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/medy17/dropsilk.git"
+  },
   "main": "electron/main.js",
   "scripts": {
     "gen:version": "node scripts/generate-version.js",
