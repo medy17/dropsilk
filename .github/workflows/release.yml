@@ -1,65 +1,60 @@
 name: Build and Release
 
-# This workflow runs when you push a tag that looks like a version number (e.g v1.0.0)
 on:
   push:
     tags:
       - "v*.*.*"
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
-    # We use macos-latest because it's the only way to build for all three
-    # platforms (Win, Mac, Linux) in one go with electron-builder.
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
-      # Step 1: Check out the code from your repository
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Step 2: Set up pnpm. We're not in npm land anymore, Toto.
+      # --- LINUX FIX ---
+      # AppImage generation requires libfuse2 on Ubuntu 22.04+ runners.
+      # Without this, the build often silently fails or errors out on 'appimagetool'.
+      - name: Install Linux Dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10 # Or whatever major version you use
+          version: 10
 
-      # Step 3: Set up the correct Node.js version
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          # Cache pnpm dependencies to speed up future runs.
-          # Note the path points inside your frontend directory!
           cache: "pnpm"
           cache-dependency-path: "frontend/pnpm-lock.yaml"
 
-      # Step 4: Install dependencies using pnpm
-      # THIS IS THE KEY PART! We tell this step to run inside the /frontend folder.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         working-directory: ./frontend
 
-      # Step 5: Run the build script
-      # We run the build command from inside /frontend as well.
-      # The `-- --publish always` part is crucial. The first `--` separates
-      # pnpm arguments from the script's arguments. The `--publish always` tells
-      # electron-builder to prepare the artifacts for a release.
-      - name: Build application
+      - name: Build & Publish
+        # We add --linux --win --mac explicitly to be safe,
+        # though Electron Builder usually auto-detects based on OS.
+        # But since we are relying on the matrix to separate them,
+        # standard build command is fine.
         run: pnpm run build:electron -- --publish always
         working-directory: ./frontend
         env:
-          # The GITHUB_TOKEN is a special secret provided by GitHub Actions
-          # that allows electron-builder to interact with the GitHub API.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Step 6: Create the GitHub Release and upload the built files
-      # This action automatically finds the tag, creates a release, and uploads
-      # the files for you. It's fucking magic.
-      - name: Create Release and Upload Artifacts
-        uses: softprops/action-gh-release@v2
-        with:
-          # We point it to the release directory, which is now inside /frontend
-          files: frontend/release/*
-          fail_on_unmatched_files: true
+          VITE_API_BASE_URL: https://dropsilk-backend.onrender.com
