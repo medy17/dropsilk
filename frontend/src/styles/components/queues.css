@@ -35,6 +35,59 @@
     background: var(--c-dropzone-hover-bg);
 }
 
+/* src/styles/components/queues.css */
+
+/* Base Suspicious Style */
+.queue-item.is-suspicious {
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.06) 0%, transparent 100%);
+    border-left: 3px solid var(--c-danger);
+    transition: border-radius 0.2s ease, background 0.2s ease;
+}
+
+/* Suspicious Status Text Wrapper */
+.warning-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--c-danger);
+    font-weight: 700;
+    font-size: 0.9em;
+}
+
+.warning-badge svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-width: 0;
+}
+
+/* --- GROUPING LOGIC (Lil Mama Radii) --- */
+
+/* 1. Isolated Executable: Round both left corners */
+.queue-item.is-suspicious.suspicious-single {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+/* 2. Start of a Block: Round top-left only */
+.queue-item.is-suspicious.suspicious-start {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 0; /* Square bottom to connect to next */
+}
+
+/* 3. Middle of a Block: Square both left corners */
+.queue-item.is-suspicious.suspicious-middle {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* 4. End of a Block: Round bottom-left only */
+.queue-item.is-suspicious.suspicious-end {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 12px; /* Round bottom to finish */
+}
+
 .file-icon {
     flex-shrink: 0;
     background: linear-gradient(135deg, rgb(91 206 250 / .1), rgb(245 169 184 / .1));

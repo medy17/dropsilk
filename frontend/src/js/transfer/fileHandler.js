@@ -1,20 +1,21 @@
-// js/transfer/fileHandler.js
+// src/js/transfer/fileHandler.js
 // Contains the core logic for file transfers, including queueing, chunking, and handling selections.
 import i18next from '../i18n.js';
-import { store } from '../state.js';
-import { showToast } from '../utils/toast.js';
-import { sendData, getBufferedAmount } from '../network/webrtc.js';
-import { HIGH_WATER_MARK, OPFS_THRESHOLD } from '../config.js';
-import { uiElements } from '../ui/dom.js';
-import { getFileIcon } from '../utils/helpers.js';
+import {store} from '../state.js';
+import {showToast} from '../utils/toast.js';
+import {sendData, getBufferedAmount} from '../network/webrtc.js';
+import {HIGH_WATER_MARK, OPFS_THRESHOLD} from '../config.js';
+import {uiElements} from '../ui/dom.js';
+import {getFileIcon} from '../utils/helpers.js';
 import {
     updateReceiverActions,
     checkQueueOverflow,
     appendChatMessage,
 } from '../ui/view.js';
-import { isPreviewable } from '../preview/previewConfig.js';
-import { showPreview } from '../preview/previewManager.js';
-import { audioManager } from '../utils/audioManager.js';
+import {isPreviewable} from '../preview/previewConfig.js';
+import {showPreview} from '../preview/previewManager.js';
+import {audioManager} from '../utils/audioManager.js';
+import {isExecutable} from '../utils/security.js';
 
 let worker;
 // OPFS-specific state
@@ -42,6 +43,8 @@ let incomingFileInfo = null;
 let incomingFileData = [];
 let incomingFileReceived = 0;
 let lastReceiveProgressUpdate = 0; // For throttling UI updates
+
+let batchExecutableCount = 0;
 
 // State variables for audio cues
 let isNewBatch = true;
@@ -73,13 +76,13 @@ function formatTimeRemaining(seconds) {
     const remainingSeconds = Math.floor(seconds % 60);
 
     const parts = [];
-    if (hours > 0) parts.push(i18next.t('hr', { count: hours })); // e.g., "1 hr", "2 hrs"
-    if (minutes > 0) parts.push(i18next.t('min', { count: minutes })); // e.g., "1 min", "2 mins"
+    if (hours > 0) parts.push(i18next.t('hr', {count: hours})); // e.g., "1 hr", "2 hrs"
+    if (minutes > 0) parts.push(i18next.t('min', {count: minutes})); // e.g., "1 min", "2 mins"
     if (remainingSeconds > 0 || parts.length === 0) {
-        parts.push(i18next.t('sec', { count: remainingSeconds })); // e.g., "1 sec", "5 secs"
+        parts.push(i18next.t('sec', {count: remainingSeconds})); // e.g., "1 sec", "5 secs"
     }
 
-    return i18next.t('timeRemaining', { time: parts.slice(0, 2).join(' ') }); // e.g., "1 min 15 sec remaining"
+    return i18next.t('timeRemaining', {time: parts.slice(0, 2).join(' ')}); // e.g., "1 min 15 sec remaining"
 }
 
 export function cancelFileSend(fileId) {
@@ -178,7 +181,10 @@ export function handleFolderSelection(files) {
             body: i18next.t('folderSelectionWarningDescription'),
             duration: 0,
             actions: [
-                { text: i18next.t('cancel'), class: 'btn-secondary', callback: () => {} },
+                {
+                    text: i18next.t('cancel'), class: 'btn-secondary', callback: () => {
+                    }
+                },
                 {
                     text: i18next.t('proceedAnyway'),
                     class: 'btn-primary',
@@ -244,10 +250,10 @@ function startFileSend(file) {
     lastSpeedCalcOffset = 0;
     speedSamples = [];
 
-    sendData(JSON.stringify({ name: file.name, type: file.type, size: file.size }));
+    sendData(JSON.stringify({name: file.name, type: file.type, size: file.size}));
 
     worker.onmessage = (e) => {
-        const { type, chunk } = e.data;
+        const {type, chunk} = e.data;
         if (type === 'chunk') {
             chunkQueue.push(chunk);
             drainQueue();
@@ -260,7 +266,7 @@ function startFileSend(file) {
     };
     const customChunkSize =
         parseInt(localStorage.getItem('dropsilk-chunk-size'), 10) || null;
-    worker.postMessage({ file: file, config: { chunkSize: customChunkSize } });
+    worker.postMessage({file: file, config: {chunkSize: customChunkSize}});
 }
 
 export function drainQueue() {
@@ -380,7 +386,7 @@ export async function handleDataChannelMessage(event) {
 
             // Control message for screen-share ending
             if (parsedData.type === 'stream-ended') {
-                const { hideRemoteStreamView } = await import('../ui/view.js');
+                const {hideRemoteStreamView} = await import('../ui/view.js');
                 hideRemoteStreamView();
                 return;
             }
@@ -427,7 +433,7 @@ export async function handleDataChannelMessage(event) {
                         create: true,
                     });
                     const writer = await fileHandle.createWritable();
-                    opfsState.set(incomingFileInfo.name, { writer, fileHandle });
+                    opfsState.set(incomingFileInfo.name, {writer, fileHandle});
                 } catch (error) {
                     console.error('OPFS setup failed, falling back to memory.', error);
                     showToast({
@@ -500,7 +506,7 @@ export async function handleDataChannelMessage(event) {
                         duration: 8000,
                     });
                     opfsState.delete(incomingFileInfo.name);
-                    return; // Abort further processing
+                    return;
                 }
                 opfsState.delete(incomingFileInfo.name);
             } else {
@@ -509,9 +515,21 @@ export async function handleDataChannelMessage(event) {
                 });
             }
 
+            const finalFileInfo = {...incomingFileInfo};
+
+            // --- SECURITY CHECK WITH LOGGING ---
+            const isDangerous = isExecutable(finalFileInfo.name);
+            console.log(`[FileHandler] Processing "${finalFileInfo.name}" - Dangerous? ${isDangerous}`);
+
+            if (isDangerous) {
+                batchExecutableCount++;
+            }
+
+            // --- AUTO DOWNLOAD LOGIC ---
             const autoDownloadEnabled =
                 localStorage.getItem('dropsilk-auto-download') === 'true';
-            if (autoDownloadEnabled) {
+
+            if (autoDownloadEnabled && !isDangerous) {
                 const maxSizeMB = parseFloat(
                     localStorage.getItem('dropsilk-auto-download-max-size') || '100',
                 );
@@ -522,24 +540,14 @@ export async function handleDataChannelMessage(event) {
                         const link = document.createElement('a');
                         link.href = URL.createObjectURL(receivedBlob);
                         link.download = incomingFileInfo.name;
-                        document.body.appendChild(link); // Required for Firefox
+                        document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
-                        // We do not call URL.revokeObjectURL here because the object URL is
-                        // still needed for the manual "Save" button in the UI.
                     } catch (e) {
                         console.error('Auto-download failed:', e);
-                        showToast({
-                            type: 'danger',
-                            title: 'Auto-Download Failed',
-                            body: 'Could not automatically save the file. Please download it manually.',
-                            duration: 8000,
-                        });
                     }
                 }
             }
-
-            const finalFileInfo = { ...incomingFileInfo };
 
             store.actions.addReceivedFile({
                 name: finalFileInfo.name,
@@ -547,31 +555,40 @@ export async function handleDataChannelMessage(event) {
             });
             updateReceiverActions();
 
+            // --- UI UPDATE LOGIC ---
             const fileId = store.actions.getFileId(finalFileInfo.name);
             const fileElement = document.getElementById(fileId);
 
             if (fileElement) {
-                // Final UI update for the progress bar and status text
                 fileElement.querySelector('progress').value = 1;
-                // Keep the percentage at 100%
                 fileElement.querySelector('.percent').textContent = '100%';
-                // Update the status text to "Complete!"
+
                 const statusTextElement = fileElement.querySelector('.status-text');
                 if (statusTextElement) {
-                    statusTextElement.textContent = i18next.t(
-                        'completeStatus',
-                        'Complete!',
-                    );
+                    if (isDangerous) {
+                        // FORCE RED COLOR VIA JS IN CASE CSS FAILS
+                        statusTextElement.innerHTML = `
+                            <span class="warning-badge">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+  <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+</svg>
+                                Executable
+                            </span>
+                        `;
+                        statusTextElement.style.color = '';
+                        statusTextElement.style.fontWeight = '';
+
+                        fileElement.classList.add('is-suspicious');
+
+                        updateSuspiciousGroupings();
+                    } else {
+                        statusTextElement.textContent = i18next.t('completeStatus', 'Complete!');
+                    }
                 }
 
                 const actionContainer = fileElement.querySelector('.file-action');
-
                 const fileExtension = finalFileInfo.name.toLowerCase().split('.').pop();
-                const isVideo =
-                    finalFileInfo.type.startsWith('video/') ||
-                    ['mp4', 'mov', 'mkv', 'webm', 'ts', 'm4v', 'avi'].includes(
-                        fileExtension,
-                    );
+                const isVideo = finalFileInfo.type.startsWith('video/') || ['mp4', 'mov', 'mkv', 'webm', 'ts', 'm4v', 'avi'].includes(fileExtension);
                 const canPreview = isPreviewable(finalFileInfo.name);
 
                 // Read persisted preview consent map
@@ -580,15 +597,13 @@ export async function handleDataChannelMessage(event) {
                     previewConsent = JSON.parse(
                         localStorage.getItem('dropsilk-preview-consent') || '{}',
                     );
-                } catch (_) {}
+                } catch (_) {
+                }
 
-                // Step 1: Show the animated checkmark
                 const checkmarkIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>`;
                 actionContainer.innerHTML = `<button class="file-action-btn file-action-btn--complete is-entering" disabled>${checkmarkIconSVG}</button>`;
 
-                // Step 2: After a delay, replace the checkmark with the final action buttons
                 setTimeout(() => {
-                    // Ensure the file element still exists in the DOM before proceeding
                     if (!document.body.contains(fileElement)) return;
 
                     const downloadIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>`;
@@ -600,7 +615,6 @@ export async function handleDataChannelMessage(event) {
                     } else if (canPreview) {
                         let titleText = 'Preview File';
                         let disabledAttr = '';
-                        // Only apply disabled state if the file is a PPTX and consent is denied.
                         if (fileExtension === 'pptx' && previewConsent?.pptx === 'deny') {
                             titleText = 'PPTX preview disabled by your privacy choice';
                             disabledAttr = 'disabled aria-disabled="true"';
@@ -613,10 +627,8 @@ export async function handleDataChannelMessage(event) {
                         finalFileInfo.name
                     }" class="file-action-btn save-btn" title="Save">${downloadIconSVG}</a>`;
 
-                    // Add the 'is-entering' class to the group for the pop-in animation
                     actionContainer.innerHTML = `<div class="file-action-group is-entering">${buttonsHTML}</div>`;
 
-                    // Re-attach event listeners to the newly created buttons
                     const previewBtn = actionContainer.querySelector('.preview-btn');
                     if (previewBtn) {
                         previewBtn.onclick = () => {
@@ -628,18 +640,32 @@ export async function handleDataChannelMessage(event) {
                             }
                         };
                     }
-                }, 1200); // 1.2-second delay for the checkmark to be visible
+                }, 1200);
             }
 
             incomingFileInfo = null;
-            lastReceiveProgressUpdate = 0; // Reset for next file
+            lastReceiveProgressUpdate = 0;
 
-            // Use a timer to play the sound if no new file arrives shortly
+            // --- BATCH NOTIFICATION LOGIC ---
             if (receiveCompletionTimer) clearTimeout(receiveCompletionTimer);
             receiveCompletionTimer = setTimeout(() => {
-                audioManager.play('receive_complete');
+                if (batchExecutableCount > 0) {
+                    audioManager.play('error');
+                    showToast({
+                        type: 'danger',
+                        title: i18next.t('securityAlertTitle', 'Security Alert'),
+                        body: i18next.t('securityAlertBody', {
+                            count: batchExecutableCount,
+                            defaultValue: `Received ${batchExecutableCount} executable files. Auto-download blocked.`
+                        }),
+                        duration: 8000,
+                    });
+                } else {
+                    audioManager.play('receive_complete');
+                }
+                batchExecutableCount = 0;
                 receiveCompletionTimer = null;
-            }, 1500); // 1.5-second delay to wait for a potential next file
+            }, 1500);
 
             return;
         }
@@ -734,6 +760,41 @@ export async function handleDataChannelMessage(event) {
     }
 }
 
+function updateSuspiciousGroupings() {
+    const queue = document.getElementById('receiver-queue');
+    if (!queue) return;
+
+    const items = Array.from(queue.querySelectorAll('.queue-item'));
+
+    items.forEach((item, index) => {
+        // If this item isn't suspicious, skip it (it keeps default styling)
+        if (!item.classList.contains('is-suspicious')) return;
+
+        // Clean previous grouping classes
+        item.classList.remove('suspicious-single', 'suspicious-start', 'suspicious-middle', 'suspicious-end');
+
+        const prev = items[index - 1];
+        const next = items[index + 1];
+
+        const isPrevSuspicious = prev && prev.classList.contains('is-suspicious');
+        const isNextSuspicious = next && next.classList.contains('is-suspicious');
+
+        if (!isPrevSuspicious && !isNextSuspicious) {
+            // [Safe] -> [Suspicious] -> [Safe]
+            item.classList.add('suspicious-single');
+        } else if (!isPrevSuspicious && isNextSuspicious) {
+            // [Safe] -> [Suspicious] -> [Suspicious]
+            item.classList.add('suspicious-start');
+        } else if (isPrevSuspicious && isNextSuspicious) {
+            // [Suspicious] -> [Suspicious] -> [Suspicious]
+            item.classList.add('suspicious-middle');
+        } else if (isPrevSuspicious && !isNextSuspicious) {
+            // [Suspicious] -> [Suspicious] -> [Safe]
+            item.classList.add('suspicious-end');
+        }
+    });
+}
+
 export function resetTransferState() {
     if (worker) worker.terminate();
     worker = null;
@@ -753,6 +814,7 @@ export function resetTransferState() {
         clearTimeout(receiveCompletionTimer);
         receiveCompletionTimer = null;
     }
+    batchExecutableCount = 0;
     if (queueStartSoundTimeout) {
         clearTimeout(queueStartSoundTimeout);
         queueStartSoundTimeout = null;
