@@ -335,7 +335,7 @@ To run DropSilk locally, you'll need both this frontend repository and the corre
 
 2.  **Install dependencies:**
     ```bash
-    npm install
+    pnpm install
     ```
 
 3.  **Set up environment variables:**
@@ -355,8 +355,12 @@ To run DropSilk locally, you'll need both this frontend repository and the corre
 
 Once the backend is running, start the frontend development server:
 
+
+
 ```bash
-npm run dev
+pnpm approve-builds
+
+pnpm dev
 ```
 
 Open your browser and navigate to `http://localhost:5173` (or the address provided by Vite). You should now have a fully functional local version of DropSilk!
