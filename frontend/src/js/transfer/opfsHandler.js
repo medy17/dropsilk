@@ -29,10 +29,15 @@ export function shouldUseOpfs(fileSize) {
 export async function initOpfsForFile(fileName) {
     try {
         const root = await navigator.storage.getDirectory();
-        // Clear old files before starting a new one.
-        for await (const key of root.keys()) {
-            await root.removeEntry(key);
+
+        // Try to remove the file if it already exists to ensure fresh start, 
+        // but ignore errors if it fails (e.g. locked).
+        try {
+            await root.removeEntry(fileName);
+        } catch (e) {
+            // Ignore - might not exist or be locked
         }
+
         const fileHandle = await root.getFileHandle(fileName, { create: true });
         const writer = await fileHandle.createWritable();
         opfsState.set(fileName, { writer, fileHandle });
@@ -121,10 +126,8 @@ export async function clearOpfsStorage() {
 
     try {
         const root = await navigator.storage.getDirectory();
-        for await (const key of root.keys()) {
-            await root.removeEntry(key);
-        }
-        // Close any open writers
+
+        // Close any open writers first
         for (const [key, value] of opfsState.entries()) {
             if (value.writer) {
                 await value.writer.close().catch((e) =>
@@ -132,6 +135,15 @@ export async function clearOpfsStorage() {
                 );
             }
             opfsState.delete(key);
+        }
+
+        // iterate and remove files
+        for await (const key of root.keys()) {
+            try {
+                await root.removeEntry(key);
+            } catch (e) {
+                console.warn(`Failed to remove OPFS entry ${key}:`, e);
+            }
         }
     } catch (e) {
         console.error('Could not clear OPFS on reset:', e);

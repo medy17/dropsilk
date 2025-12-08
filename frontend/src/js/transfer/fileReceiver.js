@@ -67,6 +67,12 @@ export async function handleDataChannelMessage(event) {
             }
 
             // File metadata - new file starting
+            // Ensure data looks like file info
+            if (!parsedData.name || typeof parsedData.size !== 'number') {
+                console.warn('Received invalid file metadata:', parsedData);
+                return;
+            }
+
             if (receiveCompletionTimer) {
                 clearTimeout(receiveCompletionTimer);
                 receiveCompletionTimer = null;
@@ -163,6 +169,11 @@ async function handleIncomingChunk(data) {
  * Handles file transfer completion
  */
 async function handleFileComplete() {
+    if (!incomingFileInfo) {
+        console.warn('Received EOF but no incoming file info available.');
+        return;
+    }
+
     let receivedBlob;
 
     if (isUsingOpfs(incomingFileInfo.name)) {
