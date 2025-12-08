@@ -3,6 +3,7 @@
 
 export {
     getAllSettings,
+    getSettingsSummary,
     getPreviewConsentMap,
     setPreviewConsent,
     updateSetting,
@@ -12,3 +13,4 @@ export {
     initializeSystemFont,
     resetAllPreferences,
 } from './settingsData.js';
+

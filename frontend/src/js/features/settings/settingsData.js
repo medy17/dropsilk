@@ -28,6 +28,29 @@ export function getAllSettings() {
 }
 
 /**
+ * Gets a detailed human-readable summary of all settings
+ * @returns {string} Summary like "Sounds: On • Analytics: Off • Theme: Light..."
+ */
+export function getSettingsSummary() {
+    const settings = getAllSettings();
+    const animationLabels = { quality: 'Best', performance: 'Basic', off: 'Off' };
+    const pptxLabels = { allow: 'Allow', deny: 'Deny', ask: 'Ask' };
+
+    const parts = [
+        `Sounds: ${settings.sounds ? 'On' : 'Off'}`,
+        `Analytics: ${settings.analytics ? 'On' : 'Off'}`,
+        `Theme: ${settings.theme === 'dark' ? 'Dark' : 'Light'}`,
+        `Animation: ${animationLabels[settings.animationQuality] || 'Basic'}`,
+        `Font: ${settings.systemFont ? 'System' : 'Default'}`,
+        `Auto-Download: ${settings.autoDownload ? 'On' : 'Off'}`,
+        `PPTX Preview: ${pptxLabels[settings.pptxConsent] || 'Ask'}`,
+        `Safe Mode (OPFS): ${settings.opfsEnabled ? 'On' : 'Off'}`,
+    ];
+
+    return parts.join(' • ');
+}
+
+/**
  * Gets the preview consent map from localStorage
  * @returns {Object} Consent map
  */

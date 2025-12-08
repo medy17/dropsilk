@@ -7,7 +7,7 @@ import i18next from '../i18n.js';
 
 // Import feature modules
 import { initializeTheme } from '../features/theme/index.js';
-import { initializeAnimationQuality, initializeSystemFont } from '../features/settings/settingsData.js';
+import { initializeAnimationQuality, initializeSystemFont, getAllSettings, getSettingsSummary } from '../features/settings/settingsData.js';
 import { createSettingsModalHTML, bindSettingsEvents } from '../features/settings/settingsUI.js';
 import { setupInviteModal } from '../features/invite/inviteModal.js';
 import {
@@ -79,34 +79,15 @@ function openSettingsModal() {
  * Updates the settings summary in the header
  */
 function updateSettingsSummary() {
-    const snapshot = getSettingsSnapshot();
-    const enabledCount = Object.values(snapshot).filter(v => v === true).length;
-    const totalBooleans = Object.values(snapshot).filter(v => typeof v === 'boolean').length;
-
-    uiElements.zipSelectionInfo.textContent = i18next.t('settingsEnabled', {
-        count: enabledCount,
-        total: totalBooleans,
-        defaultValue: `${enabledCount}/${totalBooleans} enabled`
-    });
-
+    // Use the summary from settingsData module
+    uiElements.zipSelectionInfo.textContent = getSettingsSummary();
     uiElements.downloadSelectedBtn.disabled = false;
 
-    const allOn = Object.values(snapshot).filter(v => typeof v === 'boolean').every(v => v);
+    // Update select all checkbox based on boolean settings
+    const settings = getAllSettings();
+    const booleanSettings = [settings.sounds, settings.analytics, settings.systemFont, settings.autoDownload, settings.opfsEnabled];
+    const allOn = booleanSettings.every(v => v === true);
     uiElements.selectAllZipCheckbox.checked = allOn;
-}
-
-/**
- * Gets the current settings snapshot
- */
-function getSettingsSnapshot() {
-    return {
-        sounds: audioManager.isEnabled(),
-        analytics: localStorage.getItem('dropsilk-privacy-consent') === 'true',
-        darkMode: localStorage.getItem('dropsilk-theme') === 'dark',
-        systemFont: localStorage.getItem('dropsilk-system-font') === 'true',
-        autoDownload: localStorage.getItem('dropsilk-auto-download') === 'true',
-        opfs: localStorage.getItem('dropsilk-use-opfs-buffer') === 'true',
-    };
 }
 
 /**
