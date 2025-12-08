@@ -109,12 +109,26 @@ src/
 │  ├─ state.js                # Tiny global store (imperative actions)
 │  ├─ i18n.js                 # i18next + detector setup
 │  │
+│  ├─ features/               # Domain-specific feature modules
+│  │  ├─ chat/                # Chat logic, UI, and event handling
+│  │  ├─ contact/             # Contact modal logic
+│  │  ├─ invite/              # QR generation, sharing logic
+│  │  ├─ settings/            # Settings persistence and UI generation
+│  │  ├─ theme/               # Dark mode logic
+│  │  └─ zip/                 # Zip modal logic (selection state)
+│  │
 │  ├─ network/
 │  │  ├─ websocket.js         # Signalling client (Render in prod)
 │  │  └─ webrtc.js            # Peer connection, data channel, screen share
 │  │
 │  ├─ transfer/
-│  │  ├─ fileHandler.js       # Queueing, worker IO, OPFS, UI integration
+│  │  ├─ fileHandler.js       # Facade: orchestrates sender, receiver, queue
+│  │  ├─ fileSender.js        # Worker management, upload throttling
+│  │  ├─ fileReceiver.js      # Incoming stream, memory/OPFS storage
+│  │  ├─ queueManager.js      # Drag-and-drop, file selection, queue state
+│  │  ├─ transferUI.js        # HTML generation for transfer items
+│  │  ├─ opfsHandler.js       # Origin Private File System operations
+│  │  ├─ etrCalculator.js     # Shared speed/time-remaining logic
 │  │  └─ zipHandler.js        # JSZip integration for “download all”
 │  │
 │  ├─ preview/
@@ -134,7 +148,7 @@ src/
 │  │  ├─ dom.js               # Centralised DOM element queries
 │  │  ├─ events.js            # All event listeners + drag‑and‑drop
 │  │  ├─ view.js              # Small “render” helpers (no framework)
-│  │  ├─ modals.js            # Modals, settings, theme/consent UX
+│  │  ├─ modals.js            # Orchestrator for modals (delegates to features/)
 │  │  ├─ onboarding.js        # Welcome/invite overlays & positioning
 │  │  └─ effects.js           # Animation quality controller (persists + applies)
 │  │
@@ -167,11 +181,11 @@ served as‑is by Vite.
 
 Where should new things go?
 
+- New feature slice: `js/features/newFeature/`.
 - New network logic: `js/network/`.
-- New transfer features: `js/transfer/`.
+- New transfer logic: `js/transfer/` (if core logic) or `js/features/` (if UI heavy).
 - New preview type: `js/preview/handlers/` plus `previewConfig.js` entry.
 - New UI behaviour: bind in `js/ui/events.js`, render helpers in `js/ui/view.js`.
-- New settings: `js/ui/modals.js` (UI), `js/ui/effects.js` (persistence/application).
 - Small pure helpers: `js/utils/`.
 - New CSS: follow the existing split (base/layout/components/utilities).
 
@@ -180,6 +194,9 @@ Where should new things go?
 
 - ES Modules everywhere; avoid globals. The only intentional global is
   `window.videoPlayer` for the self‑contained player in `public/video.js`.
+- **Feature Modules**: Logic that owns a specific UI domain (Chat, Settings, Invite)
+  lives in `js/features/`. These modules should export setup/teardown functions
+  used by the main `ui/` orchestrators.
 - Separate DOM concerns from logic:
     - `ui/dom.js` owns querying and exposes a stable `uiElements` map.
     - `ui/events.js` attaches listeners and calls actions/helpers.
@@ -255,45 +272,46 @@ WebRTC client (`js/network/webrtc.js`):
 
 ## 7) File transfers (worker + OPFS + flow control)
 
-Sender:
+The transfer logic is modularized under `js/transfer/`, with `fileHandler.js` acting as a facade to coordinate the specific modules.
 
-- `fileHandler.startFileSend()`:
+Sender (`js/transfer/fileSender.js`):
+
+- `startFileSend()`:
     - Spawns `sender.worker.js` to read the file in chunks (default 256 KB, user
       tunable).
     - Sends JSON metadata, then ArrayBuffers, then `"EOF"`.
     - Throttles on `getBufferedAmount()` against `HIGH_WATER_MARK`.
-    - Updates UI progress and an ETA based on moving‑average speed samples.
+    - Updates UI using `transferUI.js` and calculates ETA via `etrCalculator.js`.
 - Worker (`sender.worker.js`):
     - Reads slices with `FileReader`, transfers underlying buffers to main thread
       (zero‑copy), and posts `chunk` messages.
     - Self‑terminates on `done`.
 
-Receiver:
+Receiver (`js/transfer/fileReceiver.js`):
 
-- `fileHandler.handleDataChannelMessage()`:
-    - If metadata JSON: initialises receive state; possibly enables OPFS “safe
-      mode” if large and supported.
+- `handleDataChannelMessage()`:
+    - If metadata JSON: initialises receive state; delegates to `opfsHandler.js` if
+      "safe mode" is active (large file + supported browser).
     - If ArrayBuffer:
-        - Writes to OPFS writer if active, else pushes to memory.
-        - Tracks speed/ETA and updates UI.
+        - Writes via `opfsHandler` (if safe mode) or pushes to memory array.
+        - Tracks speed/ETA via `etrCalculator.js`.
     - On `"EOF"`:
         - Finalises writer (OPFS) or creates a `Blob` from parts.
         - Adds file to `store.receivedFiles`.
-        - Updates UI buttons (preview/save) with a brief “Complete!” animation.
+        - Updates UI actions (preview/save/complete).
         - Optional auto‑download if enabled and below a size threshold.
 
-OPFS safe mode:
+OPFS Safe Mode (`js/transfer/opfsHandler.js`):
 
-- Controlled by `localStorage('dropsilk-use-opfs-buffer')` and a size threshold
-  (`OPFS_THRESHOLD`).
-- Uses `navigator.storage.getDirectory()` to create a per‑file writer.
-- Cleans up stale OPFS entries on reset and between files.
+- Encapsulates all Origin Private File System operations.
+- `initOpfsForFile`: Get directory handle, remove stale files, create writer.
+- `writeOpfsChunk`: Writes stream directly to disk.
+- `finalizeOpfsFile`: Closes writer, returns File handle as Blob.
 
-Flow control:
+UI & Queue (`js/transfer/transferUI.js`, `js/transfer/queueManager.js`):
 
-- DataChannel backpressure:
-    - Only send chunks when `bufferedAmount <= HIGH_WATER_MARK`.
-    - React quickly to `onbufferedamountlow` by draining any queued chunks.
+- `transferUI.js` contains all HTML generation templates for queue items to keep logic files clean.
+- `queueManager.js` handles file selection, folder limits, and drag-and-drop reordering.
 
 
 ## 8) Preview subsystem
@@ -376,10 +394,9 @@ Security:
     - Small pure-ish functions that read from the store and mutate view state.
     - Manages queue expansion, metrics UI, panels, pulses, and stream views.
 - `ui/modals.js`:
-    - All modals (invite, zip, settings, donate, about/contact/terms/privacy/
-      security/FAQ, preview).
-    - Settings modal doubles as a host for preferences and “advanced” options.
-    - Updates theme, fonts, analytics consent, chunk size, OPFS mode, etc.
+    - Acts as an orchestrator for global modals (About, Donate, etc.).
+    - For complex modals (Settings, Zip, Invite), it delegates logic to the relevant
+      modules in `js/features/`.
 - `ui/onboarding.js`:
     - Welcome/Invite overlays; computes safe positions using VisualViewport and
       re‑positions on orientation/resize.
@@ -458,7 +475,11 @@ Security posture:
 - No files are uploaded except optional PPTX previews and then only to the
   configured UploadThing endpoint, with auto‑clean up (server‑side).
 - WebRTC data paths are end‑to‑end encrypted (DTLS/SRTP).
-- Signalling server receives only metadata and discards it after session ends.
+- Markdown is sanitised.
+- reCAPTCHA is loaded on demand only for the contact email.
+- QR scanner accepts only our URL schema; invalid scans are rejected.
+- Do not include secrets in the client; use `VITE_` prefix for safe public
+  env vars only.
 
 
 ## 14) Build system and environments
@@ -591,10 +612,10 @@ Add a new WebSocket message:
 
 Add a new setting:
 
-1. Add UI in `populateSettingsModal()` in `ui/modals.js`.
+1. Add UI in `populateSettingsModal()` in `js/features/settings/settingsUI.js`.
 2. Persist to `localStorage` (use a `dropsilk-*` key).
 3. If it affects performance/animations, wire it up in `js/ui/effects.js`.
-4. Apply in `saveSettingsPreferences()` and reflect in the UI.
+4. Apply in `js/features/settings/settingsData.js` and reflect in the UI.
 
 Add a new language:
 
@@ -610,7 +631,8 @@ Add a new language:
     - Create `xx.json`, minimally copying the shape from `en.json`.
     - Run `scripts/update-locales.js` to update imports/resources/options and to
       seed language names across JSONs.
-- In HTML, use `data-i18n` attributes; in code, `i18next.t('key', options)`.
+- In HTML, use `data-i18n` attributes; in code, `i18next.t(key, options)` or
+  `[data-i18n]` where possible.
 - For dynamic text (e.g., toasts) always use `i18next.t()`.
 
 
@@ -631,6 +653,7 @@ Add a new language:
 If you’re unsure where something belongs:
 
 - Is it view code that touches the DOM? `ui/…`
+- Is it a feature slice (chat, settings)? `features/…`
 - Is it a network edge (signalling or peer)? `network/…`
 - Is it file transfer orchestration or IO? `transfer/…`
 - Is it a one‑off helper? `utils/…`
