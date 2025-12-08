@@ -1,29 +1,19 @@
-// js/ui/events.js
-// This file is responsible for attaching all event listeners to the DOM.
+// src/js/ui/events.js
 import i18next from '../i18n.js';
 import { uiElements, folderInputTransfer } from './dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
-import {
-    startScreenShare,
-    stopScreenShare,
-    sendData,
-} from '../network/webrtc.js';
-import {
-    handleFileSelection,
-    handleFolderSelection,
-    cancelFileSend,
-} from '../transfer/fileHandler.js';
-import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
+import { startScreenShare, stopScreenShare } from '../network/webrtc.js';
+import { handleFileSelection, handleFolderSelection, cancelFileSend } from '../transfer/fileHandler.js';
 import { showToast } from '../utils/toast.js';
 import QrScanner from 'qr-scanner';
 import Sortable from 'sortablejs';
-import { clearAllPulseEffects, appendChatMessage } from './view.js';
+import { clearAllPulseEffects } from './view.js';
+import { setupChatEvents } from './chat.js'; // Import new chat events
 
-/**
- * A simple helper to guess a file's MIME type from its extension.
- * Crucial for creating proper File objects in the Electron renderer process.
- */
+// ... (Rest of file helpers: getMimeTypeFromPath, setOtpInputError, attemptToJoinFlight, initializeSortableQueue) ...
+// (Retain existing implementation of these helpers)
+
 function getMimeTypeFromPath(fileName) {
     const extension = fileName.split('.').pop().toLowerCase();
     const mimeTypes = {
@@ -50,9 +40,6 @@ function getMimeTypeFromPath(fileName) {
 
 let lastOtpErrorSnapshot = null;
 
-/**
- * Exported function to set OTP input error state
- */
 export function setOtpInputError(errorCode) {
     const otpWrapper = uiElements.flightCodeInputWrapper;
     if (otpWrapper) {
@@ -61,9 +48,6 @@ export function setOtpInputError(errorCode) {
     }
 }
 
-/**
- * Reusable function to handle the logic for joining a flight.
- */
 function attemptToJoinFlight() {
     const ghostInput = document.getElementById('otp-ghost-input');
     const code = ghostInput ? ghostInput.value.trim().toUpperCase() : '';
@@ -84,9 +68,6 @@ function attemptToJoinFlight() {
     }
 }
 
-/**
- * Initializes the SortableJS library on the sending queue.
- */
 function initializeSortableQueue() {
     if (uiElements.sendingQueueDiv && typeof Sortable !== 'undefined') {
         new Sortable(uiElements.sendingQueueDiv, {
@@ -106,6 +87,7 @@ function initializeSortableQueue() {
 }
 
 export function initializeEventListeners() {
+    // ... (Keep existing UI listeners: createFlightBtn, joinFlightBtn, otpWrapper logic, QR scanner logic) ...
     uiElements.createFlightBtn?.addEventListener('click', () => {
         localStorage.setItem('hasSeenCreateFlightPulse', 'true');
         clearAllPulseEffects();
@@ -116,86 +98,34 @@ export function initializeEventListeners() {
     uiElements.joinFlightBtn?.addEventListener('click', attemptToJoinFlight);
 
     const otpWrapper = uiElements.flightCodeInputWrapper;
-
     if (otpWrapper) {
         const ghostInput = document.getElementById('otp-ghost-input');
-        const visualSlots = Array.from(
-            document.querySelectorAll('.otp-visual-slot'),
-        );
-
-        // Helper to sync the Ghost Input value to the Visual Slots
+        const visualSlots = Array.from(document.querySelectorAll('.otp-visual-slot'));
         const updateVisuals = () => {
-            // 1. Sanitize: Uppercase, alphanumeric only
             let val = ghostInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-
-            // 2. Strict Cap: Handle paste overflows or 'keep typing' scenarios
-            if (val.length > 6) {
-                val = val.slice(0, 6);
-            }
-
-            // 3. Write back: Ensure the input value matches our sanitized/sliced version
-            // This physically prevents the hidden input from holding >6 chars
-            if (ghostInput.value !== val) {
-                ghostInput.value = val;
-            }
-
-            // 4. Render Visuals
+            if (val.length > 6) val = val.slice(0, 6);
+            if (ghostInput.value !== val) ghostInput.value = val;
             visualSlots.forEach((slot, index) => {
-                // Set text
                 slot.textContent = val[index] || '';
-
-                // Reset classes
                 slot.classList.remove('active', 'filled');
-
-                // Filled State
-                if (val[index]) {
-                    slot.classList.add('filled');
-                }
-
-                // Active (Cursor) State Logic:
-                // - If we are at the specific index of the value length (e.g. length 2, index 2 is active)
-                // - OR if the box is totally full (length 6), keep the LAST box (index 5) active
+                if (val[index]) slot.classList.add('filled');
                 const isNextChar = index === val.length;
                 const isFullAndLast = val.length === 6 && index === 5;
-
-                if (isNextChar || isFullAndLast) {
-                    slot.classList.add('active');
-                }
+                if (isNextChar || isFullAndLast) slot.classList.add('active');
             });
-
-            // Error state cleanup
-            if (otpWrapper.classList.contains('input-error')) {
-                otpWrapper.classList.remove('input-error');
-            }
-
-            // Optional: Auto-submit on full length
-            // if (val.length === 6) attemptToJoinFlight();
+            if (otpWrapper.classList.contains('input-error')) otpWrapper.classList.remove('input-error');
         };
-
-        // 1. Input Event: Handles typing, pasting, and cutting
         ghostInput.addEventListener('input', updateVisuals);
-
-        // 2. Change Event: Failsafe for some autocomplete scenarios
         ghostInput.addEventListener('change', updateVisuals);
-
-        // 3. Paste Event: Explicitly handle pasting to ensure immediate slicing
-        ghostInput.addEventListener('paste', (e) => {
-            // Small timeout to let the value populate, then sanitize immediately
-            setTimeout(updateVisuals, 0);
-        });
-
-        // 4. Focus/Blur: Visual ring handling
+        ghostInput.addEventListener('paste', () => setTimeout(updateVisuals, 0));
         ghostInput.addEventListener('focus', () => {
             otpWrapper.classList.add('focused');
             updateVisuals();
         });
-
         ghostInput.addEventListener('blur', () => {
             otpWrapper.classList.remove('focused');
             visualSlots.forEach((s) => s.classList.remove('active'));
         });
-
-        // 5. Handle Enter Key to submit
         ghostInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -204,7 +134,7 @@ export function initializeEventListeners() {
         });
     }
 
-    /* === QR Scanner Logic === */
+    // QR Logic
     let qrScanner = null;
     const stopScanner = () => {
         if (qrScanner) {
@@ -226,54 +156,34 @@ export function initializeEventListeners() {
                         const url = new URL(result.data);
                         const code = url.searchParams.get('code');
                         if (code && code.length === 6) {
-                            // Update Ghost Input with QR Code
                             const ghostInput = document.getElementById('otp-ghost-input');
                             if (ghostInput) {
                                 ghostInput.value = code.toUpperCase();
                                 if (window.updateOtpInputStates) window.updateOtpInputStates();
                             }
-
                             stopScanner();
                             uiElements.joinFlightBtn.click();
                         } else {
-                            showToast({
-                                type: 'danger',
-                                title: i18next.t('invalidQrCode'),
-                                body: i18next.t('invalidQrCodeDescription'),
-                            });
+                            showToast({ type: 'danger', title: i18next.t('invalidQrCode'), body: i18next.t('invalidQrCodeDescription') });
                             stopScanner();
                         }
                     } catch {
-                        showToast({
-                            type: 'danger',
-                            title: i18next.t('invalidQrCode'),
-                            body: i18next.t('notDropSilkLink'),
-                        });
+                        showToast({ type: 'danger', title: i18next.t('invalidQrCode'), body: i18next.t('notDropSilkLink') });
                         stopScanner();
                     }
                 },
-                {
-                    highlightScanRegion: true,
-                    highlightCodeOutline: true,
-                },
+                { highlightScanRegion: true, highlightCodeOutline: true },
             );
             await qrScanner.start();
         } catch (error) {
             console.error('QR Scanner Error:', error);
-            showToast({
-                type: 'danger',
-                title: i18next.t('cameraError'),
-                body: i18next.t('cameraErrorDescription'),
-                duration: 8000,
-            });
+            showToast({ type: 'danger', title: i18next.t('cameraError'), body: i18next.t('cameraErrorDescription'), duration: 8000 });
             stopScanner();
         }
     });
 
     uiElements.closeQrScannerBtn?.addEventListener('click', stopScanner);
-    uiElements.leaveFlightBtnDashboard?.addEventListener('click', () =>
-        location.reload(),
-    );
+    uiElements.leaveFlightBtnDashboard?.addEventListener('click', () => location.reload());
 
     /* === File & Folder Selection === */
     if (uiElements.fileInputTransfer) {
@@ -291,22 +201,15 @@ export function initializeEventListeners() {
         }
     };
 
+    // Electron specific file handling (unchanged logic)
     if (window.electronAPI) {
-        const selectFilesBtn = document.querySelector(
-            'label[for="fileInput_transfer"]',
-        );
+        const selectFilesBtn = document.querySelector('label[for="fileInput_transfer"]');
         if (selectFilesBtn) {
             selectFilesBtn.onclick = async (e) => {
                 e.preventDefault();
                 const filesData = await window.electronAPI.selectFiles();
                 if (filesData.length > 0) {
-                    const fileObjects = filesData.map(
-                        (f) =>
-                            new File([f.data], f.name, {
-                                type: getMimeTypeFromPath(f.name),
-                                path: f.path,
-                            }),
-                    );
+                    const fileObjects = filesData.map((f) => new File([f.data], f.name, { type: getMimeTypeFromPath(f.name), path: f.path }));
                     handleFileSelection(fileObjects);
                 }
             };
@@ -315,21 +218,13 @@ export function initializeEventListeners() {
             uiElements.selectFolderBtn.onclick = async () => {
                 const filesData = await window.electronAPI.selectFolder();
                 if (filesData.length > 0) {
-                    const fileObjects = filesData.map(
-                        (f) =>
-                            new File([f.data], f.name, {
-                                type: getMimeTypeFromPath(f.name),
-                                path: f.path,
-                            }),
-                    );
+                    const fileObjects = filesData.map((f) => new File([f.data], f.name, { type: getMimeTypeFromPath(f.name), path: f.path }));
                     handleFolderSelection(fileObjects);
                 }
             };
         }
     } else {
-        uiElements.selectFolderBtn?.addEventListener('click', () =>
-            folderInputTransfer.click(),
-        );
+        uiElements.selectFolderBtn?.addEventListener('click', () => folderInputTransfer.click());
     }
 
     if (uiElements.sendingQueueDiv) {
@@ -349,17 +244,11 @@ export function initializeEventListeners() {
             const inviteeId = inviteBtn.dataset.inviteeId;
             const { currentFlightCode } = store.getState();
             if (inviteeId && currentFlightCode) {
-                sendMessage({
-                    type: 'invite-to-flight',
-                    inviteeId,
-                    flightCode: currentFlightCode,
-                });
+                sendMessage({ type: 'invite-to-flight', inviteeId, flightCode: currentFlightCode });
                 inviteBtn.textContent = i18next.t('invited');
                 inviteBtn.disabled = true;
                 setTimeout(() => {
-                    const currentBtn = document.querySelector(
-                        `.invite-user-btn[data-invitee-id="${inviteeId}"]`,
-                    );
+                    const currentBtn = document.querySelector(`.invite-user-btn[data-invitee-id="${inviteeId}"]`);
                     if (currentBtn) {
                         currentBtn.textContent = i18next.t('invite');
                         currentBtn.disabled = false;
@@ -375,17 +264,10 @@ export function initializeEventListeners() {
         if (navigator.vibrate) navigator.vibrate([50, 40, 15]);
         await navigator.clipboard.writeText(code);
         uiElements.dashboardFlightCodeBtn.classList.add('copied');
-        setTimeout(
-            () => uiElements.dashboardFlightCodeBtn.classList.remove('copied'),
-            1200,
-        );
+        setTimeout(() => uiElements.dashboardFlightCodeBtn.classList.remove('copied'), 1200);
     });
 
-    document
-        .getElementById('shareAppBtn')
-        ?.addEventListener('click', () =>
-            document.getElementById('inviteBtn').click(),
-        );
+    document.getElementById('shareAppBtn')?.addEventListener('click', () => document.getElementById('inviteBtn').click());
 
     document.getElementById('shareScreenBtn')?.addEventListener('click', () => {
         const btn = document.getElementById('shareScreenBtn');
@@ -396,122 +278,11 @@ export function initializeEventListeners() {
 
     setupDragAndDrop();
     setupDonateButton();
-    setupChat();
-}
-
-function setupChat() {
-    const form = document.getElementById('chat-form');
-    const input = document.getElementById('chat-input');
-    const sendBtn = document.getElementById('chat-send-btn');
-
-    if (!form || !input || !sendBtn) return;
-
-    const getInputText = () => {
-        // Support contenteditable or input
-        if (input.isContentEditable) {
-            return (input.innerText || '').replace(/\u00a0/g, ' ').trim();
-        }
-        return (input.value || '').trim();
-    };
-
-    const clearInput = () => {
-        if (input.isContentEditable) {
-            input.textContent = '';
-        } else {
-            input.value = '';
-        }
-    };
-
-    const send = () => {
-        const text = getInputText();
-        if (!text) return;
-
-        const MAX_CHAT_CHARS = 20000;
-        if (text.length > MAX_CHAT_CHARS) {
-            showToast({
-                type: 'danger',
-                title: i18next.t('chatTooLongTitle', 'Message too long'),
-                body: i18next.t(
-                    'chatTooLongBody',
-                    'Limit is 20,000 characters. Consider sending a .txt via file sharing.',
-                ),
-                duration: 7000,
-            });
-            return;
-        }
-
-        const state = store.getState();
-        if (!state.peerInfo) {
-            showToast({
-                type: 'danger',
-                title: i18next.t('noPeerForChatTitle'),
-                body: i18next.t('noPeerForChatBody'),
-                duration: 5000,
-            });
-            return;
-        }
-
-        const payload = {
-            kind: 'chat',
-            text,
-            sentAt: Date.now(),
-        };
-
-        try {
-            sendData(JSON.stringify(payload));
-            appendChatMessage({
-                author: 'me',
-                text,
-                timestamp: payload.sentAt,
-            });
-            clearInput();
-        } catch (err) {
-            console.error('Failed to send chat message:', err);
-            showToast({
-                type: 'danger',
-                title: i18next.t('chatSendFailedTitle'),
-                body: i18next.t('chatSendFailedBody'),
-                duration: 5000,
-            });
-        }
-    };
-
-    // Click to send (since chat input is no longer in a form)
-    sendBtn.addEventListener('click', () => {
-        send();
-    });
-
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            send();
-        }
-    });
-
-    // Optional: enforce max length while typing for contenteditable
-    input.addEventListener('input', () => {
-        const MAX_CHAT_CHARS = 20000;
-        if (input.isContentEditable) {
-            const text = (input.innerText || '').replace(/\u00a0/g, ' ');
-            if (text.length > MAX_CHAT_CHARS) {
-                input.innerText = text.slice(0, MAX_CHAT_CHARS);
-                // move caret to end
-                const range = document.createRange();
-                range.selectNodeContents(input);
-                range.collapse(false);
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-            }
-        }
-    });
+    setupChatEvents(); // Use the new function
 }
 
 function setupDonateButton() {
-    const donateButtons = [
-        document.getElementById('donateBtnHeader'),
-        document.getElementById('ko-fiBtn'),
-    ];
+    const donateButtons = [document.getElementById('donateBtnHeader'), document.getElementById('ko-fiBtn')];
     const kofiIframe = document.getElementById('kofiframe');
     if (!kofiIframe) return;
     const loadKoFi = () => {
@@ -530,16 +301,13 @@ function setupDragAndDrop() {
     let dragCounter = 0;
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) =>
-        document.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-        }),
+        document.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); })
     );
     ['dragenter', 'dragover'].forEach((eventName) =>
-        dropZone.addEventListener(eventName, handleDragEnter, false),
+        dropZone.addEventListener(eventName, handleDragEnter, false)
     );
     ['dragleave', 'drop'].forEach((eventName) =>
-        dropZone.addEventListener(eventName, handleDragLeave, false),
+        dropZone.addEventListener(eventName, handleDragLeave, false)
     );
     dropZone.addEventListener('drop', handleDrop, false);
 
