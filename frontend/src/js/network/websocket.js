@@ -19,9 +19,8 @@ import {
     hideBoardingOverlay,
     failBoarding,
     clearAllPulseEffects,
-    resetChatView,
-    disableChat,
 } from '../ui/view.js';
+import { resetChatView, disableChat } from '../features/chat/index.js';
 import { showInviteOnboarding } from '../ui/onboarding.js';
 import { audioManager } from '../utils/audioManager.js';
 import { uiElements } from '../ui/dom.js';

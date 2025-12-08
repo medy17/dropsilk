@@ -6,17 +6,18 @@ import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
 import {
     enableDropZone,
-    enableChat,
     updateDashboardStatus,
     disableDropZone,
-    disableChat,
     renderNetworkUsersView,
+} from '../ui/view.js';
+import { enableChat, disableChat } from '../features/chat/index.js';
+import {
     showRemoteStreamView,
     hideRemoteStreamView,
     showLocalStreamView,
     hideLocalStreamView,
     updateShareButton,
-} from '../ui/view.js';
+} from '../ui/streaming.js';
 import {
     handleDataChannelMessage,
     ensureQueueIsActive,
@@ -50,7 +51,7 @@ async function getIceServers() {
         }
         // --- FIX: The backend now sends the full { iceServers: [...] } object ---
         const data = await response.json();
-        return data.iceServers; 
+        return data.iceServers;
     } catch (error) {
         console.error("Could not get TURN server credentials, falling back to public STUN.", error);
         // Fallback to a public STUN server if the backend call fails for any reason.
@@ -385,7 +386,7 @@ export async function startScreenShare({ withSystemAudio = true } = {}) {
         if (audioTrack) {
             try {
                 audioTrack.contentHint = 'music'; // hint for better quality
-            } catch (_) {}
+            } catch (_) { }
             systemAudioTrackSender = peerConnection.addTrack(
                 audioTrack,
                 localScreenStream
