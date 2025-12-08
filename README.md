@@ -6,13 +6,13 @@
     <br />
     <i>Instantly share files and screen, device-to-device. No cloud. No limits.</i>
   </p>
-  
+
   <p>
     <a href="https://dropsilk.xyz"><strong>Production Deployment »</strong></a> <br />
     <a href="https://dropsilk.vercel.app"><strong>Mirror »</strong></a> <br />
     <a href="https://github.com/medy17/DropSilk_Backend"><strong>Backend Code »</strong></a>
   </p>
-  
+
   <div>
     <img src="https://img.shields.io/github/license/medy17/dropsilk?style=for-the-badge" alt="License"/>
     <img src="https://img.shields.io/github/last-commit/medy17/dropsilk?style=for-the-badge" alt="Last Commit"/>
@@ -87,8 +87,8 @@ DropSilk is built on a few key architectural principles to ensure performance, p
 
 1.  **WebRTC for Peer-to-Peer Communication:** Instead of a traditional client-server upload/download model, DropSilk uses WebRTC. This creates a direct, encrypted connection between the two users' browsers. This means files never touch our server, dramatically enhancing privacy and speed, especially on a local network.
 2.  **Decoupled Signaling:** A lightweight WebSocket server acts as a "rendezvous" point. Its only job is to help two peers find each other and exchange the metadata needed to establish the direct WebRTC connection. Once the connection is made, the signaling server is no longer involved in the transfer itself.
-3.  **Non-Blocking File Processing with Web Workers:** Reading large files on the main browser thread can freeze the UI. DropSilk delegates all file reading and chunking to a dedicated Web Worker. The main thread simply sends the file object to the worker and receives ready-to-send chunks, ensuring the interface remains fluid and responsive at all times.
-4.  **OPFS for Stability (Safe Mode):** Browsers have memory limits. Attempting to buffer a multi-gigabyte file in RAM can cause the tab to crash. The "Safe Mode" feature leverages the **Origin Private File System (OPFS)** to stream incoming file chunks directly to disk instead of memory, making the application robust enough to handle massive files.
+3.  **Non-Blocking File Processing with Web Workers:** Reading large files on the main browser thread can freeze the UI. DropSilk delegates all file reading and chunking to a dedicated Web Worker. The main thread simply sends the file object to the worker and receives ready-to-send chunks, ensuring the interface remains fluid and responsive at all times. This logic is cleanly separated into dedicated modules like `fileSender.js` and `queueManager.js` for improved maintainability.
+4.  **OPFS for Stability (Safe Mode):** Browsers have memory limits. Attempting to buffer a multi-gigabyte file in RAM can cause the tab to crash. The "Safe Mode" feature leverages the **Origin Private File System (OPFS)** to stream incoming file chunks directly to disk instead of memory, making the application robust enough to handle massive files. This is managed by a dedicated `opfsHandler.js` module, which keeps the main receiving logic simple and focused on orchestration.
 5.  **Performance-First UI Rendering:** The application is engineered to feel fast, not just transfer files fast. Hidden UI elements with infinite animations (like loading spinners) are paused to prevent background CPU usage. All browser resources are hence dedicated to the user's current interaction for a smooth, lag-free experience.
 
 ### Project Structure
@@ -112,6 +112,7 @@ The following is a list of most of the important files and folders.
               <summary>scripts/</summary>
               <ul>
                 <li>update-locales.js</li>
+                <li>generate-version.js</li>
               </ul>
             </details>
           </li>
@@ -180,6 +181,19 @@ The following is a list of most of the important files and folders.
                     <ul>
                       <li>
                         <details>
+                          <summary>features/</summary>
+                          <ul>
+                            <li>chat/</li>
+                            <li>contact/</li>
+                            <li>invite/</li>
+                            <li>settings/</li>
+                            <li>theme/</li>
+                            <li>zip/</li>
+                          </ul>
+                        </details>
+                      </li>
+                      <li>
+                        <details>
                           <summary>network/</summary>
                           <ul>
                             <li>webrtc.js</li>
@@ -201,7 +215,13 @@ The following is a list of most of the important files and folders.
                         <details>
                           <summary>transfer/</summary>
                           <ul>
+                            <li>etrCalculator.js</li>
                             <li>fileHandler.js</li>
+                            <li>fileReceiver.js</li>
+                            <li>fileSender.js</li>
+                            <li>opfsHandler.js</li>
+                            <li>queueManager.js</li>
+                            <li>transferUI.js</li>
                             <li>zipHandler.js</li>
                           </ul>
                         </details>
@@ -211,10 +231,12 @@ The following is a list of most of the important files and folders.
                           <summary>ui/</summary>
                           <ul>
                             <li>dom.js</li>
+                            <li>drawer.js</li>
                             <li>effects.js</li>
                             <li>events.js</li>
                             <li>modals.js</li>
                             <li>onboarding.js</li>
+                            <li>streaming.js</li>
                             <li>view.js</li>
                           </ul>
                         </details>
@@ -225,6 +247,7 @@ The following is a list of most of the important files and folders.
                           <ul>
                             <li>audioManager.js</li>
                             <li>helpers.js</li>
+                            <li>security.js</li>
                             <li>toast.js</li>
                             <li>uploadHelper.js</li>
                           </ul>
@@ -234,6 +257,7 @@ The following is a list of most of the important files and folders.
                       <li>config.js</li>
                       <li>i18n.js</li>
                       <li>state.js</li>
+                      <li>version.gen.js</li>
                     </ul>
                   </details>
                 </li>
@@ -262,6 +286,7 @@ The following is a list of most of the important files and folders.
                             <li>audio.css</li>
                             <li>boarding.css</li>
                             <li>buttons.css</li>
+                            <li>chat.css</li>
                             <li>connections.css</li>
                             <li>dashboard.css</li>
                             <li>docx.css</li>
@@ -300,6 +325,22 @@ The following is a list of most of the important files and folders.
                           </ul>
                         </details>
                       </li>
+                    </ul>
+                  </details>
+                </li>
+                <li>
+                  <details>
+                    <summary>locales/</summary>
+                    <ul>
+                      <li>en.json</li>
+                      <li>es.json</li>
+                      <li>fr.json</li>
+                      <li>it.json</li>
+                      <li>ja.json</li>
+                      <li>ms.json</li>
+                      <li>pt.json</li>
+                      <li>sw.json</li>
+                      <li>zh.json</li>
                     </ul>
                   </details>
                 </li>
@@ -370,17 +411,17 @@ Open your browser and navigate to `http://localhost:5173` (or the address provid
 When the user clicks “View Email” in the Contact modal, the app renders a reCAPTCHA challenge and, on success, exchanges the token with the backend to retrieve the email address.
 
 - Env vars:
-  - `VITE_RECAPTCHA_SITE_KEY` must be set at build time (Vite only injects `VITE_*` variables).
-  - `VITE_API_BASE_URL` must be a full URL (include `http://` or `https://`).
+    - `VITE_RECAPTCHA_SITE_KEY` must be set at build time (Vite only injects `VITE_*` variables).
+    - `VITE_API_BASE_URL` must be a full URL (include `http://` or `https://`).
 - Client request:
-  - `POST ${VITE_API_BASE_URL}/request-email`
-  - Headers: `Content-Type: application/json`, `Accept: application/json`
-  - Body: `{"token":"<recaptcha_token_from_client>"}`
-  - No credentials/cookies.
+    - `POST ${VITE_API_BASE_URL}/request-email`
+    - Headers: `Content-Type: application/json`, `Accept: application/json`
+    - Body: `{"token":"<recaptcha_token_from_client>"}`
+    - No credentials/cookies.
 - Backend response contract:
-  - Success 200: `{"email":"you@domain.com"}`
-  - Failure 4xx/5xx: `{"error":"<string_reason>"}`
-    - Possible values currently: `reCAPTCHA token is required`, `recaptcha_failed`, `server_not_configured`, `internal_error`.
+    - Success 200: `{"email":"you@domain.com"}`
+    - Failure 4xx/5xx: `{"error":"<string_reason>"}`
+        - Possible values currently: `reCAPTCHA token is required`, `recaptcha_failed`, `server_not_configured`, `internal_error`.
 - CORS: the backend should allow your dev/staging/production origins for `POST` with `Content-Type`.
 
 ## License
