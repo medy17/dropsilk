@@ -5,6 +5,7 @@ frontend/node_modules
 frontend/release
 frontend/.env
 frontend/src/js/version.gen.js
+frontend/src/js/locales.gen.js
 /frontend/vite.config.js
 .idea
 .env

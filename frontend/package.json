@@ -10,10 +10,11 @@
   "main": "electron/main.js",
   "scripts": {
     "gen:version": "node scripts/generate-version.js",
-    "dev": "pnpm gen:version && vite --host",
-    "build:web": "pnpm gen:version && vite build",
+    "gen:locales": "node scripts/generate-locales.js",
+    "dev": "pnpm gen:version && pnpm gen:locales && vite --host",
+    "build:web": "pnpm gen:version && pnpm gen:locales && vite build",
     "dev:electron": "concurrently \"pnpm:dev\" \"cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
-    "build:electron": "pnpm gen:version && cross-env VITE_API_BASE_URL=https://dropsilk-backend.onrender.com vite build --base=./ && electron-builder",
+    "build:electron": "pnpm gen:version && pnpm gen:locales && cross-env VITE_API_BASE_URL=https://dropsilk-backend.onrender.com vite build --base=./ && electron-builder",
     "preview": "vite preview",
     "update-locales": "node scripts/update-locales.js",
     "test": "vitest run",
@@ -24,7 +25,10 @@
   "build": {
     "appId": "com.dropsilk.app",
     "productName": "DropSilk",
-    "files": ["dist/**/*", "electron/**/*"],
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
     "directories": {
       "buildResources": "assets",
       "output": "release"

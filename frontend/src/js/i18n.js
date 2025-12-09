@@ -2,6 +2,7 @@
 
 import i18next from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { SUPPORTED_LOCALES } from './locales.gen'; // Auto-generated
 // START-AUTOGEN-IMPORTS
 import en from '../locales/en.json';
 import es from '../locales/es.json';
@@ -14,13 +15,18 @@ import sw from '../locales/sw.json';
 import zh from '../locales/zh.json';
 // END-AUTOGEN-IMPORTS
 
+i18next.on('languageChanged', (lng) => {
+    document.documentElement.lang = lng;
+});
+
 i18next
     .use(LanguageDetector)
     .init({
         debug: import.meta.env?.DEV === true,
         fallbackLng: 'en',
+        supportedLngs: SUPPORTED_LOCALES,
         resources: {
-// START-AUTOGEN-RESOURCES
+            // START-AUTOGEN-RESOURCES
             en: {
                 translation: en,
             },
@@ -48,7 +54,7 @@ i18next
             zh: {
                 translation: zh,
             },
-// END-AUTOGEN-RESOURCES
+            // END-AUTOGEN-RESOURCES
         },
     });
 
