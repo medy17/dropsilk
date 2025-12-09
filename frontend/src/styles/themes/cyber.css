@@ -1,0 +1,31 @@
+/* CYBER THEME */
+body[data-theme="cyber"] {
+    --brilliant-blue: #fcee0a; /* Cyber Yellow */
+    --brilliant-pink: #ff003c; /* Cyber Red/Pink */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+    --c-panel-border: rgba(252, 238, 10, 0.4);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(252, 238, 10, 0.15), rgba(255, 0, 60, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(252, 238, 10, 0.15) 0%, rgba(255, 0, 60, 0.1) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(255, 0, 60, 0.15) 0%, rgba(252, 238, 10, 0.1) 100%);
+}
+
+/* Cyber Dark */
+body[data-theme="cyber"][data-mode="dark"] {
+    --dark-bg-base: #0f0f11;
+    --dark-bg-root: #050505;
+
+    --c-panel-shadow: 0 0 0 1px rgba(252, 238, 10, 0.2), 0 4px 15px rgba(255, 0, 60, 0.15);
+    --c-footer-border: rgba(255, 0, 60, 0.15);
+
+    --c-dropzone-bg: rgba(252, 238, 10, 0.03);
+    --c-dropzone-border: rgba(252, 238, 10, 0.4);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(252, 238, 10, 0.2), rgba(255, 0, 60, 0.15));
+
+    --c-progress-track: #2a2a2a;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(252, 238, 10, 0.25) 0%, rgba(255, 0, 60, 0.2) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(255, 0, 60, 0.25) 0%, rgba(252, 238, 10, 0.2) 100%);
+}

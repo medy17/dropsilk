@@ -16,4 +16,8 @@ module.exports = {
     ruby: { name: 'Ruby', darkColor: '#241414' },
     ocean: { name: 'Ocean', darkColor: '#102026' },
     nebula: { name: 'Nebula', darkColor: '#1a1626' },
+    terminal: { name: 'Terminal', darkColor: '#000000' },
+    cyber: { name: 'Cyber', darkColor: '#050505' },
+    coffee: { name: 'Coffee', darkColor: '#1a1613' },
+    royal: { name: 'Royal', darkColor: '#13111f' },
 };

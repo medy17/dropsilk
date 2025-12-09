@@ -3,8 +3,10 @@
 
 import { uiElements } from '../../ui/dom.js';
 import { store } from '../../state.js';
-import { getAllSettings } from '../settings/settingsData.js'; // Helper to get current state if needed (circular dep caution: we might need to read DOM/LocalStorage directly if settingsData imports this)
+import { getAllSettings } from '../settings/settingsData.js'; // Helper to get current state if needed
 import QRCode from 'qrcode';
+// --- NEW IMPORT ---
+import { THEME_CONFIG } from '../../themeConfig.gen.js';
 
 /**
  * Generates a QR code for the current flight code.
@@ -58,25 +60,22 @@ export function applyTheme(theme = null, mode = null) {
 
     const themeMetaColors = {
         light: '#ffffff',
-        dark: '#111113', // Default Dark
-        // START-AUTOGEN-META-COLORS
-        midnight: '#16161e', // Midnight Dark
-        sunset: '#191724', // Sunset Dark
-        forest: '#14241e', // Forest Dark
-        ruby: '#241414', // Ruby Dark
-        ocean: '#102026', // Ocean Dark
-        nebula: '#1a1626', // Nebula Dark
-// END-AUTOGEN-META-COLORS
+        dark: '#111113', // Default Dark Fallback
     };
+
+    // --- NEW LOGIC: Look up the dark mode color from the generated config ---
+    if (theme && theme !== 'default' && THEME_CONFIG[theme]) {
+        themeMetaColors.dark = THEME_CONFIG[theme].darkColor;
+    }
+    // -----------------------------------------------------------------------
 
     if (mode === 'light') {
         themeToggle?.setAttribute('aria-label', 'Switch to Shades Down (Dark Mode)');
         if (metaThemeColor) metaThemeColor.setAttribute('content', themeMetaColors.light);
     } else {
         themeToggle?.setAttribute('aria-label', 'Switch to Shades Up (Light Mode)');
-        // If mode is dark, check if we have specific theme background color, otherwise default dark
-        const darkColor = (theme && theme !== 'default' && themeMetaColors[theme]) ? themeMetaColors[theme] : themeMetaColors.dark;
-        if (metaThemeColor) metaThemeColor.setAttribute('content', darkColor);
+        // Use the dynamically resolved dark color
+        if (metaThemeColor) metaThemeColor.setAttribute('content', themeMetaColors.dark);
     }
 
     // Regenerate QR code if invite modal is open (QR colors depend on theme/mode)

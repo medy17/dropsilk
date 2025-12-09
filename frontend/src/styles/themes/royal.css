@@ -1,0 +1,31 @@
+/* ROYAL THEME */
+body[data-theme="royal"] {
+    --brilliant-blue: #a855f7; /* Royal Purple */
+    --brilliant-pink: #fbbf24; /* Amber/Gold */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+    --c-panel-border: rgba(168, 85, 247, 0.3);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(251, 191, 36, 0.08));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(168, 85, 247, 0.12) 0%, rgba(251, 191, 36, 0.10) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(251, 191, 36, 0.12) 0%, rgba(168, 85, 247, 0.08) 100%);
+}
+
+/* Royal Dark */
+body[data-theme="royal"][data-mode="dark"] {
+    --dark-bg-base: #1e1b2e; /* Deep purple/slate */
+    --dark-bg-root: #13111f;
+
+    --c-panel-shadow: 0 0 0 1px rgba(168, 85, 247, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3);
+    --c-footer-border: rgba(251, 191, 36, 0.1);
+
+    --c-dropzone-bg: rgba(168, 85, 247, 0.05);
+    --c-dropzone-border: rgba(168, 85, 247, 0.3);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(251, 191, 36, 0.1));
+
+    --c-progress-track: #2d2a40;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(168, 85, 247, 0.2) 0%, rgba(251, 191, 36, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(251, 191, 36, 0.2) 0%, rgba(168, 85, 247, 0.15) 100%);
+}

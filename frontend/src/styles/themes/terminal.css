@@ -1,0 +1,35 @@
+/* TERMINAL THEME */
+body[data-theme="terminal"] {
+    --brilliant-blue: #33ff00; /* Matrix Green */
+    --brilliant-pink: #008f11; /* Darker Terminal Green */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+    --c-panel-border: rgba(51, 255, 0, 0.3);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(51, 255, 0, 0.15), rgba(0, 143, 17, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(51, 255, 0, 0.15) 0%, rgba(0, 143, 17, 0.12) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(0, 143, 17, 0.15) 0%, rgba(51, 255, 0, 0.1) 100%);
+
+    /* Make error/success fit the monochrome vibe slightly better */
+    --c-success: #33ff00;
+    --c-danger: #ff3300;
+}
+
+/* Terminal Dark */
+body[data-theme="terminal"][data-mode="dark"] {
+    --dark-bg-base: #0a0a0a; /* Almost pitch black */
+    --dark-bg-root: #000000; /* Pitch black */
+
+    --c-panel-shadow: 0 0 0 1px rgba(51, 255, 0, 0.2), 0 4px 12px rgba(0, 50, 0, 0.5);
+    --c-footer-border: rgba(51, 255, 0, 0.15);
+
+    --c-dropzone-bg: rgba(0, 20, 0, 0.4);
+    --c-dropzone-border: rgba(51, 255, 0, 0.4);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(51, 255, 0, 0.2), rgba(0, 143, 17, 0.15));
+
+    --c-progress-track: #1a1a1a;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(51, 255, 0, 0.25) 0%, rgba(0, 143, 17, 0.2) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(0, 143, 17, 0.25) 0%, rgba(51, 255, 0, 0.2) 100%);
+}
