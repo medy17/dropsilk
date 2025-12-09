@@ -3,6 +3,7 @@
 
 import { uiElements } from '../../ui/dom.js';
 import { store } from '../../state.js';
+import { getAllSettings } from '../settings/settingsData.js'; // Helper to get current state if needed (circular dep caution: we might need to read DOM/LocalStorage directly if settingsData imports this)
 import QRCode from 'qrcode';
 
 /**
@@ -29,26 +30,56 @@ function generateQRCode() {
 }
 
 /**
- * Applies the specified theme to the document.
- * @param {string} theme - 'light' or 'dark'
- * @param {boolean} persist - Whether to save to localStorage (default: true)
+ * Applies the specified theme and mode to the document.
+ * @param {string|null} theme - 'default', 'midnight', 'sunset' or null to keep current
+ * @param {string|null} mode - 'light', 'dark' or null to keep current
  */
-export function applyTheme(theme, persist = true) {
+export function applyTheme(theme = null, mode = null) {
     const body = uiElements.body || document.body;
-    body.setAttribute('data-theme', theme);
-    if (persist) {
-        localStorage.setItem('dropsilk-theme', theme);
+
+    // Resolve current values if not provided
+    if (!theme || !mode) {
+        const currentSettings = getAllSettings();
+        if (!theme) theme = currentSettings.theme;
+        if (!mode) mode = currentSettings.mode;
     }
+
+    // Apply attributes
+    body.setAttribute('data-theme', theme);
+    body.setAttribute('data-mode', mode);
+
+    // Persist
+    localStorage.setItem('dropsilk-color-theme', theme);
+    localStorage.setItem('dropsilk-mode', mode);
+
+    // Update Meta and UI
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     const themeToggle = document.getElementById('theme-toggle');
-    if (theme === 'dark') {
-        themeToggle?.setAttribute('aria-label', 'Switch to Shades Up (Light Mode)');
-        if (metaThemeColor) metaThemeColor.setAttribute('content', '#111113');
-    } else {
+
+    const themeMetaColors = {
+        light: '#ffffff',
+        dark: '#111113', // Default Dark
+        // START-AUTOGEN-META-COLORS
+        midnight: '#16161e', // Midnight Dark
+        sunset: '#191724', // Sunset Dark
+        forest: '#14241e', // Forest Dark
+        ruby: '#241414', // Ruby Dark
+        ocean: '#102026', // Ocean Dark
+        nebula: '#1a1626', // Nebula Dark
+// END-AUTOGEN-META-COLORS
+    };
+
+    if (mode === 'light') {
         themeToggle?.setAttribute('aria-label', 'Switch to Shades Down (Dark Mode)');
-        if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff');
+        if (metaThemeColor) metaThemeColor.setAttribute('content', themeMetaColors.light);
+    } else {
+        themeToggle?.setAttribute('aria-label', 'Switch to Shades Up (Light Mode)');
+        // If mode is dark, check if we have specific theme background color, otherwise default dark
+        const darkColor = (theme && theme !== 'default' && themeMetaColors[theme]) ? themeMetaColors[theme] : themeMetaColors.dark;
+        if (metaThemeColor) metaThemeColor.setAttribute('content', darkColor);
     }
-    // Regenerate QR code if invite modal is open (QR colors depend on theme)
+
+    // Regenerate QR code if invite modal is open (QR colors depend on theme/mode)
     const inviteModal = document.getElementById('inviteModal');
     if (inviteModal && inviteModal.classList.contains('show')) {
         generateQRCode();
@@ -68,11 +99,14 @@ export function getCurrentTheme() {
  * Initializes the theme from localStorage and sets up the toggle listener.
  */
 export function initializeTheme() {
-    const savedTheme = localStorage.getItem('dropsilk-theme');
-    applyTheme(savedTheme || 'light', !!savedTheme);
+    // Migration logic handles initial read in settingsData, but we explicitly apply here to be safe
+    // getAllSettings includes the migration result if we call it.
+    const { theme, mode } = getAllSettings();
+    applyTheme(theme, mode);
+
     const themeToggle = document.getElementById('theme-toggle');
     themeToggle?.addEventListener('click', () => {
-        const currentTheme = getCurrentTheme();
-        applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        const currentMode = uiElements.body.getAttribute('data-mode') || 'light';
+        applyTheme(null, currentMode === 'dark' ? 'light' : 'dark');
     });
 }

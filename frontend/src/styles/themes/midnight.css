@@ -1,0 +1,32 @@
+/* MIDNIGHT THEME */
+body[data-theme="midnight"] {
+    --brilliant-blue: #7aa2f7;
+    --brilliant-pink: #bb9af7;
+
+    /* Re-bind variables to new colors */
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+    --c-panel-border: rgba(122, 162, 247, 0.3);
+
+    /* Theme-specific gradients (Light Mode defaults) */
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(122, 162, 247, 0.12), rgba(187, 154, 247, 0.08));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(122, 162, 247, 0.12) 0%, rgba(187, 154, 247, 0.10) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(187, 154, 247, 0.12) 0%, rgba(122, 162, 247, 0.08) 100%);
+}
+
+/* Midnight Dark */
+body[data-theme="midnight"][data-mode="dark"] {
+    --dark-bg-base: #1a1b26;
+    --dark-bg-root: #16161e;
+
+    --c-panel-shadow: 0 0 0 1px rgba(122, 162, 247, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3);
+    --c-footer-border: rgba(122, 162, 247, 0.1);
+    --c-dropzone-bg: rgba(122, 162, 247, 0.05);
+    --c-dropzone-border: rgba(122, 162, 247, 0.3);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(122, 162, 247, 0.15), rgba(187, 154, 247, 0.1));
+    --c-progress-track: #292e42;
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(122, 162, 247, 0.2) 0%, rgba(187, 154, 247, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(187, 154, 247, 0.2) 0%, rgba(122, 162, 247, 0.15) 100%);
+    --c-success: #9ece6a;
+    --c-danger: #f7768e;
+}

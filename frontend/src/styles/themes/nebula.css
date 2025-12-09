@@ -1,0 +1,31 @@
+/* NEBULA THEME */
+body[data-theme="nebula"] {
+    --brilliant-blue: #8b5cf6;
+    /* Violet */
+    --brilliant-pink: #d946ef;
+    /* Fuchsia */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+    --c-panel-border: rgba(139, 92, 246, 0.3);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(217, 70, 239, 0.08));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(139, 92, 246, 0.12) 0%, rgba(217, 70, 239, 0.10) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(217, 70, 239, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%);
+}
+
+/* Nebula Dark */
+body[data-theme="nebula"][data-mode="dark"] {
+    --dark-bg-base: #241e33;
+    /* Deep Violet-ish */
+    --dark-bg-root: #1a1626;
+
+    --c-panel-shadow: 0 0 0 1px rgba(139, 92, 246, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3);
+    --c-footer-border: rgba(217, 70, 239, 0.1);
+    --c-dropzone-bg: rgba(139, 92, 246, 0.05);
+    --c-dropzone-border: rgba(139, 92, 246, 0.3);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(217, 70, 239, 0.1));
+    --c-progress-track: #342e43;
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(139, 92, 246, 0.2) 0%, rgba(217, 70, 239, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(217, 70, 239, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+}

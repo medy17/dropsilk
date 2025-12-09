@@ -1,0 +1,24 @@
+/* =========================================
+   MODE OVERRIDES (Light / Dark)
+   ========================================= */
+
+body[data-mode="dark"] {
+    --c-bg: var(--dark-bg-root);
+    --c-text-primary: #f4f4f5;
+    --c-text-secondary: #a1a1aa;
+    --c-panel-bg: var(--dark-bg-base);
+    --c-panel-border: rgba(245, 169, 184, 0.4);
+    --c-panel-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.2);
+    --c-header-bg: rgba(24, 24, 27, 0.01);
+    --c-footer-bg: #111113;
+    --c-footer-border: rgba(255, 255, 255, 0.1);
+    --c-dropzone-bg: rgba(255, 255, 255, 0.02);
+    --c-dropzone-border: rgba(245, 169, 184, 0.25);
+    /* Note: Hover BGs and Btn BGs depend on theme colors, so we define generic ones or let themes override */
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(91, 206, 250, 0.1), rgba(245, 169, 184, 0.08));
+    --c-progress-track: #37373d;
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(91, 206, 250, 0.15) 0%, rgba(245, 169, 184, 0.12) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(245, 169, 184, 0.15) 0%, rgba(91, 206, 250, 0.10) 100%);
+    --c-success: #3ec6a8;
+    --c-danger: #f87171;
+}

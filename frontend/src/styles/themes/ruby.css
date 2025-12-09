@@ -1,0 +1,31 @@
+/* RUBY THEME */
+body[data-theme="ruby"] {
+    --brilliant-blue: #f43f5e;
+    /* Rose */
+    --brilliant-pink: #f97316;
+    /* Orange */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+    --c-panel-border: rgba(244, 63, 94, 0.3);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(244, 63, 94, 0.12), rgba(249, 115, 22, 0.08));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(244, 63, 94, 0.12) 0%, rgba(249, 115, 22, 0.10) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(249, 115, 22, 0.12) 0%, rgba(244, 63, 94, 0.08) 100%);
+}
+
+/* Ruby Dark */
+body[data-theme="ruby"][data-mode="dark"] {
+    --dark-bg-base: #2e1a1a;
+    /* Deep Red-ish */
+    --dark-bg-root: #241414;
+
+    --c-panel-shadow: 0 0 0 1px rgba(244, 63, 94, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3);
+    --c-footer-border: rgba(249, 115, 22, 0.1);
+    --c-dropzone-bg: rgba(244, 63, 94, 0.05);
+    --c-dropzone-border: rgba(244, 63, 94, 0.3);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(249, 115, 22, 0.1));
+    --c-progress-track: #3d2a2a;
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(244, 63, 94, 0.2) 0%, rgba(249, 115, 22, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(249, 115, 22, 0.2) 0%, rgba(244, 63, 94, 0.15) 100%);
+}

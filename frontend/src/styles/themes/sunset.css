@@ -1,0 +1,34 @@
+/* SUNSET THEME */
+body[data-theme="sunset"] {
+    --brilliant-blue: #f6c177;
+    /* Gold */
+    --brilliant-pink: #eb6f92;
+    /* Rose */
+
+    /* Re-bind variables to new colors */
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+    --c-panel-border: rgba(235, 111, 146, 0.3);
+
+    /* Theme-specific gradients (Light Mode defaults) */
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(246, 193, 119, 0.12), rgba(235, 111, 146, 0.08));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(246, 193, 119, 0.12) 0%, rgba(235, 111, 146, 0.10) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(235, 111, 146, 0.12) 0%, rgba(246, 193, 119, 0.08) 100%);
+}
+
+/* Sunset Dark */
+body[data-theme="sunset"][data-mode="dark"] {
+    --dark-bg-base: #232136;
+    --dark-bg-root: #191724;
+
+    --c-panel-shadow: 0 0 0 1px rgba(246, 193, 119, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3);
+    --c-footer-border: rgba(235, 111, 146, 0.1);
+    --c-dropzone-bg: rgba(235, 111, 146, 0.05);
+    --c-dropzone-border: rgba(246, 193, 119, 0.3);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(246, 193, 119, 0.15), rgba(235, 111, 146, 0.1));
+    --c-progress-track: #44415a;
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(246, 193, 119, 0.2) 0%, rgba(235, 111, 146, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(235, 111, 146, 0.2) 0%, rgba(246, 193, 119, 0.15) 100%);
+    --c-success: #9ccfd8;
+    --c-danger: #eb6f92;
+}

@@ -1,5 +1,15 @@
 /* 1. Base Styles */
-@import 'base/variables.css';
+@import 'themes/default.css';
+@import 'base/modes.css';
+
+/* START-AUTOGEN-THEMES */
+@import 'themes/midnight.css';
+@import 'themes/sunset.css';
+@import 'themes/forest.css';
+@import 'themes/ruby.css';
+@import 'themes/ocean.css';
+@import 'themes/nebula.css';
+/* END-AUTOGEN-THEMES */
 @import 'base/globals.css';
 @import 'base/theme.css';
 @import 'base/animations.css';
