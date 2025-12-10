@@ -1,6 +1,6 @@
 {
   "name": "dropsilk",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "author": "Ahmed medy17 <> (ahmed@dropsilk.xyz) (https://github.com/medy17)",
   "description": "A modern, privacy-focused, peer-to-peer file transfer application built with WebRTC",
   "repository": {
@@ -18,10 +18,10 @@
     "preview": "vite preview",
     "update-locales": "node scripts/update-locales.js",
     "update-themes": "node scripts/update-themes.js",
-    "test": "pnpm gen:locales && vitest run",
+    "test": "pnpm gen:locales && pnpm update-themes && vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "pnpm gen:locales && vitest run"
+    "test:run": "pnpm gen:locales && pnpm update-themes && vitest run"
   },
   "build": {
     "appId": "com.dropsilk.app",
