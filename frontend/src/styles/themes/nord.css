@@ -1,0 +1,34 @@
+/* NORD THEME */
+body[data-theme="nord"] {
+    --brilliant-blue: #88c0d0;
+    /* Ice Blue */
+    --brilliant-pink: #5e81ac;
+    /* Ocean Blue */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+
+    --c-panel-border: rgba(136, 192, 208, 0.4);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(136, 192, 208, 0.15), rgba(94, 129, 172, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(136, 192, 208, 0.15) 0%, rgba(94, 129, 172, 0.12) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(94, 129, 172, 0.15) 0%, rgba(136, 192, 208, 0.12) 100%);
+}
+
+/* Nord Dark - POLAR NIGHT */
+body[data-theme="nord"][data-mode="dark"] {
+    --dark-bg-base: #2e3440;
+    /* The official Nord Dark Grey */
+    --dark-bg-root: #242933;
+
+    --c-panel-shadow: 0 0 0 1px rgba(136, 192, 208, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2);
+    --c-footer-border: rgba(136, 192, 208, 0.1);
+
+    --c-dropzone-bg: rgba(136, 192, 208, 0.05);
+    --c-dropzone-border: rgba(136, 192, 208, 0.3);
+
+    --c-progress-track: #3b4252;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(136, 192, 208, 0.2) 0%, rgba(94, 129, 172, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(94, 129, 172, 0.2) 0%, rgba(136, 192, 208, 0.15) 100%);
+}

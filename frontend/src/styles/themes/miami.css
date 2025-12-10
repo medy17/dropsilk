@@ -1,0 +1,36 @@
+/* MIAMI THEME */
+body[data-theme="miami"] {
+    --brilliant-blue: #01cdfe;
+    /* Cyan */
+    --brilliant-pink: #ff71ce;
+    /* Hot Pink */
+
+    --c-primary: var(--brilliant-pink);
+    /* Pink is primary here */
+    --c-secondary: var(--brilliant-blue);
+
+    --c-panel-border: rgba(255, 113, 206, 0.4);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(255, 113, 206, 0.15), rgba(1, 205, 254, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(255, 113, 206, 0.15) 0%, rgba(1, 205, 254, 0.12) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(1, 205, 254, 0.15) 0%, rgba(255, 113, 206, 0.12) 100%);
+}
+
+/* Miami Dark - NIGHT DRIVE */
+body[data-theme="miami"][data-mode="dark"] {
+    --dark-bg-base: #2b213a;
+    /* Deep Purple/Indigo */
+    --dark-bg-root: #201a2b;
+
+    --c-panel-shadow: 0 0 0 1px rgba(255, 113, 206, 0.2), 0 4px 15px rgba(1, 205, 254, 0.15);
+    --c-footer-border: rgba(1, 205, 254, 0.15);
+
+    --c-dropzone-bg: rgba(255, 113, 206, 0.05);
+    --c-dropzone-border: rgba(255, 113, 206, 0.3);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(255, 113, 206, 0.15), rgba(1, 205, 254, 0.1));
+
+    --c-progress-track: #3e3354;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(255, 113, 206, 0.25) 0%, rgba(1, 205, 254, 0.2) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(1, 205, 254, 0.25) 0%, rgba(255, 113, 206, 0.2) 100%);
+}

@@ -1,0 +1,35 @@
+/* BIOLUME THEME */
+body[data-theme="biolume"] {
+    --brilliant-blue: #2dd4bf;
+    /* Teal */
+    --brilliant-pink: #0ea5e9;
+    /* Sky Blue */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+
+    --c-panel-border: rgba(45, 212, 191, 0.4);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(45, 212, 191, 0.15), rgba(14, 165, 233, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(45, 212, 191, 0.15) 0%, rgba(14, 165, 233, 0.12) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(14, 165, 233, 0.15) 0%, rgba(45, 212, 191, 0.12) 100%);
+}
+
+/* Biolume Dark - THE ABYSS */
+body[data-theme="biolume"][data-mode="dark"] {
+    --dark-bg-base: #042f2e;
+    /* Very dark teal/black */
+    --dark-bg-root: #020617;
+    /* Slate 950 */
+
+    --c-panel-shadow: 0 0 0 1px rgba(45, 212, 191, 0.15), 0 0 20px rgba(45, 212, 191, 0.05);
+    --c-footer-border: rgba(45, 212, 191, 0.1);
+
+    --c-dropzone-bg: rgba(17, 94, 89, 0.15);
+    --c-dropzone-border: rgba(45, 212, 191, 0.3);
+
+    --c-progress-track: #134e4a;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(45, 212, 191, 0.2) 0%, rgba(14, 165, 233, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(14, 165, 233, 0.2) 0%, rgba(45, 212, 191, 0.15) 100%);
+}

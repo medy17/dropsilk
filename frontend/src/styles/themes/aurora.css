@@ -1,0 +1,34 @@
+/* AURORA THEME */
+body[data-theme="aurora"] {
+    --brilliant-blue: #00f0ff;
+    /* Bright Cyan */
+    --brilliant-pink: #bf5af2;
+    /* Soft Violet */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+
+    --c-panel-border: rgba(0, 240, 255, 0.4);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(191, 90, 242, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(0, 240, 255, 0.15) 0%, rgba(191, 90, 242, 0.12) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(191, 90, 242, 0.15) 0%, rgba(0, 240, 255, 0.12) 100%);
+}
+
+/* Aurora Dark - BOREALIS */
+body[data-theme="aurora"][data-mode="dark"] {
+    --dark-bg-base: #23273a;
+    /* Slightly warmer/purpler slate than Nord */
+    --dark-bg-root: #1e2130;
+
+    --c-panel-shadow: 0 0 0 1px rgba(0, 240, 255, 0.15), 0 4px 15px rgba(191, 90, 242, 0.1);
+    --c-footer-border: rgba(0, 240, 255, 0.1);
+
+    --c-dropzone-bg: rgba(0, 240, 255, 0.05);
+    --c-dropzone-border: rgba(0, 240, 255, 0.3);
+
+    --c-progress-track: #363a4f;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(0, 240, 255, 0.2) 0%, rgba(191, 90, 242, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(191, 90, 242, 0.2) 0%, rgba(0, 240, 255, 0.15) 100%);
+}

@@ -1,0 +1,45 @@
+/* CHRISTMAS THEME (The "Not Rasta" Version) */
+body[data-theme="christmas"] {
+    /* Candy Cane Red - slightly pinker/cooler to pop */
+    --brilliant-blue: #ff3333;
+    /* Winter Mint/Emerald Green - NO YELLOW allowed */
+    --brilliant-pink: #10b981;
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+
+    --c-panel-border: rgba(255, 51, 51, 0.4);
+
+    /* The gradient is now Red -> Emerald. Crisp. */
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(255, 51, 51, 0.15), rgba(16, 185, 129, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(255, 51, 51, 0.15) 0%, rgba(16, 185, 129, 0.12) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, rgba(255, 51, 51, 0.12) 100%);
+}
+
+/* Christmas Dark - SILENT NIGHT */
+body[data-theme="christmas"][data-mode="dark"] {
+    /* Deep "Mulled Wine" Dark - subtle purple/red undertone, very cozy */
+    --dark-bg-base: #1a0f0f;
+    --dark-bg-root: #0f0505;
+
+    /* A snowy/frosty white glow on the shadows instead of colored neon */
+    --c-panel-shadow: 0 0 0 1px rgba(255, 51, 51, 0.3), 0 4px 20px rgba(255, 255, 255, 0.05);
+
+    --c-footer-border: rgba(255, 255, 255, 0.1);
+    /* Frosty border */
+
+    --c-dropzone-bg: rgba(255, 51, 51, 0.05);
+    --c-dropzone-border: rgba(255, 51, 51, 0.4);
+
+    /* Subtle holiday gradient */
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(255, 51, 51, 0.2), rgba(16, 185, 129, 0.15));
+
+    --c-progress-track: #2b1d1d;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(255, 51, 51, 0.3) 0%, rgba(16, 185, 129, 0.2) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(16, 185, 129, 0.3) 0%, rgba(255, 51, 51, 0.2) 100%);
+
+    /* Keep these classic */
+    --c-success: #10b981;
+    --c-danger: #ff3333;
+}

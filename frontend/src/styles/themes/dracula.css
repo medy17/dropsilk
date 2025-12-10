@@ -1,0 +1,40 @@
+/* DRACULA THEME */
+body[data-theme="dracula"] {
+    --brilliant-blue: #bd93f9;
+    /* Purple */
+    --brilliant-pink: #ff79c6;
+    /* Pink */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+
+    --c-panel-border: rgba(189, 147, 249, 0.4);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(189, 147, 249, 0.15), rgba(255, 121, 198, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(189, 147, 249, 0.15) 0%, rgba(255, 121, 198, 0.12) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(255, 121, 198, 0.15) 0%, rgba(189, 147, 249, 0.12) 100%);
+}
+
+/* Dracula Dark - THE CLASSIC */
+body[data-theme="dracula"][data-mode="dark"] {
+    --dark-bg-base: #282a36;
+    /* The official Dracula BG */
+    --dark-bg-root: #1e1f29;
+
+    --c-panel-shadow: 0 0 0 1px rgba(189, 147, 249, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
+    --c-footer-border: rgba(98, 114, 164, 0.3);
+    /* Blue-grey */
+
+    --c-dropzone-bg: rgba(68, 71, 90, 0.4);
+    --c-dropzone-border: rgba(189, 147, 249, 0.4);
+
+    --c-progress-track: #44475a;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(189, 147, 249, 0.25) 0%, rgba(255, 121, 198, 0.2) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(255, 121, 198, 0.25) 0%, rgba(189, 147, 249, 0.2) 100%);
+
+    --c-success: #50fa7b;
+    /* Dracula Green */
+    --c-danger: #ff5555;
+    /* Dracula Red */
+}
