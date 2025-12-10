@@ -5,11 +5,11 @@ import i18next from '../../i18n.js';
 import { audioManager } from '../../utils/audioManager.js';
 import { applyTheme } from '../theme/index.js';
 import {
-    getAllSettings,
-    getPreviewConsentMap,
-    setPreviewConsent,
-    applyAnimationQuality,
-    applySystemFont,
+  getAllSettings,
+  getPreviewConsentMap,
+  setPreviewConsent,
+  applyAnimationQuality,
+  applySystemFont,
 } from './settingsData.js';
 
 // --- NEW IMPORT ---
@@ -21,35 +21,26 @@ import { AVAILABLE_THEMES, THEME_CONFIG } from '../../themeConfig.gen.js';
  * @returns {string} HTML string
  */
 export function createSettingsModalHTML() {
-    const settings = getAllSettings();
-    const consentMap = getPreviewConsentMap();
-    const pptxConsent = consentMap.pptx || 'ask';
+  const settings = getAllSettings();
+  const consentMap = getPreviewConsentMap();
+  const pptxConsent = consentMap.pptx || 'ask';
 
-    // --- DYNAMIC OPTION GENERATION ---
-    // Instead of hardcoding HTML, we map over the keys from your generated file.
-    const themeOptions = AVAILABLE_THEMES.map(key => {
-        const config = THEME_CONFIG[key];
-        // Check if this is the currently selected theme
-        const isSelected = settings.theme === key ? 'selected' : '';
-        // Create the option tag
-        return `<option value="${key}" ${isSelected}>${config.name}</option>`;
-    }).join('\n');
+  // --- DYNAMIC OPTION GENERATION ---
+  // Instead of hardcoding HTML, we map over the keys from your generated file.
+  const themeOptions = AVAILABLE_THEMES.map(key => {
+    const config = THEME_CONFIG[key];
+    // Check if this is the currently selected theme
+    const isSelected = settings.theme === key ? 'selected' : '';
+    // Create the option tag
+    return `<option value="${key}" ${isSelected}>${config.name}</option>`;
+  }).join('\n');
 
-    return `
+  return `
       <div class="settings-list">
         ${createToggleSetting('sounds', i18next.t('sounds'), i18next.t('soundsDescription'), settings.sounds)}
         ${createToggleSetting('analytics', i18next.t('analytics'), i18next.t('analyticsDescription'), settings.analytics)}
         
-        <div class="settings-item">
-          <div class="settings-item-info">
-            <div class="settings-item-title">${i18next.t('mode', 'Mode')}</div>
-            <div class="settings-item-desc">${i18next.t('modeDescription', 'Choose light or dark appearance.')}</div>
-          </div>
-          <div class="segmented" id="settings-mode-selector">
-            <button type="button" class="seg-btn ${settings.mode === 'light' ? 'active' : ''}" data-value="light">${i18next.t('light')}</button>
-            <button type="button" class="seg-btn ${settings.mode === 'dark' ? 'active' : ''}" data-value="dark">${i18next.t('dark')}</button>
-          </div>
-        </div>
+        ${createToggleSetting('mode', i18next.t('darkMode'), i18next.t('darkModeDescription'), settings.mode === 'dark')}
 
         <div class="settings-item">
           <div class="settings-item-info">
@@ -133,7 +124,7 @@ export function createSettingsModalHTML() {
  * Creates a toggle setting item HTML
  */
 function createToggleSetting(id, title, description, checked, disabled = false) {
-    return `
+  return `
         <div class="settings-item">
           <div class="settings-item-info">
             <div class="settings-item-title">${title}</div>
@@ -151,21 +142,21 @@ function createToggleSetting(id, title, description, checked, disabled = false) 
  * Gets language options HTML
  */
 function getLanguageOptions() {
-    const langs = [
-        { code: 'en', name: 'english' },
-        { code: 'es', name: 'spanish' },
-        { code: 'fr', name: 'french' },
-        { code: 'it', name: 'italian' },
-        { code: 'ja', name: 'japanese' },
-        { code: 'ms', name: 'malay' },
-        { code: 'pt', name: 'portuguese' },
-        { code: 'sw', name: 'swahili' },
-        { code: 'zh', name: 'chinese' },
-    ];
+  const langs = [
+    { code: 'en', name: 'english' },
+    { code: 'es', name: 'spanish' },
+    { code: 'fr', name: 'french' },
+    { code: 'it', name: 'italian' },
+    { code: 'ja', name: 'japanese' },
+    { code: 'ms', name: 'malay' },
+    { code: 'pt', name: 'portuguese' },
+    { code: 'sw', name: 'swahili' },
+    { code: 'zh', name: 'chinese' },
+  ];
 
-    return langs.map(lang =>
-        `<option value="${lang.code}" ${i18next.language.startsWith(lang.code) ? 'selected' : ''}>${i18next.t(lang.name)}</option>`
-    ).join('\n');
+  return langs.map(lang =>
+    `<option value="${lang.code}" ${i18next.language.startsWith(lang.code) ? 'selected' : ''}>${i18next.t(lang.name)}</option>`
+  ).join('\n');
 }
 
 /**
@@ -174,107 +165,105 @@ function getLanguageOptions() {
  * @param {Function} onSave - Callback when settings change
  */
 export function bindSettingsEvents(container, onSave) {
-    // Sounds toggle
-    container.querySelector('#settings-sounds')?.addEventListener('change', (e) => {
-        if (e.target.checked) audioManager.enable();
-        else audioManager.disable();
-        onSave?.();
-    });
+  // Sounds toggle
+  container.querySelector('#settings-sounds')?.addEventListener('change', (e) => {
+    if (e.target.checked) audioManager.enable();
+    else audioManager.disable();
+    onSave?.();
+  });
 
-    // Analytics toggle
-    container.querySelector('#settings-analytics')?.addEventListener('change', (e) => {
-        localStorage.setItem('dropsilk-privacy-consent', e.target.checked ? 'true' : 'false');
-        onSave?.();
-    });
+  // Analytics toggle
+  container.querySelector('#settings-analytics')?.addEventListener('change', (e) => {
+    localStorage.setItem('dropsilk-privacy-consent', e.target.checked ? 'true' : 'false');
+    onSave?.();
+  });
 
-    // Mode selector
-    container.querySelector('#settings-mode-selector')?.addEventListener('click', (e) => {
-        const btn = e.target.closest('.seg-btn');
-        if (!btn) return;
-        container.querySelectorAll('#settings-mode-selector .seg-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        applyTheme(null, btn.dataset.value); // Update mode only
-        onSave?.();
-    });
+  // Mode selector
+  // Dark Mode toggle
+  container.querySelector('#settings-mode')?.addEventListener('change', (e) => {
+    const mode = e.target.checked ? 'dark' : 'light';
+    applyTheme(null, mode); // Update mode only
+    onSave?.();
+  });
 
-    // Theme selector
-    container.querySelector('#settings-theme-selector')?.addEventListener('change', (e) => {
-        applyTheme(e.target.value, null); // Update theme only
-        onSave?.();
-    });
+  // Theme selector
+  container.querySelector('#settings-theme-selector')?.addEventListener('change', (e) => {
+    applyTheme(e.target.value, null); // Update theme only
+    onSave?.();
+  });
 
-    // Animation quality segmented control
-    container.querySelector('#settings-animation-quality')?.addEventListener('click', (e) => {
-        const btn = e.target.closest('.seg-btn');
-        if (!btn) return;
-        container.querySelectorAll('#settings-animation-quality .seg-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        applyAnimationQuality(btn.dataset.value);
-        onSave?.();
-    });
+  // Animation quality segmented control
+  container.querySelector('#settings-animation-quality')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.seg-btn');
+    if (!btn) return;
+    container.querySelectorAll('#settings-animation-quality .seg-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyAnimationQuality(btn.dataset.value);
+    onSave?.();
+  });
 
-    // Language select
-    container.querySelector('#settings-language')?.addEventListener('change', (e) => {
-        i18next.changeLanguage(e.target.value);
-        localStorage.setItem('dropsilk-language', e.target.value);
-        onSave?.();
-    });
+  // Language select
+  container.querySelector('#settings-language')?.addEventListener('change', (e) => {
+    i18next.changeLanguage(e.target.value);
+    localStorage.setItem('dropsilk-language', e.target.value);
+    onSave?.();
+  });
 
-    // System font toggle
-    container.querySelector('#settings-system-font')?.addEventListener('change', (e) => {
-        localStorage.setItem('dropsilk-system-font', e.target.checked ? 'true' : 'false');
-        applySystemFont(e.target.checked);
-        onSave?.();
-    });
+  // System font toggle
+  container.querySelector('#settings-system-font')?.addEventListener('change', (e) => {
+    localStorage.setItem('dropsilk-system-font', e.target.checked ? 'true' : 'false');
+    applySystemFont(e.target.checked);
+    onSave?.();
+  });
 
-    // Auto-download toggle
-    container.querySelector('#settings-auto-download')?.addEventListener('change', (e) => {
-        localStorage.setItem('dropsilk-auto-download', e.target.checked ? 'true' : 'false');
-        const sizeContainer = container.querySelector('#auto-download-size-container');
-        if (sizeContainer) sizeContainer.style.display = e.target.checked ? '' : 'none';
-        onSave?.();
-    });
+  // Auto-download toggle
+  container.querySelector('#settings-auto-download')?.addEventListener('change', (e) => {
+    localStorage.setItem('dropsilk-auto-download', e.target.checked ? 'true' : 'false');
+    const sizeContainer = container.querySelector('#auto-download-size-container');
+    if (sizeContainer) sizeContainer.style.display = e.target.checked ? '' : 'none';
+    onSave?.();
+  });
 
-    // Auto-download max size
-    container.querySelector('#settings-auto-download-max-size')?.addEventListener('change', (e) => {
-        localStorage.setItem('dropsilk-auto-download-max-size', e.target.value);
-        onSave?.();
-    });
+  // Auto-download max size
+  container.querySelector('#settings-auto-download-max-size')?.addEventListener('change', (e) => {
+    localStorage.setItem('dropsilk-auto-download-max-size', e.target.value);
+    onSave?.();
+  });
 
-    // PPTX consent segmented control
-    container.querySelector('#settings-pptx-consent')?.addEventListener('click', (e) => {
-        const btn = e.target.closest('.seg-btn');
-        if (!btn) return;
-        container.querySelectorAll('#settings-pptx-consent .seg-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        setPreviewConsent('pptx', btn.dataset.value);
-        onSave?.();
-    });
+  // PPTX consent segmented control
+  container.querySelector('#settings-pptx-consent')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.seg-btn');
+    if (!btn) return;
+    container.querySelectorAll('#settings-pptx-consent .seg-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    setPreviewConsent('pptx', btn.dataset.value);
+    onSave?.();
+  });
 
-    // OPFS toggle
-    container.querySelector('#settings-opfs-buffer')?.addEventListener('change', (e) => {
-        localStorage.setItem('dropsilk-use-opfs-buffer', e.target.checked ? 'true' : 'false');
-        onSave?.();
-    });
+  // OPFS toggle
+  container.querySelector('#settings-opfs-buffer')?.addEventListener('change', (e) => {
+    localStorage.setItem('dropsilk-use-opfs-buffer', e.target.checked ? 'true' : 'false');
+    onSave?.();
+  });
 
-    // Chunk size input
-    container.querySelector('#settings-chunk-size')?.addEventListener('change', (e) => {
-        localStorage.setItem('dropsilk-chunk-size', e.target.value);
-        onSave?.();
-    });
+  // Chunk size input
+  container.querySelector('#settings-chunk-size')?.addEventListener('change', (e) => {
+    localStorage.setItem('dropsilk-chunk-size', e.target.value);
+    onSave?.();
+  });
 
-    // Reset preferences button
-    container.querySelector('#reset-preferences-btn')?.addEventListener('click', () => {
-        if (confirm(i18next.t('resetPreferencesConfirm', 'Are you sure you want to reset all preferences?'))) {
-            const keys = [
-                'dropsilk-mode', 'dropsilk-color-theme', 'dropsilk-animation-quality', 'dropsilk-system-font',
-                'dropsilk-auto-download', 'dropsilk-auto-download-max-size', 'dropsilk-chunk-size',
-                'dropsilk-use-opfs-buffer', 'dropsilk-preview-consent', 'dropsilk-language',
-            ]; keys.forEach(key => localStorage.removeItem(key));
-            audioManager.enable();
-            // We reload anyway, but for clarity:
-            applyTheme('default', 'light');
-            location.reload();
-        }
-    });
+  // Reset preferences button
+  container.querySelector('#reset-preferences-btn')?.addEventListener('click', () => {
+    if (confirm(i18next.t('resetPreferencesConfirm', 'Are you sure you want to reset all preferences?'))) {
+      const keys = [
+        'dropsilk-mode', 'dropsilk-color-theme', 'dropsilk-animation-quality', 'dropsilk-system-font',
+        'dropsilk-auto-download', 'dropsilk-auto-download-max-size', 'dropsilk-chunk-size',
+        'dropsilk-use-opfs-buffer', 'dropsilk-preview-consent', 'dropsilk-language',
+      ]; keys.forEach(key => localStorage.removeItem(key));
+      audioManager.enable();
+      // We reload anyway, but for clarity:
+      applyTheme('default', 'light');
+      location.reload();
+    }
+  });
 }

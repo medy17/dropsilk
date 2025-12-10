@@ -53,19 +53,22 @@ export function getAllSettings() {
  */
 export function getSettingsSummary() {
     const settings = getAllSettings();
-    const animationLabels = { quality: 'Best', performance: 'Basic', off: 'Off' };
+    const onState = '<span style="color: var(--c-success); font-weight: bold;">On</span>';
+    const offState = '<span style="color: var(--c-danger); font-weight: bold;">Off</span>';
+
+    const animationLabels = { quality: 'Best', performance: 'Basic', off: offState };
     const pptxLabels = { allow: 'Allow', deny: 'Deny', ask: 'Ask' };
 
     const parts = [
-        `Sounds: ${settings.sounds ? 'On' : 'Off'}`,
-        `Analytics: ${settings.analytics ? 'On' : 'Off'}`,
+        `Sounds: ${settings.sounds ? onState : offState}`,
+        `Analytics: ${settings.analytics ? onState : offState}`,
         `Mode: ${settings.mode === 'dark' ? 'Dark' : 'Light'}`,
         `Theme: ${settings.theme.charAt(0).toUpperCase() + settings.theme.slice(1)}`,
         `Animation: ${animationLabels[settings.animationQuality] || 'Basic'}`,
         `Font: ${settings.systemFont ? 'System' : 'Default'}`,
-        `Auto-Download: ${settings.autoDownload ? 'On' : 'Off'}`,
+        `Auto-Download: ${settings.autoDownload ? onState : offState}`,
         `PPTX Preview: ${pptxLabels[settings.pptxConsent] || 'Ask'}`,
-        `Safe Mode (OPFS): ${settings.opfsEnabled ? 'On' : 'Off'}`,
+        `Safe Mode (OPFS): ${settings.opfsEnabled ? onState : offState}`,
     ];
 
     return parts.join(' • ');
