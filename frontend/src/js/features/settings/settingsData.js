@@ -2,7 +2,7 @@
 // Handles settings state and persistence
 
 import { audioManager } from '../../utils/audioManager.js';
-import { applyTheme, getCurrentTheme } from '../theme/index.js';
+import { applyTheme } from '../theme/index.js';
 import i18next from '../../i18n.js';
 
 /**
@@ -118,45 +118,45 @@ export function setPreviewConsent(type, value) {
  */
 export function updateSetting(key, value) {
     switch (key) {
-        case 'sounds':
-            if (value) audioManager.enable();
-            else audioManager.disable();
-            break;
-        case 'analytics':
-            localStorage.setItem('dropsilk-privacy-consent', value ? 'true' : 'false');
-            break;
-        case 'mode':
-            applyTheme(null, value); // Pass null theme to only update mode
-            break;
-        case 'theme':
-            applyTheme(value, null); // Pass null mode to only update theme
-            break;
-        case 'animationQuality':
-            applyAnimationQuality(value);
-            break;
-        case 'systemFont':
-            localStorage.setItem('dropsilk-system-font', value ? 'true' : 'false');
-            applySystemFont(value);
-            break;
-        case 'autoDownload':
-            localStorage.setItem('dropsilk-auto-download', value ? 'true' : 'false');
-            break;
-        case 'autoDownloadMaxSize':
-            localStorage.setItem('dropsilk-auto-download-max-size', String(value));
-            break;
-        case 'chunkSize':
-            localStorage.setItem('dropsilk-chunk-size', String(value));
-            break;
-        case 'opfsEnabled':
-            localStorage.setItem('dropsilk-use-opfs-buffer', value ? 'true' : 'false');
-            break;
-        case 'pptxConsent':
-            setPreviewConsent('pptx', value);
-            break;
-        case 'language':
-            i18next.changeLanguage(value);
-            localStorage.setItem('dropsilk-language', value);
-            break;
+    case 'sounds':
+        if (value) audioManager.enable();
+        else audioManager.disable();
+        break;
+    case 'analytics':
+        localStorage.setItem('dropsilk-privacy-consent', value ? 'true' : 'false');
+        break;
+    case 'mode':
+        applyTheme(null, value); // Pass null theme to only update mode
+        break;
+    case 'theme':
+        applyTheme(value, null); // Pass null mode to only update theme
+        break;
+    case 'animationQuality':
+        applyAnimationQuality(value);
+        break;
+    case 'systemFont':
+        localStorage.setItem('dropsilk-system-font', value ? 'true' : 'false');
+        applySystemFont(value);
+        break;
+    case 'autoDownload':
+        localStorage.setItem('dropsilk-auto-download', value ? 'true' : 'false');
+        break;
+    case 'autoDownloadMaxSize':
+        localStorage.setItem('dropsilk-auto-download-max-size', String(value));
+        break;
+    case 'chunkSize':
+        localStorage.setItem('dropsilk-chunk-size', String(value));
+        break;
+    case 'opfsEnabled':
+        localStorage.setItem('dropsilk-use-opfs-buffer', value ? 'true' : 'false');
+        break;
+    case 'pptxConsent':
+        setPreviewConsent('pptx', value);
+        break;
+    case 'language':
+        i18next.changeLanguage(value);
+        localStorage.setItem('dropsilk-language', value);
+        break;
     }
 }
 

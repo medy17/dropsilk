@@ -19,8 +19,9 @@ function replaceBlock(content, blockName, newContent) {
     let endTag = startTag.replace('START', 'END');
 
     // Escape for regex
-    const safeStart = startTag.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    const safeEnd = endTag.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const escapeRegex = new RegExp('[-\\/\\\\^$*+?.()|[\\]{}]', 'g');
+    const safeStart = startTag.replace(escapeRegex, '\\$&');
+    const safeEnd = endTag.replace(escapeRegex, '\\$&');
 
     const regex = new RegExp(`${safeStart}[\\s\\S]*?${safeEnd}`, 'g');
 
@@ -36,7 +37,7 @@ function main() {
     console.log('🎨 Updating Themes...');
 
     // Ensure generated directory exists
-    if (!fs.existsSync(generatedConfigPath)){
+    if (!fs.existsSync(generatedConfigPath)) {
         fs.mkdirSync(generatedConfigPath, { recursive: true });
     }
 

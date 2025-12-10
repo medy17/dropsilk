@@ -2,8 +2,8 @@
 // This file contains pure utility functions that can be used anywhere in the application.
 
 export function generateRandomName() {
-    const adjectives = ["Swift", "Clever", "Silent", "Agile", "Brave", "Bright", "Eager", "Bold", "Flying", "Soaring", "Windy", "Cloudy"];
-    const nouns = ["Fox", "Jaguar", "Eagle", "Sparrow", "Lion", "Tiger", "River", "Sky", "Aero", "Jet", "Pilot", "Wing"];
+    const adjectives = ['Swift', 'Clever', 'Silent', 'Agile', 'Brave', 'Bright', 'Eager', 'Bold', 'Flying', 'Soaring', 'Windy', 'Cloudy'];
+    const nouns = ['Fox', 'Jaguar', 'Eagle', 'Sparrow', 'Lion', 'Tiger', 'River', 'Sky', 'Aero', 'Jet', 'Pilot', 'Wing'];
     return `${adjectives[Math.floor(Math.random() * adjectives.length)]}${nouns[Math.floor(Math.random() * nouns.length)]}${Math.floor(Math.random() * 900) + 100}`;
 }
 

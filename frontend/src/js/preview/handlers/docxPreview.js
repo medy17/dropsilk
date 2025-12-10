@@ -1,6 +1,6 @@
 // js/preview/handlers/docxPreview.js
 // Renders DOCX and other word processing documents using Mammoth.js.
-import * as mammoth from "mammoth";
+import * as mammoth from 'mammoth';
 
 export default async function renderDocxPreview(blob, contentElement) {
     try {

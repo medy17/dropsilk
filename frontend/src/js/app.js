@@ -1,20 +1,20 @@
 // js/app.js
 // This is the main entry point for the application.
 import { VERSION } from './version.gen.js';
-import { initEffects } from "./ui/effects.js";
-import "../styles/index.css"; // load for vite
-import i18next from "./i18n.js";
-import { store } from "./state.js";
-import { renderUserName, showBoardingOverlay, initializeOnboardingPulses } from "./ui/view.js";
-import { initializeEventListeners } from "./ui/events.js";
-import { initializeModals } from "./ui/modals.js";
-import { connect as connectWebSocket } from "./network/websocket.js";
-import { showWelcomeOnboarding } from "./ui/onboarding.js";
-import { inject } from "@vercel/analytics";
-import { RECAPTCHA_SITE_KEY, API_BASE_URL } from "./config.js";
+import { initEffects } from './ui/effects.js';
+import '../styles/index.css'; // load for vite
+import i18next from './i18n.js';
+import { store } from './state.js';
+import { renderUserName, showBoardingOverlay, initializeOnboardingPulses } from './ui/view.js';
+import { initializeEventListeners } from './ui/events.js';
+import { initializeModals } from './ui/modals.js';
+import { connect as connectWebSocket } from './network/websocket.js';
+import { showWelcomeOnboarding } from './ui/onboarding.js';
+import { inject } from '@vercel/analytics';
+import { RECAPTCHA_SITE_KEY, API_BASE_URL } from './config.js';
 
 function initializeGlobalUI() {
-    console.log("Initializing Global UI (Theme, Modals)...");
+    console.log('Initializing Global UI (Theme, Modals)...');
     initializeModals();
 }
 
@@ -36,7 +36,7 @@ function translateStaticElements() {
 
 // Function now accepts a parameter to know if the user was invited
 function initializeAppCore(isInvitedUser = false) {
-    console.log("Initializing App Core Logic...");
+    console.log('Initializing App Core Logic...');
 
     // Attach all event listeners specific to the app.
     initializeEventListeners();
@@ -76,22 +76,22 @@ function activateDeferredScript(byId, { async = true, defer = false } = {}) {
     if (!placeholder) {
         return Promise.resolve();
     }
-    if (placeholder.getAttribute("data-activated") === "true") {
+    if (placeholder.getAttribute('data-activated') === 'true') {
         return Promise.resolve(); // already activated
     }
 
-    const src = placeholder.getAttribute("data-src") || placeholder.src || "";
+    const src = placeholder.getAttribute('data-src') || placeholder.src || '';
     if (!src) {
         return Promise.resolve();
     }
 
     return new Promise((resolve, reject) => {
-        const s = document.createElement("script");
+        const s = document.createElement('script');
         s.src = src;
         if (async) s.async = true;
         if (defer) s.defer = true;
         s.onload = () => {
-            placeholder.setAttribute("data-activated", "true");
+            placeholder.setAttribute('data-activated', 'true');
             resolve();
         };
         s.onerror = (e) => reject(e);
@@ -107,25 +107,25 @@ let analyticsLoaded = false;
 function activateAnalytics() {
     if (analyticsLoaded) return;
 
-    const loaderPlaceholder = document.getElementById("gtag-script-loader");
-    const initPlaceholder = document.getElementById("gtag-script-init");
+    const loaderPlaceholder = document.getElementById('gtag-script-loader');
+    const initPlaceholder = document.getElementById('gtag-script-init');
 
     if (!loaderPlaceholder || !initPlaceholder) {
-        console.warn("Analytics placeholders not found; skipping analytics.");
+        console.warn('Analytics placeholders not found; skipping analytics.');
         return;
     }
 
-    activateDeferredScript("gtag-script-loader")
+    activateDeferredScript('gtag-script-loader')
         .then(() => {
-            const initScript = document.createElement("script");
-            initScript.textContent = initPlaceholder.textContent || "";
+            const initScript = document.createElement('script');
+            initScript.textContent = initPlaceholder.textContent || '';
             document.head.appendChild(initScript);
-            initPlaceholder.setAttribute("data-activated", "true");
+            initPlaceholder.setAttribute('data-activated', 'true');
             analyticsLoaded = true;
-            console.log("Analytics activated after consent.");
+            console.log('Analytics activated after consent.');
         })
         .catch((err) => {
-            console.error("Failed to load analytics:", err);
+            console.error('Failed to load analytics:', err);
         });
 }
 
@@ -135,14 +135,14 @@ function activateAnalytics() {
 let speedInsightsLoaded = false;
 function activateSpeedInsights() {
     if (speedInsightsLoaded) return;
-    const id = "vercel-speed-insights";
+    const id = 'vercel-speed-insights';
     activateDeferredScript(id)
         .then(() => {
             speedInsightsLoaded = true;
-            console.log("Speed Insights activated after consent.");
+            console.log('Speed Insights activated after consent.');
         })
         .catch((err) => {
-            console.error("Failed to load Speed Insights:", err);
+            console.error('Failed to load Speed Insights:', err);
         });
 }
 
@@ -155,9 +155,9 @@ function activateVercelAnalytics() {
     try {
         inject();
         vercelAnalyticsLoaded = true;
-        console.log("Vercel Analytics activated after consent.");
+        console.log('Vercel Analytics activated after consent.');
     } catch (e) {
-        console.error("Failed to load Vercel Analytics:", e);
+        console.error('Failed to load Vercel Analytics:', e);
     }
 }
 
@@ -177,48 +177,48 @@ let recaptchaScriptLoading = null;
 function getRecaptchaSiteKey() {
     // Prefer build-time env; fall back to any DOM-provided key if needed.
     if (RECAPTCHA_SITE_KEY) return RECAPTCHA_SITE_KEY;
-    const scriptPh = document.getElementById("recaptcha-script");
-    const container = document.getElementById("recaptcha-container");
-    const keyFromScript = scriptPh?.getAttribute("data-sitekey") || "";
-    const keyFromContainer = container?.getAttribute("data-sitekey") || "";
-    const sitekey = keyFromScript || keyFromContainer || "";
+    const scriptPh = document.getElementById('recaptcha-script');
+    const container = document.getElementById('recaptcha-container');
+    const keyFromScript = scriptPh?.getAttribute('data-sitekey') || '';
+    const keyFromContainer = container?.getAttribute('data-sitekey') || '';
+    const sitekey = keyFromScript || keyFromContainer || '';
     if (!sitekey) {
         console.warn(
-            "reCAPTCHA site key not found. Set data-sitekey on #recaptcha-script or #recaptcha-container."
+            'reCAPTCHA site key not found. Set data-sitekey on #recaptcha-script or #recaptcha-container.'
         );
     }
     return sitekey;
 }
 
 function revealEmailUI() {
-    const pretext = document.getElementById("captcha-pretext");
-    const initial = document.getElementById("email-view-initial-state");
-    const captcha = document.getElementById("email-view-captcha-state");
-    const revealed = document.getElementById("email-view-revealed-state");
-    if (pretext) pretext.style.display = "none";
-    if (initial) initial.style.display = "none";
-    if (captcha) captcha.style.display = "none";
-    if (revealed) revealed.style.display = "block";
+    const pretext = document.getElementById('captcha-pretext');
+    const initial = document.getElementById('email-view-initial-state');
+    const captcha = document.getElementById('email-view-captcha-state');
+    const revealed = document.getElementById('email-view-revealed-state');
+    if (pretext) pretext.style.display = 'none';
+    if (initial) initial.style.display = 'none';
+    if (captcha) captcha.style.display = 'none';
+    if (revealed) revealed.style.display = 'block';
 }
 
 function setEmailInUI(email) {
-    const link = document.getElementById("revealed-email-link");
+    const link = document.getElementById('revealed-email-link');
     if (!link) return;
-    const safeEmail = String(email || "").trim();
-    link.textContent = safeEmail || "email-protected";
-    link.href = safeEmail ? `mailto:${safeEmail}` : "#";
+    const safeEmail = String(email || '').trim();
+    link.textContent = safeEmail || 'email-protected';
+    link.href = safeEmail ? `mailto:${safeEmail}` : '#';
 }
 
 async function requestRealEmail(token) {
     try {
-        const base = API_BASE_URL || "";
+        const base = API_BASE_URL || '';
         // If API_BASE_URL is empty, this will hit same-origin /request-email
         const endpoint = `${base}/request-email`;
         const res = await fetch(endpoint, {
-            method: "POST",
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
             },
             body: JSON.stringify({ token }),
         });
@@ -229,27 +229,27 @@ async function requestRealEmail(token) {
         setEmailInUI(data.email);
         revealEmailUI();
     } catch (err) {
-        console.error("Failed to fetch contact email:", err);
+        console.error('Failed to fetch contact email:', err);
         // Keep the CAPTCHA state visible so user can retry
-        const captcha = document.getElementById("email-view-captcha-state");
-        const initial = document.getElementById("email-view-initial-state");
-        if (initial) initial.style.display = "none";
-        if (captcha) captcha.style.display = "block";
+        const captcha = document.getElementById('email-view-captcha-state');
+        const initial = document.getElementById('email-view-initial-state');
+        if (initial) initial.style.display = 'none';
+        if (captcha) captcha.style.display = 'block';
         // Reset the widget to let the user try again
-        if (typeof window.grecaptcha?.reset === "function" && recaptchaWidgetId !== null) {
+        if (typeof window.grecaptcha?.reset === 'function' && recaptchaWidgetId !== null) {
             window.grecaptcha.reset(recaptchaWidgetId);
         }
     }
 }
 
 function renderRecaptchaIfNeeded() {
-    const container = document.getElementById("recaptcha-container");
+    const container = document.getElementById('recaptcha-container');
     if (!container) return;
 
     // Ensure container is visible (important for some UI libs)
-    const captchaState = document.getElementById("email-view-captcha-state");
-    if (captchaState && captchaState.style.display === "none") {
-        captchaState.style.display = "block";
+    const captchaState = document.getElementById('email-view-captcha-state');
+    if (captchaState && captchaState.style.display === 'none') {
+        captchaState.style.display = 'block';
     }
 
     const sitekey = getRecaptchaSiteKey();
@@ -260,7 +260,7 @@ function renderRecaptchaIfNeeded() {
         return;
     }
 
-    if (!window.grecaptcha || typeof window.grecaptcha.render !== "function") {
+    if (!window.grecaptcha || typeof window.grecaptcha.render !== 'function') {
         // Script not ready yet
         return;
     }
@@ -271,12 +271,12 @@ function renderRecaptchaIfNeeded() {
             // Token received: verify server-side and then reveal.
             requestRealEmail(token);
         },
-        "error-callback": () => {
-            console.warn("reCAPTCHA error occurred.");
+        'error-callback': () => {
+            console.warn('reCAPTCHA error occurred.');
         },
-        "expired-callback": () => {
-            console.warn("reCAPTCHA expired, resetting.");
-            if (typeof window.grecaptcha?.reset === "function") {
+        'expired-callback': () => {
+            console.warn('reCAPTCHA expired, resetting.');
+            if (typeof window.grecaptcha?.reset === 'function') {
                 window.grecaptcha.reset(widgetId);
             }
         },
@@ -284,14 +284,14 @@ function renderRecaptchaIfNeeded() {
 
     container.dataset.widgetId = String(widgetId);
     recaptchaWidgetId = widgetId;
-    console.log("reCAPTCHA rendered.");
+    console.log('reCAPTCHA rendered.');
 }
 
 function loadRecaptchaScriptAndRender() {
     // Define onload callback before injecting the script, so the query param finds it.
     window.onRecaptchaLoadCallback = function () {
         try {
-            if (typeof window.grecaptcha?.ready === "function") {
+            if (typeof window.grecaptcha?.ready === 'function') {
                 window.grecaptcha.ready(() => {
                     renderRecaptchaIfNeeded();
                 });
@@ -299,14 +299,14 @@ function loadRecaptchaScriptAndRender() {
                 renderRecaptchaIfNeeded();
             }
         } catch (e) {
-            console.error("Error in onRecaptchaLoadCallback:", e);
+            console.error('Error in onRecaptchaLoadCallback:', e);
         }
     };
 
     if (!recaptchaScriptLoading) {
-        recaptchaScriptLoading = activateDeferredScript("recaptcha-script").catch(
+        recaptchaScriptLoading = activateDeferredScript('recaptcha-script').catch(
             (err) => {
-                console.error("Failed to load reCAPTCHA:", err);
+                console.error('Failed to load reCAPTCHA:', err);
                 recaptchaScriptLoading = null;
             }
         );
@@ -321,24 +321,24 @@ function loadRecaptchaScriptAndRender() {
 }
 
 function initializeRecaptchaLazyLoad() {
-    const viewEmailBtn = document.getElementById("viewEmailBtn");
+    const viewEmailBtn = document.getElementById('viewEmailBtn');
     if (!viewEmailBtn) return;
 
     // Avoid double-binding if called twice somehow
-    if (viewEmailBtn.dataset.bound === "true") return;
-    viewEmailBtn.dataset.bound = "true";
+    if (viewEmailBtn.dataset.bound === 'true') return;
+    viewEmailBtn.dataset.bound = 'true';
 
-    viewEmailBtn.addEventListener("click", (e) => {
+    viewEmailBtn.addEventListener('click', (e) => {
         e.preventDefault();
         if (!recaptchaRequested) {
             recaptchaRequested = true;
             // Show CAPTCHA state
-            const initial = document.getElementById("email-view-initial-state");
-            const captcha = document.getElementById("email-view-captcha-state");
-            if (initial) initial.style.display = "none";
-            if (captcha) captcha.style.display = "block";
+            const initial = document.getElementById('email-view-initial-state');
+            const captcha = document.getElementById('email-view-captcha-state');
+            if (initial) initial.style.display = 'none';
+            if (captcha) captcha.style.display = 'block';
 
-            if (window.grecaptcha && typeof window.grecaptcha.render === "function") {
+            if (window.grecaptcha && typeof window.grecaptcha.render === 'function') {
                 renderRecaptchaIfNeeded();
             }
             else {
@@ -356,16 +356,16 @@ function initializeRecaptchaLazyLoad() {
  * Manages the privacy consent banner and analytics script loading.
  */
 function initializePrivacyConsent() {
-    const consentToast = document.getElementById("privacy-consent-toast");
-    const acceptBtn = document.getElementById("accept-privacy-btn");
-    const privacyLinkInToast = document.getElementById("privacy-link-in-toast");
-    const privacyModalTrigger = document.getElementById("privacyBtn");
+    const consentToast = document.getElementById('privacy-consent-toast');
+    const acceptBtn = document.getElementById('accept-privacy-btn');
+    const privacyLinkInToast = document.getElementById('privacy-link-in-toast');
+    const privacyModalTrigger = document.getElementById('privacyBtn');
 
     if (!consentToast || !acceptBtn || !privacyLinkInToast || !privacyModalTrigger)
         return;
 
     const hasConsented =
-        localStorage.getItem("dropsilk-privacy-consent") === "true";
+        localStorage.getItem('dropsilk-privacy-consent') === 'true';
 
     if (hasConsented) {
         // Load analytics-related scripts immediately for returning users.
@@ -378,11 +378,11 @@ function initializePrivacyConsent() {
     // Logic to show the toast
     const showPrivacyToast = () => {
         setTimeout(() => {
-            consentToast.style.display = "block";
+            consentToast.style.display = 'block';
             // Force reflow
-            // eslint-disable-next-line no-unused-expressions
+             
             consentToast.offsetHeight;
-            consentToast.classList.add("show");
+            consentToast.classList.add('show');
         }, 500);
     };
 
@@ -390,32 +390,32 @@ function initializePrivacyConsent() {
     if (hasSeenWelcome) {
         showPrivacyToast();
     } else {
-        document.addEventListener("onboardingWelcomeDismissed", showPrivacyToast, {
+        document.addEventListener('onboardingWelcomeDismissed', showPrivacyToast, {
             once: true,
         });
     }
 
     // Event listener for the accept button
-    acceptBtn.addEventListener("click", () => {
-        localStorage.setItem("dropsilk-privacy-consent", "true");
+    acceptBtn.addEventListener('click', () => {
+        localStorage.setItem('dropsilk-privacy-consent', 'true');
         activateAnalytics();
         activateSpeedInsights();
         activateVercelAnalytics();
-        consentToast.classList.remove("show");
+        consentToast.classList.remove('show');
         setTimeout(() => {
-            consentToast.style.display = "none";
+            consentToast.style.display = 'none';
         }, 500);
     });
 
     // Event listener for the "Privacy Policy" link inside the toast
-    privacyLinkInToast.addEventListener("click", () => {
+    privacyLinkInToast.addEventListener('click', () => {
         privacyModalTrigger.click();
     });
 }
 
 // --- Main Execution ---
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("DropSilk Initializing...");
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DropSilk Initializing...');
     initEffects();
     const applyTranslations = () => translateStaticElements();
     if (i18next.isInitialized) applyTranslations();
@@ -425,12 +425,12 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeGlobalUI();
 
     // Ensure dummy is shown until reveal
-    setEmailInUI(""); // clears/fallbacks initial link
+    setEmailInUI(''); // clears/fallbacks initial link
 
-    const isAppPage = document.querySelector(".main-content");
+    const isAppPage = document.querySelector('.main-content');
 
     const urlParams = new URLSearchParams(window.location.search);
-    const flightCodeFromUrl = urlParams.get("code");
+    const flightCodeFromUrl = urlParams.get('code');
 
     if (isAppPage) {
         const isInvited = flightCodeFromUrl && flightCodeFromUrl.length === 6;
@@ -442,7 +442,7 @@ document.addEventListener("DOMContentLoaded", () => {
         initializeAppCore(isInvited);
     } else {
         console.log(
-            "On a non-app page (e.g., 404). Core logic will not be initialized."
+            'On a non-app page (e.g., 404). Core logic will not be initialized.'
         );
     }
 

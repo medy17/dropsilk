@@ -44,7 +44,7 @@ function addPulseEffect(element) {
     element.classList.add('pulse-effect');
     element.insertAdjacentHTML(
         'beforeend',
-        `<span class="pulse-ring"></span><span class="pulse-ring"></span><span class="pulse-ring"></span>`,
+        '<span class="pulse-ring"></span><span class="pulse-ring"></span><span class="pulse-ring"></span>',
     );
 
     // Allow the parent ticket (if it exists) to overflow so the pulse isn't clipped.
@@ -83,8 +83,8 @@ export function enterFlightMode(flightCode) {
     store.actions.setCurrentFlightCode(flightCode);
 
     // Safety check for elements
-    const setup = uiElements.setupContainer || document.querySelector(".main-content");
-    const dash = uiElements.dashboard || document.getElementById("dashboard");
+    const setup = uiElements.setupContainer || document.querySelector('.main-content');
+    const dash = uiElements.dashboard || document.getElementById('dashboard');
 
     if (setup) setup.style.display = 'none';
     if (dash) dash.style.display = 'flex';
@@ -198,14 +198,14 @@ export function renderNetworkUsersView() {
             <div class="network-user-details">
                 <span class="network-user-name">${user.name}</span>
                 <span class="network-user-id">${i18next.t('userId', {
-            id: user.id,
-        })}</span>
+        id: user.id,
+    })}</span>
             </div>
             <button class="btn btn-primary invite-user-btn" data-invitee-id="${user.id
-            }" ${!currentFlightCode
-                ? `disabled title="${i18next.t('createOrJoinFlightToInvite')}"`
-                : ''
-            }>
+}" ${!currentFlightCode
+    ? `disabled title="${i18next.t('createOrJoinFlightToInvite')}"`
+    : ''
+}>
                 ${i18next.t('invite')}
             </button>`;
         list.appendChild(userEl);
@@ -224,18 +224,18 @@ export function renderInFlightView() {
     uiElements.connectionPanelList.innerHTML = `
         <div class="inflight-user-item">
             <div class="inflight-user-details"><span class="inflight-user-name">${myName}</span><span class="user-badge">${i18next.t(
-        'you',
-    )}</span></div>
+    'you',
+)}</span></div>
             <span class="inflight-user-id">${i18next.t('userId', {
         id: myId,
     })}</span>
         </div>
         <div class="inflight-user-item">
             <div class="inflight-user-details"><span class="inflight-user-name">${peerInfo.name
-        }</span></div>
+}</span></div>
             <span class="inflight-user-id">${i18next.t('userId', {
-            id: peerInfo.id,
-        })}</span>
+        id: peerInfo.id,
+    })}</span>
         </div>`;
 }
 
@@ -294,7 +294,7 @@ export function checkQueueOverflow(queueId) {
         queueDiv.classList.add('queue-collapsible');
         const btn = document.createElement('button');
         btn.className = 'btn btn-primary expand-queue-btn';
-        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg><span>Expand</span>`;
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg><span>Expand</span>';
         btn.onclick = () => {
             queueDiv.classList.remove('queue-collapsible');
             queueDiv.classList.add('expanded');

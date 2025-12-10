@@ -9,17 +9,17 @@ describe('XLSX Library', () => {
 
     it('should read a simple excel file (mock data)', () => {
         // Create a simple workbook
-        const ws = XLSX.utils.aoa_to_sheet([["A1", "B1"], ["A2", "B2"]]);
+        const ws = XLSX.utils.aoa_to_sheet([['A1', 'B1'], ['A2', 'B2']]);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
         
         // Write to buffer and read back to verify round trip (simulating the preview flow)
         const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
         const readWb = XLSX.read(wbout, { type: 'array' });
         
-        expect(readWb.SheetNames).toContain("Sheet1");
-        const html = XLSX.utils.sheet_to_html(readWb.Sheets["Sheet1"]);
-        expect(html).toContain("<table>");
-        expect(html).toContain("A1");
+        expect(readWb.SheetNames).toContain('Sheet1');
+        const html = XLSX.utils.sheet_to_html(readWb.Sheets['Sheet1']);
+        expect(html).toContain('<table>');
+        expect(html).toContain('A1');
     });
 });

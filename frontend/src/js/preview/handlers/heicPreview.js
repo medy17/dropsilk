@@ -1,6 +1,6 @@
 // js/preview/handlers/heicPreview.js
 // Renders HEIC/HEIF images by converting them to a browser-compatible format.
-import heic2any from "heic2any";
+import heic2any from 'heic2any';
 
 export default async function renderHeicPreview(blob, contentElement) {
     let convertedBlob;
@@ -11,7 +11,7 @@ export default async function renderHeicPreview(blob, contentElement) {
         // We choose JPEG for its good compression and universal support.
         convertedBlob = await heic2any({
             blob,
-            toType: "image/jpeg",
+            toType: 'image/jpeg',
             quality: 0.4, // Optional: control the quality
         });
 

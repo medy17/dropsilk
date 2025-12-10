@@ -211,12 +211,12 @@ async function findRepoRoot(startDir) {
         try {
             await fs.stat(githubPath);
             return currentDir;
-        } catch {}
+        } catch { /* empty */ }
 
         try {
             await fs.stat(gitPath);
             return currentDir;
-        } catch {}
+        } catch { /* empty */ }
 
         const parentDir = path.dirname(currentDir);
         if (parentDir === currentDir) {
@@ -235,7 +235,7 @@ async function processWorkflows(repoRoot) {
     try {
         const stats = await fs.stat(workflowsPath);
         if (stats.isDirectory()) {
-            console.log(`📂 Processing .github/workflows/...`);
+            console.log('📂 Processing .github/workflows/...');
             await walkDir(workflowsPath, '.github/workflows');
             // Ensure .github is tracked in results
             if (!results.byDirectory['.github']) {
@@ -243,7 +243,7 @@ async function processWorkflows(repoRoot) {
             }
             return true;
         }
-    } catch (error) {
+    } catch {
         // No workflows? No drama, mate
         console.log('ℹ️  No .github/workflows directory found');
     }

@@ -189,7 +189,7 @@ export function showWelcomeOnboarding() {
             target.classList.add('onboarding-highlight-parent');
 
             // Force reflow then animate in
-            // eslint-disable-next-line no-unused-expressions
+             
             welcomeOnboarding.offsetHeight;
             welcomeOnboarding.classList.add('show');
             document.body.style.overflow = 'hidden';
@@ -281,7 +281,7 @@ export function showInviteOnboarding() {
             }
 
             // Force reflow then animate in
-            // eslint-disable-next-line no-unused-expressions
+             
             inviteOnboarding.offsetHeight;
             inviteOnboarding.classList.add('show');
             document.body.style.overflow = 'hidden';
@@ -297,22 +297,22 @@ export function showInviteOnboarding() {
     }
 
     // Handle resize/orientation changes — only re-position, don't re-show
-        let resizeTimeout;
-        const handleResize = () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                        if (!inviteOnboarding.classList.contains('show')) return;
-                        const rect2 = inviteBtn.getBoundingClientRect();
-                        const tooltip =
+    let resizeTimeout;
+    const handleResize = () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (!inviteOnboarding.classList.contains('show')) return;
+            const rect2 = inviteBtn.getBoundingClientRect();
+            const tooltip =
                                 inviteOnboarding.querySelector('.onboarding-tooltip');
-                        const viewport = getViewportInfo();
-                        if (isMobileDevice()) {
-                                positionTooltipMobile(tooltip, rect2, viewport);
-                            } else {
-                                positionTooltipDesktop(tooltip, rect2, viewport);
-                            }
-                    }, 100);
-            };
+            const viewport = getViewportInfo();
+            if (isMobileDevice()) {
+                positionTooltipMobile(tooltip, rect2, viewport);
+            } else {
+                positionTooltipDesktop(tooltip, rect2, viewport);
+            }
+        }, 100);
+    };
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);

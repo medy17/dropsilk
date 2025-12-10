@@ -1,6 +1,6 @@
 // js/preview/previewManager.js
 // Manages loading and displaying file previews in a modal.
-import i18next from "../i18n.js";
+import i18next from '../i18n.js';
 import { previewConfig } from './previewConfig.js';
 import { store } from '../state.js';
 import { showToast } from '../utils/toast.js';
@@ -58,7 +58,7 @@ async function cleanupPreview() {
         try {
             await currentHandlerModule.cleanup();
         } catch (e) {
-            console.error("Error during custom preview cleanup:", e);
+            console.error('Error during custom preview cleanup:', e);
         }
     }
     currentHandlerModule = null;
@@ -181,7 +181,7 @@ export async function showPreview(fileName) {
     const file = receivedFiles.find(f => f.name === fileName);
 
     if (!file) {
-        console.error("File not found for preview:", fileName);
+        console.error('File not found for preview:', fileName);
         return;
     }
 
@@ -234,7 +234,7 @@ export async function showPreview(fileName) {
         previewContent.style.display = 'block';
 
     } catch (error) {
-        console.error("Error loading preview:", error);
+        console.error('Error loading preview:', error);
         previewContent.innerHTML = `<div class="empty-state">Preview failed: ${error.message}</div>`;
         previewLoader.style.display = 'none';
         previewContent.style.display = 'block';

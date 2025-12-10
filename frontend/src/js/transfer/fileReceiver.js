@@ -266,7 +266,7 @@ function updateCompletedFileUI(fileInfo, blob, isDangerous) {
     let previewConsent = {};
     try {
         previewConsent = JSON.parse(localStorage.getItem('dropsilk-preview-consent') || '{}');
-    } catch (_) { }
+    } catch { /* empty */ }
 
     const isPptxDisabled = fileExtension === 'pptx' && previewConsent?.pptx === 'deny';
     actionContainer.innerHTML = createCompleteIndicator();

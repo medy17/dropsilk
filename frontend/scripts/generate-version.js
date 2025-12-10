@@ -6,14 +6,14 @@ const { execSync } = require('child_process');
 let pkg = { version: '0.0.0' };
 try {
     pkg = require('../package.json');
-} catch (e) {
+} catch {
     console.warn('⚠️ Could not find package.json, using default version.');
 }
 
 const runGit = (command) => {
     try {
         return execSync(command).toString().trim();
-    } catch (e) {
+    } catch {
         return null;
     }
 };
@@ -49,7 +49,7 @@ if (!isMain) {
     // Attempt to get commit count.
     // On Vercel (shallow clone), this might fail or return a low number.
     // We can fallback to Vercel's commit SHA (shortened) if count fails.
-    let buildId = runGit(`git rev-list --count main..HEAD`);
+    let buildId = runGit('git rev-list --count main..HEAD');
 
     if (!buildId && process.env.VERCEL_GIT_COMMIT_SHA) {
         // Fallback: Use first 7 chars of SHA if we can't count commits
@@ -64,7 +64,7 @@ if (!isMain) {
 }
 
 const destDir = path.join(__dirname, '../src/js');
-if (!fs.existsSync(destDir)){
+if (!fs.existsSync(destDir)) {
     fs.mkdirSync(destDir, { recursive: true });
 }
 

@@ -1,6 +1,6 @@
 // js/preview/handlers/audioPreview.js
 // Renders audio files with a visual waveform using WaveSurfer.js.
-import WaveSurfer from "wavesurfer.js";
+import WaveSurfer from 'wavesurfer.js';
 
 let wavesurfer = null;
 

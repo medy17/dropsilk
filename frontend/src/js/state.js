@@ -5,8 +5,8 @@ import { generateRandomName } from './utils/helpers.js';
 
 const initialState = {
     // Core state
-    myId: "",
-    myName: "",
+    myId: '',
+    myName: '',
     currentFlightCode: null,
     isFlightCreator: false,
     peerInfo: null,
@@ -54,7 +54,7 @@ export const store = {
                     const parsedState = JSON.parse(savedOnboardingState);
                     state.onboardingState = { ...initialState.onboardingState, ...parsedState };
                 } catch (e) {
-                    console.error("Could not parse saved onboarding state.");
+                    console.error('Could not parse saved onboarding state.');
                 }
             }
         },
@@ -115,7 +115,7 @@ export const store = {
                 newQueue.unshift(currentlySendingFile);
             }
             state.fileToSendQueue = newQueue;
-            console.log("Reordered send queue:", state.fileToSendQueue.map(f => f.name));
+            console.log('Reordered send queue:', state.fileToSendQueue.map(f => f.name));
         },
 
         addFileIdMapping: (file, id) => { state.fileIdMap.set(file, id); },
@@ -142,7 +142,7 @@ export const store = {
         setHasScrolledForReceive: (value) => { state.hasScrolledForReceive = value; },
         setHasScrolledForChatReceive: (value) => { state.hasScrolledForChatReceive = value; },
         updateOnboardingState: (step) => {
-            if (state.onboardingState.hasOwnProperty(step)) {
+            if (Object.prototype.hasOwnProperty.call(state.onboardingState, step)) {
                 state.onboardingState[step] = true;
                 localStorage.setItem('dropsilk-onboarding', JSON.stringify(state.onboardingState));
             }

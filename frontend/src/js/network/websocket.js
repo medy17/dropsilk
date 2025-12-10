@@ -97,91 +97,91 @@ async function onMessage(event) {
     const state = store.getState();
 
     switch (msg.type) {
-        case 'registered':
-            store.actions.setMyId(msg.id);
-            break;
-        case 'users-on-network-update':
-            store.actions.setLastNetworkUsers(msg.users);
-            if (!state.peerInfo) {
-                renderNetworkUsersView();
-            }
-            break;
-        case 'flight-invitation':
-            audioManager.play('invite');
-            showInvitationToast(msg.fromName, msg.flightCode);
-            break;
-        case 'flight-created':
-            enterFlightMode(msg.flightCode);
-            // Show the "invite" onboarding step with a small delay for the UI transition
-            setTimeout(showInviteOnboarding, 300);
-            break;
-        case 'peer-joined':
-            try {
-                audioManager.play('connect');
-                showToast({
-                    type: 'success',
-                    title: i18next.t('peerConnected'),
-                    body: i18next.t('peerConnectedDescription', {
-                        peerName: msg.peer.name,
-                    }),
-                    duration: 5000,
+    case 'registered':
+        store.actions.setMyId(msg.id);
+        break;
+    case 'users-on-network-update':
+        store.actions.setLastNetworkUsers(msg.users);
+        if (!state.peerInfo) {
+            renderNetworkUsersView();
+        }
+        break;
+    case 'flight-invitation':
+        audioManager.play('invite');
+        showInvitationToast(msg.fromName, msg.flightCode);
+        break;
+    case 'flight-created':
+        enterFlightMode(msg.flightCode);
+        // Show the "invite" onboarding step with a small delay for the UI transition
+        setTimeout(showInviteOnboarding, 300);
+        break;
+    case 'peer-joined':
+        try {
+            audioManager.play('connect');
+            showToast({
+                type: 'success',
+                title: i18next.t('peerConnected'),
+                body: i18next.t('peerConnectedDescription', {
+                    peerName: msg.peer.name,
+                }),
+                duration: 5000,
+            });
+
+            document.getElementById('closeInviteModal')?.click();
+            hideBoardingOverlay();
+
+            clearAllPulseEffects();
+
+            localStorage.setItem('hasSeenInvitePulse', 'true');
+
+            // Check for dashboard visibility and auto-join state
+            const dashboard = uiElements.dashboard || document.getElementById('dashboard');
+            const isDashboardHidden = !dashboard || dashboard.style.display !== 'flex';
+
+            if (!state.currentFlightCode || isDashboardHidden || isAutoJoining) {
+                console.log('Force entering flight mode. Reason:', {
+                    missingCode: !state.currentFlightCode,
+                    hidden: isDashboardHidden,
+                    autoJoin: isAutoJoining
                 });
-
-                document.getElementById('closeInviteModal')?.click();
-                hideBoardingOverlay();
-
-                clearAllPulseEffects();
-
-                localStorage.setItem('hasSeenInvitePulse', 'true');
-
-                // Check for dashboard visibility and auto-join state
-                const dashboard = uiElements.dashboard || document.getElementById('dashboard');
-                const isDashboardHidden = !dashboard || dashboard.style.display !== 'flex';
-
-                if (!state.currentFlightCode || isDashboardHidden || isAutoJoining) {
-                    console.log('Force entering flight mode. Reason:', {
-                        missingCode: !state.currentFlightCode,
-                        hidden: isDashboardHidden,
-                        autoJoin: isAutoJoining
-                    });
-                    enterFlightMode(msg.flightCode);
-                    isAutoJoining = false;
-                }
-                store.actions.setConnectionType(msg.connectionType || 'wan');
-                store.actions.setPeerInfo(msg.peer);
-                updateDashboardStatus(
-                    `${i18next.t('peerConnected')} (${store
-                        .getState()
-                        .connectionType.toUpperCase()} mode)`,
-                    'connected',
-                );
-                renderInFlightView();
-
-                if (state.isFlightCreator) {
-                    await initializePeerConnection(true);
-                }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } catch (e) {
-                console.error('Error in peer-joined handler:', e);
-                // Emergency fallback
-                try {
-                    enterFlightMode(msg.flightCode);
-                } catch (err2) {
-                    console.error('Critical failure entering flight mode:', err2);
-                    alert('Failed to load flight dashboard. Please refresh.');
-                }
+                enterFlightMode(msg.flightCode);
+                isAutoJoining = false;
             }
-            break;
-        case 'signal':
-            await handleSignal(msg.data);
-            break;
-        case 'peer-left':
-            handlePeerLeft();
-            break;
-        case 'error':
-            failBoarding();
-            await handleServerError(msg.message);
-            break;
+            store.actions.setConnectionType(msg.connectionType || 'wan');
+            store.actions.setPeerInfo(msg.peer);
+            updateDashboardStatus(
+                `${i18next.t('peerConnected')} (${store
+                    .getState()
+                    .connectionType.toUpperCase()} mode)`,
+                'connected',
+            );
+            renderInFlightView();
+
+            if (state.isFlightCreator) {
+                await initializePeerConnection(true);
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (e) {
+            console.error('Error in peer-joined handler:', e);
+            // Emergency fallback
+            try {
+                enterFlightMode(msg.flightCode);
+            } catch (err2) {
+                console.error('Critical failure entering flight mode:', err2);
+                alert('Failed to load flight dashboard. Please refresh.');
+            }
+        }
+        break;
+    case 'signal':
+        await handleSignal(msg.data);
+        break;
+    case 'peer-left':
+        handlePeerLeft();
+        break;
+    case 'error':
+        failBoarding();
+        await handleServerError(msg.message);
+        break;
     }
 }
 

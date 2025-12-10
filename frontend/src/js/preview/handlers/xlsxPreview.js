@@ -1,12 +1,12 @@
 // js/preview/handlers/xlsxPreview.js
 // Renders Excel (XLSX, XLS) files using SheetJS.
-import * as XLSX from "xlsx";
+import * as XLSX from 'xlsx';
 
 export default async function renderXlsxPreview(blob, contentElement) {
 
     const arrayBuffer = await blob.arrayBuffer();
     const data = new Uint8Array(arrayBuffer);
-    const workbook = XLSX.read(data, { type: "array" });
+    const workbook = XLSX.read(data, { type: 'array' });
 
     // Create main container
     const xlsxContainer = document.createElement('div');

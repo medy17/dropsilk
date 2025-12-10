@@ -1,19 +1,19 @@
 // js/utils/toast.js
 // Manages the creation and display of toast notifications.
 
-import i18next from "../i18n.js";
+import i18next from '../i18n.js';
 import { uiElements } from '../ui/dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
 
 export function showToast({
-                              type = 'info',
-                              title,
-                              body,
-                              duration = 10000,
-                              actions = [],
-                              onRemove = null,
-                          }) {
+    type = 'info',
+    title,
+    body,
+    duration = 10000,
+    actions = [],
+    onRemove = null,
+}) {
     const toastId = `toast-${Date.now()}`;
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -88,7 +88,7 @@ export function showInvitationToast(fromName, flightCode) {
                 class: 'btn-primary',
                 callback: () => {
                     store.actions.setIsFlightCreator(false);
-                    sendMessage({ type: "join-flight", flightCode });
+                    sendMessage({ type: 'join-flight', flightCode });
                 }
             }
         ],

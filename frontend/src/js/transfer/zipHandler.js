@@ -45,7 +45,7 @@ async function proceedWithZipping(files) {
             zip.file(file.name, file.blob);
         });
 
-        const zipBlob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } }, (metadata) => {
+        const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } }, (metadata) => {
             if (btnSpan) btnSpan.textContent = `Zipping... ${Math.round(metadata.percent)}%`;
         });
 

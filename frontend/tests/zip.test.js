@@ -26,7 +26,7 @@ vi.mock('../src/js/ui/dom.js', () => ({
 }));
 
 // Setup specific innerHTML structure expectations for buttons
-uiElements.downloadSelectedBtn.innerHTML = `<span></span><i class="download-icon"></i><i class="spinner-icon"></i>`;
+uiElements.downloadSelectedBtn.innerHTML = '<span></span><i class="download-icon"></i><i class="spinner-icon"></i>';
 uiElements.zipModalDefaultFooter.style.display = 'block';
 
 vi.mock('../src/js/state.js', () => ({

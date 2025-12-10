@@ -1,16 +1,16 @@
-import { uploadBlobForPreview } from "../../utils/uploadHelper.js";
+import { uploadBlobForPreview } from '../../utils/uploadHelper.js';
 
 const modalContent = document.querySelector('#previewModal .preview-modal-content');
 
 export function cleanup() {
-  if (modalContent) {
-    modalContent.classList.remove('is-widescreen-preview');
-  }
+    if (modalContent) {
+        modalContent.classList.remove('is-widescreen-preview');
+    }
 }
 export default async function renderPptxPreview(
     blob,
     contentElement,
-    fileName = "presentation.pptx"
+    fileName = 'presentation.pptx'
 ) {
     modalContent?.classList.add('is-widescreen-preview');
 
@@ -25,7 +25,7 @@ export default async function renderPptxPreview(
     try {
         const publicUrl = await uploadBlobForPreview(blob, fileName);
         const src =
-            "https://view.officeapps.live.com/op/embed.aspx?src=" +
+            'https://view.officeapps.live.com/op/embed.aspx?src=' +
             encodeURIComponent(publicUrl);
 
         contentElement.innerHTML = `
@@ -38,14 +38,14 @@ export default async function renderPptxPreview(
       </iframe>
     `;
     } catch (err) {
-        console.error("PPTX preview failed:", err);
+        console.error('PPTX preview failed:', err);
         contentElement.innerHTML = `
       <div class="empty-state">
         <h3>Preview Unavailable</h3>
         <p>Could not load presentation preview.</p>
         <p style="font-size: 0.9em; color: #666;">Error: ${
-            err?.message || "Unknown error"
-        }</p>
+    err?.message || 'Unknown error'
+}</p>
       </div>
     `;
     }

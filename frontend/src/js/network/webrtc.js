@@ -6,9 +6,6 @@ import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
 import {
     enableDropZone,
-    updateDashboardStatus,
-    disableDropZone,
-    renderNetworkUsersView,
 } from '../ui/view.js';
 import { enableChat, disableChat } from '../features/chat/index.js';
 import {
@@ -53,9 +50,9 @@ async function getIceServers() {
         const data = await response.json();
         return data.iceServers;
     } catch (error) {
-        console.error("Could not get TURN server credentials, falling back to public STUN.", error);
+        console.error('Could not get TURN server credentials, falling back to public STUN.', error);
         // Fallback to a public STUN server if the backend call fails for any reason.
-        return [{ urls: "stun:stun.l.google.com:19302" }];
+        return [{ urls: 'stun:stun.l.google.com:19302' }];
     }
 }
 
@@ -139,35 +136,35 @@ function chooseDisplayAudioByUA(wantAudio = true) {
     }
 
     switch (info.browser) {
-        case 'chrome':
-        case 'edge':
-        case 'opera': {
-            const audio = {
-                echoCancellation: false,
-                noiseSuppression: false,
-            };
-            if (supports.suppressLocalAudioPlayback) {
-                audio.suppressLocalAudioPlayback = true;
-            }
-            let hint =
-                'For best results, use "Share tab audio". Full system audio works on Windows.';
-            if (info.os === 'macos') {
-                hint =
-                    'Tab audio works. Full system audio may not be available on macOS.';
-            }
-            return { audio, hint };
+    case 'chrome':
+    case 'edge':
+    case 'opera': {
+        const audio = {
+            echoCancellation: false,
+            noiseSuppression: false,
+        };
+        if (supports.suppressLocalAudioPlayback) {
+            audio.suppressLocalAudioPlayback = true;
         }
-        case 'firefox':
-            return {
-                audio: true,
-                hint: 'Firefox supports *tab audio only*. Full window/screen may be silent.',
-            };
-        case 'safari':
-        default:
-            return {
-                audio: false,
-                hint: 'This browser does not reliably support audio in screen share.',
-            };
+        let hint =
+                'For best results, use "Share tab audio". Full system audio works on Windows.';
+        if (info.os === 'macos') {
+            hint =
+                    'Tab audio works. Full system audio may not be available on macOS.';
+        }
+        return { audio, hint };
+    }
+    case 'firefox':
+        return {
+            audio: true,
+            hint: 'Firefox supports *tab audio only*. Full window/screen may be silent.',
+        };
+    case 'safari':
+    default:
+        return {
+            audio: false,
+            hint: 'This browser does not reliably support audio in screen share.',
+        };
     }
 }
 
@@ -234,7 +231,7 @@ export async function initializePeerConnection(isOfferer) {
                 data: { sdp: peerConnection.localDescription },
             });
         } catch (err) {
-            console.error("Error creating offer:", err);
+            console.error('Error creating offer:', err);
         }
     } else {
         peerConnection.ondatachannel = (event) => {
@@ -348,19 +345,19 @@ async function handleQualityChange(preset, track) {
 
     let constraints = {};
     switch (preset) {
-        case 'quality':
-            constraints = { frameRate: 60, height: 1080 };
-            break;
-        case 'performance':
-            constraints = { frameRate: 15, height: 480 };
-            break;
-        case 'clarity':
-            constraints = { frameRate: 15, height: 1080 };
-            break;
-        case 'smoothness':
-        default:
-            constraints = { frameRate: 30, height: 720 };
-            break;
+    case 'quality':
+        constraints = { frameRate: 60, height: 1080 };
+        break;
+    case 'performance':
+        constraints = { frameRate: 15, height: 480 };
+        break;
+    case 'clarity':
+        constraints = { frameRate: 15, height: 1080 };
+        break;
+    case 'smoothness':
+    default:
+        constraints = { frameRate: 30, height: 720 };
+        break;
     }
 
     try {
@@ -386,7 +383,7 @@ export async function startScreenShare({ withSystemAudio = true } = {}) {
         if (audioTrack) {
             try {
                 audioTrack.contentHint = 'music'; // hint for better quality
-            } catch (_) { }
+            } catch { /* empty */ }
             systemAudioTrackSender = peerConnection.addTrack(
                 audioTrack,
                 localScreenStream

@@ -5,10 +5,10 @@ export const uiElements = {
     body: document.body,
 
     // Setup Screen
-    setupContainer: document.querySelector(".main-content"),
-    userNameDisplay: document.getElementById("userNameDisplay"),
-    createFlightBtn: document.getElementById("createFlightBtn"),
-    joinFlightBtn: document.getElementById("joinFlightBtn"),
+    setupContainer: document.querySelector('.main-content'),
+    userNameDisplay: document.getElementById('userNameDisplay'),
+    createFlightBtn: document.getElementById('createFlightBtn'),
+    joinFlightBtn: document.getElementById('joinFlightBtn'),
     flightCodeInputWrapper: document.querySelector('.flight-code-input-wrapper'),
 
     // Scan QR Code
@@ -21,16 +21,16 @@ export const uiElements = {
     boardingOverlay: document.getElementById('boarding-overlay'),
 
     // Dashboard
-    dashboard: document.getElementById("dashboard"),
-    dashboardFlightCodeBtn: document.getElementById("dashboard-flight-code"),
-    dashboardFlightStatus: document.getElementById("dashboard-flight-status"),
-    leaveFlightBtnDashboard: document.getElementById("leaveFlightBtnDashboard"),
+    dashboard: document.getElementById('dashboard'),
+    dashboardFlightCodeBtn: document.getElementById('dashboard-flight-code'),
+    dashboardFlightStatus: document.getElementById('dashboard-flight-status'),
+    leaveFlightBtnDashboard: document.getElementById('leaveFlightBtnDashboard'),
     inviteBtn: document.getElementById('inviteBtn'),
 
     // File Transfer
-    fileInputTransfer: document.getElementById("fileInput_transfer"),
-    sendingQueueDiv: document.getElementById("sending-queue"),
-    receiverQueueDiv: document.getElementById("receiver-queue"),
+    fileInputTransfer: document.getElementById('fileInput_transfer'),
+    sendingQueueDiv: document.getElementById('sending-queue'),
+    receiverQueueDiv: document.getElementById('receiver-queue'),
     dropZone: document.querySelector('.drop-zone'),
     dropZoneText: document.querySelector('.drop-zone p'),
     dropZoneSecondaryText: document.querySelector('.drop-zone .secondary-text'),
@@ -51,8 +51,8 @@ export const uiElements = {
 
 
     // Modals & Nav
-    toastContainer: document.getElementById("toast-container"),
-    settingsBtn: document.getElementById("settingsBtn"),
+    toastContainer: document.getElementById('toast-container'),
+    settingsBtn: document.getElementById('settingsBtn'),
 
     // Metrics
     metricsSentEl: document.getElementById('metrics-sent'),
@@ -60,8 +60,8 @@ export const uiElements = {
     metricsSpeedEl: document.getElementById('metrics-speed'),
 
     // Connection Panel
-    connectionPanelTitle: document.getElementById("connection-panel-title"),
-    connectionPanelList: document.getElementById("connection-panel-list"),
+    connectionPanelTitle: document.getElementById('connection-panel-title'),
+    connectionPanelList: document.getElementById('connection-panel-list'),
 
     // Onboarding
     welcomeOnboarding: document.getElementById('welcomeOnboarding'),

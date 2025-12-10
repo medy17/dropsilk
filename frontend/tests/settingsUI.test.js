@@ -128,7 +128,7 @@ describe('Settings UI Integration', () => {
             expect(container.querySelector('#settings-theme-selector').value).toBe('ocean');
 
             // Segmented controls use 'active' class
-            const qualityBtn = container.querySelector(`#settings-animation-quality .seg-btn[data-value="quality"]`);
+            const qualityBtn = container.querySelector('#settings-animation-quality .seg-btn[data-value="quality"]');
             expect(qualityBtn.classList.contains('active')).toBe(true);
         });
     });
@@ -192,7 +192,7 @@ describe('Settings UI Integration', () => {
             renderAndBind();
 
             // Find the 'off' button
-            const offBtn = container.querySelector(`#settings-animation-quality .seg-btn[data-value="off"]`);
+            const offBtn = container.querySelector('#settings-animation-quality .seg-btn[data-value="off"]');
             offBtn.click();
 
             expect(settingsData.applyAnimationQuality).toHaveBeenCalledWith('off');
