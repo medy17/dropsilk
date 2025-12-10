@@ -11,6 +11,7 @@
 module.exports = {
     // Filename (key): { name: 'Display Name', darkColor: 'Meta Tag Color for Dark Mode' }
     midnight: { name: 'Midnight', darkColor: '#16161e' },
+    candy: { name: 'Candy', darkColor: '#14020a' },
     sunset: { name: 'Sunset', darkColor: '#191724' },
     forest: { name: 'Forest', darkColor: '#14241e' },
     ruby: { name: 'Ruby', darkColor: '#241414' },
