@@ -23,7 +23,7 @@
     "test:ui": "vitest --ui",
     "test:run": "pnpm gen:locales && pnpm update-themes && vitest run",
     "lint": "eslint .",
-    "prepare": "husky"
+    "prepare": "node -e \"if (process.env.CI !== '1') require('husky').install()\""
   },
   "lint-staged": {
     "*.js": "eslint --fix"
