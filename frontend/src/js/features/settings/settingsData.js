@@ -53,22 +53,36 @@ export function getAllSettings() {
  */
 export function getSettingsSummary() {
     const settings = getAllSettings();
-    const onState = '<span style="color: var(--c-success); font-weight: bold;">On</span>';
-    const offState = '<span style="color: var(--c-danger); font-weight: bold;">Off</span>';
+    const onState = `<span style="color: var(--c-success); font-weight: bold;">${i18next.t('on')}</span>`;
+    const offState = `<span style="color: var(--c-danger); font-weight: bold;">${i18next.t('off')}</span>`;
 
-    const animationLabels = { quality: 'Best', performance: 'Basic', off: offState };
-    const pptxLabels = { allow: 'Allow', deny: 'Deny', ask: 'Ask' };
+    const animationLabels = {
+        quality: i18next.t('best'),
+        performance: i18next.t('basic'),
+        off: offState
+    };
+    const pptxLabels = {
+        allow: i18next.t('allow'),
+        deny: i18next.t('deny'),
+        ask: i18next.t('ask')
+    };
+
+    const mode = settings.mode === 'dark' ? i18next.t('dark') : i18next.t('light');
+    const themeName = settings.theme === 'default'
+        ? i18next.t('default')
+        : i18next.t(`theme_${settings.theme}`, settings.theme.charAt(0).toUpperCase() + settings.theme.slice(1));
+    const font = settings.systemFont ? i18next.t('system') : i18next.t('default');
 
     const parts = [
-        `Sounds: ${settings.sounds ? onState : offState}`,
-        `Analytics: ${settings.analytics ? onState : offState}`,
-        `Mode: ${settings.mode === 'dark' ? 'Dark' : 'Light'}`,
-        `Theme: ${settings.theme.charAt(0).toUpperCase() + settings.theme.slice(1)}`,
-        `Animation: ${animationLabels[settings.animationQuality] || 'Basic'}`,
-        `Font: ${settings.systemFont ? 'System' : 'Default'}`,
-        `Auto-Download: ${settings.autoDownload ? onState : offState}`,
-        `PPTX Preview: ${pptxLabels[settings.pptxConsent] || 'Ask'}`,
-        `Safe Mode (OPFS): ${settings.opfsEnabled ? onState : offState}`,
+        `${i18next.t('sounds')}: ${settings.sounds ? onState : offState}`,
+        `${i18next.t('analytics')}: ${settings.analytics ? onState : offState}`,
+        `${i18next.t('mode')}: ${mode}`,
+        `${i18next.t('theme')}: ${themeName}`,
+        `${i18next.t('animation')}: ${animationLabels[settings.animationQuality] || i18next.t('basic')}`,
+        `${i18next.t('font')}: ${font}`,
+        `${i18next.t('autoDownload')}: ${settings.autoDownload ? onState : offState}`,
+        `${i18next.t('pptxPreview')}: ${pptxLabels[settings.pptxConsent] || i18next.t('ask')}`,
+        `${i18next.t('safeMode')}: ${settings.opfsEnabled ? onState : offState}`,
     ];
 
     return parts.join(' • ');
