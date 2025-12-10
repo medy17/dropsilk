@@ -28,6 +28,7 @@ vi.mock('../src/js/i18n.js', () => ({
     default: {
         language: 'en',
         changeLanguage: vi.fn(),
+        t: vi.fn((key) => key),
     }
 }));
 
@@ -94,12 +95,12 @@ describe('Settings Data & Logic', () => {
 
             const summary = getSettingsSummary();
 
-            expect(summary).toContain('Sounds: <span');
-            expect(summary).toContain('Mode: Dark');
+            expect(summary).toContain('sounds: <span');
+            expect(summary).toContain('mode: dark');
             // Mock returns 'default' for theme, so we expect default logic or mapped logic
             // Actually getSettingsSummary reads getAllSettings which reads localStorage for theme
             // Let's ensure getAllSettings reads what we set
-            expect(summary).toContain('Theme: Sunset');
+            expect(summary).toContain('theme: theme_sunset');
         });
     });
 
