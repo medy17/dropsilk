@@ -1,0 +1,42 @@
+/* STEALTH THEME */
+body[data-theme="stealth"] {
+    --brilliant-blue: #71717a;
+    /* Zinc 500 */
+    --brilliant-pink: #d4d4d8;
+    /* Zinc 300 */
+
+    --c-primary: var(--brilliant-pink);
+    /* Light Grey is primary */
+    --c-secondary: var(--brilliant-blue);
+
+    --c-panel-border: rgba(113, 113, 122, 0.4);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(228, 228, 231, 0.1), rgba(113, 113, 122, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(212, 212, 216, 0.2) 0%, rgba(113, 113, 122, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(113, 113, 122, 0.2) 0%, rgba(212, 212, 216, 0.15) 100%);
+}
+
+/* Stealth Dark - MATTE BLACK */
+body[data-theme="stealth"][data-mode="dark"] {
+    --dark-bg-base: #18181b;
+    /* Zinc 900 */
+    --dark-bg-root: #09090b;
+    /* Zinc 950 */
+
+    --c-panel-shadow: 0 0 0 1px rgba(82, 82, 91, 0.5), 0 4px 12px rgba(0, 0, 0, 0.8);
+    --c-footer-border: rgba(63, 63, 70, 0.5);
+
+    --c-dropzone-bg: rgba(39, 39, 42, 0.5);
+    --c-dropzone-border: rgba(113, 113, 122, 0.3);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+
+    --c-progress-track: #27272a;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+    --c-success: #ffffff;
+    /* Success is white */
+    --c-danger: #7f1d1d;
+    /* Danger is dark red */
+}

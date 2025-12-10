@@ -1,5 +1,29 @@
 /* 1. Base Styles */
-@import 'base/variables.css';
+@import 'themes/default.css';
+@import 'base/modes.css';
+
+/* START-AUTOGEN-THEMES */
+@import 'themes/midnight.css';
+@import 'themes/candy.css';
+@import 'themes/sunset.css';
+@import 'themes/forest.css';
+@import 'themes/ruby.css';
+@import 'themes/ocean.css';
+@import 'themes/nebula.css';
+@import 'themes/terminal.css';
+@import 'themes/cyber.css';
+@import 'themes/coffee.css';
+@import 'themes/royal.css';
+@import 'themes/christmas.css';
+@import 'themes/miami.css';
+@import 'themes/dracula.css';
+@import 'themes/sakura.css';
+@import 'themes/nord.css';
+@import 'themes/toxic.css';
+@import 'themes/aurora.css';
+@import 'themes/stealth.css';
+@import 'themes/biolume.css';
+/* END-AUTOGEN-THEMES */
 @import 'base/globals.css';
 @import 'base/theme.css';
 @import 'base/animations.css';

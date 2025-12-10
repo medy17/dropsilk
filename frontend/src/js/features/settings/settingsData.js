@@ -14,7 +14,8 @@ export function getAllSettings() {
     return {
         sounds: audioManager.isEnabled(),
         analytics: localStorage.getItem('dropsilk-privacy-consent') === 'true',
-        theme: localStorage.getItem('dropsilk-theme') || 'light',
+        theme: localStorage.getItem('dropsilk-color-theme') || 'default',
+        mode: localStorage.getItem('dropsilk-mode') || 'light',
         animationQuality: localStorage.getItem('dropsilk-animation-quality') || 'performance',
         systemFont: localStorage.getItem('dropsilk-system-font') === 'true',
         autoDownload: localStorage.getItem('dropsilk-auto-download') === 'true',
@@ -27,24 +28,47 @@ export function getAllSettings() {
     };
 }
 
+// Migration helper (run once on load implicitly via logic below or separate init)
+(function migrateTheme() {
+    const oldTheme = localStorage.getItem('dropsilk-theme');
+    if (oldTheme) {
+        if (oldTheme === 'midnight' || oldTheme === 'sunset') {
+            if (!localStorage.getItem('dropsilk-color-theme')) {
+                localStorage.setItem('dropsilk-color-theme', oldTheme);
+                localStorage.setItem('dropsilk-mode', 'dark');
+            }
+        } else if (oldTheme === 'dark') {
+            if (!localStorage.getItem('dropsilk-mode')) {
+                localStorage.setItem('dropsilk-mode', 'dark');
+            }
+        }
+        // Clear old key to prevent re-migration issues (optional, but good practice)
+        localStorage.removeItem('dropsilk-theme');
+    }
+})();
+
 /**
  * Gets a detailed human-readable summary of all settings
  * @returns {string} Summary like "Sounds: On • Analytics: Off • Theme: Light..."
  */
 export function getSettingsSummary() {
     const settings = getAllSettings();
-    const animationLabels = { quality: 'Best', performance: 'Basic', off: 'Off' };
+    const onState = '<span style="color: var(--c-success); font-weight: bold;">On</span>';
+    const offState = '<span style="color: var(--c-danger); font-weight: bold;">Off</span>';
+
+    const animationLabels = { quality: 'Best', performance: 'Basic', off: offState };
     const pptxLabels = { allow: 'Allow', deny: 'Deny', ask: 'Ask' };
 
     const parts = [
-        `Sounds: ${settings.sounds ? 'On' : 'Off'}`,
-        `Analytics: ${settings.analytics ? 'On' : 'Off'}`,
-        `Theme: ${settings.theme === 'dark' ? 'Dark' : 'Light'}`,
+        `Sounds: ${settings.sounds ? onState : offState}`,
+        `Analytics: ${settings.analytics ? onState : offState}`,
+        `Mode: ${settings.mode === 'dark' ? 'Dark' : 'Light'}`,
+        `Theme: ${settings.theme.charAt(0).toUpperCase() + settings.theme.slice(1)}`,
         `Animation: ${animationLabels[settings.animationQuality] || 'Basic'}`,
         `Font: ${settings.systemFont ? 'System' : 'Default'}`,
-        `Auto-Download: ${settings.autoDownload ? 'On' : 'Off'}`,
+        `Auto-Download: ${settings.autoDownload ? onState : offState}`,
         `PPTX Preview: ${pptxLabels[settings.pptxConsent] || 'Ask'}`,
-        `Safe Mode (OPFS): ${settings.opfsEnabled ? 'On' : 'Off'}`,
+        `Safe Mode (OPFS): ${settings.opfsEnabled ? onState : offState}`,
     ];
 
     return parts.join(' • ');
@@ -87,8 +111,11 @@ export function updateSetting(key, value) {
         case 'analytics':
             localStorage.setItem('dropsilk-privacy-consent', value ? 'true' : 'false');
             break;
+        case 'mode':
+            applyTheme(null, value); // Pass null theme to only update mode
+            break;
         case 'theme':
-            applyTheme(value);
+            applyTheme(value, null); // Pass null mode to only update theme
             break;
         case 'animationQuality':
             applyAnimationQuality(value);
@@ -178,7 +205,8 @@ export function initializeSystemFont() {
  */
 export function resetAllPreferences() {
     const keys = [
-        'dropsilk-theme',
+        'dropsilk-mode',
+        'dropsilk-color-theme',
         'dropsilk-animation-quality',
         'dropsilk-system-font',
         'dropsilk-auto-download',
@@ -195,7 +223,7 @@ export function resetAllPreferences() {
     audioManager.enable();
 
     // Apply defaults
-    applyTheme('light');
+    applyTheme('default', 'light');
     applyAnimationQuality('performance');
     applySystemFont(false);
     i18next.changeLanguage('en');

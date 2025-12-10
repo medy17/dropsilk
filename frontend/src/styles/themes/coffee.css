@@ -1,0 +1,31 @@
+/* COFFEE THEME */
+body[data-theme="coffee"] {
+    --brilliant-blue: #d4b483; /* Latte / Tan */
+    --brilliant-pink: #c19a6b; /* Darker Caramel */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+    --c-panel-border: rgba(212, 180, 131, 0.4);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(212, 180, 131, 0.15), rgba(193, 154, 107, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(212, 180, 131, 0.15) 0%, rgba(193, 154, 107, 0.12) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(193, 154, 107, 0.15) 0%, rgba(212, 180, 131, 0.1) 100%);
+}
+
+/* Coffee Dark */
+body[data-theme="coffee"][data-mode="dark"] {
+    --dark-bg-base: #26201b; /* Dark Espresso */
+    --dark-bg-root: #1a1613; /* Almost black coffee */
+
+    --c-panel-shadow: 0 0 0 1px rgba(212, 180, 131, 0.1), 0 4px 12px rgba(0, 0, 0, 0.4);
+    --c-footer-border: rgba(193, 154, 107, 0.1);
+
+    --c-dropzone-bg: rgba(212, 180, 131, 0.05);
+    --c-dropzone-border: rgba(212, 180, 131, 0.3);
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(212, 180, 131, 0.15), rgba(193, 154, 107, 0.1));
+
+    --c-progress-track: #3d332a;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(212, 180, 131, 0.2) 0%, rgba(193, 154, 107, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(193, 154, 107, 0.2) 0%, rgba(212, 180, 131, 0.15) 100%);
+}

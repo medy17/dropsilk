@@ -1,6 +1,6 @@
 {
   "name": "dropsilk",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "author": "Ahmed medy17 <> (ahmed@dropsilk.xyz) (https://github.com/medy17)",
   "description": "A modern, privacy-focused, peer-to-peer file transfer application built with WebRTC",
   "repository": {
@@ -11,16 +11,17 @@
   "scripts": {
     "gen:version": "node scripts/generate-version.js",
     "gen:locales": "node scripts/generate-locales.js",
-    "dev": "pnpm gen:version && pnpm gen:locales && vite --host",
-    "build:web": "pnpm gen:version && pnpm gen:locales && vite build",
+    "dev": "pnpm gen:version && pnpm gen:locales && pnpm update-themes && vite --host",
+    "build:web": "pnpm gen:version && pnpm gen:locales && pnpm update-themes && vite build",
     "dev:electron": "concurrently \"pnpm:dev\" \"cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
-    "build:electron": "pnpm gen:version && pnpm gen:locales && cross-env VITE_API_BASE_URL=https://dropsilk-backend.onrender.com vite build --base=./ && electron-builder",
+    "build:electron": "pnpm gen:version && pnpm gen:locales && pnpm update-themes && cross-env VITE_API_BASE_URL=https://dropsilk-backend.onrender.com vite build --base=./ && electron-builder",
     "preview": "vite preview",
     "update-locales": "node scripts/update-locales.js",
-    "test": "pnpm gen:locales && vitest run",
+    "update-themes": "node scripts/update-themes.js",
+    "test": "pnpm gen:locales && pnpm update-themes && vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "pnpm gen:locales && vitest run"
+    "test:run": "pnpm gen:locales && pnpm update-themes && vitest run"
   },
   "build": {
     "appId": "com.dropsilk.app",

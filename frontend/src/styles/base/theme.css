@@ -1,106 +1,106 @@
-body[data-theme="dark"] .aurora-background {
+body[data-mode="dark"] .aurora-background {
     opacity: 1;
 }
 
-body[data-theme="dark"] .main-content {
+body[data-mode="dark"] .main-content {
     background: #fff0;
 }
 
-body[data-theme="dark"] .not-found-content {
+body[data-mode="dark"] .not-found-content {
     background: #fff0;
 }
 
-body[data-theme="dark"] #theme-toggle .sun-icon {
+body[data-mode="dark"] #theme-toggle .sun-icon {
     display: block;
 }
 
-body[data-theme="dark"] #theme-toggle .moon-icon {
+body[data-mode="dark"] #theme-toggle .moon-icon {
     display: none;
 }
 
-body[data-theme="dark"] .not-found-title {
+body[data-mode="dark"] .not-found-title {
     text-shadow: none;
     background: -webkit-linear-gradient(var(--c-primary), var(--c-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: #fff0;
 }
 
-body[data-theme="dark"] .tagline-section {
+body[data-mode="dark"] .tagline-section {
     border: 1.5px solid rgb(245 169 184 / .3);
 }
 
-body[data-theme="dark"] .tagline-section h1 {
+body[data-mode="dark"] .tagline-section h1 {
     text-shadow: none;
 }
 
-body[data-theme="dark"] .flight-ticket-panel-wrapper {
+body[data-mode="dark"] .flight-ticket-panel-wrapper {
     filter: drop-shadow(0 0 15px rgb(91 206 250 / .1));
 }
 
-body[data-theme="dark"] .flight-ticket {
+body[data-mode="dark"] .flight-ticket {
     box-shadow: 0 4px 32px 0 rgb(0 0 0 / .2), 0 1.5px 0 0 var(--c-secondary);
 }
 
-body[data-theme="dark"] .flight-ticket h2 {
+body[data-mode="dark"] .flight-ticket h2 {
     text-shadow: none;
 }
 
-body[data-theme="dark"] #dashboard-flight-code {
+body[data-mode="dark"] #dashboard-flight-code {
     outline: none;
 }
 
-body[data-theme="dark"] #dashboard-flight-code .copy-feedback {
+body[data-mode="dark"] #dashboard-flight-code .copy-feedback {
     background: var(--dark-bg-root);
 }
 
-body[data-theme="dark"] .btn {
+body[data-mode="dark"] .btn {
     outline: none;
 }
 
-body[data-theme="dark"] .drop-zone.drag-over {
+body[data-mode="dark"] .drop-zone.drag-over {
     box-shadow: 0 8px 32px rgb(0 0 0 / .3), 0 0 0 2px rgb(91 206 250 / .3), inset 0 1px 0 rgb(255 255 255 / .05);
 }
 
-body[data-theme="dark"] .file-details__name {
+body[data-mode="dark"] .file-details__name {
     -webkit-mask-image: -webkit-linear-gradient(to right, var(--dark-bg-base) 90%, transparent 100%);
     mask-image: linear-gradient(to right, var(--dark-bg-base) 90%, transparent 100%);
 }
 
-body[data-theme="dark"] .zip-file-list {
+body[data-mode="dark"] .zip-file-list {
     background: rgb(255 255 255 / .02);
 }
 
-body[data-theme="dark"] #zip-modal-warning-footer {
+body[data-mode="dark"] #zip-modal-warning-footer {
     background-color: rgb(248 113 113 / .08);
     border-color: rgb(248 113 113 / .3);
 }
 
 
 
-body[data-theme="dark"] .pdf-page-canvas {
+body[data-mode="dark"] .pdf-page-canvas {
     box-shadow: 0 2px 10px rgb(0 0 0 / .4);
     filter: brightness(.9);
 }
 
-body[data-theme="dark"] .pdf-page-container {
+body[data-mode="dark"] .pdf-page-container {
     background-color: #2c2c34;
     box-shadow: 0 2px 10px rgb(0 0 0 / .4);
 }
 
-body[data-theme="dark"] .boarding-overlay {
+body[data-mode="dark"] .boarding-overlay {
     background: var(--dark-bg-root);
 }
 
-body[data-theme="light"] .settings-menu {
+body[data-mode="light"] .settings-menu {
     background: rgb(255 255 255 / .9);
 }
 
-body[data-theme="light"] .settings-menu button {
+body[data-mode="light"] .settings-menu button {
     color: var(--c-text-primary);
 }
 
-body[data-theme="dark"].video-modal-active .aurora-background,
-body[data-theme="dark"].video-modal-active .aurora-blob {
+body[data-mode="dark"].video-modal-active .aurora-background,
+body[data-mode="dark"].video-modal-active .aurora-blob {
     animation-play-state: paused;
 }
 
@@ -112,24 +112,24 @@ body[data-theme="dark"].video-modal-active .aurora-blob {
     display: block;
 }
 
-body[data-theme="dark"] .ticket-actions .btn-secondary {
+body[data-mode="dark"] .ticket-actions .btn-secondary {
     background: var(--c-btn-primary-bg);
     color: var(--c-primary);
     border-color: var(--c-primary);
     backdrop-filter: none;
 }
 
-body[data-theme="dark"] .ticket-actions .btn-secondary:hover {
+body[data-mode="dark"] .ticket-actions .btn-secondary:hover {
     background: var(--c-primary);
     color: var(--brilliant-white);
     border-color: var(--c-secondary);
 }
 
-body[data-theme="dark"] .settings-select {
+body[data-mode="dark"] .settings-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23f4f4f5' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
 }
 
-body[data-theme="dark"] .otp-input {
+body[data-mode="dark"] .otp-input {
     background-color: var(--c-panel-bg);
     border: 1.5px solid var(--c-primary);
 }

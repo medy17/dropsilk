@@ -16,6 +16,8 @@ describe('Global State Management', () => {
         expect(state.myName.length).toBeGreaterThan(0);
     });
 
+
+
     it('should set current flight code', () => {
         const code = 'ABC123';
         store.actions.setCurrentFlightCode(code);
@@ -62,5 +64,47 @@ describe('Global State Management', () => {
         expect(state.lastMetricsUpdateTime).toBe(time);
         expect(state.sentInInterval).toBe(0);
         expect(state.totalBytesSent).toBe(1000);
+    });
+
+    it('should remove file from queue', () => {
+        const file = new File([''], 'remove-me.txt');
+        const id = 'remove-id';
+        store.actions.addFilesToQueue([file]);
+        store.actions.addFileIdMapping(file, id);
+
+        expect(store.getState().fileToSendQueue).toContain(file);
+
+        store.actions.removeFileFromQueue(id);
+
+        expect(store.getState().fileToSendQueue).not.toContain(file);
+        expect(store.actions.getFileId(file)).toBeUndefined();
+    });
+
+    it('should reorder send queue', () => {
+        const file1 = new File([''], '1.txt');
+        const file2 = new File([''], '2.txt');
+        const file3 = new File([''], '3.txt');
+        const id1 = 'id1', id2 = 'id2', id3 = 'id3';
+
+        store.actions.addFilesToQueue([file1, file2, file3]);
+        store.actions.addFileIdMapping(file1, id1);
+        store.actions.addFileIdMapping(file2, id2);
+        store.actions.addFileIdMapping(file3, id3);
+
+        // Reorder to 3, 1, 2
+        const newOrder = [id3, id1, id2];
+        store.actions.reorderQueueByDom(newOrder);
+
+        const queue = store.getState().fileToSendQueue;
+        expect(queue[0]).toBe(file3);
+        expect(queue[1]).toBe(file1);
+        expect(queue[2]).toBe(file2);
+    });
+
+    it('should persist onboarding state', () => {
+        localStorage.setItem('dropsilk-onboarding', JSON.stringify({ welcome: true }));
+        store.actions.initializeUser();
+        expect(store.getState().onboardingState.welcome).toBe(true);
+        expect(store.getState().onboardingState.invite).toBe(false); // default
     });
 });

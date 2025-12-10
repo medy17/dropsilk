@@ -1,0 +1,35 @@
+/* SAKURA THEME */
+body[data-theme="sakura"] {
+    --brilliant-blue: #ffb7b2;
+    /* Soft Petal Pink */
+    --brilliant-pink: #ff69b4;
+    /* Hot Pink */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+
+    --c-panel-border: rgba(255, 183, 178, 0.5);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(255, 183, 178, 0.2), rgba(255, 105, 180, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(255, 183, 178, 0.3) 0%, rgba(255, 105, 180, 0.2) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(255, 105, 180, 0.2) 0%, rgba(255, 183, 178, 0.2) 100%);
+}
+
+/* Sakura Dark - NIGHT BLOOM */
+body[data-theme="sakura"][data-mode="dark"] {
+    --dark-bg-base: #2a1d23;
+    /* Deep Plum */
+    --dark-bg-root: #1f1519;
+    /* Almost Black Cherry */
+
+    --c-panel-shadow: 0 0 0 1px rgba(255, 183, 178, 0.15), 0 4px 15px rgba(255, 105, 180, 0.1);
+    --c-footer-border: rgba(255, 105, 180, 0.1);
+
+    --c-dropzone-bg: rgba(255, 105, 180, 0.05);
+    --c-dropzone-border: rgba(255, 183, 178, 0.3);
+
+    --c-progress-track: #422c36;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(255, 183, 178, 0.2) 0%, rgba(255, 105, 180, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(255, 105, 180, 0.2) 0%, rgba(255, 183, 178, 0.15) 100%);
+}

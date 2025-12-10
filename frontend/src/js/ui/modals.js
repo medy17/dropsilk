@@ -56,11 +56,13 @@ function openSettingsModal() {
     const downloadIcon = btn.querySelector('.download-icon');
     const saveIcon = btn.querySelector('.save-icon');
     const spinnerIcon = btn.querySelector('.spinner-icon');
+    const checkIcon = btn.querySelector('.check-icon');
 
     if (btnSpan) btnSpan.textContent = i18next.t('savePreferences');
     if (downloadIcon) downloadIcon.style.display = 'none';
     if (saveIcon) saveIcon.style.display = 'inline-block';
     if (spinnerIcon) spinnerIcon.style.display = 'none';
+    if (checkIcon) checkIcon.style.display = 'none';
     btn.disabled = false;
 
     const selectAllLabel = uiElements.selectAllZipCheckbox?.closest('.checkbox-label')?.querySelector('span:last-of-type');
@@ -80,7 +82,7 @@ function openSettingsModal() {
  */
 function updateSettingsSummary() {
     // Use the summary from settingsData module
-    uiElements.zipSelectionInfo.textContent = getSettingsSummary();
+    uiElements.zipSelectionInfo.innerHTML = getSettingsSummary();
     uiElements.downloadSelectedBtn.disabled = false;
 
     // Update select all checkbox based on boolean settings
@@ -140,13 +142,42 @@ function toggleAllSettings(isOn) {
 /**
  * Saves settings preferences (closes modal)
  */
-function saveSettingsPreferences() {
-    // Update PPTX preview buttons
-    updatePptxPreviewButtonsDisabled();
+const saveSettingsPreferences = () => {
+    // Visual feedback elements
+    const btn = uiElements.downloadSelectedBtn;
+    const saveIcon = btn.querySelector('.save-icon');
+    const spinnerIcon = btn.querySelector('.spinner-icon');
+    const checkIcon = btn.querySelector('.check-icon');
+    const btnSpan = btn.querySelector('span');
+    const originalText = i18next.t('savePreferences');
 
-    // Close modal
-    document.getElementById('closeZipModal')?.click();
-}
+    // 1. Show spinner
+    if (saveIcon) saveIcon.style.display = 'none';
+    if (spinnerIcon) spinnerIcon.style.display = 'inline-block';
+    if (btnSpan) btnSpan.textContent = i18next.t('saving');
+    btn.disabled = true;
+
+    // Simulate saving delay (e.g. 500ms)
+    setTimeout(() => {
+        // 2. Show checkmark
+        if (spinnerIcon) spinnerIcon.style.display = 'none';
+        if (checkIcon) checkIcon.style.display = 'inline-block';
+        if (btnSpan) btnSpan.textContent = i18next.t('saved', 'Saved!'); // Ensure 'saved' key exists or use fallback
+
+        // 3. Close after delay
+        setTimeout(() => {
+            // Update PPTX preview buttons
+            updatePptxPreviewButtonsDisabled();
+
+            // Close modal
+            document.getElementById('closeZipModal')?.click();
+
+            // Reset button state (optional, but good for next open)
+            // Ideally existing openSettingsModal resets it, but safe to do here if needed
+            // For now, rely on openSettingsModal to reset.
+        }, 750);
+    }, 500);
+};
 
 /**
  * Initializes all modals

@@ -1,0 +1,37 @@
+/* TOXIC THEME */
+body[data-theme="toxic"] {
+    --brilliant-blue: #ccff00;
+    /* Acid Lime */
+    --brilliant-pink: #bf00ff;
+    /* Electric Purple */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+
+    --c-panel-border: rgba(204, 255, 0, 0.4);
+
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(204, 255, 0, 0.15), rgba(191, 0, 255, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(204, 255, 0, 0.2) 0%, rgba(191, 0, 255, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(191, 0, 255, 0.2) 0%, rgba(204, 255, 0, 0.15) 100%);
+}
+
+/* Toxic Dark - HAZARD ZONE */
+body[data-theme="toxic"][data-mode="dark"] {
+    --dark-bg-base: #121212;
+    --dark-bg-root: #000000;
+
+    --c-panel-shadow: 0 0 0 1px rgba(204, 255, 0, 0.3), 0 0 15px rgba(191, 0, 255, 0.2);
+    --c-footer-border: rgba(204, 255, 0, 0.2);
+
+    --c-dropzone-bg: rgba(204, 255, 0, 0.05);
+    --c-dropzone-border: rgba(204, 255, 0, 0.5);
+    /* Strong border */
+
+    --c-progress-track: #2a2a2a;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(204, 255, 0, 0.3) 0%, rgba(191, 0, 255, 0.2) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(191, 0, 255, 0.3) 0%, rgba(204, 255, 0, 0.2) 100%);
+
+    --c-success: #ccff00;
+    --c-danger: #ff0055;
+}

@@ -1,0 +1,37 @@
+/* PASTEL THEME (The Marshmallow) */
+body[data-theme="candy"] {
+    --brilliant-blue: #ff9eb5;
+    /* Baby Pink */
+    --brilliant-pink: #c4b5fd;
+    /* Soft Lavender */
+
+    --c-primary: var(--brilliant-blue);
+    --c-secondary: var(--brilliant-pink);
+
+    --c-panel-border: rgba(255, 158, 181, 0.4);
+
+    /* Very airy, dreamy gradients */
+    --c-dropzone-hover-bg: linear-gradient(135deg, rgba(255, 158, 181, 0.15), rgba(196, 181, 253, 0.1));
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(255, 158, 181, 0.25) 0%, rgba(196, 181, 253, 0.2) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(196, 181, 253, 0.25) 0%, rgba(255, 158, 181, 0.2) 100%);
+}
+
+/* Pastel Dark - DREAM STATE */
+body[data-theme="candy"][data-mode="dark"] {
+    /* This is NOT black. It's a deep, desaturated dusty plum. Very soft. */
+    --dark-bg-base: #2a2430;
+    --dark-bg-root: #1f1a24;
+
+    /* Shadows are soft glowing halos, not hard lines */
+    --c-panel-shadow: 0 0 0 1px rgba(255, 158, 181, 0.15), 0 4px 20px rgba(196, 181, 253, 0.05);
+
+    --c-footer-border: rgba(255, 158, 181, 0.1);
+
+    --c-dropzone-bg: rgba(255, 158, 181, 0.04);
+    --c-dropzone-border: rgba(255, 158, 181, 0.3);
+
+    --c-progress-track: #3d3442;
+
+    --c-btn-primary-bg: linear-gradient(90deg, rgba(255, 158, 181, 0.2) 0%, rgba(196, 181, 253, 0.15) 100%);
+    --c-btn-secondary-bg: linear-gradient(90deg, rgba(196, 181, 253, 0.2) 0%, rgba(255, 158, 181, 0.15) 100%);
+}
