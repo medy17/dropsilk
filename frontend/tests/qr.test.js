@@ -185,25 +185,8 @@ describe('QR Workflow', () => {
             expect(mainContent.style.display).toBe('none');
         });
 
-        it('should auto-fill input and trigger join when WebSocket connects with URL param', async () => {
-            window.location.search = '?code=AUTO99';
-
-            const ghostInput = document.getElementById('otp-ghost-input');
-            const joinBtn = document.getElementById('joinFlightBtn');
-            const joinSpy = vi.spyOn(joinBtn, 'click');
-
-            // We mock the onOpen logic flow here because we cannot easily access
-            // the internal onOpen function of the websocket module in this test scope.
-            const urlParams = new URLSearchParams(window.location.search);
-            const flightCodeFromUrl = urlParams.get('code');
-
-            if (flightCodeFromUrl) {
-                ghostInput.value = flightCodeFromUrl.toUpperCase();
-                joinBtn.click();
-            }
-
-            expect(ghostInput.value).toBe('AUTO99');
-            expect(joinSpy).toHaveBeenCalled();
-        });
+        // NOTE: The WebSocket onOpen auto-join flow is tested implicitly via integration.
+        // A unit test here would require mocking the WebSocket module internals,
+        // which is complex and provides limited value vs. E2E testing.
     });
 });

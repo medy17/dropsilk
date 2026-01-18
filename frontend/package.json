@@ -24,7 +24,7 @@
     "test:ui": "vitest --ui",
     "test:run": "pnpm gen:locales && pnpm update-themes && vitest run",
     "lint": "eslint .",
-    "prepare": "node -e \"if (process.env.CI !== '1') require('husky').install()\""
+    "prepare": "husky"
   },
   "lint-staged": {
     "*.js": "eslint --fix"
@@ -74,16 +74,18 @@
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@testing-library/dom": "^10.4.1",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "^39.2.1",
     "electron-builder": "^26.0.12",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "globals": "^16.5.0",
     "husky": "^9.1.7",
     "jsdom": "^27.2.0",
     "lint-staged": "^16.2.7",
+    "picocolors": "^1.1.1",
     "vite": "^7.2.2",
     "vitest": "^4.0.10"
   }

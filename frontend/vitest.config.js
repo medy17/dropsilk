@@ -1,5 +1,6 @@
 // vitest.config.js
 import { defineConfig } from 'vitest/config';
+import PrettyReporter from './tests/pretty-reporter.js';
 
 export default defineConfig({
     test: {
@@ -7,5 +8,6 @@ export default defineConfig({
         globals: true,        // Allows using describe, it, expect without imports
         setupFiles: ['./tests/setup.js'], // We need to mock some browser APIs
         include: ['tests/**/*.test.js'],
+        reporters: [new PrettyReporter()],
     },
 });

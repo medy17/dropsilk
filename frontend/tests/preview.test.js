@@ -65,12 +65,6 @@ describe('Preview Configuration', () => {
     });
 });
 
-describe('Preview Manager', () => {
-    it('should pass sanity check', () => {
-        expect(true).toBe(true);
-    });
-    // We would need to import showPreview from previewManager.js
-    // Mocks would be needed for store, dom elements, etc.
-    // Given previewManager.js uses extensive DOM manipulation and script loading,
-    // we'll add a basic test for updatePptxPreviewButtonsDisabled which is exported.
-});
+// NOTE: Preview Manager (previewManager.js) requires extensive DOM manipulation
+// and dynamic script loading. Its core functionality is better tested via E2E
+// tests rather than unit tests with heavy mocking.
