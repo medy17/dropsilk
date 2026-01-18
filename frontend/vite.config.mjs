@@ -8,7 +8,7 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
     build: {
-        chunkSizeWarningLimit: 1000, // Suppress large chunk warnings
+        chunkSizeWarningLimit: 2000, // Suppress large chunk warnings (pdf.worker is ~1.9MB)
         rollupOptions: {
             input: {
                 main: resolve(__dirname, 'index.html'),
