@@ -2,8 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
     populateZipModal,
-    updateZipSelection,
-    resetZipModal
+    updateZipSelection
 } from '../src/js/features/zip/zipModal.js';
 import { downloadAllFilesAsZip } from '../src/js/transfer/zipHandler.js';
 import { uiElements } from '../src/js/ui/dom.js';

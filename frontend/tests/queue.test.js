@@ -1,5 +1,5 @@
 // tests/queue.test.js
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { handleFileSelection, handleFolderSelection, setupQueueDragDrop } from '../src/js/transfer/queueManager.js';
 import { store } from '../src/js/state.js';
 import { uiElements } from '../src/js/ui/dom.js';

@@ -2,7 +2,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { initializeModals } from '../src/js/ui/modals.js';
 import { uiElements } from '../src/js/ui/dom.js';
-import i18next from '../src/js/i18n.js';
 
 // Mocks
 vi.mock('../src/js/ui/dom.js', () => ({

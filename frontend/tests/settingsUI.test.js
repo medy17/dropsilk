@@ -5,7 +5,6 @@ import { createSettingsModalHTML, bindSettingsEvents } from '../src/js/features/
 import { audioManager } from '../src/js/utils/audioManager.js';
 import * as themeForMock from '../src/js/features/theme/index.js';
 import * as settingsData from '../src/js/features/settings/settingsData.js';
-import i18next from '../src/js/i18n.js';
 
 // --- MOCKS ---
 
