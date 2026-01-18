@@ -3,11 +3,11 @@
  * A custom Vitest reporter with progress bar and colorful output
  */
 
-import pc from "picocolors";
-import path from "node:path";
+import pc from 'picocolors';
+import path from 'node:path';
 
 function normalisePath(p) {
-    return p.replaceAll("\\", "/");
+    return p.replaceAll('\\', '/');
 }
 
 function toRelative(p) {
@@ -30,58 +30,58 @@ function safeDirname(p) {
     try {
         return path.dirname(p);
     } catch {
-        return "";
+        return '';
     }
 }
 
 function normaliseState(rawState, mode) {
-    if (mode === "skip") return "skip";
-    if (mode === "todo") return "todo";
+    if (mode === 'skip') return 'skip';
+    if (mode === 'todo') return 'todo';
 
-    const s = String(rawState ?? "").toLowerCase();
+    const s = String(rawState ?? '').toLowerCase();
 
-    if (s === "pass" || s === "passed" || s === "success") return "pass";
-    if (s === "fail" || s === "failed") return "fail";
-    if (s === "skip" || s === "skipped") return "skip";
-    if (s === "todo") return "todo";
+    if (s === 'pass' || s === 'passed' || s === 'success') return 'pass';
+    if (s === 'fail' || s === 'failed') return 'fail';
+    if (s === 'skip' || s === 'skipped') return 'skip';
+    if (s === 'todo') return 'todo';
 
-    if (!s) return "pending";
-    return "unknown";
+    if (!s) return 'pending';
+    return 'unknown';
 }
 
 function iconFor(state) {
     switch (state) {
-        case "pass":
-            return pc.green("✔");
-        case "fail":
-            return pc.red("✖");
-        case "skip":
-            return pc.yellow("↷");
-        case "todo":
-            return pc.yellow("…");
-        case "pending":
-            return pc.gray("·");
-        default:
-            return pc.gray("?");
+    case 'pass':
+        return pc.green('✔');
+    case 'fail':
+        return pc.red('✖');
+    case 'skip':
+        return pc.yellow('↷');
+    case 'todo':
+        return pc.yellow('…');
+    case 'pending':
+        return pc.gray('·');
+    default:
+        return pc.gray('?');
     }
 }
 
 function colourName(state, text) {
     switch (state) {
-        case "pass":
-            return pc.white(text);
-        case "fail":
-            return pc.red(text);
-        case "skip":
-        case "todo":
-            return pc.yellow(text);
-        default:
-            return pc.gray(text);
+    case 'pass':
+        return pc.white(text);
+    case 'fail':
+        return pc.red(text);
+    case 'skip':
+    case 'todo':
+        return pc.yellow(text);
+    default:
+        return pc.gray(text);
     }
 }
 
 function formatDuration(ms) {
-    if (!ms || ms <= 0) return "";
+    if (!ms || ms <= 0) return '';
     if (ms < 1000) return pc.dim(` ${Math.round(ms)}ms`);
     return pc.dim(` ${(ms / 1000).toFixed(2)}s`);
 }
@@ -113,10 +113,10 @@ export default class PrettyReporter {
                 return this.originalStderr(chunk, ...args);
             };
 
-            process.stdout.write(pc.cyan(pc.bold("\n 🧪 DROPSILK TEST SUITE \n")));
-            process.stdout.write(pc.gray(" Running tests…\n\n"));
+            process.stdout.write(pc.cyan(pc.bold('\n 🧪 DROPSILK TEST SUITE \n')));
+            process.stdout.write(pc.gray(' Running tests…\n\n'));
         } catch (e) {
-            console.error("Reporter init error:", e);
+            console.error('Reporter init error:', e);
         }
     }
 
@@ -131,17 +131,17 @@ export default class PrettyReporter {
                 const state = normaliseState(pack.result.state, undefined);
 
                 const terminal =
-                    state === "pass" || state === "fail" || state === "skip" || state === "todo";
+                    state === 'pass' || state === 'fail' || state === 'skip' || state === 'todo';
 
                 if (!terminal) continue;
                 if (this.completed.has(pack.id)) continue;
 
                 this.completed.add(pack.id);
 
-                if (state === "pass") this.pass += 1;
-                if (state === "fail") this.fail += 1;
-                if (state === "skip") this.skip += 1;
-                if (state === "todo") this.todo += 1;
+                if (state === 'pass') this.pass += 1;
+                if (state === 'fail') this.fail += 1;
+                if (state === 'skip') this.skip += 1;
+                if (state === 'todo') this.todo += 1;
             }
 
             // Progress bar (throttled to prevent flickering)
@@ -151,18 +151,18 @@ export default class PrettyReporter {
 
             this.renderProgressLine();
         } catch (e) {
-            console.error("Reporter update error:", e);
+            console.error('Reporter update error:', e);
         }
     }
 
     onTestRunEnd() {
         try {
             // Clear the progress line
-            process.stdout.write("\r\x1b[2K\n");
+            process.stdout.write('\r\x1b[2K\n');
             this.printReportFromState();
         } catch (e) {
             // Don't let reporter errors affect exit code
-            console.error("Reporter error:", e);
+            console.error('Reporter error:', e);
         }
     }
 
@@ -188,7 +188,7 @@ export default class PrettyReporter {
 
         const walk = (t) => {
             if (!t) return;
-            if (t.type === "test") total += 1;
+            if (t.type === 'test') total += 1;
             if (Array.isArray(t.tasks)) t.tasks.forEach(walk);
         };
 
@@ -208,29 +208,29 @@ export default class PrettyReporter {
         const width = 28;
         const filled = Math.round((pct / 100) * width);
         const bar =
-            pc.green("█".repeat(filled)) + pc.gray("░".repeat(width - filled));
+            pc.green('█'.repeat(filled)) + pc.gray('░'.repeat(width - filled));
 
         const elapsed = (Date.now() - this.startMs) / 1000;
 
         const line = [
-            pc.dim(" Progress "),
-            "[",
+            pc.dim(' Progress '),
+            '[',
             bar,
-            "] ",
+            '] ',
             pc.white(`${pct}%`),
             pc.dim(`  (${done}/${this.totalTests})`),
-            pc.dim("  | "),
+            pc.dim('  | '),
             pc.green(`✔ ${this.pass}`),
-            pc.dim(" "),
+            pc.dim(' '),
             pc.red(`✖ ${this.fail}`),
-            pc.dim(" "),
+            pc.dim(' '),
             pc.yellow(`↷ ${this.skip}`),
-            this.todo ? pc.dim(" ") : "",
-            this.todo ? pc.yellow(`… ${this.todo}`) : "",
+            this.todo ? pc.dim(' ') : '',
+            this.todo ? pc.yellow(`… ${this.todo}`) : '',
             pc.dim(`  | ${elapsed.toFixed(1)}s`),
-        ].join("");
+        ].join('');
 
-        process.stdout.write("\r\x1b[2K" + line);
+        process.stdout.write('\r\x1b[2K' + line);
     }
 
     printReportFromState() {
@@ -247,14 +247,14 @@ export default class PrettyReporter {
         this.todo = totals.todo;
         this.totalTests = totals.total;
 
-        process.stdout.write(pc.cyan(pc.bold("\n 📊 RESULTS \n")));
+        process.stdout.write(pc.cyan(pc.bold('\n 📊 RESULTS \n')));
 
         // Group by directory
         const grouped = new Map();
         for (const file of files) {
-            const raw = file.filepath ?? file.file ?? file.name ?? "";
+            const raw = file.filepath ?? file.file ?? file.name ?? '';
             const rel = normalisePath(toRelative(raw));
-            const dir = normalisePath(safeDirname(rel)) || ".";
+            const dir = normalisePath(safeDirname(rel)) || '.';
             const arr = grouped.get(dir) ?? [];
             arr.push(file);
             grouped.set(dir, arr);
@@ -263,18 +263,18 @@ export default class PrettyReporter {
         const dirs = [...grouped.keys()].sort((a, b) => a.localeCompare(b));
 
         for (const dir of dirs) {
-            const niceDir = dir === "." ? "tests" : dir;
+            const niceDir = dir === '.' ? 'tests' : dir;
             process.stdout.write(pc.magenta(pc.bold(`\n 📁 ${niceDir}\n`)));
 
             const dirFiles = grouped.get(dir) ?? [];
             dirFiles.sort((a, b) => {
-                const ap = a.filepath ?? a.file ?? a.name ?? "";
-                const bp = b.filepath ?? b.file ?? b.name ?? "";
+                const ap = a.filepath ?? a.file ?? a.name ?? '';
+                const bp = b.filepath ?? b.file ?? b.name ?? '';
                 return ap.localeCompare(bp);
             });
 
             for (const file of dirFiles) {
-                const raw = file.filepath ?? file.file ?? file.name ?? "";
+                const raw = file.filepath ?? file.file ?? file.name ?? '';
                 const rel = normalisePath(toRelative(raw));
                 const fname = safeBasename(rel);
 
@@ -290,11 +290,11 @@ export default class PrettyReporter {
                 if (stats.todo > 0) extrasParts.push(pc.yellow(`${stats.todo} todo`));
 
                 const extras = extrasParts.length
-                    ? pc.dim(` (${extrasParts.join(", ")})`)
-                    : "";
+                    ? pc.dim(` (${extrasParts.join(', ')})`)
+                    : '';
 
                 process.stdout.write(
-                    `  ${pc.dim(fname)}${pc.dim("  ")}${badge}${extras}${formatDuration(
+                    `  ${pc.dim(fname)}${pc.dim('  ')}${badge}${extras}${formatDuration(
                         stats.durationMs,
                     )}\n`,
                 );
@@ -302,7 +302,7 @@ export default class PrettyReporter {
                 if (Array.isArray(file.tasks) && file.tasks.length) {
                     for (const t of file.tasks) this.printTaskTree(t, 4);
                 } else {
-                    process.stdout.write(pc.dim("    (no tasks collected)\n"));
+                    process.stdout.write(pc.dim('    (no tasks collected)\n'));
                 }
             }
         }
@@ -310,11 +310,11 @@ export default class PrettyReporter {
         const done = this.pass + this.fail + this.skip + this.todo;
         const pct = this.totalTests ? Math.round((done / this.totalTests) * 100) : 0;
 
-        process.stdout.write(pc.gray("\n ─────────────────────────────────────────────\n"));
+        process.stdout.write(pc.gray('\n ─────────────────────────────────────────────\n'));
         process.stdout.write(
             ` Summary: ${pc.green(`✔ ${this.pass}`)}  ${pc.red(
                 `✖ ${this.fail}`,
-            )}  ${pc.yellow(`↷ ${this.skip}`)}${this.todo ? `  ${pc.yellow(`… ${this.todo}`)}` : ""
+            )}  ${pc.yellow(`↷ ${this.skip}`)}${this.todo ? `  ${pc.yellow(`… ${this.todo}`)}` : ''
             }\n`,
         );
         process.stdout.write(
@@ -331,7 +331,7 @@ export default class PrettyReporter {
             process.exitCode = 1;
         } else {
             process.stdout.write(
-                pc.green(`\n ✅ All tests passed!\n\n`),
+                pc.green('\n ✅ All tests passed!\n\n'),
             );
             process.exitCode = 0;
         }
@@ -347,13 +347,13 @@ export default class PrettyReporter {
         const walk = (t) => {
             if (!t) return;
 
-            if (t.type === "test") {
+            if (t.type === 'test') {
                 total += 1;
                 const st = normaliseState(t.result?.state, t.mode);
-                if (st === "pass") pass += 1;
-                else if (st === "fail") fail += 1;
-                else if (st === "skip") skip += 1;
-                else if (st === "todo") todo += 1;
+                if (st === 'pass') pass += 1;
+                else if (st === 'fail') fail += 1;
+                else if (st === 'skip') skip += 1;
+                else if (st === 'todo') todo += 1;
             }
 
             if (Array.isArray(t.tasks)) t.tasks.forEach(walk);
@@ -376,14 +376,14 @@ export default class PrettyReporter {
         const walk = (t) => {
             if (!t) return;
 
-            if (t.type === "test") {
+            if (t.type === 'test') {
                 const st = normaliseState(t.result?.state, t.mode);
-                if (st === "pass") pass += 1;
-                else if (st === "fail") fail += 1;
-                else if (st === "skip") skip += 1;
-                else if (st === "todo") todo += 1;
+                if (st === 'pass') pass += 1;
+                else if (st === 'fail') fail += 1;
+                else if (st === 'skip') skip += 1;
+                else if (st === 'todo') todo += 1;
 
-                if (typeof t.result?.duration === "number") {
+                if (typeof t.result?.duration === 'number') {
                     durationMs += t.result.duration;
                 }
             }
@@ -397,9 +397,9 @@ export default class PrettyReporter {
     }
 
     printTaskTree(task, indent) {
-        const pad = " ".repeat(indent);
+        const pad = ' '.repeat(indent);
 
-        if (task.type === "suite") {
+        if (task.type === 'suite') {
             if (task.name && task.name.trim()) {
                 process.stdout.write(`${pad}${pc.blue(pc.bold(task.name))}\n`);
             }
@@ -409,33 +409,33 @@ export default class PrettyReporter {
             return;
         }
 
-        if (task.type === "test") {
+        if (task.type === 'test') {
             const state = normaliseState(task.result?.state, task.mode);
             const icon = iconFor(state);
-            const name = colourName(state, task.name ?? "(unnamed test)");
+            const name = colourName(state, task.name ?? '(unnamed test)');
             const time = formatDuration(task.result?.duration);
 
             process.stdout.write(`${pad}${icon} ${name}${time}\n`);
 
-            if (state === "fail" && Array.isArray(task.result?.errors)) {
+            if (state === 'fail' && Array.isArray(task.result?.errors)) {
                 for (const err of task.result.errors) {
                     let msg;
                     if (err instanceof Error) {
-                        msg = err.message.split("\n")[0];
-                    } else if (typeof err === "string") {
-                        msg = err.split("\n")[0];
-                    } else if (err && typeof err === "object") {
+                        msg = err.message.split('\n')[0];
+                    } else if (typeof err === 'string') {
+                        msg = err.split('\n')[0];
+                    } else if (err && typeof err === 'object') {
                         // Handle objects that can't be converted to primitive
                         try {
                             msg = JSON.stringify(err).slice(0, 100);
                         } catch {
-                            msg = "[object]";
+                            msg = '[object]';
                         }
                     } else {
-                        msg = String(err ?? "Unknown error").split("\n")[0];
+                        msg = String(err ?? 'Unknown error').split('\n')[0];
                     }
 
-                    process.stdout.write(`${pad}  ${pc.red("└─ ")}${pc.dim(msg)}\n`);
+                    process.stdout.write(`${pad}  ${pc.red('└─ ')}${pc.dim(msg)}\n`);
                 }
             }
         }
