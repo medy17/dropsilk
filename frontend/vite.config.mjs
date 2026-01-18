@@ -8,6 +8,7 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
     build: {
+        chunkSizeWarningLimit: 1000, // Suppress large chunk warnings
         rollupOptions: {
             input: {
                 main: resolve(__dirname, 'index.html'),
