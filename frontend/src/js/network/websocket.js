@@ -286,9 +286,14 @@ async function onMessage(event) {
     switch (msg.type) {
     case 'registered':
         store.actions.setMyId(msg.id);
-        // Store the session token for reconnection
-        if (msg.sessionToken) {
-            store.actions.setSessionToken(msg.sessionToken);
+        
+        // If we are performing a fresh connect (not a reconnect), store the new token.
+        // If we ARE reconnecting, we MUST PRESERVE our old sessionToken to prove who we are.
+        // The server will confirm the valid token in 'rejoin-success'.
+        if (reconnectAttempts === 0) {
+            if (msg.sessionToken) {
+                store.actions.setSessionToken(msg.sessionToken);
+            }
         }
 
         // If we're reconnecting and have a prior flight + session, attempt rejoin
