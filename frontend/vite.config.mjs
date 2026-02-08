@@ -17,4 +17,9 @@ export default defineConfig({
         },
     },
     publicDir: 'public',
+    preview: {
+        mode: 'development', // Run preview in development mode to connect to local backend
+        port: 4173,
+        host: true,
+    },
 });

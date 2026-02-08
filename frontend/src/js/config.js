@@ -1,13 +1,17 @@
 // js/config.js (FINAL, CORRECTED VERSION)
 
 function getWebSocketUrl() {
+    // Check if we're running in vite preview (localhost:4173 or similar)
+    const isPreviewMode = window.location.port === '4173' || 
+                         (window.location.hostname === 'localhost' && window.location.port !== '5173');
+    
     // Vite sets this variable automatically. It's 'production' during a build, and 'development' during dev.
-    if (import.meta.env.MODE === 'production') {
-        // For any production build (web deploy OR Electron), always use the production URL.
+    if (import.meta.env.MODE === 'production' && !isPreviewMode) {
+        // For production builds (web deploy OR Electron), use the production URL.
         return 'wss://dropsilk-backend.onrender.com';
     }
 
-    // The following logic will only run in development mode (`npm run dev` or `npm run dev:electron`).
+    // For development mode or preview mode, connect to local backend
     if (window.location.protocol !== 'https:') {
         // Connect to the local backend using the same hostname but on port 8080.
         return `ws://${window.location.hostname}:8080`;
