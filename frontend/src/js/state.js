@@ -13,6 +13,10 @@ const initialState = {
     connectionType: 'wan',
     lastNetworkUsers: [],
 
+    // Session / reconnect state
+    sessionToken: null,
+    intentionalLeave: false,
+
     // Transfer state
     fileToSendQueue: [],
     currentlySendingFile: null,
@@ -66,7 +70,20 @@ export const store = {
             state.fileIdMap = new Map();
             store.actions.initializeUser();
         },
+        // Soft reset: preserves flight code, session token, file queue, and name for reconnection
+        softReset: () => {
+            state.peerInfo = null;
+            if (state.metricsInterval) clearInterval(state.metricsInterval);
+            state.metricsInterval = null;
+            state.totalBytesSent = 0;
+            state.totalBytesReceived = 0;
+            state.sentInInterval = 0;
+            state.receivedInInterval = 0;
+            state.lastMetricsUpdateTime = 0;
+        },
         setMyId: (id) => { state.myId = id; },
+        setSessionToken: (token) => { state.sessionToken = token; },
+        setIntentionalLeave: (value) => { state.intentionalLeave = value; },
         setCurrentFlightCode: (code) => { state.currentFlightCode = code; },
         setIsFlightCreator: (isCreator) => { state.isFlightCreator = isCreator; },
         setConnectionType: (type) => { state.connectionType = type; },

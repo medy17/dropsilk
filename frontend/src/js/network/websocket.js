@@ -1,5 +1,6 @@
 // js/network/websocket.js
 // Manages the WebSocket signalling server connection.
+// Includes reconnect engine, visibility lifecycle handlers, and session token management.
 
 import i18next from '../i18n.js';
 import { WEBSOCKET_URL } from '../config.js';
@@ -25,15 +26,34 @@ import { showInviteOnboarding } from '../ui/onboarding.js';
 import { audioManager } from '../utils/audioManager.js';
 import { uiElements } from '../ui/dom.js';
 
+// --- Connection state ---
 let ws;
 let isAutoJoining = false;
 
+// --- Reconnect engine state ---
+let reconnectAttempts = 0;
+let reconnectTimer = null;
+let reconnectToastHandle = null;
+const MAX_RECONNECT_ATTEMPTS = 8;
+const BASE_RECONNECT_DELAY = 1000; // 1s
+const MAX_RECONNECT_DELAY = 30000; // 30s
+
+// --- Lifecycle state ---
+let wasHiddenDuringFlight = false;
+let lifecycleHandlersAttached = false;
+
+// ─────────────────────────────────────────────
+//  PUBLIC API
+// ─────────────────────────────────────────────
+
 export function connect() {
+    cleanupSocket();
     ws = new WebSocket(WEBSOCKET_URL);
     ws.onopen = onOpen;
     ws.onmessage = onMessage;
     ws.onclose = onClose;
     ws.onerror = onError;
+    attachLifecycleHandlers();
 }
 
 export function sendMessage(payload) {
@@ -41,6 +61,173 @@ export function sendMessage(payload) {
         ws.send(JSON.stringify(payload));
     }
 }
+
+// ─────────────────────────────────────────────
+//  LIFECYCLE HANDLERS (Mobile background/foreground)
+// ─────────────────────────────────────────────
+
+function attachLifecycleHandlers() {
+    if (lifecycleHandlersAttached) return;
+    lifecycleHandlersAttached = true;
+
+    // visibilitychange: fires when user switches tabs, opens file picker, etc.
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    // pageshow: fires when returning from bfcache (back-forward cache), common on iOS
+    window.addEventListener('pageshow', onPageShow);
+
+    // beforeunload: user is intentionally navigating away or refreshing
+    window.addEventListener('beforeunload', onBeforeUnload);
+}
+
+function onVisibilityChange() {
+    if (document.visibilityState === 'hidden') {
+        // Tab went to background. Mark this so we know to attempt reconnect on return.
+        const { currentFlightCode } = store.getState();
+        if (currentFlightCode) {
+            wasHiddenDuringFlight = true;
+        }
+    } else if (document.visibilityState === 'visible') {
+        // Tab came back to foreground
+        console.log('[WS] Tab became visible. WS readyState:', ws?.readyState);
+        if (wasHiddenDuringFlight && (!ws || ws.readyState !== WebSocket.OPEN)) {
+            console.log('[WS] Connection lost while in background. Attempting reconnect...');
+            attemptReconnect();
+        }
+        wasHiddenDuringFlight = false;
+    }
+}
+
+function onPageShow(event) {
+    // event.persisted is true when the page is restored from bfcache
+    if (event.persisted || (ws && ws.readyState !== WebSocket.OPEN)) {
+        const { currentFlightCode } = store.getState();
+        if (currentFlightCode) {
+            console.log('[WS] Page restored (bfcache or stale). Reconnecting...');
+            attemptReconnect();
+        }
+    }
+}
+
+function onBeforeUnload() {
+    // Mark as intentional so onClose doesn't try to reconnect
+    store.actions.setIntentionalLeave(true);
+}
+
+// ─────────────────────────────────────────────
+//  RECONNECT ENGINE
+// ─────────────────────────────────────────────
+
+function attemptReconnect() {
+    if (reconnectTimer) return; // Already scheduled
+    if (store.getState().intentionalLeave) return; // User chose to leave
+
+    if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+        console.warn('[WS] Max reconnect attempts reached. Giving up.');
+        handlePermanentDisconnect();
+        return;
+    }
+
+    const delay = Math.min(
+        BASE_RECONNECT_DELAY * Math.pow(2, reconnectAttempts),
+        MAX_RECONNECT_DELAY,
+    );
+    reconnectAttempts++;
+
+    console.log(`[WS] Reconnect attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms`);
+
+    // Show a non-destructive toast (only on first attempt)
+    if (reconnectAttempts === 1) {
+        reconnectToastHandle = showToast({
+            type: 'info',
+            title: i18next.t('reconnecting', 'Reconnecting...'),
+            body: i18next.t('reconnectingDescription', 'Connection interrupted. Reconnecting to your flight...'),
+            duration: 0,
+        });
+    }
+
+    reconnectTimer = setTimeout(() => {
+        reconnectTimer = null;
+        doReconnect();
+    }, delay);
+}
+
+function doReconnect() {
+    cleanupSocket();
+    ws = new WebSocket(WEBSOCKET_URL);
+    ws.onopen = onReconnectOpen;
+    ws.onmessage = onMessage;
+    ws.onclose = onReconnectClose;
+    ws.onerror = onError;
+}
+
+function onReconnectOpen() {
+    console.log('[WS] Reconnected to server.');
+
+    // Re-register with the server
+    sendMessage({
+        type: 'register-details',
+        name: store.getState().myName,
+        localIpPrefix: 'unknown',
+        localIp: 'unknown',
+    });
+
+    // The server will respond with 'registered' which gives us a new ID.
+    // We then attempt to rejoin our flight via the session token.
+    // The rejoin attempt happens in onMessage when we receive 'registered'.
+}
+
+function onReconnectClose() {
+    console.warn('[WS] Reconnect socket closed.');
+    attemptReconnect();
+}
+
+function resetReconnectState() {
+    reconnectAttempts = 0;
+    if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+    }
+    if (reconnectToastHandle) {
+        reconnectToastHandle.remove();
+        reconnectToastHandle = null;
+    }
+    wasHiddenDuringFlight = false;
+}
+
+function cleanupSocket() {
+    if (ws) {
+        // Remove handlers to prevent stale callbacks
+        ws.onopen = null;
+        ws.onmessage = null;
+        ws.onclose = null;
+        ws.onerror = null;
+        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+            ws.close();
+        }
+        ws = null;
+    }
+}
+
+/**
+ * Called when reconnection has completely failed or grace period expired.
+ * NOW we nuke state and show the fatal error.
+ */
+function handlePermanentDisconnect() {
+    resetReconnectState();
+    failBoarding();
+    showToast({
+        type: 'danger',
+        title: i18next.t('connectionLost', 'Connection Lost'),
+        body: i18next.t('connectionLostDescription', 'Could not reconnect to the server. Please refresh the page.'),
+        duration: 0,
+    });
+    store.actions.resetState();
+}
+
+// ─────────────────────────────────────────────
+//  WEBSOCKET EVENT HANDLERS
+// ─────────────────────────────────────────────
 
 function onOpen() {
     sendMessage({
@@ -99,7 +286,111 @@ async function onMessage(event) {
     switch (msg.type) {
     case 'registered':
         store.actions.setMyId(msg.id);
+        // Store the session token for reconnection
+        if (msg.sessionToken) {
+            store.actions.setSessionToken(msg.sessionToken);
+        }
+
+        // If we're reconnecting and have a prior flight + session, attempt rejoin
+        if (reconnectAttempts > 0 && state.currentFlightCode && state.sessionToken) {
+            console.log('[WS] Attempting rejoin-flight:', state.currentFlightCode);
+            sendMessage({
+                type: 'rejoin-flight',
+                sessionToken: state.sessionToken,
+                flightCode: state.currentFlightCode,
+            });
+        }
         break;
+
+    case 'rejoin-success':
+        console.log('[WS] Rejoin successful:', msg.flightCode);
+        resetReconnectState();
+
+        // Update session token if the server echoed a new one
+        if (msg.sessionToken) {
+            store.actions.setSessionToken(msg.sessionToken);
+        }
+        store.actions.setCurrentFlightCode(msg.flightCode);
+        store.actions.setConnectionType(msg.connectionType || 'wan');
+
+        if (msg.peer) {
+            store.actions.setPeerInfo(msg.peer);
+            updateDashboardStatus(
+                `${i18next.t('peerConnected')} (${(msg.connectionType || 'wan').toUpperCase()} mode)`,
+                'connected',
+            );
+            renderInFlightView();
+
+            // Re-establish WebRTC with the peer (preserve file queue)
+            resetPeerConnectionState(true);
+            if (state.isFlightCreator) {
+                await initializePeerConnection(true);
+            }
+        } else {
+            updateDashboardStatus(
+                i18next.t('reconnectedWaiting', 'Reconnected. Waiting for peer...'),
+                'disconnected',
+            );
+        }
+
+        showToast({
+            type: 'success',
+            title: i18next.t('reconnected', 'Reconnected'),
+            body: i18next.t('reconnectedDescription', 'Successfully rejoined your flight.'),
+            duration: 3000,
+        });
+        break;
+
+    case 'rejoin-failed':
+        console.warn('[WS] Rejoin failed:', msg.reason, msg.message);
+        resetReconnectState();
+        // The flight is gone or grace period expired — do a full reset
+        handlePermanentDisconnect();
+        break;
+
+    case 'peer-temporarily-disconnected':
+        // Our peer's connection dropped but they may reconnect within the grace period.
+        // Do NOT tear down the flight. Show a waiting state.
+        console.log('[WS] Peer temporarily disconnected. Grace period:', msg.gracePeriodMs, 'ms');
+        resetPeerConnectionState(true);
+        disableChat();
+        disableDropZone();
+        updateDashboardStatus(
+            i18next.t('peerReconnecting', 'Peer reconnecting...'),
+            'disconnected',
+        );
+        break;
+
+    case 'peer-reconnected':
+        // Our peer has come back within the grace period.
+        console.log('[WS] Peer reconnected:', msg.peer?.name);
+        store.actions.setPeerInfo(msg.peer);
+        store.actions.setConnectionType(msg.connectionType || 'wan');
+        updateDashboardStatus(
+            `${i18next.t('peerConnected')} (${(msg.connectionType || 'wan').toUpperCase()} mode)`,
+            'connected',
+        );
+        renderInFlightView();
+
+        // Re-establish WebRTC (preserve file queue)
+        resetPeerConnectionState(true);
+        if (state.isFlightCreator) {
+            await initializePeerConnection(true);
+        }
+
+        showToast({
+            type: 'success',
+            title: i18next.t('peerReconnected', 'Peer Reconnected'),
+            body: i18next.t('peerReconnectedDescription', 'Your peer has reconnected.'),
+            duration: 3000,
+        });
+        break;
+
+    case 'server-shutdown':
+        // Server is going down intentionally — don't attempt reconnect
+        store.actions.setIntentionalLeave(true);
+        break;
+
     case 'users-on-network-update':
         store.actions.setLastNetworkUsers(msg.users);
         if (!state.peerInfo) {
@@ -186,11 +477,36 @@ async function onMessage(event) {
 }
 
 function onClose() {
+    const { intentionalLeave, currentFlightCode } = store.getState();
+
+    // If we were in a flight and this wasn't intentional, attempt to reconnect
+    if (currentFlightCode && !intentionalLeave) {
+        console.log('[WS] Connection lost during active flight. Starting reconnect...');
+        // Soft-reset: clear peer/metrics but preserve flight code, session token, and file queue
+        store.actions.softReset();
+        resetPeerConnectionState(true);
+        disableChat();
+        disableDropZone();
+        updateDashboardStatus(
+            i18next.t('reconnecting', 'Reconnecting...'),
+            'disconnected',
+        );
+        attemptReconnect();
+        return;
+    }
+
+    // If not in a flight, or user intentionally left — full reset
+    if (intentionalLeave) {
+        store.actions.setIntentionalLeave(false); // Reset the flag
+        return; // Let the page reload/navigation happen naturally
+    }
+
+    // Not in a flight, lost connection — show error and reset
     failBoarding();
     showToast({
         type: 'danger',
-        title: 'Connection Lost',
-        body: 'Connection to the server was lost. Please refresh the page to reconnect.',
+        title: i18next.t('connectionLost', 'Connection Lost'),
+        body: i18next.t('connectionLostDescription', 'Connection to the server was lost. Please refresh the page to reconnect.'),
         duration: 0,
     });
     store.actions.resetState();
@@ -200,7 +516,17 @@ function onError(error) {
     console.error('WebSocket error:', error);
 }
 
+// ─────────────────────────────────────────────
+//  PEER LEFT / SERVER ERROR HANDLERS
+// ─────────────────────────────────────────────
+
 export function handlePeerLeft() {
+    // During an active reconnect, the peer connection closing is expected.
+    // Don't cascade into a destructive reset — the reconnect engine owns UI state.
+    if (reconnectAttempts > 0 || reconnectTimer) {
+        console.log('[WS] Ignoring peer-left during reconnect cycle.');
+        return;
+    }
     if (!store.getState().peerInfo) return;
     audioManager.play('disconnect');
     console.log('Peer has left the flight.');

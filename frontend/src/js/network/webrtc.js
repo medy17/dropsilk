@@ -312,7 +312,7 @@ function setupDataChannel() {
     dataChannel.onmessage = (event) => handleDataChannelMessage(event);
 }
 
-export function resetPeerConnectionState() {
+export function resetPeerConnectionState(preserveTransferState = false) {
     if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
@@ -322,11 +322,13 @@ export function resetPeerConnectionState() {
     const { metricsInterval } = store.getState();
     if (metricsInterval) clearInterval(metricsInterval);
     dataChannel = null;
-    import('../transfer/fileHandler.js')
-        .then(({ resetTransferState }) => {
-            if (resetTransferState) resetTransferState();
-        })
-        .catch((err) => console.error('Error resetting transfer state:', err));
+    if (!preserveTransferState) {
+        import('../transfer/fileHandler.js')
+            .then(({ resetTransferState }) => {
+                if (resetTransferState) resetTransferState();
+            })
+            .catch((err) => console.error('Error resetting transfer state:', err));
+    }
 }
 
 export function sendData(data) {
