@@ -17,7 +17,8 @@ import i18next from '../i18n.js';
 export function handleFileSelection(files) {
     if (files.length === 0) return;
     const currentState = store.getState();
-    if (!currentState.peerInfo && !currentState.roomPeer) {
+    const isWaitingInRoom = Boolean(currentState.currentFlightCode);
+    if (isWaitingInRoom && !currentState.peerInfo && !currentState.roomPeer) {
         showToast({
             type: 'info',
             title: 'Waiting for peer',

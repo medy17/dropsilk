@@ -23,7 +23,7 @@ vi.mock('../src/js/state.js', () => ({
 
 vi.mock('../src/js/ui/dom.js', () => ({
     uiElements: {
-        sendingQueueDiv: document.createElement('div'),
+        sendingQueueDiv: null,
     }
 }));
 
@@ -41,6 +41,10 @@ vi.mock('../src/js/transfer/transferUI.js', () => ({
 
 vi.mock('../src/js/transfer/fileSender.js', () => ({
     ensureQueueIsActive: vi.fn()
+}));
+
+vi.mock('../src/js/network/roomSession.js', () => ({
+    markCurrentParticipantReady: vi.fn(() => Promise.resolve(null))
 }));
 
 vi.mock('../src/js/i18n.js', () => ({
