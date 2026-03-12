@@ -279,9 +279,16 @@ function setupDataChannel() {
             shareScreenBtn.disabled = true;
             shareScreenBtn.title = 'Screen sharing is not supported on mobile devices.';
         } else {
-            updateShareButton(false);
-            const { hint } = getDisplayMediaOptions(true);
-            if (shareScreenBtn) shareScreenBtn.title = hint;
+            import('./screenShareSession.js')
+                .then(({ isScreenShareActive }) => {
+                    updateShareButton(isScreenShareActive());
+                    const { hint } = getDisplayMediaOptions(true);
+                    if (shareScreenBtn) shareScreenBtn.title = hint;
+                })
+                .catch((error) => {
+                    console.error('Failed to sync screen share state:', error);
+                    updateShareButton(false);
+                });
         }
 
         ensureQueueIsActive();

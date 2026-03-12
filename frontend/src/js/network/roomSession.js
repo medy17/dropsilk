@@ -6,6 +6,7 @@ import {
     markParticipantReady as markParticipantReadyRequest,
 } from './roomApi.js';
 import { connect as connectWebSocket } from './websocket.js';
+import { syncScreenShareSession } from './screenShareSession.js';
 import {
     enterFlightMode,
     enableDropZone,
@@ -36,6 +37,30 @@ function getLobbyStatusText(summary) {
     return 'Peer joined. Select files whenever you are ready.';
 }
 
+function handlePeerConnected(peer, previousRoomPeerId) {
+    if (previousRoomPeerId === peer.participantId) {
+        return;
+    }
+
+    audioManager.play('connect');
+    audioManager.vibrate(60);
+    showToast({
+        type: 'success',
+        title: 'Peer Connected!',
+        body: `${peer.name} has joined the flight.`,
+        duration: 5000,
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+export function handlePeerDisconnected(previousRoomPeerId) {
+    if (!previousRoomPeerId) {
+        return;
+    }
+
+    audioManager.play('disconnect');
+}
+
 function applyRoomSummary(summary) {
     const state = store.getState();
     const previousRoomPeerId = state.roomPeer?.participantId || null;
@@ -61,18 +86,9 @@ function applyRoomSummary(summary) {
         enableDropZone();
         renderInFlightView();
 
-        if (previousRoomPeerId !== summary.peer.participantId) {
-            audioManager.play('connect');
-            audioManager.vibrate(60);
-            showToast({
-                type: 'success',
-                title: 'Peer Connected!',
-                body: `${summary.peer.name} has joined the flight.`,
-                duration: 5000,
-            });
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        handlePeerConnected(summary.peer, previousRoomPeerId);
     } else {
+        handlePeerDisconnected(previousRoomPeerId);
         disableDropZone();
         if (!store.getState().peerInfo) {
             renderNetworkUsersView();
@@ -82,6 +98,8 @@ function applyRoomSummary(summary) {
     if (!store.getState().peerInfo) {
         updateDashboardStatus(getLobbyStatusText(summary), 'default');
     }
+
+    syncScreenShareSession(summary);
 
     if (
         summary.shouldConnect &&
@@ -99,6 +117,8 @@ function applyRoomSummary(summary) {
 }
 
 function handleRoomError(error, fallbackTitle = 'Room Error') {
+    audioManager.play('error');
+    audioManager.vibrate(150);
     showToast({
         type: 'danger',
         title: fallbackTitle,

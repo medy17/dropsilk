@@ -47,3 +47,13 @@ export function markParticipantReady(roomCode, participantId, payload) {
         }
     );
 }
+
+export function setParticipantScreenShare(roomCode, participantId, active) {
+    return request(
+        `/api/rooms/${encodeURIComponent(roomCode)}/participants/${encodeURIComponent(participantId)}/screen-share`,
+        {
+            method: 'POST',
+            body: JSON.stringify({ active }),
+        }
+    );
+}

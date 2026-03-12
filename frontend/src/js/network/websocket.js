@@ -125,20 +125,6 @@ async function onMessage(event) {
         break;
     case 'peer-joined':
         try {
-            const shouldAnnounceConnection = !state.roomPeer;
-            if (shouldAnnounceConnection) {
-                audioManager.play('connect');
-                audioManager.vibrate(60);
-                showToast({
-                    type: 'success',
-                    title: i18next.t('peerConnected'),
-                    body: i18next.t('peerConnectedDescription', {
-                        peerName: msg.peer.name,
-                    }),
-                    duration: 5000,
-                });
-            }
-
             document.getElementById('closeInviteModal')?.click();
             hideBoardingOverlay();
 
@@ -175,9 +161,6 @@ async function onMessage(event) {
 
             if (state.isFlightCreator) {
                 await initializePeerConnection(true);
-            }
-            if (shouldAnnounceConnection) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         } catch (e) {
             console.error('Error in peer-joined handler:', e);
@@ -245,8 +228,12 @@ export function handlePeerLeft() {
     const currentState = store.getState();
     if (!currentState.peerInfo && !currentState.roomPeer) return;
 
-    audioManager.play('disconnect');
     console.log('Peer has left the flight.');
+    const previousRoomPeerId =
+        currentState.roomPeer?.participantId ||
+        currentState.peerInfo?.participantId ||
+        currentState.peerInfo?.id ||
+        null;
     store.actions.clearPeerInfo();
     store.actions.setRoomPeer(null);
     store.actions.setRoomStatus('waiting');
@@ -259,10 +246,13 @@ export function handlePeerLeft() {
     disableChat();
     updateDashboardStatus('Peer disconnected. Waiting...', 'disconnected');
     disableDropZone();
-    import('./roomSession.js')
-        .then(({ startRoomPolling }) => startRoomPolling())
-        .catch((error) => console.error('Failed to resume room polling:', error));
     renderNetworkUsersView();
+    import('./roomSession.js')
+        .then(({ handlePeerDisconnected, startRoomPolling }) => {
+            handlePeerDisconnected(previousRoomPeerId);
+            startRoomPolling();
+        })
+        .catch((error) => console.error('Failed to resume room polling:', error));
 }
 
 async function handleServerError(message) {

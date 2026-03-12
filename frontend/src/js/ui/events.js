@@ -5,17 +5,8 @@ import { uiElements, folderInputTransfer } from './dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
 import { createRoomFlow, joinRoomFlow } from '../network/roomSession.js';
-import {
-    startScreenShare,
-    stopScreenShare,
-    sendData,
-} from '../network/webrtc.js';
-import {
-    handleFileSelection,
-    handleFolderSelection,
-    cancelFileSend,
-} from '../transfer/fileHandler.js';
-import { downloadAllFilesAsZip } from '../transfer/zipHandler.js';
+import { startScreenShare, stopScreenShare } from '../network/screenShareSession.js';
+import { handleFileSelection, handleFolderSelection, cancelFileSend } from '../transfer/fileHandler.js';
 import { showToast } from '../utils/toast.js';
 import QrScanner from 'qr-scanner';
 import Sortable from 'sortablejs';
@@ -50,20 +41,16 @@ function getMimeTypeFromPath(fileName) {
     return mimeTypes[extension] || 'application/octet-stream';
 }
 
-let lastOtpErrorSnapshot = null;
-
 function canSelectFiles() {
     const state = store.getState();
     return Boolean(state.peerInfo || state.roomPeer);
 }
 
-function guardFileSelectionTrigger(event) {
+function guardFileSelectionTrigger() {
     if (canSelectFiles()) {
         return true;
     }
 
-    event.preventDefault();
-    event.stopPropagation();
     showToast({
         type: 'info',
         title: 'Waiting for peer',
@@ -76,11 +63,10 @@ function guardFileSelectionTrigger(event) {
 /**
  * Exported function to set OTP input error state
  */
-export function setOtpInputError(errorCode) {
+export function setOtpInputError() {
     const otpWrapper = uiElements.flightCodeInputWrapper;
     if (otpWrapper) {
         otpWrapper.classList.add('input-error');
-        lastOtpErrorSnapshot = errorCode;
     }
 }
 
@@ -96,10 +82,8 @@ function attemptToJoinFlight() {
         joinRoomFlow(code).catch((error) => {
             console.error('Failed to join room:', error);
         });
-        lastOtpErrorSnapshot = null;
     } else {
         uiElements.flightCodeInputWrapper.classList.add('input-error');
-        lastOtpErrorSnapshot = code;
         showToast({
             type: 'danger',
             title: i18next.t('invalidCode'),
@@ -208,7 +192,7 @@ export function initializeEventListeners() {
         ghostInput.addEventListener('change', updateVisuals);
 
         // 3. Paste Event: Explicitly handle pasting to ensure immediate slicing
-        ghostInput.addEventListener('paste', (e) => {
+        ghostInput.addEventListener('paste', () => {
             // Small timeout to let the value populate, then sanitize immediately
             setTimeout(updateVisuals, 0);
         });
@@ -325,11 +309,10 @@ export function initializeEventListeners() {
             'label[for="fileInput_transfer"]',
         );
         if (selectFilesBtn) {
-            selectFilesBtn.onclick = async (e) => {
-                if (!guardFileSelectionTrigger(e)) {
+            selectFilesBtn.onclick = async () => {
+                if (!guardFileSelectionTrigger()) {
                     return;
                 }
-                e.preventDefault();
                 const filesData = await window.electronAPI.selectFiles();
                 if (filesData.length > 0) {
                     const fileObjects = filesData.map(
@@ -370,8 +353,8 @@ export function initializeEventListeners() {
     } else {
         const selectFilesBtn = document.querySelector('label[for="fileInput_transfer"]');
         selectFilesBtn?.addEventListener('click', guardFileSelectionTrigger);
-        uiElements.selectFolderBtn?.addEventListener('click', (event) => {
-            if (!guardFileSelectionTrigger(event)) {
+        uiElements.selectFolderBtn?.addEventListener('click', () => {
+            if (!guardFileSelectionTrigger()) {
                 return;
             }
             folderInputTransfer.click();
@@ -379,8 +362,8 @@ export function initializeEventListeners() {
     }
 
     if (uiElements.sendingQueueDiv) {
-        uiElements.sendingQueueDiv.addEventListener('click', (e) => {
-            const cancelBtn = e.target.closest('.cancel-file-btn');
+        uiElements.sendingQueueDiv.addEventListener('click', () => {
+            const cancelBtn = uiElements.sendingQueueDiv.querySelector('.cancel-file-btn');
             if (cancelBtn) {
                 const fileId = cancelBtn.dataset.fileId;
                 if (fileId) cancelFileSend(fileId);
@@ -483,11 +466,9 @@ function setupDragAndDrop() {
     );
     dropZone.addEventListener('drop', handleDrop, false);
 
-    document.addEventListener('dragenter', (e) => {
-        if (e.dataTransfer.types.includes('Files')) {
-            dragCounter++;
-            uiElements.body.classList.add('dragging');
-        }
+    document.addEventListener('dragenter', () => {
+        dragCounter++;
+        uiElements.body.classList.add('dragging');
     });
     document.addEventListener('dragleave', () => {
         dragCounter--;
@@ -501,7 +482,7 @@ function setupDragAndDrop() {
         uiElements.body.classList.remove('dragging');
     });
 
-    function handleDragEnter(e) {
+    function handleDragEnter() {
         if (dropZone.classList.contains('disabled')) return;
         dropZone.classList.add('drag-over');
     }

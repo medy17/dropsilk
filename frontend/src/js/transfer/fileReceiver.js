@@ -56,6 +56,12 @@ export async function handleDataChannelMessage(event) {
                 return;
             }
 
+            if (parsedData.type === 'screen-share-requested') {
+                const { handleScreenShareWakeRequest } = await import('../network/screenShareSession.js');
+                handleScreenShareWakeRequest();
+                return;
+            }
+
             // Chat message
             if (parsedData.kind === 'chat') {
                 appendChatMessage({
