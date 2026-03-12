@@ -4,6 +4,7 @@ import i18next from '../i18n.js';
 import { uiElements, folderInputTransfer } from './dom.js';
 import { store } from '../state.js';
 import { sendMessage } from '../network/websocket.js';
+import { createRoomFlow, joinRoomFlow } from '../network/roomSession.js';
 import {
     startScreenShare,
     stopScreenShare,
@@ -51,6 +52,27 @@ function getMimeTypeFromPath(fileName) {
 
 let lastOtpErrorSnapshot = null;
 
+function canSelectFiles() {
+    const state = store.getState();
+    return Boolean(state.peerInfo || state.roomPeer);
+}
+
+function guardFileSelectionTrigger(event) {
+    if (canSelectFiles()) {
+        return true;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    showToast({
+        type: 'info',
+        title: 'Waiting for peer',
+        body: 'A second user needs to join the room before you can select files.',
+        duration: 5000,
+    });
+    return false;
+}
+
 /**
  * Exported function to set OTP input error state
  */
@@ -71,7 +93,9 @@ function attemptToJoinFlight() {
 
     if (code.length === 6) {
         store.actions.setIsFlightCreator(false);
-        sendMessage({ type: 'join-flight', flightCode: code });
+        joinRoomFlow(code).catch((error) => {
+            console.error('Failed to join room:', error);
+        });
         lastOtpErrorSnapshot = null;
     } else {
         uiElements.flightCodeInputWrapper.classList.add('input-error');
@@ -107,11 +131,15 @@ function initializeSortableQueue() {
 }
 
 export function initializeEventListeners() {
-    uiElements.createFlightBtn?.addEventListener('click', () => {
+    uiElements.createFlightBtn?.addEventListener('click', async () => {
         localStorage.setItem('hasSeenCreateFlightPulse', 'true');
         clearAllPulseEffects();
         store.actions.setIsFlightCreator(true);
-        sendMessage({ type: 'create-flight' });
+        try {
+            await createRoomFlow();
+        } catch (error) {
+            console.error('Failed to create room:', error);
+        }
     });
 
     uiElements.joinFlightBtn?.addEventListener('click', attemptToJoinFlight);
@@ -298,6 +326,9 @@ export function initializeEventListeners() {
         );
         if (selectFilesBtn) {
             selectFilesBtn.onclick = async (e) => {
+                if (!guardFileSelectionTrigger(e)) {
+                    return;
+                }
                 e.preventDefault();
                 const filesData = await window.electronAPI.selectFiles();
                 if (filesData.length > 0) {
@@ -314,6 +345,15 @@ export function initializeEventListeners() {
         }
         if (uiElements.selectFolderBtn) {
             uiElements.selectFolderBtn.onclick = async () => {
+                if (!canSelectFiles()) {
+                    showToast({
+                        type: 'info',
+                        title: 'Waiting for peer',
+                        body: 'A second user needs to join the room before you can select files.',
+                        duration: 5000,
+                    });
+                    return;
+                }
                 const filesData = await window.electronAPI.selectFolder();
                 if (filesData.length > 0) {
                     const fileObjects = filesData.map(
@@ -328,9 +368,14 @@ export function initializeEventListeners() {
             };
         }
     } else {
-        uiElements.selectFolderBtn?.addEventListener('click', () =>
-            folderInputTransfer.click(),
-        );
+        const selectFilesBtn = document.querySelector('label[for="fileInput_transfer"]');
+        selectFilesBtn?.addEventListener('click', guardFileSelectionTrigger);
+        uiElements.selectFolderBtn?.addEventListener('click', (event) => {
+            if (!guardFileSelectionTrigger(event)) {
+                return;
+            }
+            folderInputTransfer.click();
+        });
     }
 
     if (uiElements.sendingQueueDiv) {

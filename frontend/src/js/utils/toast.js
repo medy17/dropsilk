@@ -4,7 +4,7 @@
 import i18next from '../i18n.js';
 import { uiElements } from '../ui/dom.js';
 import { store } from '../state.js';
-import { sendMessage } from '../network/websocket.js';
+import { joinRoomFlow } from '../network/roomSession.js';
 
 export function showToast({
     type = 'info',
@@ -88,7 +88,9 @@ export function showInvitationToast(fromName, flightCode) {
                 class: 'btn-primary',
                 callback: () => {
                     store.actions.setIsFlightCreator(false);
-                    sendMessage({ type: 'join-flight', flightCode });
+                    joinRoomFlow(flightCode).catch((error) => {
+                        console.error('Failed to accept invitation:', error);
+                    });
                 }
             }
         ],

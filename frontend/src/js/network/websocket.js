@@ -26,9 +26,29 @@ import { audioManager } from '../utils/audioManager.js';
 import { uiElements } from '../ui/dom.js';
 
 let ws;
-let isAutoJoining = false;
+let pendingAttach = null;
+let suppressCloseHandling = false;
 
-export function connect() {
+export function connect(options = {}) {
+    if (options?.roomCode && options?.participantId) {
+        pendingAttach = options;
+    }
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        if (pendingAttach?.roomCode && pendingAttach?.participantId) {
+            sendMessage({
+                type: 'attach-room',
+                roomCode: pendingAttach.roomCode,
+                participantId: pendingAttach.participantId,
+            });
+        }
+        return;
+    }
+
+    if (ws && ws.readyState === WebSocket.CONNECTING) {
+        return;
+    }
+
     ws = new WebSocket(WEBSOCKET_URL);
     ws.onopen = onOpen;
     ws.onmessage = onMessage;
@@ -42,6 +62,23 @@ export function sendMessage(payload) {
     }
 }
 
+export function isConnected() {
+    return Boolean(ws && ws.readyState === WebSocket.OPEN);
+}
+
+export function disconnect({ silent = false } = {}) {
+    suppressCloseHandling = silent;
+    pendingAttach = null;
+
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+        ws.close();
+        return;
+    }
+
+    ws = null;
+    suppressCloseHandling = false;
+}
+
 function onOpen() {
     sendMessage({
         type: 'register-details',
@@ -50,45 +87,12 @@ function onOpen() {
         localIp: 'unknown',
     });
 
-    try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const flightCodeFromUrl = urlParams.get('code');
-
-        if (flightCodeFromUrl && flightCodeFromUrl.length === 6) {
-            console.log(
-                `Found flight code in URL, attempting to auto-join via ticket flow: ${flightCodeFromUrl}`,
-            );
-            isAutoJoining = true;
-
-            // Pass code into the ticket input flow
-            const ghostInput = document.getElementById('otp-ghost-input');
-            const joinBtn = document.getElementById('joinFlightBtn');
-
-            if (ghostInput && joinBtn) {
-                ghostInput.value = flightCodeFromUrl.toUpperCase();
-                // Trigger visual update if the global helper exists (optional but good)
-                if (typeof window.updateOtpInputStates === 'function') {
-                    window.updateOtpInputStates();
-                }
-                joinBtn.click();
-            } else {
-                console.warn('Auto-join failed: Input or Button not found in DOM.');
-                // Fallback to direct message if UI elements are missing (shouldn't happen)
-                store.actions.setIsFlightCreator(false);
-                sendMessage({
-                    type: 'join-flight',
-                    flightCode: flightCodeFromUrl.toUpperCase(),
-                });
-            }
-
-            window.history.replaceState(
-                {},
-                document.title,
-                window.location.pathname,
-            );
-        }
-    } catch (e) {
-        console.error('Error processing URL for auto-join:', e);
+    if (pendingAttach?.roomCode && pendingAttach?.participantId) {
+        sendMessage({
+            type: 'attach-room',
+            roomCode: pendingAttach.roomCode,
+            participantId: pendingAttach.participantId,
+        });
     }
 }
 
@@ -100,9 +104,13 @@ async function onMessage(event) {
     case 'registered':
         store.actions.setMyId(msg.id);
         break;
+    case 'room-attached':
+        store.actions.setCurrentFlightCode(msg.flightCode);
+        store.actions.setRoomRole(msg.role || store.getState().roomRole);
+        break;
     case 'users-on-network-update':
         store.actions.setLastNetworkUsers(msg.users);
-        if (!state.peerInfo) {
+        if (!state.peerInfo && !state.roomPeer) {
             renderNetworkUsersView();
         }
         break;
@@ -117,15 +125,19 @@ async function onMessage(event) {
         break;
     case 'peer-joined':
         try {
-            audioManager.play('connect');
-            showToast({
-                type: 'success',
-                title: i18next.t('peerConnected'),
-                body: i18next.t('peerConnectedDescription', {
-                    peerName: msg.peer.name,
-                }),
-                duration: 5000,
-            });
+            const shouldAnnounceConnection = !state.roomPeer;
+            if (shouldAnnounceConnection) {
+                audioManager.play('connect');
+                audioManager.vibrate(60);
+                showToast({
+                    type: 'success',
+                    title: i18next.t('peerConnected'),
+                    body: i18next.t('peerConnectedDescription', {
+                        peerName: msg.peer.name,
+                    }),
+                    duration: 5000,
+                });
+            }
 
             document.getElementById('closeInviteModal')?.click();
             hideBoardingOverlay();
@@ -138,17 +150,17 @@ async function onMessage(event) {
             const dashboard = uiElements.dashboard || document.getElementById('dashboard');
             const isDashboardHidden = !dashboard || dashboard.style.display !== 'flex';
 
-            if (!state.currentFlightCode || isDashboardHidden || isAutoJoining) {
+            if (!state.currentFlightCode || isDashboardHidden) {
                 console.log('Force entering flight mode. Reason:', {
                     missingCode: !state.currentFlightCode,
                     hidden: isDashboardHidden,
-                    autoJoin: isAutoJoining
+                    pendingAttach: Boolean(pendingAttach)
                 });
                 enterFlightMode(msg.flightCode);
-                isAutoJoining = false;
             }
             store.actions.setConnectionType(msg.connectionType || 'wan');
             store.actions.setPeerInfo(msg.peer);
+            store.actions.setSignalingInitiated(true);
             updateDashboardStatus(
                 `${i18next.t('peerConnected')} (${store
                     .getState()
@@ -157,10 +169,16 @@ async function onMessage(event) {
             );
             renderInFlightView();
 
+            import('./roomSession.js')
+                .then(({ stopRoomPolling }) => stopRoomPolling())
+                .catch((error) => console.error('Failed to stop room polling:', error));
+
             if (state.isFlightCreator) {
                 await initializePeerConnection(true);
             }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (shouldAnnounceConnection) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         } catch (e) {
             console.error('Error in peer-joined handler:', e);
             // Emergency fallback
@@ -186,14 +204,37 @@ async function onMessage(event) {
 }
 
 function onClose() {
-    failBoarding();
+    const wasSuppressed = suppressCloseHandling;
+    suppressCloseHandling = false;
+    pendingAttach = null;
+    ws = null;
+
+    if (wasSuppressed) {
+        return;
+    }
+
+    import('./roomSession.js')
+        .then(({ handleSignalingClosed }) => handleSignalingClosed())
+        .catch((error) => console.error('Failed to handle signaling close:', error));
+
+    if (!store.getState().currentFlightCode) {
+        failBoarding();
+        showToast({
+            type: 'danger',
+            title: 'Connection Lost',
+            body: 'Connection to the server was lost. Please refresh the page to reconnect.',
+            duration: 0,
+        });
+        store.actions.resetState();
+        return;
+    }
+
     showToast({
-        type: 'danger',
-        title: 'Connection Lost',
-        body: 'Connection to the server was lost. Please refresh the page to reconnect.',
-        duration: 0,
+        type: 'info',
+        title: 'Secure channel closed',
+        body: 'Waiting for the room to become ready again...',
+        duration: 5000,
     });
-    store.actions.resetState();
 }
 
 function onError(error) {
@@ -201,10 +242,15 @@ function onError(error) {
 }
 
 export function handlePeerLeft() {
-    if (!store.getState().peerInfo) return;
+    const currentState = store.getState();
+    if (!currentState.peerInfo && !currentState.roomPeer) return;
+
     audioManager.play('disconnect');
     console.log('Peer has left the flight.');
     store.actions.clearPeerInfo();
+    store.actions.setRoomPeer(null);
+    store.actions.setRoomStatus('waiting');
+    store.actions.setSignalingInitiated(false);
     store.actions.setHasScrolledForSend(false);
     store.actions.setHasScrolledForReceive(false);
     store.actions.setHasScrolledForChatReceive(false);
@@ -213,6 +259,9 @@ export function handlePeerLeft() {
     disableChat();
     updateDashboardStatus('Peer disconnected. Waiting...', 'disconnected');
     disableDropZone();
+    import('./roomSession.js')
+        .then(({ startRoomPolling }) => startRoomPolling())
+        .catch((error) => console.error('Failed to resume room polling:', error));
     renderNetworkUsersView();
 }
 

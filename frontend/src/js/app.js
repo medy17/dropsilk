@@ -5,10 +5,11 @@ import { initEffects } from './ui/effects.js';
 import '../styles/index.css'; // load for vite
 import i18next from './i18n.js';
 import { store } from './state.js';
-import { renderUserName, showBoardingOverlay, initializeOnboardingPulses } from './ui/view.js';
+import { renderUserName, showBoardingOverlay, initializeOnboardingPulses, failBoarding } from './ui/view.js';
 import { initializeEventListeners } from './ui/events.js';
 import { initializeModals } from './ui/modals.js';
 import { connect as connectWebSocket } from './network/websocket.js';
+import { joinRoomFlow } from './network/roomSession.js';
 import { showWelcomeOnboarding } from './ui/onboarding.js';
 import { inject } from '@vercel/analytics';
 import { RECAPTCHA_SITE_KEY, API_BASE_URL } from './config.js';
@@ -56,8 +57,25 @@ function initializeAppCore(isInvitedUser = false) {
     // Show visual cues like pulsing buttons for new users.
     initializeOnboardingPulses();
 
-    // Connect to the signaling server.
     connectWebSocket();
+
+    if (isInvitedUser) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const flightCodeFromUrl = urlParams.get('code');
+        if (flightCodeFromUrl && flightCodeFromUrl.length === 6) {
+            joinRoomFlow(flightCodeFromUrl.toUpperCase())
+                .catch(() => {
+                    failBoarding();
+                })
+                .finally(() => {
+                    window.history.replaceState(
+                        {},
+                        document.title,
+                        window.location.pathname,
+                    );
+                });
+        }
+    }
 
     // Only show the welcome guide if it's a new, non-invited user.
     if (!isInvitedUser) {

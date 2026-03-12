@@ -1,7 +1,7 @@
 // js/network/webrtc.js
 // Handles the creation and management of the WebRTC peer connection.
 
-import { HIGH_WATER_MARK } from '../config.js';
+import { API_BASE_URL, HIGH_WATER_MARK } from '../config.js';
 import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
 import {
@@ -20,10 +20,6 @@ import {
     ensureQueueIsActive,
     drainQueue,
 } from '../transfer/fileHandler.js';
-
-// --- NEW ---
-// Read the backend URL from the environment variable, same as in uploadHelper.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * --- NEW ---

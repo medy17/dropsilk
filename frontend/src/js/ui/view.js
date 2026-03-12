@@ -218,8 +218,9 @@ export function renderNetworkUsersView() {
 }
 
 export function renderInFlightView() {
-    const { peerInfo, myId, myName } = store.getState();
-    if (!peerInfo) return;
+    const { peerInfo, roomPeer, myId, myName } = store.getState();
+    const activePeer = peerInfo || roomPeer;
+    if (!activePeer) return;
     uiElements.connectionPanelTitle.textContent = i18next.t('inFlightWith');
     uiElements.connectionPanelList.innerHTML = `
         <div class="inflight-user-item">
@@ -231,10 +232,10 @@ export function renderInFlightView() {
     })}</span>
         </div>
         <div class="inflight-user-item">
-            <div class="inflight-user-details"><span class="inflight-user-name">${peerInfo.name
+            <div class="inflight-user-details"><span class="inflight-user-name">${activePeer.name
 }</span></div>
             <span class="inflight-user-id">${i18next.t('userId', {
-        id: peerInfo.id,
+        id: activePeer.id || activePeer.participantId,
     })}</span>
         </div>`;
 }

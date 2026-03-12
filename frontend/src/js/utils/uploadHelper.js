@@ -1,12 +1,11 @@
 // js/utils/uploadHelper.js
 // FINAL VERSION
 
-// 1. Read the backend URL from the environment variable set in Vercel.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE_URL } from '../config.js';
 
 // 2. Add a check to ensure the variable is set, providing a clear error if it's not.
 if (!API_BASE_URL) {
-    const errorMsg = 'FATAL: VITE_API_BASE_URL environment variable is not set. The frontend doesn\'t know where the backend is located.';
+    const errorMsg = 'FATAL: API_BASE_URL is not set. The frontend doesn\'t know where the backend is located.';
     console.error(errorMsg);
     // You might want to display this error to the user as well.
     alert(errorMsg);

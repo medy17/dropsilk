@@ -7,6 +7,7 @@ import { showToast } from '../utils/toast.js';
 import { checkQueueOverflow } from '../ui/view.js';
 import { createSendQueueItemHTML } from './transferUI.js';
 import { ensureQueueIsActive } from './fileSender.js';
+import { markCurrentParticipantReady } from '../network/roomSession.js';
 import i18next from '../i18n.js';
 
 /**
@@ -15,6 +16,16 @@ import i18next from '../i18n.js';
  */
 export function handleFileSelection(files) {
     if (files.length === 0) return;
+    const currentState = store.getState();
+    if (!currentState.peerInfo && !currentState.roomPeer) {
+        showToast({
+            type: 'info',
+            title: 'Waiting for peer',
+            body: 'A second user needs to join the room before you can select files.',
+            duration: 5000,
+        });
+        return;
+    }
     const isFirstSend = store.getState().fileToSendQueue.length === 0;
     store.actions.addFilesToQueue(files);
 
@@ -42,6 +53,9 @@ export function handleFileSelection(files) {
     checkQueueOverflow('sending-queue');
 
     ensureQueueIsActive();
+    markCurrentParticipantReady(files).catch((error) => {
+        console.error('Failed to mark participant ready:', error);
+    });
 }
 
 /**
