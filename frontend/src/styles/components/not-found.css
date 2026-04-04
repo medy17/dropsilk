@@ -27,7 +27,7 @@
 }
 
 .not-found-title {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--ff-mono);
     font-size: clamp(5em, 20vw, 8em);
     font-weight: 800;
     line-height: 1;

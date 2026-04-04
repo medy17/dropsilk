@@ -38,7 +38,7 @@
     fill: currentColor;
 }
 .audio-time {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--ff-mono);
     color: var(--c-text-secondary);
     font-size: 1rem;
     min-width: 110px;

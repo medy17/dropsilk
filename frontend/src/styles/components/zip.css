@@ -59,7 +59,7 @@
 
 #zipSelectionInfo {
     color: var(--c-text-secondary);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--ff-mono);
     font-size: .9em;
 }
 

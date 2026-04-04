@@ -23,7 +23,7 @@
 }
 
 .flight-ticket h2 {
-    font-family: "IBM Plex Mono", monospace;
+    font-family: var(--ff-mono);
     margin: 0;
     font-weight: 700;
     color: var(--c-primary);
@@ -38,7 +38,7 @@
 }
 
 .ticket-actions {
-    font-family: "IBM Plex Sans";
+    font-family: var(--ff-sans);
     display: flex;
     flex-direction: column;
     gap: .8em;
@@ -52,29 +52,139 @@
     border: 1.5px solid var(--c-primary);
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s, transform 0.1s ease-out;
-    background: var(--c-btn-primary-bg);
+    transition: color 0.22s ease, border-color 0.22s ease, transform 0.1s ease-out, box-shadow 0.22s ease;
+    background: transparent;
     color: var(--c-primary);
     box-shadow: 0 1px 4px rgb(91 206 250 / .06);
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    outline: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5em;
+    text-decoration: none;
+}
+
+.ticket-actions button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--c-primary);
+    border-radius: inherit;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
 }
 
 .ticket-actions button:hover {
-    background: var(--c-primary);
     color: var(--brilliant-white);
     border-color: var(--c-secondary);
     outline: none;
+    transform: none;
+    box-shadow: 0 4px 12px rgb(91 206 250 / .18);
 }
 
 .ticket-actions button:focus {
-    background: var(--c-primary);
     color: var(--brilliant-white);
     border-color: var(--c-secondary);
     outline: none;
+    transform: none;
+}
+
+.ticket-actions button:hover::before,
+.ticket-actions button:focus::before {
+    clip-path: inset(0 0 0 0);
 }
 
 .ticket-actions button:active {
     transform: translateY(0) scale(.97);
     transition-duration: 0.1s;
+}
+
+.ticket-actions button:disabled {
+    opacity: .45;
+    border-color: var(--c-text-secondary);
+    color: var(--c-text-secondary);
+    box-shadow: none;
+}
+
+.ticket-actions button:disabled::before {
+    clip-path: inset(0 100% 0 0);
+}
+
+.ticket-actions button.is-loading {
+    color: var(--brilliant-white);
+    border-color: var(--c-secondary);
+    box-shadow: 0 4px 12px rgb(91 206 250 / .18);
+    cursor: progress;
+}
+
+.ticket-actions button.is-loading::before {
+    clip-path: inset(0 0 0 0);
+}
+
+.ticket-actions button.is-loading > * {
+    opacity: 0;
+}
+
+.ticket-actions button.is-loading::after {
+    content: '';
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 999px;
+    border: 2px solid rgb(255 255 255 / .32);
+    border-top-color: var(--brilliant-white);
+    animation: ticket-btn-spin 0.7s linear infinite;
+}
+
+.ticket-actions .btn,
+.ticket-actions .btn-primary,
+.ticket-actions .btn-secondary,
+.ticket-actions .btn-danger {
+    background: transparent;
+    outline: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.ticket-actions .btn-primary,
+.ticket-actions .btn-secondary,
+.ticket-actions .btn-danger {
+    color: var(--c-primary);
+    border-color: var(--c-primary);
+}
+
+.ticket-actions .btn-primary:hover,
+.ticket-actions .btn-primary:focus,
+.ticket-actions .btn-secondary:hover,
+.ticket-actions .btn-secondary:focus,
+.ticket-actions .btn-danger:hover,
+.ticket-actions .btn-danger:focus {
+    background: transparent;
+    color: var(--brilliant-white);
+    border-color: var(--c-secondary);
+    transform: none;
+    box-shadow: 0 4px 12px rgb(91 206 250 / .18);
+}
+
+.ticket-actions .btn-primary:hover::before,
+.ticket-actions .btn-primary:focus::before,
+.ticket-actions .btn-secondary:hover::before,
+.ticket-actions .btn-secondary:focus::before,
+.ticket-actions .btn-danger:hover::before,
+.ticket-actions .btn-danger:focus::before {
+    clip-path: inset(0 0 0 0);
+}
+
+@keyframes ticket-btn-spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .or-separator {

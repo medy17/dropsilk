@@ -2,7 +2,7 @@
     display: inline-block;
     background: linear-gradient(90deg, rgb(91 206 250 / .12) 0%, rgb(245 169 184 / .1) 100%);
     color: var(--c-primary);
-    font-family: "IBM Plex Mono", monospace;
+    font-family: var(--ff-mono);
     font-size: 1em;
     font-weight: 700;
     border-radius: 10px;

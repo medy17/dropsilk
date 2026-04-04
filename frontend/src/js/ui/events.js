@@ -46,6 +46,16 @@ function canSelectFiles() {
     return Boolean(state.peerInfo || state.roomPeer);
 }
 
+function setTicketButtonLoading(button, isLoading) {
+    if (!button) {
+        return;
+    }
+
+    button.classList.toggle('is-loading', isLoading);
+    button.disabled = isLoading;
+    button.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+}
+
 function guardFileSelectionTrigger() {
     if (canSelectFiles()) {
         return true;
@@ -119,10 +129,13 @@ export function initializeEventListeners() {
         localStorage.setItem('hasSeenCreateFlightPulse', 'true');
         clearAllPulseEffects();
         store.actions.setIsFlightCreator(true);
+        setTicketButtonLoading(uiElements.createFlightBtn, true);
         try {
             await createRoomFlow();
         } catch (error) {
             console.error('Failed to create room:', error);
+        } finally {
+            setTicketButtonLoading(uiElements.createFlightBtn, false);
         }
     });
 
@@ -226,10 +239,12 @@ export function initializeEventListeners() {
             qrScanner = null;
         }
         uiElements.qrScannerOverlay.classList.remove('show');
+        setTicketButtonLoading(uiElements.scanQrBtn, false);
     };
 
     uiElements.scanQrBtn?.addEventListener('click', async () => {
         if (qrScanner) return;
+        setTicketButtonLoading(uiElements.scanQrBtn, true);
         uiElements.qrScannerOverlay.classList.add('show');
         try {
             qrScanner = new QrScanner(

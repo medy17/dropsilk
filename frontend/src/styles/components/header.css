@@ -46,7 +46,7 @@
 .header-nav-link {
     background: none;
     border: none;
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: var(--ff-sans);
     font-weight: 600;
     font-size: .95rem;
     color: var(--c-text-secondary);

@@ -59,7 +59,7 @@
 }
 
 #boarding-flight-code {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--ff-mono);
     font-weight: 700;
     color: var(--c-secondary);
     letter-spacing: .1em;

@@ -33,7 +33,7 @@
 .footer-nav-link {
     background: none;
     border: none;
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: var(--ff-sans);
     font-weight: 500;
     font-size: 1em;
     color: var(--c-text-secondary);
@@ -72,12 +72,12 @@
 /* PRODUCTION STYLE: Clean, subtle text */
 .version-tag.prod {
     opacity: 0.7;
-    font-family: 'IBM Plex Mono', monospace; /* or your mono font */
+    font-family: var(--ff-mono); /* or your mono font */
 }
 
 /* DEV STYLE: The "Pop" */
 .version-tag.dev {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--ff-mono);
     font-size: 0.75em; /* Slightly smaller to fit the extra info */
     background: rgba(91, 206, 250, 0.15); /* Light Primary Color bg */
     border: 1px solid var(--c-primary);    /* Primary Color border */

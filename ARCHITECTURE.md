@@ -14,648 +14,588 @@
   </p>
 </div>
 
+This document explains how the frontend is structured. It is intended for
+contributors who need to understand where code lives, how runtime responsibilities
+are split, and what conventions to follow when extending the app.
 
-This document explains how DropSilk (frontend) is structured and how things
-fit together. It’s intended for contributors and maintainers: where files live,
-how modules talk to each other, how we keep code consistent, and how to add new
-features without surprising the rest of the system.
-
-If you’re looking for how to run the app, see the main README. This doc focuses
-on the architecture of the project itself.
+If you are looking for setup and local run instructions, see the README. This
+document focuses on the internal architecture of the frontend project itself.
 
 ## Table of contents
 
-1. High‑level overview
+1. High-level overview
 2. Runtime flow
-3. Directory layout and file placement
+3. Directory layout and generated files
 4. Module boundaries and conventions
 5. State management
-6. Networking (WebSocket + WebRTC)
-7. File transfers (worker + OPFS + flow control)
+6. Networking and room lifecycle
+7. File transfers
 8. Preview subsystem
 9. Screen sharing
-10. UI architecture (DOM, events, view, modals, onboarding)
+10. UI architecture
 11. Styling and theming
-12. Internationalisation (i18n)
-13. Privacy, consent, and third‑party scripts
+12. Internationalisation
+13. Privacy, consent, and third-party scripts
 14. Build system and environments
 15. Testing and manual QA
 16. Performance guidelines
 17. Accessibility notes
 18. Security notes
-19. Common workflows (recipes)
-20. Adding or changing translations
-21. Known limitations and cross‑browser notes
+19. Common workflows
+20. Known limitations and cross-browser notes
 
+## 1) High-level overview
 
-## 1) High‑level overview
-
-DropSilk’s frontend is a single‑page, vanilla‑JS app built with Vite. There is
-no front‑end framework. The app is structured around a small set of
+DropSilk's frontend is a single-page app built with Vite and plain ES modules.
+There is no client-side framework. The codebase is organized around a few clear
 responsibilities:
 
-- UI: DOM queries, event listeners, small, focused view updates.
-- Networking: a WebSocket signalling client and a WebRTC client.
-- Transfer: chunking, queueing, throttling, OPFS safe mode, zipping.
-- Preview: modular, lazy‑loaded handlers for different file types.
-- State: a tiny in‑memory store with imperative actions (no reactivity lib).
-- i18n: i18next with a language auto‑detector and a small tool to sync locales.
-- Styling: CSS modules split into base/layout/components/utilities + themes.
-- Desktop Shell (Electron): Provides native integrations like file/folder dialogs through a secure IPC bridge.
+- UI: DOM queries, event binding, view updates, onboarding, modals, drawer.
+- Room/session flow: REST-backed room creation/join/status, then WebSocket attachment.
+- Networking: WebSocket signaling plus WebRTC data-channel setup.
+- Transfers: queueing, chunking, worker-based reads, receive orchestration, OPFS.
+- Screen sharing: separate signaling/session handling from file-transfer WebRTC.
+- Preview: lazy-loaded handlers for file-type-specific viewers.
+- State: a small in-memory store with imperative actions.
+- i18n: i18next with generated locale metadata.
+- Styling: CSS split into base, layout, components, utilities, responsive, themes.
+- Desktop shell: Electron provides native file/folder pickers through preload IPC.
 
-Data path in practice:
+Broadly, the frontend talks to the
+backend's room API first, polls room state, and only attaches the WebSocket
+signaling channel once one of the users selects a file, starts a chat, or shares their screen.
 
-- UI actions (user input) trigger store actions and networking.
-- The WebSocket server only handles signalling + aux messages (no file data).
-- Files flow via WebRTC data channels, chunked in a Web Worker.
-- Received files land in memory or OPFS (safe mode), then the UI updates.
-- Previews are lazy‑loaded, sandboxed, and sanitised as needed.
-
+**The main idea is that WebSockets are disposable and the source-of-truth lives in PostgreSQL.**
 
 ## 2) Runtime flow
 
-Boot sequence (simplified):
+Boot sequence, simplified:
 
-1. Inline script in `<head>` applies animation quality from `localStorage` to prevent flashes.
-2. `DOMContentLoaded` in `js/app.js`.
-3. Initialise UI shell (modals, theming, drawer, privacy toast scaffolding).
-4. Bind DOM event listeners and set up drag‑and‑drop.
-5. Initialise user store (random name, onboarding state).
-6. Show onboarding pulses/coachmarks as appropriate.
-7. If a “code” parameter is present in the URL, show the boarding overlay.
-8. Connect to the WebSocket signalling server.
-9. Translate static `[data-i18n]` strings; re‑translate on language change.
-10. On consent, activate analytics and speed insights (deferred scripts).
+1. An inline script in `index.html` applies animation/performance classes before
+   first paint to avoid flashes.
+2. `src/js/app.js` runs on `DOMContentLoaded`.
+3. `initEffects()` applies persisted animation quality.
+4. i18n is initialized and static `[data-i18n]` nodes are translated.
+5. Global UI is initialized: modals, theme, drawer, onboarding scaffolding.
+6. Event listeners are bound.
+7. User state is initialized from local storage and generated defaults.
+8. Privacy consent and deferred third-party scripts are wired up.
+9. If `?code=XXXXXX` exists, the app shows the boarding overlay and attempts
+   `joinRoomFlow()`.
+10. Otherwise the regular home/onboarding path is shown.
 
-Once connected:
+Room and connection flow:
 
-- WebSocket “registered” message sets our ID; users list updates the “network”
-  panel.
-- Creating or joining a flight flips the UI into dashboard mode.
-- A “peer‑joined” message triggers the WebRTC offerer to start (or the
-  answerer to wait for a data channel).
-- The data channel enables transfers and screen sharing controls.
+1. `createRoomFlow()` or `joinRoomFlow()` calls the REST room API.
+2. The returned room summary is applied to store + UI.
+3. `roomSession.js` starts polling room status.
+4. Once the summary says the room should connect, `websocket.connect()` attaches
+   the signaling socket to the room with a participant ID.
+5. WebSocket relays signaling messages and peer presence.
+6. `webrtc.js` establishes the file-transfer data channel.
+7. File transfers, chat, and optional screen sharing become available.
 
+Screen sharing is separate from the file-transfer peer connection. It has its
+own session module and its own signaling attachment flow.
 
-## 3) Directory layout and file placement
+## 3) Directory layout and generated files
 
-Everything relevant to the client app lives under `src/`:
+Everything relevant to the client app lives under `frontend/`.
 
 ```
-src/
-├─ js/
-│  ├─ app.js                  # Entry (wires everything together)
-│  ├─ config.js               # Runtime config (WS URL, ICE, constants)
-│  ├─ state.js                # Tiny global store (imperative actions)
-│  ├─ i18n.js                 # i18next + detector setup
-│  │
-│  ├─ features/               # Domain-specific feature modules
-│  │  ├─ chat/                # Chat logic, UI, and event handling
-│  │  ├─ contact/             # Contact modal logic
-│  │  ├─ invite/              # QR generation, sharing logic
-│  │  ├─ settings/            # Settings persistence and UI generation
-│  │  ├─ theme/               # Dark mode logic
-│  │  └─ zip/                 # Zip modal logic (selection state)
-│  │
-│  ├─ network/
-│  │  ├─ websocket.js         # Signalling client (Render in prod)
-│  │  └─ webrtc.js            # Peer connection, data channel, screen share
-│  │
-│  ├─ transfer/
-│  │  ├─ fileHandler.js       # Facade: orchestrates sender, receiver, queue
-│  │  ├─ fileSender.js        # Worker management, upload throttling
-│  │  ├─ fileReceiver.js      # Incoming stream, memory/OPFS storage
-│  │  ├─ queueManager.js      # Drag-and-drop, file selection, queue state
-│  │  ├─ transferUI.js        # HTML generation for transfer items
-│  │  ├─ opfsHandler.js       # Origin Private File System operations
-│  │  ├─ etrCalculator.js     # Shared speed/time-remaining logic
-│  │  └─ zipHandler.js        # JSZip integration for “download all”
-│  │
-│  ├─ preview/
-│  │  ├─ previewConfig.js     # Registry: ext → handler + metadata
-│  │  ├─ previewManager.js    # Lazy‑load handlers, consent gates (PPTX)
-│  │  └─ handlers/
-│  │     ├─ imagePreview.js
-│  │     ├─ audioPreview.js
-│  │     ├─ codePreview.js
-│  │     ├─ mdPreview.js
-│  │     ├─ pdfPreview.js
-│  │     ├─ docxPreview.js
-│  │     ├─ pptxPreview.js    # Requires UploadThing + consent
-│  │     └─ xlsxPreview.js
-│  │
-│  ├─ ui/
-│  │  ├─ dom.js               # Centralised DOM element queries
-│  │  ├─ events.js            # All event listeners + drag‑and‑drop
-│  │  ├─ view.js              # Small “render” helpers (no framework)
-│  │  ├─ modals.js            # Orchestrator for modals (delegates to features/)
-│  │  ├─ onboarding.js        # Welcome/invite overlays & positioning
-│  │  └─ effects.js           # Animation quality controller (persists + applies)
-│  │
-│  ├─ utils/
-│  │  ├─ helpers.js           # Pure utilities (formatBytes, file icon, etc.)
-│  │  ├─ toast.js             # Notification system
-│  │  ├─ audioManager.js      # Shared sounds + haptics (user‑toggled)
-│  │  └─ uploadHelper.js      # UploadThing client bootstrap
-│  │
-│  └─ workers/
-│     └─ sender.worker.js     # (Placed at root as sender.worker.js for Vite)
-│
-├─ styles/
-│  ├─ base/                   # Variables, animations, theme
-│  ├─ layout/                 # Aurora background, grids, layout shells
-│  ├─ components/             # Buttons, forms, modals, queues, etc.
-│  ├─ utilities.css
-│  ├─ index.css               # Aggregator @imports by category
-│  └─ responsive.css
-│
-├─ locales/                   # JSON translations
-│  ├─ en.json … zh.json
-│
-└─ scripts/
-└─ update-locales.js       # Keeps i18n imports/resources/options in sync
+frontend/
+├─ electron/
+│  ├─ main.js
+│  └─ preload.js
+├─ public/
+│  ├─ sender.worker.js
+│  ├─ video.js
+│  ├─ sounds/
+│  └─ favicons/
+├─ scripts/
+│  ├─ generate-locales.js
+│  ├─ generate-version.js
+│  ├─ update-locales.js
+│  ├─ update-themes.js
+│  └─ theme-config.js
+├─ src/
+│  ├─ js/
+│  │  ├─ app.js
+│  │  ├─ config.js
+│  │  ├─ i18n.js
+│  │  ├─ locales.gen.js        # generated
+│  │  ├─ state.js
+│  │  ├─ themeConfig.gen.js    # generated
+│  │  ├─ version.gen.js        # generated
+│  │  ├─ features/
+│  │  │  ├─ chat/
+│  │  │  ├─ contact/
+│  │  │  ├─ invite/
+│  │  │  ├─ settings/
+│  │  │  ├─ theme/
+│  │  │  └─ zip/
+│  │  ├─ network/
+│  │  │  ├─ roomApi.js
+│  │  │  ├─ roomSession.js
+│  │  │  ├─ screenShareSession.js
+│  │  │  ├─ webrtc.js
+│  │  │  └─ websocket.js
+│  │  ├─ preview/
+│  │  │  ├─ handlers/
+│  │  │  ├─ previewConfig.js
+│  │  │  └─ previewManager.js
+│  │  ├─ transfer/
+│  │  │  ├─ etrCalculator.js
+│  │  │  ├─ fileHandler.js
+│  │  │  ├─ fileReceiver.js
+│  │  │  ├─ fileSender.js
+│  │  │  ├─ opfsHandler.js
+│  │  │  ├─ queueManager.js
+│  │  │  ├─ transferUI.js
+│  │  │  └─ zipHandler.js
+│  │  ├─ ui/
+│  │  │  ├─ dom.js
+│  │  │  ├─ drawer.js
+│  │  │  ├─ effects.js
+│  │  │  ├─ events.js
+│  │  │  ├─ modals.js
+│  │  │  ├─ onboarding.js
+│  │  │  ├─ streaming.js
+│  │  │  └─ view.js
+│  │  └─ utils/
+│  │     ├─ audioManager.js
+│  │     ├─ helpers.js
+│  │     ├─ security.js
+│  │     ├─ toast.js
+│  │     └─ uploadHelper.js
+│  ├─ locales/
+│  └─ styles/
+├─ tests/
+├─ index.html
+├─ 404.html
+├─ vite.config.mjs
+└─ vitest.config.js
 ```
 
-Static assets (favicons, sounds, workers, images) live in `public/` and are
-served as‑is by Vite.
+Notes:
 
-Where should new things go?
+- `public/sender.worker.js` is the transfer worker. It is not stored under
+  `src/js/workers/`.
+- `src/js/locales.gen.js`, `src/js/themeConfig.gen.js`, and
+  `src/js/version.gen.js` are generated artifacts. Do not hand-edit them.
+- Theme CSS files live under `src/styles/themes/` and are imported into
+  `src/styles/index.css` by `scripts/update-themes.js`.
 
-- New feature slice: `js/features/newFeature/`.
-- New network logic: `js/network/`.
-- New transfer logic: `js/transfer/` (if core logic) or `js/features/` (if UI heavy).
-- New preview type: `js/preview/handlers/` plus `previewConfig.js` entry.
-- New UI behaviour: bind in `js/ui/events.js`, render helpers in `js/ui/view.js`.
-- Small pure helpers: `js/utils/`.
-- New CSS: follow the existing split (base/layout/components/utilities).
+Where should new code go?
 
+- New domain feature: `src/js/features/<feature>/`.
+- Room or signaling concerns: `src/js/network/`.
+- File-transfer logic: `src/js/transfer/`.
+- Preview handler: `src/js/preview/handlers/`.
+- DOM-heavy orchestration: `src/js/ui/`.
+- Small shared helpers: `src/js/utils/`.
+- CSS additions: the relevant file under `src/styles/`.
 
 ## 4) Module boundaries and conventions
 
-- ES Modules everywhere; avoid globals. The only intentional global is
-  `window.videoPlayer` for the self‑contained player in `public/video.js`.
-- **Feature Modules**: Logic that owns a specific UI domain (Chat, Settings, Invite)
-  lives in `js/features/`. These modules should export setup/teardown functions
-  used by the main `ui/` orchestrators.
-- Separate DOM concerns from logic:
-    - `ui/dom.js` owns querying and exposes a stable `uiElements` map.
-    - `ui/events.js` attaches listeners and calls actions/helpers.
-    - `ui/view.js` mutates the DOM to reflect state changes.
-- Avoid the network layer calling DOM directly. It calls small view utilities
-  (e.g., `updateShareButton`) and store actions, not arbitrary DOM selectors.
-- Lazy‑load heavy dependencies (PDF.js worker, preview handlers, UploadThing
-  client, analytics scripts).
-- Keep handlers side‑effect free (receive a `Blob` and a mount element; render
-  there; return nothing). Optional `cleanup()` if needed.
-- Filenames: kebab‑case for files, camelCase for functions, PascalCase for
-  classes (rarely used here). Use named exports for utilities; default export
-  for a single “main” function per module (e.g., preview handlers).
-- CSS: prefer component‑scoped selectors; use CSS variables for colour and
-  theme; avoid deep descendant selectors.
+- ES modules everywhere; avoid globals.
+- `app.js` is the entry and top-level orchestrator.
+- `state.js` is the only shared mutable store. Mutate through `store.actions`.
+- `ui/dom.js` centralizes element lookups. Prefer importing it over scattering
+  raw selectors across unrelated modules.
+- `ui/events.js` binds listeners and routes user actions to feature/network code.
+- `ui/view.js` and `ui/streaming.js` own DOM updates for their surfaces.
+- `features/*` own domain-specific UI and persistence logic.
+- `network/*` owns room lifecycle, signaling, peer setup, and screen-share sessions.
+- `transfer/*` owns queueing, sender/receiver behavior, OPFS, and transfer UI.
+- `preview/*` owns file-type dispatch and lazy preview rendering.
 
+Conventions:
+
+- Keep DOM mutation close to UI modules.
+- Keep backend protocol handling in `network/*`.
+- Keep side effects explicit; do not hide network calls inside generic helpers.
+- Prefer small functions and named exports unless a module has one obvious default.
+- Lazy-load heavy dependencies and preview handlers.
 
 ## 5) State management
 
-`js/state.js` exposes a tiny store:
+`src/js/state.js` contains a small in-memory store with imperative actions.
+There is no subscription system and no reactive layer.
 
-- `getState()` returns a shallow copy of the state.
-- `actions` is the only way to mutate state.
-- No subscriptions; modules update the UI after actions where needed.
-- Metrics speed is computed on an interval from `webrtc.js`.
+State groups:
 
-State slices include:
-
-- Peer/session: `myId`, `myName`, `currentFlightCode`, `isFlightCreator`,
-  `peerInfo`, `connectionType`, `lastNetworkUsers`.
-- Transfer: `fileToSendQueue`, `currentlySendingFile`, `fileIdMap`,
-  `receivedFiles`.
-- Metrics: totals + per‑interval counters + a setInterval handle.
-- UI: onboarding flags, whether invitation toast is visible, scroll flags.
+- Identity/session: `myId`, `myName`, `currentFlightCode`, `isFlightCreator`.
+- Room lifecycle: `roomParticipantId`, `roomRole`, `roomStatus`, `roomPeer`,
+  `signalingInitiated`.
+- Peer/network: `peerInfo`, `connectionType`, `lastNetworkUsers`.
+- Transfers: queue, current send, DOM file ID map, received files.
+- Metrics: totals, interval counters, metrics timer handle.
+- UI flags: onboarding, scroll state, invitation toast visibility.
 
 Guidelines:
 
-- Keep state minimal; prefer deriving, not storing the same data twice.
-- Use `store.actions` to mutate; then call view helpers to reflect in the UI.
+- Add state only when multiple modules truly need it.
+- Prefer deriving display values instead of storing duplicates.
+- Clear state on disconnect/reset through store actions, not ad hoc mutation.
 
+## 6) Networking and room lifecycle
 
-## 6) Networking (WebSocket + WebRTC)
+The networking layer has four distinct pieces:
 
-WebSocket client (`js/network/websocket.js`):
+- `roomApi.js`: REST calls for room creation, joining, polling status, marking
+  readiness, and screen-share state.
+- `roomSession.js`: applies room summaries to store/UI and manages polling.
+- `websocket.js`: attaches signaling to a room and relays peer/signaling events.
+- `webrtc.js`: creates the file-transfer `RTCPeerConnection` and data channel.
 
-- Establishes a signalling socket to the backend.
-- On connection, registers user details and checks URL for `?code=XXXXXX` to
-  auto‑join a flight.
-- Handles messages:
-    - `registered`, `users-on-network-update`, `flight-invitation`,
-      `flight-created`, `peer-joined`, `signal`, `peer-left`, `error`.
-- Delegates to:
-    - Store actions (e.g., `setPeerInfo`, `setConnectionType`).
-    - `webrtc.handleSignal` for SDP/ICE.
-    - View helpers (boarding overlay, dashboard status, in‑flight panel).
-    - Toasts + audio cues.
+### Room-first model
 
-WebRTC client (`js/network/webrtc.js`):
+Create/join flows go through `roomApi.js` first. The backend returns a room
+summary that includes the local participant, peer state, room status, and
+whether the signaling channel should attach yet.
 
-- Builds `RTCPeerConnection` with a full ICE configuration. The backend provides
-  STUN and TURN server credentials, allowing for robust NAT traversal even
-  behind restrictive firewalls. In development or local network environments,
-  it can fall back to operating without external ICE servers.
-- Creates a reliable `RTCDataChannel` named `fileTransfer`.
-    - `bufferedAmountLowThreshold` set to `HIGH_WATER_MARK / 2`.
-    - `onbufferedamountlow` calls `drainQueue()` to keep the pipe full.
-- Bootstraps offer/answer flow and relays SDP/ICE via WebSocket.
-- Screen share:
-    - `getDisplayMedia` with UA‑tailored audio constraints.
-    - Adds tracks, renegotiates, and wires UI controls for quality presets.
-- Emits small UI changes (enable drop zone, share button text) via view helpers.
+`roomSession.js` then:
 
+- updates the store with room metadata
+- enters flight mode in the UI
+- enables or disables the drop zone depending on peer presence
+- keeps polling until the room is ready
+- attaches the WebSocket signaling channel when `shouldConnect` is true
 
-## 7) File transfers (worker + OPFS + flow control)
+### Signaling
 
-The transfer logic is modularized under `js/transfer/`, with `fileHandler.js` acting as a facade to coordinate the specific modules.
+`websocket.js` does not own room creation/joining. It owns:
 
-Sender (`js/transfer/fileSender.js`):
+- registering the client
+- attaching to a room with `roomCode` and `participantId`
+- receiving signaling messages
+- relaying SDP/ICE to `webrtc.js`
+- handling peer-left/error/socket-close cases
 
-- `startFileSend()`:
-    - Spawns `sender.worker.js` to read the file in chunks (default 256 KB, user
-      tunable).
-    - Sends JSON metadata, then ArrayBuffers, then `"EOF"`.
-    - Throttles on `getBufferedAmount()` against `HIGH_WATER_MARK`.
-    - Updates UI using `transferUI.js` and calculates ETA via `etrCalculator.js`.
-- Worker (`sender.worker.js`):
-    - Reads slices with `FileReader`, transfers underlying buffers to main thread
-      (zero‑copy), and posts `chunk` messages.
-    - Self‑terminates on `done`.
+### WebRTC
 
-Receiver (`js/transfer/fileReceiver.js`):
+`webrtc.js` creates the file-transfer peer connection and data channel:
 
-- `handleDataChannelMessage()`:
-    - If metadata JSON: initialises receive state; delegates to `opfsHandler.js` if
-      "safe mode" is active (large file + supported browser).
-    - If ArrayBuffer:
-        - Writes via `opfsHandler` (if safe mode) or pushes to memory array.
-        - Tracks speed/ETA via `etrCalculator.js`.
-    - On `"EOF"`:
-        - Finalises writer (OPFS) or creates a `Blob` from parts.
-        - Adds file to `store.receivedFiles`.
-        - Updates UI actions (preview/save/complete).
-        - Optional auto‑download if enabled and below a size threshold.
+- ICE servers are fetched from `${API_BASE_URL}/api/turn-credentials`
+- LAN connections skip external ICE
+- fallback is public STUN if TURN fetch fails
+- the data channel uses `HIGH_WATER_MARK` and `bufferedAmountLowThreshold`
+  based flow control
+- metrics are updated on an interval once the channel opens
 
-OPFS Safe Mode (`js/transfer/opfsHandler.js`):
+The signaling socket and the file-transfer peer connection are separate from
+the screen-sharing session described below.
 
-- Encapsulates all Origin Private File System operations.
-- `initOpfsForFile`: Get directory handle, remove stale files, create writer.
-- `writeOpfsChunk`: Writes stream directly to disk.
-- `finalizeOpfsFile`: Closes writer, returns File handle as Blob.
+## 7) File transfers
 
-UI & Queue (`js/transfer/transferUI.js`, `js/transfer/queueManager.js`):
+File-transfer logic lives under `src/js/transfer/`.
 
-- `transferUI.js` contains all HTML generation templates for queue items to keep logic files clean.
-- `queueManager.js` handles file selection, folder limits, and drag-and-drop reordering.
+Key modules:
 
+- `fileHandler.js`: thin facade that re-exports sender/receiver/queue functions
+  and provides a combined reset helper.
+- `fileSender.js`: worker-driven file reads, chunk dispatch, throttling.
+- `fileReceiver.js`: incoming metadata/chunks/EOF handling, receive assembly,
+  screen-share wake messages.
+- `queueManager.js`: file/folder selection, queue state, drag-drop sorting,
+  ready-state signaling to the room session.
+- `transferUI.js`: transfer row/template HTML generation.
+- `opfsHandler.js`: Origin Private File System streaming for large receives.
+- `zipHandler.js`: "download all" archive support.
+
+Transfer model:
+
+1. User selects files or folders.
+2. `queueManager.js` adds them to store state and updates UI.
+3. The sender worker reads the current file in chunks from `public/sender.worker.js`.
+4. Chunks are sent over the data channel with backpressure control.
+5. Receiver writes to memory or OPFS depending on size/support/settings.
+6. On EOF, the final Blob/File is assembled, stored, and surfaced in the UI.
+
+OPFS safe mode is used to avoid exhausting tab memory on large receives.
 
 ## 8) Preview subsystem
 
-Design:
+The preview system is extension-driven and lazy-loaded.
 
-- `previewConfig.js` declares extension → handler mappings, optional
-  dependencies and stylesheets, and a `requiresUploadConsent` flag.
-- `previewManager.js` resolves a file by name, enforces consent (PPTX), lazy‑
-  loads dependencies, then loads the handler and mounts it in the modal.
-- Handlers live in `js/preview/handlers/` and export:
-    - `default(blob, contentElement)` to render
-    - optionally, `cleanup()` to tear down state between previews
-- PPTX preview uploads the blob to UploadThing, uses Microsoft Office Online
-  Viewer to display.
+- `previewConfig.js` maps file types to extensions and handlers.
+- `previewManager.js` chooses a handler, loads dependencies, and mounts preview UI.
+- Handlers live in `preview/handlers/`.
+
+Supported handler groups include:
+
+- images
+- HEIC/HEIF
+- audio
+- code/text
+- Markdown
+- PDF
+- DOCX
+- PPTX
+- PSD
+- XLSX/XLS/CSV
+
+Important details:
+
+- Markdown is sanitized.
+- PPTX preview requires explicit upload consent and backend availability.
+- Some handlers load their own external styles or heavy libraries only when used.
 
 Adding a new preview:
 
-1. Create `js/preview/handlers/yourTypePreview.js`:
-
-   ```js
-   // js/preview/handlers/xyzPreview.js
-   export async function cleanup() {
-     // Optionally tear down things here
-   }
-
-   export default async function renderXyzPreview(blob, mount) {
-     // Read/process the blob
-     const text = await blob.text();
-     const pre = document.createElement('pre');
-     pre.textContent = text.slice(0, 1000);
-     mount.appendChild(pre);
-   }
-   ```
-
-2. Wire it in `js/preview/previewConfig.js`:
-
-   ```js
-   export const previewConfig = {
-     // …
-     xyz: {
-       extensions: ['xyz'],
-       handler: () => import('./handlers/xyzPreview.js'),
-     },
-   };
-   ```
-
-3. The preview modal shows when you call `showPreview(fileName)`.
-
-Security:
-
-- Markdown uses DOMPurify.
-- External styles/scripts are only added when needed and only for the active
-  preview (lazy).
-- PPTX requires explicit user consent before any upload.
-
+1. Create `src/js/preview/handlers/<type>Preview.js`.
+2. Register extensions and handler import in `previewConfig.js`.
+3. Add any consent or stylesheet requirements there as well.
 
 ## 9) Screen sharing
 
-- Toggled by a single “Share Screen” button, disabled on mobile.
-- UA‑aware audio constraints:
-    - Chrome/Edge/Opera: tab audio works everywhere; full system audio on Windows.
-    - Firefox: tab audio only.
-    - Safari/Android/iOS: audio not reliably supported (disabled).
-- Quality presets use `MediaTrackConstraints` via `track.applyConstraints`.
-- Local and remote panels show small inline controls with a quality menu and a
-  fullscreen toggle for the viewer.
-- Renegotiation occurs when adding/removing tracks.
+Screen sharing has its own session layer in `src/js/network/screenShareSession.js`.
 
+Responsibilities of `screenShareSession.js`:
 
-## 10) UI architecture (DOM, events, view, modals, onboarding)
+- track whether local screen share is active
+- manage a second WebSocket attachment for the `screen-share` channel
+- manage a dedicated peer connection for screen-share media
+- keep room state in sync through `roomApi.setParticipantScreenShare()`
+- wake the remote side when a share starts
+- show/hide local and remote stream UI through `ui/streaming.js`
 
-- `ui/dom.js`: Single source of truth for DOM nodes.
-- `ui/events.js`:
-    - All listeners bound in one place.
-    - Drag‑and‑drop, OTP flight code behaviour, QR scan flow, sortable queue,
-      screen sharing toggles, “leave” behaviour.
-    - Progressive Enhancement for Desktop: Checks for the existence of `window.electronAPI`. If present, it overrides the default file/folder input behavior to call the native OS dialogs via IPC.
-- `ui/view.js`:
-    - Small pure-ish functions that read from the store and mutate view state.
-    - Manages queue expansion, metrics UI, panels, pulses, and stream views.
-- `ui/modals.js`:
-    - Acts as an orchestrator for global modals (About, Donate, etc.).
-    - For complex modals (Settings, Zip, Invite), it delegates logic to the relevant
-      modules in `js/features/`.
-- `ui/onboarding.js`:
-    - Welcome/Invite overlays; computes safe positions using VisualViewport and
-      re‑positions on orientation/resize.
-- `ui/effects.js`:
-    - Manages the "Animation Quality" setting. Reads from `localStorage`, applies
-      `<body>` classes (`reduced-effects`, `no-effects`), and reflects the
-      current choice in the UI.
+This separation keeps file transfer stable even when screen sharing is toggled.
 
-Design principle: keep each of these files scoped to one job to minimise
-surprise and cross‑module coupling.
+Browser support behavior is pragmatic:
 
+- mobile/iOS/Android: screen sharing is disabled or audio is unavailable
+- Chrome/Edge/Opera: best support, especially for tab audio
+- Firefox: tab audio only
+- Safari: more limited audio support
+
+## 10) UI architecture
+
+UI responsibilities are intentionally split:
+
+- `ui/dom.js`: stable element map
+- `ui/events.js`: user input, drag-and-drop, OTP inputs, room actions, screen-share triggers
+- `ui/view.js`: queue/dashboard/network/onboarding rendering helpers
+- `ui/streaming.js`: stream-specific UI
+- `ui/modals.js`: modal orchestration and delegation to feature modules
+- `ui/onboarding.js`: welcome/invite overlays and positioning logic
+- `ui/effects.js`: animation quality/performance classes
+- `ui/drawer.js`: responsive drawer behavior
+
+Feature modules extend this core shell:
+
+- `features/chat/`: chat state/view/events
+- `features/contact/`: contact modal and email reveal flow
+- `features/invite/`: QR/share modal behavior
+- `features/settings/`: settings persistence and settings UI
+- `features/theme/`: theme application and QR regeneration
+- `features/zip/`: ZIP modal state and actions
+
+Electron support is progressive enhancement. When `window.electronAPI` exists,
+the UI can route file/folder picking through native dialogs instead of browser
+inputs.
 
 ## 11) Styling and theming
 
-- CSS is split by concern and loaded via `styles/index.css` which @imports:
-  base, layout, components, utilities, responsive.
-- Theme:
-    - Light/dark toggled by `body[data-theme]` and CSS variables.
-    - Theme switch updates `<meta name="theme-color">` and re‑draws QR codes.
-- Animations:
-    - Aurora background and blobs are managed via user settings (`high`/`reduced`/`off`)
-      to ensure zero idle CPU cost when disabled or reduced.
-    - Reduced motion is honoured with `prefers-reduced-motion`.
-    - UI animations are paused in hidden elements (e.g., modal loaders) to prevent
-      background style recalculations.
-- Responsive:
-    - Breakpoints at `max-width: 991px`, `768px`, etc.
-    - Drawer appears on small screens; footer links collapse; controls compact.
+Styles are loaded from `src/styles/index.css`, which aggregates:
 
-Naming:
+- `base/`
+- `layout/`
+- `components/`
+- `utilities.css`
+- `responsive.css`
+- generated theme imports from `themes/*.css`
 
-- Component file per surface (dropzone, buttons, queues, modals, etc).
-- Keep selectors shallow; prefer CSS vars for colour and spacing.
+Theme system details:
 
+- Theme name is stored separately from light/dark mode.
+- The document uses `data-theme` and `data-mode` attributes.
+- `scripts/update-themes.js` generates `themeConfig.gen.js` from
+  `scripts/theme-config.js` and the actual theme CSS files present on disk.
+- `features/theme/index.js` uses the generated config to update meta theme color
+  and to regenerate QR codes when needed.
 
-## 12) Internationalisation (i18n)
+The architecture includes a catalog of named themes plus a mode toggle.
 
-- `i18n.js` wires i18next with `i18next-browser-languagedetector`.
-- Static text is rendered by scanning DOM nodes with `[data-i18n]` attributes.
-- Settings modal includes a language selector that triggers `i18next.changeLanguage`.
-- Translation resources live in `src/locales/*.json`.
+## 12) Internationalisation
 
-Automation:
+i18n is built on `i18next` and locale JSON files under `src/locales/`.
 
-- `scripts/update-locales.js` synchronises:
-    - Imports/resources in `i18n.js`.
-    - Language options in `ui/modals.js` (between markers).
-    - Adds missing language labels to all locale JSON files.
+The frontend uses generated locale metadata:
+
+- `scripts/generate-locales.js` scans locale files and produces `src/js/locales.gen.js`
+- `src/js/i18n.js` imports `SUPPORTED_LOCALES` from that generated file
+- `scripts/update-locales.js` keeps locale wiring and labels synchronized
+
+The app translates:
+
+- static DOM nodes via `[data-i18n]`
+- runtime strings via `i18next.t(...)`
 
 Guidelines:
 
-- Always add keys to `en.json` first; keep keys descriptive and scoped.
-- Do not hardcode strings in JS/HTML; use `i18next.t(key, options)` or
-  `[data-i18n]` where possible.
+- add keys to `en.json` first
+- keep keys descriptive and scoped
+- do not hardcode user-facing strings in JS unless there is a strong reason
 
+## 13) Privacy, consent, and third-party scripts
 
-## 13) Privacy, consent, and third‑party scripts
+Consent-sensitive features are deferred until needed.
 
-- Privacy consent toast:
-    - Appears after the welcome onboarding on first run.
-    - Accepting sets `dropsilk-privacy-consent` and activates:
-        - Google Analytics (gtag) script (deferred until consent).
-        - Vercel Speed Insights (deferred until consent).
-    - The settings modal can enable analytics later without a reload; disabling
-      prompts a reload to fully stop collection.
-- PPTX preview consent:
-    - Explicit prompt with “remember” tickbox.
-    - Stored per extension in `dropsilk-preview-consent`.
-    - If denied, preview buttons for PPTX are disabled with a tooltip.
-- reCAPTCHA:
-    - Lazy‑loaded only when the user clicks “View Email”.
-    - Uses the site key placeholder in the DOM attribute.
+- Privacy consent gates Google Analytics, Vercel Speed Insights, and Vercel Analytics.
+- `app.js` activates deferred scripts only after explicit consent.
+- reCAPTCHA is lazy-loaded only when the user asks to reveal the contact email.
+- PPTX preview requires separate explicit upload consent.
 
-Security posture:
+Client-side rules:
 
-- No files are uploaded except optional PPTX previews and then only to the
-  configured UploadThing endpoint, with auto‑clean up (server‑side).
-- WebRTC data paths are end‑to‑end encrypted (DTLS/SRTP).
-- Markdown is sanitised.
-- reCAPTCHA is loaded on demand only for the contact email.
-- QR scanner accepts only our URL schema; invalid scans are rejected.
-- Do not include secrets in the client; use `VITE_` prefix for safe public
-  env vars only.
-
+- no secrets in client code
+- only public values use `VITE_*`
+- external scripts should load lazily whenever possible
 
 ## 14) Build system and environments
 
-- Build tool: Vite (+ ESM everywhere).
-- Dev server: `npm run dev` or `npm run dev:electron` for desktop. (see package.json).
-- Environments:
-    - `.env.local` must include:
+Tooling:
 
-      ```text
-      VITE_API_BASE_URL=http://localhost:8080
-      ```
+- Vite for web builds and dev server
+- Vitest for tests
+- Electron + electron-builder for desktop packaging
 
-      This powers the UploadThing client for PPTX previews.
+Scripts in `package.json`:
 
-- Electron Build: `npm run build:electron` orchestrates a two-step process:
-    - `vite build --base=./`: Vite builds the frontend with relative paths (`./`) for the app to work when loaded from the local filesystem via Electron's protocol.
-    - `electron-builder`: This tool packages the Vite output along with the `electron/` scripts into distributable installers (`.dmg`, `.exe`, `.AppImage`).
+- `pnpm dev`: generates version/locales/themes, then runs Vite
+- `pnpm build:web`: generates version/locales/themes, then builds web output
+- `pnpm dev:electron`: runs Vite plus Electron
+- `pnpm build:electron`: builds web assets with `--base=./` and packages Electron
+- `pnpm test`: regenerates locales/themes, then runs Vitest
 
-- WebSocket URL resolution is dynamic:
-    - If `location.protocol !== 'https:'` → `ws://<host>:8080` (useful on LAN).
-    - Else → production `wss://dropsilk-backend.onrender.com`.
-- **Pre-paint script**: A small, inline script in `index.html` reads the animation
-  quality from `localStorage` and applies a class to `<body>` before the first
-  paint. This prevents a "flash" of unwanted animations on page load.
+Generated build metadata:
 
-Public assets:
+- `generate-version.js` writes `src/js/version.gen.js`
+- branch/build metadata is derived from git or Vercel env vars
 
-- Served from `public/`, accessible by `/…` at runtime (e.g., `/sounds/*.mp3`,
-  `/video.js`).
+Environment values used by the frontend:
 
-PDF.js worker:
+- `VITE_API_BASE_URL`
+- `VITE_RECAPTCHA_SITE_KEY`
 
-- Imported as `pdf.worker?url` and assigned to `GlobalWorkerOptions.workerSrc`
-  at runtime.
+Runtime config behavior in `src/js/config.js`:
 
+- API base URL is normalized for LAN usage when possible
+- production builds default to the Render backend
+- dev and preview builds connect to the local backend on port `8080`
+- WebSocket URL and API base URL are resolved separately
 
 ## 15) Testing and manual QA
 
-There’s no formal test suite yet. For manual checks:
+The repo includes a real test suite.
 
-- Flights:
-    - Create and join flows.
-    - Invitation toast → “Join” works.
-    - URL `?code=` on load auto‑boards.
-- Transfer:
-    - Small and large files (multi‑GB) with and without OPFS.
-    - Drag‑and‑drop and folder selection (size/count warnings).
-    - Queue reordering and cancel mid‑transfer.
-    - Auto‑download on and off; size cap respected.
-- Screen share:
-    - Chrome/Edge (tab audio), Firefox (tab only), macOS/Windows differences.
-    - Fullscreen enter/exit and orientation lock on mobile/tablet.
-- Previews:
-    - Images, audio (WaveSurfer), code (HLJS), Markdown (sanitised),
-      PDF (lazy page render), DOCX (Mammoth), XLSX (SheetJS), PPTX
-      (consent + UploadThing + Office embed).
-- Internationalisation:
-    - Language selector and persisted choice.
-    - Update‑locales script regenerates imports and options.
-- Accessibility:
-    - Keyboard only: modals, video player controls, drawer, OTP inputs.
-    - Reduced motion and performance modes apply.
-- Privacy:
-    - Consent banner shows, toggling analytics works as described.
+Test setup:
 
-Future work: Vitest for units and Playwright for simple E2E flows could be
-added later.
+- Vitest with `jsdom`
+- shared mocks in `tests/setup.js`
+- custom pretty reporter for local runs
 
+Coverage areas include:
+
+- state/store behavior
+- queue and transfer flows
+- previews
+- settings and settings UI
+- onboarding and modals
+- i18n
+- contact flow
+- streaming behavior
+- security helpers
+- ZIP/XLSX/QR related logic
+
+Manual QA is still important for:
+
+- real browser-to-browser transfers
+- cross-browser screen sharing
+- very large file receives and OPFS behavior
+- Electron-native picker flows
+- production-like privacy/analytics consent behavior
 
 ## 16) Performance guidelines
 
-- Keep heavy libs lazy:
-    - PDF.js, UploadThing client, preview handlers, analytics, reCAPTCHA.
-- Use Web Workers for blocking IO (file reads).
-- Avoid frequent DOM reads/writes in loops; batch updates and throttle.
-- DataChannel: honour `bufferedAmount` thresholds to prevent stalling.
-- **Animations**:
-    - The single biggest source of idle performance cost comes from hidden but
-      mounted elements with infinite CSS animations (e.g., spinners in modals).
-      This causes constant style recalculations even when invisible.
-    - **Rule**: All hidden elements with animations must either be unmounted (`display: none`)
-      or have their animations explicitly paused (`animation-play-state: paused`).
-    - The "Animation Quality" setting in the UI directly controls this, allowing
-      the app to achieve near-zero CPU usage at idle in `reduced` or `off` modes.
-- OPFS safe mode for large receives avoids memory spikes/crashes.
-
+- Keep heavy libraries lazy.
+- Use the worker for file reads instead of blocking the main thread.
+- Respect data-channel backpressure.
+- Prefer OPFS for large receives when supported.
+- Avoid repeated DOM reads/writes inside tight loops.
+- Hidden animated elements must be paused or removed from layout.
+- Treat animation quality settings as a performance control, not just a visual preference.
 
 ## 17) Accessibility notes
 
-- Keyboard support:
-    - Modals: Escape closes (with zipping guard), focus remains reasonable.
-    - OTP inputs: left/right navigation, paste support, error animation.
-    - Drawer links forward to original buttons; tap feedback on mobile.
-- Reduced motion:
-    - Follow `prefers-reduced-motion` and user “performance/off” settings.
-- Colour contrast:
-    - Palette set by CSS variables; maintain contrast for important UI.
-- Video player:
-    - Keyboard shortcuts: Space/F/M/←/→; focus states are visible.
-
+- Keyboard interaction matters for modals, OTP inputs, drawer navigation, and controls.
+- Reduced motion is respected through both system preference and user settings.
+- Focus visibility should remain intact when adding new UI.
+- Screen-sharing and media controls should continue to expose clear labels and states.
 
 ## 18) Security notes
 
-- No file content goes to our servers (P2P only) except PPTX preview uploads,
-  which are opt‑in and time‑limited on the server.
-- WebRTC encrypts media/data (DTLS/SRTP).
-- Markdown is sanitised.
-- reCAPTCHA is loaded on demand only for the contact email.
-- QR scanner accepts only our URL schema; invalid scans are rejected.
-- Do not include secrets in the client; use `VITE_` prefix for safe public
-  env vars only.
+- File contents stay peer-to-peer except optional consented preview uploads such as PPTX.
+- WebRTC traffic is encrypted by the browser stack.
+- Markdown and preview content must remain sanitized.
+- reCAPTCHA is loaded on demand only for the contact flow.
+- Client code must not contain secrets.
+- Backend-dependent features should fail closed and visibly when config is missing.
 
+## 19) Common workflows
 
-## 19) Common workflows (recipes)
+Add a new room/session capability:
 
-Add a new preview type:
+1. Update the backend contract first.
+2. Extend `roomApi.js` or `websocket.js` as appropriate.
+3. Apply room summary changes in `roomSession.js`.
+4. Reflect state in `ui/view.js` or the relevant feature module.
 
-1. Create a handler under `js/preview/handlers/`.
+Add a new file preview:
+
+1. Create a handler in `preview/handlers/`.
 2. Register it in `previewConfig.js`.
-3. If it needs external CSS, list it in `stylesheets`.
-4. If it requires uploading (e.g., server‑side render), set
-   `requiresUploadConsent: true` and implement that in the handler.
-
-Add a new WebSocket message:
-
-1. Update the backend protocol.
-2. Add a `case` in `js/network/websocket.js:onMessage`.
-3. Dispatch store actions and call view helpers; do not query DOM directly.
+3. Lazy-load any heavy dependency.
+4. Add tests for extension routing and handler behavior where feasible.
 
 Add a new setting:
 
-1. Add UI in `populateSettingsModal()` in `js/features/settings/settingsUI.js`.
-2. Persist to `localStorage` (use a `dropsilk-*` key).
-3. If it affects performance/animations, wire it up in `js/ui/effects.js`.
-4. Apply in `js/features/settings/settingsData.js` and reflect in the UI.
+1. Define persistence in `features/settings/settingsData.js`.
+2. Render controls in `features/settings/settingsUI.js`.
+3. Apply side effects in the owning module, such as `ui/effects.js` or `features/theme/index.js`.
+4. Add or update tests.
 
-Add a new language:
+Add a new theme:
 
-1. Add `src/locales/xx.json`.
-2. Run `node scripts/update-locales.js`.
-3. Fill translations in the new JSON file(s).
+1. Add `<theme>.css` under `src/styles/themes/`.
+2. Add its metadata to `scripts/theme-config.js`.
+3. Run `pnpm update-themes`.
 
+Add a new locale:
 
-## 20) Adding or changing translations
+1. Add `src/locales/<code>.json`.
+2. Run `pnpm gen:locales` and `pnpm update-locales`.
+3. Fill translations and verify selector labels.
 
-- Keys live in `src/locales/en.json` first; keep names descriptive.
-- To add a language:
-    - Create `xx.json`, minimally copying the shape from `en.json`.
-    - Run `scripts/update-locales.js` to update imports/resources/options and to
-      seed language names across JSONs.
-- In HTML, use `data-i18n` attributes; in code, `i18next.t(key, options)` or
-  `[data-i18n]` where possible.
-- For dynamic text (e.g., toasts) always use `i18next.t()`.
+## 20) Known limitations and cross-browser notes
 
-
-## 21) Known limitations and cross‑browser notes
-
-- iOS and many Android browsers cannot share screen audio.
-- Firefox supports tab‑audio only (not window/desktop audio).
-- OPFS is not supported everywhere; we gracefully fall back to memory.
-- PPTX preview depends on UploadThing and Microsoft Office embed; it will not
-  work offline and requires consent/LAN connectivity to the backend.
-- Some CSS effects vary slightly across browsers (e.g., gradient masks).
-- Connectivity relies on WebRTC's ICE framework (STUN/TURN). In highly
-  restrictive network environments where even TURN relaying is blocked, direct
-  peer-to-peer connections may fail.
+- OPFS is not available in every browser; the app falls back to memory.
+- Mobile browsers have limited or no screen-share support, especially for audio.
+- Firefox screen-share audio support is narrower than Chromium-based browsers.
+- PPTX preview depends on backend availability, UploadThing, consent, and external viewing.
+- Very restrictive networks can still block peer connectivity even with TURN.
+- Some preview and visual effects behave slightly differently across browsers.
 
 ---
 
-If you’re unsure where something belongs:
+If you are unsure where something belongs:
 
-- Is it view code that touches the DOM? `ui/…`
-- Is it a feature slice (chat, settings)? `features/…`
-- Is it a network edge (signalling or peer)? `network/…`
-- Is it file transfer orchestration or IO? `transfer/…`
-- Is it a one‑off helper? `utils/…`
-- Is it a file preview? `preview/…`
-- Is it global app wiring? `app.js`
+- Room or connection lifecycle: `network/`
+- File-transfer mechanics: `transfer/`
+- Preview rendering: `preview/`
+- Domain-specific UI slice: `features/`
+- Shared DOM/view orchestration: `ui/`
+- Small shared utility: `utils/`
+- Build-time generation: `scripts/`

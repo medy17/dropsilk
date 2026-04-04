@@ -28,7 +28,7 @@
 }
 
 .network-user-id {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--ff-mono);
     font-size: .8em;
     color: var(--c-text-secondary);
     opacity: .8;
@@ -77,7 +77,7 @@
 }
 
 .inflight-user-id {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--ff-mono);
     font-size: .8em;
     color: var(--c-text-secondary);
     opacity: .8;

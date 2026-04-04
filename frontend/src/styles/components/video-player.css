@@ -2,7 +2,7 @@
     position: relative;
     z-index: 1;
     background-color: #000;
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: var(--ff-sans);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -207,7 +207,7 @@
 
 .time-container {
     font-size: .9rem;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--ff-mono);
     min-width: 100px;
     white-space: nowrap;
 }

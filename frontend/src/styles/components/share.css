@@ -40,7 +40,7 @@
 }
 
 .flight-code-display .code {
-    font-family: "IBM Plex Mono", monospace;
+    font-family: var(--ff-mono);
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--c-primary);

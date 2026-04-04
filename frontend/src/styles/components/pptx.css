@@ -48,7 +48,7 @@ body[data-theme="dark"] .pptx-slide-viewer {
 }
 
 .slide-element .text-content {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-family: var(--ff-sans);
     line-height: 1.3;
     word-wrap: break-word;
 }
