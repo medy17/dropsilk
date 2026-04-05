@@ -6,6 +6,7 @@ import { store } from '../state.js';
 import { sendMessage, handlePeerLeft } from './websocket.js';
 import {
     enableDropZone,
+    updateMetricsUI,
 } from '../ui/view.js';
 import { enableChat, disableChat } from '../features/chat/index.js';
 import {
@@ -19,7 +20,9 @@ import {
     handleDataChannelMessage,
     ensureQueueIsActive,
     drainQueue,
+    resetTransferState,
 } from '../transfer/fileHandler.js';
+import { isScreenShareActive } from './screenShareSession.js';
 
 /**
  * --- NEW ---
@@ -279,24 +282,16 @@ function setupDataChannel() {
             shareScreenBtn.disabled = true;
             shareScreenBtn.title = 'Screen sharing is not supported on mobile devices.';
         } else {
-            import('./screenShareSession.js')
-                .then(({ isScreenShareActive }) => {
-                    updateShareButton(isScreenShareActive());
-                    const { hint } = getDisplayMediaOptions(true);
-                    if (shareScreenBtn) shareScreenBtn.title = hint;
-                })
-                .catch((error) => {
-                    console.error('Failed to sync screen share state:', error);
-                    updateShareButton(false);
-                });
+            updateShareButton(isScreenShareActive());
+            const { hint } = getDisplayMediaOptions(true);
+            if (shareScreenBtn) shareScreenBtn.title = hint;
         }
 
         ensureQueueIsActive();
 
         const { metricsInterval } = store.getState();
         if (metricsInterval) clearInterval(metricsInterval);
-        const newInterval = setInterval(async () => {
-            const { updateMetricsUI } = await import('../ui/view.js');
+        const newInterval = setInterval(() => {
             updateMetricsUI();
         }, 1000);
         store.actions.setMetricsInterval(newInterval);
@@ -325,11 +320,7 @@ export function resetPeerConnectionState() {
     const { metricsInterval } = store.getState();
     if (metricsInterval) clearInterval(metricsInterval);
     dataChannel = null;
-    import('../transfer/fileHandler.js')
-        .then(({ resetTransferState }) => {
-            if (resetTransferState) resetTransferState();
-        })
-        .catch((err) => console.error('Error resetting transfer state:', err));
+    if (resetTransferState) resetTransferState();
 }
 
 export function sendData(data) {
@@ -346,7 +337,7 @@ async function handleQualityChange(preset, track) {
     if (!track) return;
     console.log(`Changing stream quality to: ${preset}`);
 
-    let constraints = {};
+    let constraints;
     switch (preset) {
     case 'quality':
         constraints = { frameRate: 60, height: 1080 };

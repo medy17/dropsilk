@@ -4,6 +4,7 @@
 import i18next from '../i18n.js';
 import { store } from '../state.js';
 import { showToast } from '../utils/toast.js';
+import { handleScreenShareWakeRequest } from '../network/screenShareSession.js';
 import { uiElements } from '../ui/dom.js';
 import { audioManager } from '../utils/audioManager.js';
 import { isExecutable } from '../utils/security.js';
@@ -57,7 +58,6 @@ export async function handleDataChannelMessage(event) {
             }
 
             if (parsedData.type === 'screen-share-requested') {
-                const { handleScreenShareWakeRequest } = await import('../network/screenShareSession.js');
                 handleScreenShareWakeRequest();
                 return;
             }

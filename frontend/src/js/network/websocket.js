@@ -24,6 +24,14 @@ import { resetChatView, disableChat } from '../features/chat/index.js';
 import { showInviteOnboarding } from '../ui/onboarding.js';
 import { audioManager } from '../utils/audioManager.js';
 import { uiElements } from '../ui/dom.js';
+import {
+    stopRoomPolling,
+    startRoomPolling,
+    handleSignalingClosed,
+    handlePeerDisconnected,
+} from './roomSession.js';
+
+import { setOtpInputError } from '../ui/events.js';
 
 let ws;
 let pendingAttach = null;
@@ -155,9 +163,7 @@ async function onMessage(event) {
             );
             renderInFlightView();
 
-            import('./roomSession.js')
-                .then(({ stopRoomPolling }) => stopRoomPolling())
-                .catch((error) => console.error('Failed to stop room polling:', error));
+            stopRoomPolling();
 
             if (state.isFlightCreator) {
                 await initializePeerConnection(true);
@@ -196,9 +202,7 @@ function onClose() {
         return;
     }
 
-    import('./roomSession.js')
-        .then(({ handleSignalingClosed }) => handleSignalingClosed())
-        .catch((error) => console.error('Failed to handle signaling close:', error));
+    handleSignalingClosed();
 
     if (!store.getState().currentFlightCode) {
         failBoarding();
@@ -247,12 +251,8 @@ export function handlePeerLeft() {
     updateDashboardStatus('Peer disconnected. Waiting...', 'disconnected');
     disableDropZone();
     renderNetworkUsersView();
-    import('./roomSession.js')
-        .then(({ handlePeerDisconnected, startRoomPolling }) => {
-            handlePeerDisconnected(previousRoomPeerId);
-            startRoomPolling();
-        })
-        .catch((error) => console.error('Failed to resume room polling:', error));
+    handlePeerDisconnected(previousRoomPeerId);
+    startRoomPolling();
 }
 
 async function handleServerError(message) {
@@ -260,9 +260,6 @@ async function handleServerError(message) {
     if (message.includes('Flight not found')) {
         audioManager.play('error');
         if (navigator.vibrate) navigator.vibrate([75, 50, 75, 50, 75]);
-
-        const { setOtpInputError } = await import('../ui/events.js');
-        const { uiElements } = await import('../ui/dom.js');
 
         const inputs =
             uiElements.flightCodeInputWrapper.querySelectorAll('.otp-input');

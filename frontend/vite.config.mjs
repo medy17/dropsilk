@@ -7,6 +7,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
+    resolve: {
+        alias: {
+            util: 'util/',
+        },
+    },
     build: {
         chunkSizeWarningLimit: 2000, // Suppress large chunk warnings (pdf.worker is ~1.9MB)
         rollupOptions: {
