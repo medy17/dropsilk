@@ -2,7 +2,7 @@
 // Manages the WebSocket signalling server connection.
 
 import i18next from '../i18n.js';
-import { WEBSOCKET_URL } from '../config.js';
+import { WEBSOCKET_URL, API_BASE_URL } from '../config.js';
 import { store } from '../state.js';
 import { showInvitationToast, showToast } from '../utils/toast.js';
 import {
@@ -192,7 +192,7 @@ async function onMessage(event) {
     }
 }
 
-function onClose() {
+async function onClose() {
     const wasSuppressed = suppressCloseHandling;
     suppressCloseHandling = false;
     pendingAttach = null;
@@ -206,12 +206,37 @@ function onClose() {
 
     if (!store.getState().currentFlightCode) {
         failBoarding();
-        showToast({
-            type: 'danger',
-            title: 'Connection Lost',
-            body: 'Connection to the server was lost. Please refresh the page to reconnect.',
-            duration: 0,
-        });
+
+        const infraDown = await probeBackendStatus();
+
+        if (infraDown) {
+            showToast({
+                type: 'danger',
+                title: i18next.t('serviceOutage', 'Service Outage'),
+                body: i18next.t(
+                    'serviceOutageDescription',
+                    'Our servers are currently experiencing issues. We\'re aware and working on it.',
+                ),
+                duration: 0,
+                actions: [
+                    {
+                        text: i18next.t('viewStatus', 'View Status'),
+                        class: 'btn-primary',
+                        callback: () => {
+                            window.open('/status.html', '_blank');
+                        },
+                    },
+                ],
+            });
+        } else {
+            showToast({
+                type: 'danger',
+                title: 'Connection Lost',
+                body: 'Connection to the server was lost. Please refresh the page to reconnect.',
+                duration: 0,
+            });
+        }
+
         store.actions.resetState();
         return;
     }
@@ -222,6 +247,25 @@ function onClose() {
         body: 'Waiting for the room to become ready again...',
         duration: 5000,
     });
+}
+
+/**
+ * Probes the backend HTTP status endpoint to verify whether the
+ * infrastructure is actually down vs. a transient/config WebSocket issue.
+ * Returns true if the backend is unreachable (verified outage).
+ */
+async function probeBackendStatus() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/status`, {
+            cache: 'no-store',
+            signal: AbortSignal.timeout(5000),
+        });
+        // Backend responded — infra is up, WS drop was transient/config.
+        return !res.ok;
+    } catch {
+        // Network error or timeout — infra is verifiably down.
+        return true;
+    }
 }
 
 function onError(error) {

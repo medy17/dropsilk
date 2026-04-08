@@ -1,6 +1,10 @@
 {
     "rewrites": [
       {
+        "source": "/status",
+        "destination": "/status.html"
+      },
+      {
         "source": "/wp-admin/:path*",
         "destination": "https://dropsilk-server.onrender.com/wp-admin/:path*"
       },

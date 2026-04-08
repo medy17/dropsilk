@@ -1,0 +1,416 @@
+<!doctype html>
+<!--suppress HtmlDeprecatedAttribute -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="description"
+        content="DropSilk system status — check the health of all services including signaling, WebSocket, and TURN relay." />
+
+    <!-- Standard Open Graph Tags -->
+    <meta property="og:title" content="DropSilk | System Status" />
+    <meta property="og:description"
+        content="Live operational status for DropSilk's peer-to-peer file sharing services." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dropsilk.xyz/status" />
+    <meta property="og:site_name" content="DropSilk" />
+    <meta property="og:image" content="https://dropsilk.xyz/SSIV2.png" />
+
+    <title>DropSilk | System Status</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Favicon and Manifest Links -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+    <link rel="icon" type="image/x-icon" href="/favicons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/favicon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicons/favicon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/favicon-512x512.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap"
+        rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="header">
+        <a href="/" class="logo">
+            <img src="/logo.webp" fetchpriority="high" alt="DropSilk Logo - unlimited private sharing - no sign up" />
+            <span class="brand-text">Drop<wbr />Silk</span>
+        </a>
+        <nav class="header-nav">
+            <button id="theme-toggle" class="header-nav-link" aria-label="Toggle theme">
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                    <path
+                        d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707z" />
+                </svg>
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                    <path
+                        d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z" />
+                </svg>
+            </button>
+            <a href="https://github.com/medy17/dropsilk" target="_blank" rel="noopener noreferrer"
+                class="header-nav-link icon-only" aria-label="GitHub Profile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                    <path
+                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+                </svg>
+            </a>
+        </nav>
+    </div>
+
+    <!-- AURORA BACKGROUND -->
+    <div class="aurora-background">
+        <div class="aurora-blob"></div>
+        <div class="aurora-blob"></div>
+        <div class="aurora-blob"></div>
+        <div class="aurora-blob"></div>
+    </div>
+
+    <!-- Status Page Content -->
+    <div class="status-container">
+        <div class="status-header-section">
+            <svg class="status-hero-icon" xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
+            <h1 class="status-page-title">System Status</h1>
+            <div class="status-overall" id="overall-status">
+                <span class="status-dot checking"></span>
+                <span class="status-overall-text" id="overall-status-text">Checking services...</span>
+            </div>
+            <p class="status-timestamp" id="status-timestamp">Last checked: —</p>
+        </div>
+
+        <!-- Services Grid -->
+        <div class="status-services-grid">
+            <!-- Frontend Service -->
+            <div class="status-card" id="card-frontend">
+                <div class="status-card-header">
+                    <div class="status-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                    </div>
+                    <div class="status-card-info">
+                        <h3>Frontend</h3>
+                        <span class="status-card-desc">Web application &amp; UI</span>
+                    </div>
+                    <div class="status-badge" id="badge-frontend">
+                        <span class="status-dot checking"></span>
+                        <span class="badge-text">Checking</span>
+                    </div>
+                </div>
+                <div class="status-card-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Response Time</span>
+                        <span class="meta-value" id="frontend-latency">—</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Protocol</span>
+                        <span class="meta-value" id="frontend-protocol">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backend API Service -->
+            <div class="status-card" id="card-backend">
+                <div class="status-card-header">
+                    <div class="status-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="status-card-info">
+                        <h3>Backend API</h3>
+                        <span class="status-card-desc">Core server &amp; REST endpoints</span>
+                    </div>
+                    <div class="status-badge" id="badge-backend">
+                        <span class="status-dot checking"></span>
+                        <span class="badge-text">Checking</span>
+                    </div>
+                </div>
+                <div class="status-card-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Response Time</span>
+                        <span class="meta-value" id="backend-latency">—</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Uptime</span>
+                        <span class="meta-value" id="backend-uptime">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WebSocket Service -->
+            <div class="status-card" id="card-websocket">
+                <div class="status-card-header">
+                    <div class="status-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                            <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                        </svg>
+                    </div>
+                    <div class="status-card-info">
+                        <h3>WebSocket</h3>
+                        <span class="status-card-desc">Real-time signaling</span>
+                    </div>
+                    <div class="status-badge" id="badge-websocket">
+                        <span class="status-dot checking"></span>
+                        <span class="badge-text">Checking</span>
+                    </div>
+                </div>
+                <div class="status-card-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Active Connections</span>
+                        <span class="meta-value" id="ws-connections">—</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Active Flights</span>
+                        <span class="meta-value" id="ws-flights">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TURN Relay Service -->
+            <div class="status-card" id="card-turn">
+                <div class="status-card-header">
+                    <div class="status-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path
+                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div class="status-card-info">
+                        <h3>TURN Relay</h3>
+                        <span class="status-card-desc">Cloudflare NAT traversal</span>
+                    </div>
+                    <div class="status-badge" id="badge-turn">
+                        <span class="status-dot checking"></span>
+                        <span class="badge-text">Checking</span>
+                    </div>
+                </div>
+                <div class="status-card-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Provider</span>
+                        <span class="meta-value">Cloudflare</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Purpose</span>
+                        <span class="meta-value">Relay fallback</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="status-stats-panel" id="stats-panel" style="display: none;">
+            <h2 class="status-stats-title">Server Metrics</h2>
+            <div class="status-stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="stat-connections">0</span>
+                    <span class="stat-label">Total Connections</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="stat-flights-created">0</span>
+                    <span class="stat-label">Flights Created</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="stat-flights-joined">0</span>
+                    <span class="stat-label">Flights Joined</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="stat-memory">0 MB</span>
+                    <span class="stat-label">Memory (Heap)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-actions">
+            <button class="btn btn-primary" id="refreshBtn" onclick="checkAllServices()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                Refresh Status
+            </button>
+            <a href="/" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 18l-6-6 6-6" />
+                </svg>
+                Back to DropSilk
+            </a>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            &copy; 2025 DropSilk. A peer-to-peer passion project.
+        </div>
+    </footer>
+
+    <script type="module" src="/src/js/app.js"></script>
+    <script>
+        // --- Status Page Logic ---
+        function getBackendUrl() {
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return 'http://' + window.location.hostname + ':8080';
+            }
+            return 'https://dropsilk-backend.onrender.com';
+        }
+
+        function setBadge(id, status, text) {
+            var badge = document.getElementById(id);
+            if (!badge) return;
+            var dot = badge.querySelector('.status-dot');
+            var label = badge.querySelector('.badge-text');
+            dot.className = 'status-dot ' + status;
+            label.textContent = text;
+        }
+
+        function setOverall(status, text) {
+            var dot = document.querySelector('#overall-status .status-dot');
+            var label = document.getElementById('overall-status-text');
+            dot.className = 'status-dot ' + status;
+            label.textContent = text;
+        }
+
+        async function checkFrontend() {
+            var start = performance.now();
+            try {
+                var res = await fetch('/', { method: 'HEAD', cache: 'no-store' });
+                var ms = Math.round(performance.now() - start);
+                document.getElementById('frontend-latency').textContent = ms + ' ms';
+                document.getElementById('frontend-protocol').textContent = window.location.protocol === 'https:' ? 'HTTPS' : 'HTTP';
+                if (res.ok) {
+                    setBadge('badge-frontend', 'operational', 'Operational');
+                    return 'operational';
+                }
+                setBadge('badge-frontend', 'degraded', 'Degraded');
+                return 'degraded';
+            } catch (e) {
+                document.getElementById('frontend-latency').textContent = 'Timeout';
+                setBadge('badge-frontend', 'down', 'Down');
+                return 'down';
+            }
+        }
+
+        async function checkBackend() {
+            var base = getBackendUrl();
+            var start = performance.now();
+            try {
+                var res = await fetch(base + '/api/status', { cache: 'no-store' });
+                var ms = Math.round(performance.now() - start);
+                document.getElementById('backend-latency').textContent = ms + ' ms';
+
+                if (!res.ok) {
+                    setBadge('badge-backend', 'degraded', 'Degraded');
+                    return { backendStatus: 'degraded', data: null };
+                }
+
+                var data = await res.json();
+                document.getElementById('backend-uptime').textContent = data.uptimeFormatted || '—';
+
+                // WebSocket service
+                if (data.services && data.services.websocket) {
+                    var wsSvc = data.services.websocket;
+                    setBadge('badge-websocket', wsSvc.status === 'operational' ? 'operational' : 'degraded',
+                        wsSvc.status === 'operational' ? 'Operational' : 'Degraded');
+                    document.getElementById('ws-connections').textContent = wsSvc.activeConnections ?? '—';
+                }
+
+                // Signaling flights
+                if (data.services && data.services.signaling) {
+                    document.getElementById('ws-flights').textContent = data.services.signaling.activeFlights ?? '—';
+                }
+
+                // TURN service
+                if (data.services && data.services.turn) {
+                    var turnStatus = data.services.turn.status;
+                    if (turnStatus === 'operational') {
+                        setBadge('badge-turn', 'operational', 'Operational');
+                    } else if (turnStatus === 'not_configured') {
+                        setBadge('badge-turn', 'degraded', 'Not Configured');
+                    } else {
+                        setBadge('badge-turn', 'down', 'Down');
+                    }
+                }
+
+                // Stats panel
+                if (data.stats) {
+                    document.getElementById('stats-panel').style.display = '';
+                    document.getElementById('stat-connections').textContent = data.stats.totalConnections ?? 0;
+                    document.getElementById('stat-flights-created').textContent = data.stats.totalFlightsCreated ?? 0;
+                    document.getElementById('stat-flights-joined').textContent = data.stats.totalFlightsJoined ?? 0;
+                }
+                if (data.memory) {
+                    document.getElementById('stat-memory').textContent = data.memory.heapUsedMB + ' / ' + data.memory.heapTotalMB + ' MB';
+                }
+
+                setBadge('badge-backend', 'operational', 'Operational');
+                return { backendStatus: 'operational', data: data };
+            } catch (e) {
+                document.getElementById('backend-latency').textContent = 'Timeout';
+                setBadge('badge-backend', 'down', 'Down');
+                setBadge('badge-websocket', 'down', 'Down');
+                setBadge('badge-turn', 'down', 'Unknown');
+                return { backendStatus: 'down', data: null };
+            }
+        }
+
+        async function checkAllServices() {
+            setOverall('checking', 'Checking services...');
+            document.getElementById('status-timestamp').textContent = 'Checking now...';
+
+            var results = await Promise.all([checkFrontend(), checkBackend()]);
+            var frontendResult = results[0];
+            var backendResult = results[1];
+
+            var now = new Date();
+            document.getElementById('status-timestamp').textContent = 'Last checked: ' + now.toLocaleString();
+
+            // Determine overall status
+            var statuses = [frontendResult, backendResult.backendStatus];
+            if (statuses.includes('down')) {
+                setOverall('down', 'Partial Outage');
+            } else if (statuses.includes('degraded')) {
+                setOverall('degraded', 'Degraded Performance');
+            } else {
+                setOverall('operational', 'All Systems Operational');
+            }
+        }
+
+        // Auto-refresh every 60 seconds
+        setInterval(checkAllServices, 60000);
+
+        // Initial check once the page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function () { setTimeout(checkAllServices, 300); });
+        } else {
+            setTimeout(checkAllServices, 300);
+        }
+    </script>
+</body>
+
+</html>
