@@ -47,8 +47,8 @@ describe('Settings Data & Logic', () => {
             expect(settings.sounds).toBe(true); // Mocked audioManager defaults to true
             expect(settings.analytics).toBe(false);
             expect(settings.theme).toBe('default');
-            expect(settings.mode).toBe('light');
-            expect(settings.animationQuality).toBe('performance');
+            expect(settings.mode).toBe('dark');
+            expect(settings.animationQuality).toBe('quality');
             expect(settings.systemFont).toBe(false);
             expect(settings.autoDownload).toBe(false);
             expect(settings.opfsEnabled).toBe(false);

@@ -15,8 +15,8 @@ export function getAllSettings() {
         sounds: audioManager.isEnabled(),
         analytics: localStorage.getItem('dropsilk-privacy-consent') === 'true',
         theme: localStorage.getItem('dropsilk-color-theme') || 'default',
-        mode: localStorage.getItem('dropsilk-mode') || 'light',
-        animationQuality: localStorage.getItem('dropsilk-animation-quality') || 'performance',
+        mode: localStorage.getItem('dropsilk-mode') || 'dark',
+        animationQuality: localStorage.getItem('dropsilk-animation-quality') || 'quality',
         systemFont: localStorage.getItem('dropsilk-system-font') === 'true',
         autoDownload: localStorage.getItem('dropsilk-auto-download') === 'true',
         autoDownloadMaxSize: parseFloat(localStorage.getItem('dropsilk-auto-download-max-size') || '100'),
@@ -44,6 +44,15 @@ export function getAllSettings() {
         }
         // Clear old key to prevent re-migration issues (optional, but good practice)
         localStorage.removeItem('dropsilk-theme');
+    }
+})();
+
+// One-time migration to new defaults: Dark mode and Best animation quality
+(function migrateToDarkQuality() {
+    if (!localStorage.getItem('dropsilk-defaults-migrated-v2')) {
+        localStorage.setItem('dropsilk-mode', 'dark');
+        localStorage.setItem('dropsilk-animation-quality', 'quality');
+        localStorage.setItem('dropsilk-defaults-migrated-v2', 'true');
     }
 })();
 
@@ -198,7 +207,7 @@ export function initializeAnimationQuality() {
         } else if (oldSetting === 'false') {
             quality = 'quality';
         } else {
-            quality = 'performance';
+            quality = 'quality';
         }
         localStorage.setItem(newKey, quality);
     }
@@ -237,8 +246,8 @@ export function resetAllPreferences() {
     audioManager.enable();
 
     // Apply defaults
-    applyTheme('default', 'light');
-    applyAnimationQuality('performance');
+    applyTheme('default', 'dark');
+    applyAnimationQuality('quality');
     applySystemFont(false);
     i18next.changeLanguage('en');
 
