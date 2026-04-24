@@ -2,6 +2,7 @@
 // This is the main entry point for the application.
 import { VERSION } from './version.gen.js';
 import { initEffects } from './ui/effects.js';
+import { initAurora } from './ui/aurora.js';
 import '../styles/index.css'; // load for vite
 import i18next from './i18n.js';
 import { store } from './state.js';
@@ -434,6 +435,7 @@ function initializePrivacyConsent() {
 // --- Main Execution ---
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DropSilk Initializing...');
+    initAurora();
     initEffects();
     const applyTranslations = () => translateStaticElements();
     if (i18next.isInitialized) applyTranslations();

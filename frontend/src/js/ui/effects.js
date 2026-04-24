@@ -1,4 +1,6 @@
 // src/js/ui/effects.js
+import { startAurora, stopAurora } from './aurora.js';
+
 const KEY_CANDIDATES = [
     'dropsilk:animation-quality',
     'dropsilk.animQuality',
@@ -66,21 +68,21 @@ function applyBodyClasses(q) {
 
 function hardStopAurora(q) {
     const aurora = document.querySelector('.aurora-background');
-    const blobs = document.querySelectorAll('.aurora-blob');
     if (aurora) {
         if (q === 'off') {
             aurora.hidden = true;
             aurora.style.animationPlayState = 'paused';
+            stopAurora();
+        } else if (q === 'reduced') {
+            aurora.hidden = false;
+            aurora.style.animationPlayState = 'paused';
+            stopAurora();
         } else {
             aurora.hidden = false;
-            aurora.style.animationPlayState = q === 'reduced' ? 'paused' : 'running';
+            aurora.style.animationPlayState = 'running';
+            startAurora();
         }
     }
-    blobs.forEach((el) => {
-        if (q !== 'high') el.setAttribute('hidden', '');
-        else el.removeAttribute('hidden');
-        el.style.animationPlayState = q === 'high' ? 'running' : 'paused';
-    });
 }
 
 function updateBoardingSpinnerState() {

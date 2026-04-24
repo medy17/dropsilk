@@ -4,9 +4,9 @@
     --brilliant-pink: #f5a9b8;
     --brilliant-white: #ffffff;
 
-    /* DEFAULT DARK BACKGROUNDS */
-    --dark-bg-base: #18181b;
-    --dark-bg-root: #111113;
+    /* OLED DARK BACKGROUNDS */
+    --dark-bg-base: #09090b;
+    --dark-bg-root: #000000;
 
     /* Base Variables (Light Mode Default) */
     --c-bg: var(--brilliant-white);

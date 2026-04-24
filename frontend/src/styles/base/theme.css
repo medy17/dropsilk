@@ -3,11 +3,11 @@ body[data-mode="dark"] .aurora-background {
 }
 
 body[data-mode="dark"] .main-content {
-    background: #fff0;
+    background: #00000000;
 }
 
 body[data-mode="dark"] .not-found-content {
-    background: #fff0;
+    background: #00000000;
 }
 
 body[data-mode="dark"] #theme-toggle .sun-icon {
@@ -22,7 +22,7 @@ body[data-mode="dark"] .not-found-title {
     text-shadow: none;
     background: -webkit-linear-gradient(var(--c-primary), var(--c-secondary));
     -webkit-background-clip: text;
-    -webkit-text-fill-color: #fff0;
+    -webkit-text-fill-color: #00000000;
 }
 
 body[data-mode="dark"] .tagline-section {
@@ -75,15 +75,13 @@ body[data-mode="dark"] #zip-modal-warning-footer {
     border-color: rgb(248 113 113 / .3);
 }
 
-
-
 body[data-mode="dark"] .pdf-page-canvas {
     box-shadow: 0 2px 10px rgb(0 0 0 / .4);
     filter: brightness(.9);
 }
 
 body[data-mode="dark"] .pdf-page-container {
-    background-color: #2c2c34;
+    background-color: #000000;
     box-shadow: 0 2px 10px rgb(0 0 0 / .4);
 }
 
