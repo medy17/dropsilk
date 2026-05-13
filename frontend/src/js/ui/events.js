@@ -324,7 +324,9 @@ export function initializeEventListeners() {
             'label[for="fileInput_transfer"]',
         );
         if (selectFilesBtn) {
-            selectFilesBtn.onclick = async () => {
+            selectFilesBtn.onclick = async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
                 if (!guardFileSelectionTrigger()) {
                     return;
                 }
