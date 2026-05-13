@@ -8,7 +8,6 @@ import {
     enableDropZone,
     updateMetricsUI,
 } from '../ui/view.js';
-import { enableChat, disableChat } from '../features/chat/index.js';
 import {
     showRemoteStreamView,
     hideRemoteStreamView,
@@ -275,7 +274,6 @@ function setupDataChannel() {
     dataChannel.onopen = () => {
         console.log('Data channel opened!');
         enableDropZone();
-        enableChat();
 
         const shareScreenBtn = document.getElementById('shareScreenBtn');
         if (isMobile() || !navigator.mediaDevices?.getDisplayMedia) {
@@ -300,7 +298,6 @@ function setupDataChannel() {
     dataChannel.onclose = () => {
         console.log('Data channel closed.');
         handlePeerLeft();
-        disableChat();
         const { metricsInterval } = store.getState();
         if (metricsInterval) clearInterval(metricsInterval);
     };

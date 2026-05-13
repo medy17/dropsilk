@@ -16,3 +16,4 @@ export {
 } from './chatMessages.js';
 
 export { setupChat } from './chatEvents.js';
+export { sendChatMessage, syncChatSession, resetChatSession } from '../../network/chatSession.js';

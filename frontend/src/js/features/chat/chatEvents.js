@@ -3,9 +3,9 @@
 
 import i18next from '../../i18n.js';
 import { store } from '../../state.js';
-import { sendData } from '../../network/webrtc.js';
 import { showToast } from '../../utils/toast.js';
 import { appendChatMessage } from './chatMessages.js';
+import { sendChatMessage } from '../../network/chatSession.js';
 
 export function setupChat() {
     const form = document.getElementById('chat-form');
@@ -30,7 +30,7 @@ export function setupChat() {
         }
     };
 
-    const send = () => {
+    const send = async () => {
         const text = getInputText();
         if (!text) return;
 
@@ -49,7 +49,7 @@ export function setupChat() {
         }
 
         const state = store.getState();
-        if (!state.peerInfo) {
+        if (!state.peerInfo && !state.roomPeer) {
             showToast({
                 type: 'danger',
                 title: i18next.t('noPeerForChatTitle'),
@@ -59,14 +59,8 @@ export function setupChat() {
             return;
         }
 
-        const payload = {
-            kind: 'chat',
-            text,
-            sentAt: Date.now(),
-        };
-
         try {
-            sendData(JSON.stringify(payload));
+            const payload = await sendChatMessage(text);
             appendChatMessage({
                 author: 'me',
                 text,
@@ -86,13 +80,13 @@ export function setupChat() {
 
     // Click to send (since chat input is no longer in a form)
     sendBtn.addEventListener('click', () => {
-        send();
+        void send();
     });
 
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            send();
+            void send();
         }
     });
 

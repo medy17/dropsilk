@@ -93,7 +93,6 @@ export function enterFlightMode(flightCode) {
     disableDropZone();
     renderNetworkUsersView();
     resetChatView();
-    // Disable chat until a peer connects
     disableChat();
     // Initialize chat visibility tracking when entering a flight
     setTimeout(() => {

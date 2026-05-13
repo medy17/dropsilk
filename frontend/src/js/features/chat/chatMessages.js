@@ -107,7 +107,9 @@ export function appendChatMessage({ author, text, timestamp }) {
     const authorLabel =
         author === 'me'
             ? i18next.t('you')
-            : store.getState().peerInfo?.name || i18next.t('peer');
+            : store.getState().peerInfo?.name ||
+              store.getState().roomPeer?.name ||
+              i18next.t('peer');
 
     const timeLabel = new Date(safeTime).toLocaleTimeString([], {
         hour: '2-digit',

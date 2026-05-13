@@ -5,13 +5,13 @@ import i18next from '../i18n.js';
 import { store } from '../state.js';
 import { showToast } from '../utils/toast.js';
 import { handleScreenShareWakeRequest } from '../network/screenShareSession.js';
+import { handleChatWakeRequest } from '../network/chatSession.js';
 import { uiElements } from '../ui/dom.js';
 import { audioManager } from '../utils/audioManager.js';
 import { isExecutable } from '../utils/security.js';
 import { isPreviewable } from '../preview/previewConfig.js';
 import { showPreview } from '../preview/previewManager.js';
 import { updateReceiverActions, checkQueueOverflow } from '../ui/view.js';
-import { appendChatMessage } from '../features/chat/index.js';
 import {
     createReceiveQueueItemHTML,
     createReceivedFileActions,
@@ -62,13 +62,8 @@ export async function handleDataChannelMessage(event) {
                 return;
             }
 
-            // Chat message
-            if (parsedData.kind === 'chat') {
-                appendChatMessage({
-                    author: 'peer',
-                    text: parsedData.text || '',
-                    timestamp: parsedData.sentAt || Date.now(),
-                });
+            if (parsedData.type === 'chat-requested') {
+                handleChatWakeRequest();
                 return;
             }
 

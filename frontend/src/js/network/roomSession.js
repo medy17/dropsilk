@@ -7,6 +7,7 @@ import {
 } from './roomApi.js';
 import { connect as connectWebSocket } from './websocket.js';
 import { syncScreenShareSession } from './screenShareSession.js';
+import { syncChatSession } from '../features/chat/index.js';
 import {
     enterFlightMode,
     enableDropZone,
@@ -16,6 +17,7 @@ import {
     renderNetworkUsersView,
     updateDashboardStatus,
 } from '../ui/view.js';
+import { enableChat, disableChat } from '../features/chat/index.js';
 import { showToast } from '../utils/toast.js';
 import { audioManager } from '../utils/audioManager.js';
 
@@ -84,12 +86,14 @@ function applyRoomSummary(summary) {
 
     if (summary.peer) {
         enableDropZone();
+        enableChat();
         renderInFlightView();
 
         handlePeerConnected(summary.peer, previousRoomPeerId);
     } else {
         handlePeerDisconnected(previousRoomPeerId);
         disableDropZone();
+        disableChat();
         if (!store.getState().peerInfo) {
             renderNetworkUsersView();
         }
@@ -100,6 +104,7 @@ function applyRoomSummary(summary) {
     }
 
     syncScreenShareSession(summary);
+    syncChatSession(summary);
 
     if (
         summary.shouldConnect &&
@@ -208,12 +213,13 @@ export function stopRoomPolling() {
 }
 
 export function handleSignalingClosed() {
-    if (!store.getState().currentFlightCode || !store.getState().roomParticipantId) {
+    const state = store.getState();
+    if (!state.currentFlightCode || !state.roomParticipantId) {
         return;
     }
 
     store.actions.setSignalingInitiated(false);
-    if (!store.getState().peerInfo) {
+    if (!state.peerInfo && !state.roomPeer) {
         updateDashboardStatus('Secure channel closed. Waiting to reconnect...', 'disconnected');
     }
     startRoomPolling();

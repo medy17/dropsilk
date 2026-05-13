@@ -57,3 +57,13 @@ export function setParticipantScreenShare(roomCode, participantId, active) {
         }
     );
 }
+
+export function setParticipantChatActive(roomCode, participantId, active) {
+    return request(
+        `/api/rooms/${encodeURIComponent(roomCode)}/participants/${encodeURIComponent(participantId)}/chat`,
+        {
+            method: 'POST',
+            body: JSON.stringify({ active }),
+        }
+    );
+}
