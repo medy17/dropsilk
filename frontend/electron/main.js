@@ -4,6 +4,11 @@ const { app, BrowserWindow, ipcMain, dialog, protocol } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+if (process.platform === 'linux' && process.env.VITE_DEV_SERVER_URL) {
+    app.commandLine.appendSwitch('no-sandbox');
+    app.commandLine.appendSwitch('disable-setuid-sandbox');
+}
+
 // --- NEW AND IMPORTANT ---
 // Register our 'app' protocol as a privileged scheme.
 // This allows it to use APIs like fetch, localStorage, service workers, etc.

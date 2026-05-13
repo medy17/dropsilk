@@ -2,15 +2,18 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { createRequire } from 'module';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const require = createRequire(import.meta.url);
+const utilPolyfillPath = require.resolve('util/');
 
 export default defineConfig({
     resolve: {
-        alias: {
-            util: 'util/',
-        },
+        alias: [
+            { find: /^util$/, replacement: utilPolyfillPath },
+        ],
     },
     build: {
         chunkSizeWarningLimit: 2000, // Suppress large chunk warnings (pdf.worker is ~1.9MB)
