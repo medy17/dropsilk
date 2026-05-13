@@ -1,5 +1,5 @@
 // js/utils/uploadHelper.js
-// FINAL VERSION
+import { genUploader } from 'uploadthing/client';
 
 import { API_BASE_URL } from '../config.js';
 
@@ -12,40 +12,7 @@ if (!API_BASE_URL) {
     throw new Error(errorMsg);
 }
 
-let uploaderPromise = null;
-
-async function getUploader() {
-    if (uploaderPromise) return uploaderPromise;
-
-    uploaderPromise = (async () => {
-        // This part, loading the client from a CDN, is correct and unchanged.
-        const candidates = [
-            'https://esm.sh/uploadthing@7/client?bundle&target=es2020',
-            'https://esm.sh/uploadthing@7/client?bundle',
-        ];
-
-        let lastErr;
-        for (const url of candidates) {
-            try {
-                // @vite-ignore
-                const mod = await import(/* @vite-ignore */ url);
-                if (mod && typeof mod.genUploader === 'function') {
-                    const { genUploader } = mod;
-
-                    const ut = genUploader({ url: `${API_BASE_URL}/api/uploadthing` });
-
-                    return ut;
-                }
-            } catch (e) {
-                lastErr = e;
-                console.warn('UploadThing CDN import failed for', url, e);
-            }
-        }
-        throw lastErr || new Error('Could not load UploadThing client');
-    })();
-
-    return uploaderPromise;
-}
+const uploader = genUploader({ url: `${API_BASE_URL}/api/uploadthing` });
 
 /**
  * Upload a blob and return a public URL. This function is correct and unchanged.
@@ -57,8 +24,7 @@ export async function uploadBlobForPreview(
     blob,
     filename = 'presentation.pptx'
 ) {
-    const ut = await getUploader();
-    const { uploadFiles } = ut;
+    const { uploadFiles } = uploader;
 
     const file = new File([blob], filename, {
         type:

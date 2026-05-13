@@ -57,7 +57,7 @@ async function proceedWithZipping(files) {
 
         document.getElementById('closeZipModal').click();
 
-    } catch (error) {
+    } catch {
         showToast({ type: 'danger', title: 'Zipping Failed', body: 'An error occurred while creating the zip file.', duration: 8000 });
     } finally {
         // --- GUARANTEED UI CLEANUP ---

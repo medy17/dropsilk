@@ -34,7 +34,7 @@ export async function initOpfsForFile(fileName) {
         // but ignore errors if it fails (e.g. locked).
         try {
             await root.removeEntry(fileName);
-        } catch (e) {
+        } catch {
             // Ignore - might not exist or be locked
         }
 
@@ -130,8 +130,8 @@ export async function clearOpfsStorage() {
         // Close any open writers first
         for (const [key, value] of opfsState.entries()) {
             if (value.writer) {
-                await value.writer.close().catch((e) =>
-                    console.error('Error closing writer on reset:', e)
+                await value.writer.close().catch((error) =>
+                    console.error('Error closing writer on reset:', error)
                 );
             }
             opfsState.delete(key);

@@ -58,8 +58,8 @@ export const store = {
                     // Merge saved state with initial state to handle new properties
                     const parsedState = JSON.parse(savedOnboardingState);
                     state.onboardingState = { ...initialState.onboardingState, ...parsedState };
-                } catch (e) {
-                    console.error('Could not parse saved onboarding state.');
+                } catch (error) {
+                    console.error('Could not parse saved onboarding state.', error);
                 }
             }
         },

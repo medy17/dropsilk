@@ -22,6 +22,6 @@ export default async function renderMarkdownPreview(blob, contentElement) {
 
     } catch (error) {
         console.error('Error rendering Markdown preview:', error);
-        throw new Error('Could not render the Markdown file.');
+        throw new Error('Could not render the Markdown file.', { cause: error });
     }
 }

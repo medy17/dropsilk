@@ -21,6 +21,6 @@ export default async function renderImagePreview(blob, contentElement) {
     } catch (error) {
         console.error('Failed to load or decode image:', error);
         URL.revokeObjectURL(imageUrl); // Clean up immediately on error
-        throw new Error('Failed to load image. The format may be unsupported by your browser.');
+        throw new Error('Failed to load image. The format may be unsupported by your browser.', { cause: error });
     }
 }

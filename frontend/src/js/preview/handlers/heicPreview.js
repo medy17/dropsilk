@@ -40,6 +40,6 @@ export default async function renderHeicPreview(blob, contentElement) {
         if (objectUrl) {
             URL.revokeObjectURL(objectUrl); // Clean up if URL was created before error
         }
-        throw new Error('Could not preview the HEIC file. It might be corrupt or in an unsupported variation.');
+        throw new Error('Could not preview the HEIC file. It might be corrupt or in an unsupported variation.', { cause: error });
     }
 }

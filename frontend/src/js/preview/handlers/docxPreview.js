@@ -26,6 +26,6 @@ export default async function renderDocxPreview(blob, contentElement) {
         if (error.message && error.message.includes('File is not a zip file')) {
             errorMessage = 'This document format is not supported for preview. Please try a .docx file.';
         }
-        throw new Error(errorMessage);
+        throw new Error(errorMessage, { cause: error });
     }
 }

@@ -54,6 +54,6 @@ export default async function renderCodePreview(blob, contentElement) {
 
     } catch (error) {
         console.error('Error reading file as text:', error);
-        throw new Error('Could not read the file for preview.');
+        throw new Error('Could not read the file for preview.', { cause: error });
     }
 }

@@ -13,16 +13,12 @@ import { setupInviteModal } from '../features/invite/inviteModal.js';
 import {
     populateZipModal,
     resetZipModal,
-    updateZipSelection,
     setupZipModal,
-    setZipModalMode,
-    getZipModalMode
+    setZipModalMode
 } from '../features/zip/zipModal.js';
 import { setupContactModal, resetContactModal } from '../features/contact/contactModal.js';
 import { initializeDrawer } from './drawer.js';
-import { audioManager } from '../utils/audioManager.js';
 import { updatePptxPreviewButtonsDisabled } from '../preview/previewManager.js';
-import { formatBytes } from '../utils/helpers.js';
 
 /**
  * Resets the preview modal
@@ -149,7 +145,6 @@ const saveSettingsPreferences = () => {
     const spinnerIcon = btn.querySelector('.spinner-icon');
     const checkIcon = btn.querySelector('.check-icon');
     const btnSpan = btn.querySelector('span');
-    const originalText = i18next.t('savePreferences');
 
     // 1. Show spinner
     if (saveIcon) saveIcon.style.display = 'none';
