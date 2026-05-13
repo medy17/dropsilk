@@ -66,10 +66,17 @@ function applyBodyClasses(q) {
     if (q === 'off') b.classList.add('no-effects');
 }
 
+function getCurrentMode() {
+    return document.body?.getAttribute('data-mode')
+        || localStorage.getItem('dropsilk-mode')
+        || 'dark';
+}
+
 function hardStopAurora(q) {
     const aurora = document.querySelector('.aurora-background');
+    const mode = getCurrentMode();
     if (aurora) {
-        if (q === 'off') {
+        if (mode !== 'dark' || q === 'off') {
             aurora.hidden = true;
             aurora.style.animationPlayState = 'paused';
             stopAurora();
@@ -120,10 +127,15 @@ function reflectUI(q) {
         .forEach((inp) => (inp.checked = norm(inp.value) === q));
 }
 
+export function syncAuroraState(rawQuality = null) {
+    const q = norm(rawQuality) || readQuality();
+    hardStopAurora(q);
+}
+
 export function applyAnimationQuality(raw) {
     const q = writeQuality(raw);
     applyBodyClasses(q);
-    hardStopAurora(q);
+    syncAuroraState(q);
     reflectUI(q);
 }
 

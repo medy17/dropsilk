@@ -9,6 +9,7 @@ import {
     applySystemFont
 } from '../src/js/features/settings/settingsData.js';
 import { audioManager } from '../src/js/utils/audioManager.js';
+import { syncAuroraState } from '../src/js/ui/effects.js';
 
 // Mock dependencies
 vi.mock('../src/js/utils/audioManager.js', () => ({
@@ -30,6 +31,10 @@ vi.mock('../src/js/i18n.js', () => ({
         changeLanguage: vi.fn(),
         t: vi.fn((key) => key),
     }
+}));
+
+vi.mock('../src/js/ui/effects.js', () => ({
+    syncAuroraState: vi.fn(),
 }));
 
 describe('Settings Data & Logic', () => {
@@ -110,12 +115,14 @@ describe('Settings Data & Logic', () => {
             expect(document.body.classList.contains('reduced-effects')).toBe(true);
             expect(document.body.classList.contains('no-effects')).toBe(false);
             expect(localStorage.getItem('dropsilk-animation-quality')).toBe('performance');
+            expect(syncAuroraState).toHaveBeenCalledWith('performance');
         });
 
         it('should apply quality mode correctly', () => {
             applyAnimationQuality('quality');
             expect(document.body.classList.contains('reduced-effects')).toBe(false);
             expect(localStorage.getItem('dropsilk-animation-quality')).toBe('quality');
+            expect(syncAuroraState).toHaveBeenCalledWith('quality');
         });
 
         it('should initialize from localStorage', () => {

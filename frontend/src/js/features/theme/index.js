@@ -7,6 +7,7 @@ import { getAllSettings } from '../settings/settingsData.js'; // Helper to get c
 import QRCode from 'qrcode';
 // --- NEW IMPORT ---
 import { THEME_CONFIG } from '../../themeConfig.gen.js';
+import { syncAuroraState } from '../../ui/effects.js';
 
 /**
  * Generates a QR code for the current flight code.
@@ -53,6 +54,8 @@ export function applyTheme(theme = null, mode = null) {
     // Persist
     localStorage.setItem('dropsilk-color-theme', theme);
     localStorage.setItem('dropsilk-mode', mode);
+
+    syncAuroraState();
 
     // Update Meta and UI
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');

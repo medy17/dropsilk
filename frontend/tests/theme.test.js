@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { applyTheme, getCurrentTheme } from '../src/js/features/theme/index.js';
 import { uiElements } from '../src/js/ui/dom.js';
+import { syncAuroraState } from '../src/js/ui/effects.js';
 
 // Mocks
 vi.mock('../src/js/ui/dom.js', () => ({
@@ -18,6 +19,10 @@ vi.mock('../src/js/state.js', () => ({
 
 vi.mock('../src/js/features/settings/settingsData.js', () => ({
     getAllSettings: vi.fn(() => ({ theme: 'default', mode: 'light' }))
+}));
+
+vi.mock('../src/js/ui/effects.js', () => ({
+    syncAuroraState: vi.fn()
 }));
 
 // Mock generated config
@@ -86,6 +91,11 @@ describe('Theme Logic', () => {
             applyTheme('nebula', 'light');
             const meta = document.querySelector('meta[name="theme-color"]');
             expect(meta.getAttribute('content')).toBe('#ffffff');
+        });
+
+        it('should sync aurora state when mode changes', () => {
+            applyTheme('default', 'light');
+            expect(syncAuroraState).toHaveBeenCalled();
         });
     });
 

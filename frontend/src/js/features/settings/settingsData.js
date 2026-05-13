@@ -4,6 +4,7 @@
 import { audioManager } from '../../utils/audioManager.js';
 import { applyTheme } from '../theme/index.js';
 import i18next from '../../i18n.js';
+import { syncAuroraState } from '../../ui/effects.js';
 
 /**
  * Gets all current settings values
@@ -182,6 +183,7 @@ export function applyAnimationQuality(level) {
         body.classList.add('reduced-effects', 'no-effects');
     }
     localStorage.setItem('dropsilk-animation-quality', level);
+    syncAuroraState(level);
 }
 
 /**
