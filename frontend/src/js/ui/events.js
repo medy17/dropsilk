@@ -377,12 +377,14 @@ export function initializeEventListeners() {
     }
 
     if (uiElements.sendingQueueDiv) {
-        uiElements.sendingQueueDiv.addEventListener('click', () => {
-            const cancelBtn = uiElements.sendingQueueDiv.querySelector('.cancel-file-btn');
-            if (cancelBtn) {
-                const fileId = cancelBtn.dataset.fileId;
-                if (fileId) cancelFileSend(fileId);
+        uiElements.sendingQueueDiv.addEventListener('click', (e) => {
+            const cancelBtn = e.target.closest('.cancel-file-btn');
+            if (!cancelBtn || !uiElements.sendingQueueDiv.contains(cancelBtn)) {
+                return;
             }
+
+            const fileId = cancelBtn.dataset.fileId;
+            if (fileId) cancelFileSend(fileId);
         });
         initializeSortableQueue();
     }
