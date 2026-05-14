@@ -70,7 +70,15 @@ describe('Send queue cancellation', () => {
             <div class="main-content"></div>
             <button id="createFlightBtn"></button>
             <button id="joinFlightBtn"></button>
-            <div class="flight-code-input-wrapper"></div>
+            <div class="flight-code-input-wrapper">
+                <input type="text" id="otp-ghost-input" />
+                <div class="otp-visual-slot"></div>
+                <div class="otp-visual-slot"></div>
+                <div class="otp-visual-slot"></div>
+                <div class="otp-visual-slot"></div>
+                <div class="otp-visual-slot"></div>
+                <div class="otp-visual-slot"></div>
+            </div>
             <div id="sending-queue">
                 <div class="queue-item" id="send-1">
                     <div class="file-details">draft.pdf</div>
