@@ -3,6 +3,10 @@
 const { app, BrowserWindow, ipcMain, dialog, protocol } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const fsPromises = fs.promises;
+
+const readSessions = new Map();
+let nextReadSessionId = 1;
 
 if (process.platform === 'linux' && process.env.VITE_DEV_SERVER_URL) {
     app.commandLine.appendSwitch('no-sandbox');
@@ -52,6 +56,38 @@ const createWindow = () => {
     }
 };
 
+async function createFileDescriptor(filePath, nameOverride = null) {
+    const stats = await fsPromises.stat(filePath);
+    return {
+        name: nameOverride || path.basename(filePath),
+        path: filePath,
+        size: stats.size,
+        lastModified: stats.mtimeMs,
+    };
+}
+
+async function closeReadSession(sessionId) {
+    const fileHandle = readSessions.get(sessionId);
+    if (!fileHandle) {
+        return false;
+    }
+
+    readSessions.delete(sessionId);
+
+    try {
+        await fileHandle.close();
+    } catch (error) {
+        console.error(`Failed to close read session ${sessionId}:`, error);
+    }
+
+    return true;
+}
+
+async function closeAllReadSessions() {
+    const sessionIds = Array.from(readSessions.keys());
+    await Promise.all(sessionIds.map((sessionId) => closeReadSession(sessionId)));
+}
+
 app.whenReady().then(() => {
     // Register the file protocol handler now that the app is ready.
     protocol.registerFileProtocol('app', (request, callback) => {
@@ -67,11 +103,7 @@ app.whenReady().then(() => {
         if (canceled || filePaths.length === 0) {
             return [];
         }
-        return filePaths.map(filePath => ({
-            name: path.basename(filePath),
-            path: filePath,
-            data: fs.readFileSync(filePath)
-        }));
+        return Promise.all(filePaths.map((filePath) => createFileDescriptor(filePath)));
     });
 
     ipcMain.handle('dialog:openDirectory', async () => {
@@ -84,15 +116,11 @@ app.whenReady().then(() => {
         const allFiles = [];
         for (const dirPath of filePaths) {
             try {
-                const filesInDir = fs.readdirSync(dirPath, { withFileTypes: true });
+                const filesInDir = await fsPromises.readdir(dirPath, { withFileTypes: true });
                 for (const file of filesInDir) {
                     if (file.isFile()) {
                         const filePath = path.join(dirPath, file.name);
-                        allFiles.push({
-                            name: file.name,
-                            path: filePath,
-                            data: fs.readFileSync(filePath)
-                        });
+                        allFiles.push(await createFileDescriptor(filePath, file.name));
                     }
                 }
             } catch (err) {
@@ -101,6 +129,47 @@ app.whenReady().then(() => {
         }
         return allFiles;
     });
+
+    ipcMain.handle('file:startReadSession', async (_event, filePath) => {
+        if (typeof filePath !== 'string' || filePath.length === 0) {
+            throw new Error('A valid file path is required.');
+        }
+
+        const fileHandle = await fsPromises.open(filePath, 'r');
+        const sessionId = String(nextReadSessionId++);
+        readSessions.set(sessionId, fileHandle);
+        return sessionId;
+    });
+
+    ipcMain.handle('file:readChunk', async (_event, options = {}) => {
+        const { sessionId, offset, length } = options;
+        const fileHandle = readSessions.get(sessionId);
+
+        if (!fileHandle) {
+            throw new Error(`No active read session for ${sessionId}.`);
+        }
+
+        const chunkLength = Math.max(0, Number(length) || 0);
+        const chunkOffset = Math.max(0, Number(offset) || 0);
+
+        if (chunkLength === 0) {
+            return new Uint8Array();
+        }
+
+        const buffer = Buffer.allocUnsafe(chunkLength);
+        const { bytesRead } = await fileHandle.read(
+            buffer,
+            0,
+            chunkLength,
+            chunkOffset,
+        );
+
+        return new Uint8Array(buffer.buffer, buffer.byteOffset, bytesRead);
+    });
+
+    ipcMain.handle('file:closeReadSession', async (_event, sessionId) =>
+        closeReadSession(sessionId)
+    );
 
     createWindow();
 
@@ -113,6 +182,15 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
+        closeAllReadSessions().catch((error) => {
+            console.error('Failed to close read sessions during shutdown:', error);
+        });
         app.quit();
     }
+});
+
+app.on('before-quit', () => {
+    closeAllReadSessions().catch((error) => {
+        console.error('Failed to close read sessions before quit:', error);
+    });
 });

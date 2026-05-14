@@ -83,7 +83,8 @@ describe('Electron file picker', () => {
                 {
                     name: 'slides.pptx',
                     path: '/tmp/slides.pptx',
-                    data: new Uint8Array([1, 2, 3]),
+                    size: 3,
+                    lastModified: 123456789,
                 },
             ]),
             selectFolder: vi.fn().mockResolvedValue([]),
@@ -105,6 +106,11 @@ describe('Electron file picker', () => {
         expect(window.electronAPI.selectFiles).toHaveBeenCalledTimes(1);
         expect(handleFileSelection).toHaveBeenCalledTimes(1);
         expect(handleFileSelection.mock.calls[0][0][0].name).toBe('slides.pptx');
+        expect(handleFileSelection.mock.calls[0][0][0].path).toBe('/tmp/slides.pptx');
+        expect(handleFileSelection.mock.calls[0][0][0].size).toBe(3);
+        expect(handleFileSelection.mock.calls[0][0][0].type).toBe(
+            'application/octet-stream',
+        );
         expect(showToast).not.toHaveBeenCalled();
     });
 });

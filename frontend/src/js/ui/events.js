@@ -41,6 +41,16 @@ function getMimeTypeFromPath(fileName) {
     return mimeTypes[extension] || 'application/octet-stream';
 }
 
+function createElectronFileReference(fileInfo) {
+    return {
+        name: fileInfo.name,
+        path: fileInfo.path,
+        size: fileInfo.size,
+        lastModified: fileInfo.lastModified,
+        type: getMimeTypeFromPath(fileInfo.name),
+    };
+}
+
 function canSelectFiles() {
     const state = store.getState();
     return Boolean(state.peerInfo || state.roomPeer);
@@ -332,13 +342,7 @@ export function initializeEventListeners() {
                 }
                 const filesData = await window.electronAPI.selectFiles();
                 if (filesData.length > 0) {
-                    const fileObjects = filesData.map(
-                        (f) =>
-                            new File([f.data], f.name, {
-                                type: getMimeTypeFromPath(f.name),
-                                path: f.path,
-                            }),
-                    );
+                    const fileObjects = filesData.map(createElectronFileReference);
                     handleFileSelection(fileObjects);
                 }
             };
@@ -356,13 +360,7 @@ export function initializeEventListeners() {
                 }
                 const filesData = await window.electronAPI.selectFolder();
                 if (filesData.length > 0) {
-                    const fileObjects = filesData.map(
-                        (f) =>
-                            new File([f.data], f.name, {
-                                type: getMimeTypeFromPath(f.name),
-                                path: f.path,
-                            }),
-                    );
+                    const fileObjects = filesData.map(createElectronFileReference);
                     handleFolderSelection(fileObjects);
                 }
             };
